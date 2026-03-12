@@ -137,37 +137,6 @@ def find_curated_by_standard(conn: sqlite3.Connection, code: str) -> list:
             results.append(entry)
 
     return results
-    """Zwraca szablony powiązane z danym standardem (częściowe dopasowanie kodu lub nazwy).
-
-    Args:
-        conn: Połączenie z DB (row_factory=Row).
-        code: Kod lub fragment nazwy standardu (np. "ISO/IEC 27001", "ITIL").
-
-    Returns:
-        list[dict] z kluczami: doc_path, standard_code, standard_name, match_reason, title.
-
-    Raises:
-        QueryError: Gdy kod jest pusty.
-    """
-    if not code or not code.strip():
-        raise QueryError("Kod standardu nie może być pusty")
-
-    like = f"%{code.strip()}%"
-    cur = conn.execute("""
-        SELECT m.doc_path,
-               m.standard_code,
-               s.standard_name,
-               m.match_reason,
-               d.title
-        FROM doc_standard_mapping m
-        LEFT JOIN standards s ON s.standard_code = m.standard_code
-        LEFT JOIN docs d ON d.path = m.doc_path
-        WHERE m.standard_code LIKE ?
-           OR s.standard_name LIKE ?
-           OR s.standard_code LIKE ?
-        ORDER BY m.doc_path
-    """, (like, like, like))
-    return [dict(r) for r in cur.fetchall()]
 
 
 def find_by_regulation(conn: sqlite3.Connection, code: str) -> list:

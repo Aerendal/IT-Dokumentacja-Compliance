@@ -80,8 +80,6 @@ def main():
     skipped = 0
 
     for from_uid, to_uid, dep_type in rows:
-        dep_type = dep_type
-
         try:
             # Try to match actual column names
             if "source_doc_id" in dep_cols and "target_doc_id" in dep_cols:
