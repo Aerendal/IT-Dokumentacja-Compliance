@@ -1,0 +1,358 @@
+---
+title: Risk Assessment Timeline
+status: needs_content
+aligned: true
+aligned_rev: 2
+aligned_at: 2026-02-09
+aligned_by: codex
+---
+
+# Risk Assessment Timeline
+
+## Metadane
+- Właściciel: Document Owner
+- Wersja: v0.1
+- Data aktualizacji: RRRR-MM-DD
+- Status: draft | in review | approved
+
+
+> Powiązania: linkage_index.jsonl
+
+## Cel dokumentu
+Zaplanować i zwizualizować harmonogram ocen ryzyka (initial/periodic/ad-hoc) wraz z kamieniami milowymi, zależnościami i właścicielami. Upewnić się, że oceny wspierają decyzje go/no-go, compliance i releasy, a wyniki trafiają do Risk Register, Mitigation i Acceptance.
+
+## Zakres i granice
+- Obejmuje: oceny w fazach (koncepcja, design, pre-release, po incydencie, okresowe), ich wejścia/wyjścia, kryteria start/stop, zależności (architektura, testy, change), wymagane zasoby i daty przeglądów.
+- Poza zakresem: szczegółowe wyniki ocen (są w raportach assessment) i mitygacje (osobne plany/statusy).
+
+## Wejścia i wyjścia
+- Wejścia: Risk Management Plan (metodyka, appetite), wymagania compliance (ISO 27001/PCI/SOC2), architektura, backlog zmian, harmonogram release, Incident/Postmortem, TPRM, wyniki testów.
+- Wyjścia: kalendarz ocen (daty, zakres, owner, DoR), punkty kontrolne go/no-go, zasilenie Risk Register/Mitigation/Acceptance, sygnały do Change/Release/Test.
+
+## Powiązania (meta)
+- Wymaga odniesienia do: Key Documents
+- Wymaga odniesienia do: Key Document Structures
+- Wymaga odniesienia do: Document Dependencies
+- Wymaga odniesienia do: RACI i role
+- Wymaga odniesienia do: Standardy i compliance
+
+## Zależności dokumentu
+Jeżeli brak danych w bazie: wypisz znane zależności (dokumenty, kontrakty, usługi), wskaż właścicieli i wpływ na kolejność prac; gdy brak zależności – zapisz to wprost.
+
+## Powiązania sekcja↔sekcja
+Określ, które sekcje wymagają rozwinięcia lub streszczenia (np. gdy są kluczowe dla decyzji, ryzyka lub zgodności) i podaj uzasadnienie.
+
+## Fazy cyklu życia
+- Faza 1: Koncepcja i Wizja: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 2: Analiza Wymagań: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 3: Projekt / Design: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 4: Planowanie: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 5: Implementacja: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 6: Testowanie / QA: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 7: Bezpieczeństwo / Compliance: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 8: Wdrożenie / Deployment: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 9: Operacje / Maintenance: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 10: Incident Management: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 11: Monitoring / Observability: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 12: Dokumentacja referencyjna: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 13: Szkolenie / Onboarding: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 14: Komunikacja stakeholders: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 15: Knowledge Management: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 16: Postmortem / Retrospektywa: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 17: Budżetowanie / Cost Management: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 18: Vendor Management: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 19: Governance / Compliance: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 20: Decommission / Sunset: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 21: DR / BCP: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 22: Change Management: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+- Faza 23: Capacity Planning: Określ czy w tej fazie dokument powstaje, jest aktualizowany, przeglądany lub archiwizowany; podaj uzasadnienie i odpowiedzialnych.
+
+
+## Standardy i compliance
+
+Lista standardów i wymagań regulacyjnych mających zastosowanie do tego dokumentu.
+Uzupełnij na podstawie sekcji "Mające zastosowanie standardy i normy" oraz tabeli `doc_standard_mapping`.
+
+- Standard / norma: [kod i nazwa]
+- Wymaganie regulacyjne: [kod i treść]
+- Polityka wewnętrzna: [nazwa polityki]
+
+## RACI i role
+
+Macierz RACI (Responsible / Accountable / Consulted / Informed) dla działań związanych z tym dokumentem.
+
+| Działanie | Responsible | Accountable | Consulted | Informed |
+|-----------|-------------|-------------|-----------|----------|
+| Tworzenie | [rola]      | [rola]      | [rola]    | [rola]   |
+| Przegląd  | [rola]      | [rola]      | [rola]    | [rola]   |
+| Aktualizacja | [rola]   | [rola]      | [rola]    | [rola]   |
+| Archiwizacja | [rola]   | [rola]      | [rola]    | [rola]   |
+## Struktura sekcji (szkielet)
+- Kalendarz ocen: tabela/linia czasu (data start/koniec, typ oceny: initial/periodic/ad-hoc/post‑incident/pre‑release, zakres, owner, zasoby).
+- Wejścia i DoR na ocenę: architektura, dane, dostęp do środowisk, logów, testów, TPRM, decyzje projektowe.
+- Wyjścia i DoD: raport oceny, aktualizacja Risk Register, zalecenia/mitygacje, decyzje go/no-go, akceptacje (jeśli dotyczy).
+- Zależności i integracje: Change/Release plan, Test Strategy, Incident/Postmortem, Vendor/TPRM, Security/Privacy.
+- Kamienie milowe i punkty kontroli: daty przeglądów, cut-off na go/no-go, terminy uzupełnienia dowodów.
+- Raportowanie i komunikacja: format (deck/CSV/DB), odbiorcy (Steering/Tech Lead/Security/Compliance), cadencja (np. co sprint, co kwartał).
+
+## Wymagane rozwinięcia
+- Metodyka i RAG → Risk Management Plan.
+- Zakres testów/dowodów → Test Strategy / Security Testing Plan.
+- Gating release → Change/Release Plan.
+- Po incydencie → Incident Response / Postmortem.
+
+## Wymagane streszczenia
+- Streszczenie najbliższych ocen (30/60/90 dni) i ich wpływu na releasy.
+- Streszczenie ocen ad-hoc po incydentach wraz z terminami mitygacji.
+
+## Guidance
+Cel: skrócone wskazówki do wypełniania szablonów dokumentów (core/satellite).
+
+- Cel dokumentu: 2–3 zdania o decyzjach, ryzykach i wartości dokumentu.
+- Zakres i granice: co obejmuje (systemy/procesy/zespoły) i czego nie obejmuje; zaznacz granice odpowiedzialności.
+- Wejścia: dane, wymagania, standardy, zależności potrzebne przed startem.
+- Wyjścia: artefakty/rezultaty, kto je konsumuje, format (link/plik).
+- Zależności dokumentu: wymagane dokumenty lub decyzje; właściciel; wpływ na kolejność prac.
+- Powiązania sekcja↔sekcja: które sekcje się rozwijają/streszczają; podaj uzasadnienie.
+- Struktura sekcji: utrzymuj układ logiczny; sekcje bez treści oznacz jako N/A z krótkim uzasadnieniem.
+- Fazy cyklu życia: zaznacz, w których fazach dokument powstaje/aktualizuje się/archiwizuje; kto odpowiada.
+- DoR (Definition of Ready): zakres, wejścia, role, zależności, kryteria akceptacji gotowe.
+- DoD (Definition of Done): sekcje uzupełnione lub N/A, powiązania wpisane, checklisty jakości sprawdzone, wersja/data/właściciel, linki/artefakty działają.
+- Język: polski; nazwy własne pozostają bez zmian; liczby w nazwach plików usunięte już w szablonach.
+- Filozofia: optymalizuj przez rozwój, nie ucinanie — dodawaj, nie kasuj; elementy „satelitarne” zostają.
+
+odwołania.
+
+## Szybkie powiązania
+- Meta: Key Documents
+- Meta: Key Document Structures
+- Meta: Document Dependencies
+
+## Mające zastosowanie standardy i normy
+
+### Standardy międzynarodowe
+- **CIS Controls v8** — Krytyczne Mechanizmy Bezpieczeństwa (CIS)
+- **ISO/IEC 27001** — System Zarządzania Bezpieczeństwem Informacji (ISMS)
+- **ISO/IEC 27002** — Wytyczne Praktyk Bezpieczeństwa Informacji
+- **ISO/IEC 27005** — Zarządzanie Ryzykiem Bezpieczeństwa Informacji
+- **NIST CSF** — Framework Cyberbezpieczeństwa NIST
+
+> Sekcja generowana automatycznie. Zweryfikuj trafność i uzupełnij o dodatkowe normy/regulacje specyficzne dla kontekstu projektu.
+## Jak używać dokumentu
+- Przeczytaj sekcje "Cel dokumentu" i "Zakres i granice" i upewnij się, że opisują Twój przypadek.
+- Wypełniaj kolejne sekcje zgodnie z guidance i powiązaniami; korzystaj z kryteriów DoR/DoD w `reports/checklist_atomic.jsonl`.
+- Aktualizuj statusy w checklistach (structure/clarity/links, DoR/DoD), gdy sekcje są gotowe lub oznaczone jako N/A.
+
+
+## Checklisty jakości
+- [ ] Kalendarz ocen zawiera typ, zakres, ownera, daty i zależności.
+- [ ] Wejścia/DoR na każdą ocenę są zdefiniowane (architektura, dane, dostęp, logi, testy).
+- [ ] Wyjścia/DoD: raport, aktualizacja rejestru, mitygacje, decyzje go/no-go zapisane.
+- [ ] Punkty kontroli go/no-go i cut-off dla release określone.
+- [ ] Integracje z Change/Release/Test/Incident/TPRM opisane lub N/A z uzasadnieniem.
+- [ ] Cadence i odbiorcy raportów zdefiniowani; źródło prawdy na daty ustalone.
+- [ ] Metadane aktualne; sekcje N/A uzasadnione.
+
+## Definicje robocze
+- Initial Assessment — pierwsza ocena projektu/produktu (koncepcja/design).
+- Periodic Assessment — cykliczna ocena (np. kwartalnie/rocznie).
+- Ad-hoc/Post‑incident — ocena po incydencie lub istotnej zmianie architektury.
+
+## Przykłady użycia
+- Program chmurowy: initial w fazie design; pre‑release przed migracją; ad‑hoc po incydencie IAM; periodic co kwartał dla kontrolnej zgodności.
+- SaaS: assessment przed dużym refaktoringiem, przed release mobile, po CVE w komponencie, kwartalny przegląd RAG.
+
+## Ryzyka i ograniczenia
+- Oceny bez danych/wejść → definiuj DoR i blokuj start bez spełnienia.
+- Opóźnienia ocen → zaplanuj bufor przed release i automatyczne przypomnienia.
+- Brak aktualizacji rejestru po ocenie → DoD wymusza synchronizację do Risk Register/Mitigation/Acceptance.
+
+## Decyzje i uzasadnienia
+- Cadence per typ: initial (na start), pre‑release (przed cutover), post‑incident (≤7 dni), periodic (np. kwartalnie) — balans koszt vs ryzyko.
+- Wymóg go/no-go na podstawie wyników oceny — chroni przed wdrożeniem z niezamkniętymi krytycznymi ryzykami.
+
+## Założenia
+- Dostępne są zasoby i okna czasowe na wykonanie oceny i testów.
+- Ryzyka krytyczne mają właścicieli i ścieżkę eskalacji.
+
+## Otwarte pytania
+- Jaki SLA na dostarczenie wyników oceny od daty startu?
+- Czy periodic ma być stałą datą (np. pierwszy poniedziałek kwartału) czy zależne od releasów?
+
+## Powiązania z innymi dokumentami
+- [Dokument A] — [typ relacji] — [uzasadnienie]
+- [Dokument B] — [typ relacji] — [uzasadnienie]
+
+## Powiązania z sekcjami innych dokumentów
+- [Dokument X → Sekcja Y] — [powód powiązania]
+- [Dokument Z → Sekcja W] — [powód powiązania]
+
+## Słownik pojęć w dokumencie
+- [Pojęcie 1] — [definicja i źródło]
+- [Pojęcie 2] — [definicja i źródło]
+- [Pojęcie 3] — [definicja i źródło]
+
+## Wymagane odwołania do standardów
+- ISO 31000 / ISO 27005 — metodyka oceny.
+- NIST SP 800‑30 — proces analizy ryzyka.
+- STRIDE/OWASP/CIS — katalogi zagrożeń.
+- SOC 2 / ISO 27001 / PCI DSS — wymagają dowodów istnienia oceny ryzyka.
+## Mapa relacji sekcja→sekcja
+- [Sekcja A] -> [Sekcja B] : [typ relacji]
+- [Sekcja C] -> [Sekcja D] : [typ relacji]
+
+## Mapa relacji dokument→dokument
+- [Dokument A] -> [Dokument B] : [typ relacji]
+- [Dokument C] -> [Dokument D] : [typ relacji]
+
+## Ścieżki informacji
+- [Wejście] → [Sekcja źródłowa] → [Sekcja rozwinięcia] → [Wyjście]
+- [Wejście] → [Sekcja źródłowa] → [Sekcja streszczenia] → [Wyjście]
+
+## Weryfikacja spójności
+- [ ] Czy wszystkie ścieżki informacji są zamknięte?
+- [ ] Czy istnieją pętle lub sprzeczne relacje?
+- [ ] Czy sekcje krytyczne mają wskazane źródła i rozwinięcia?
+
+## Lista kontrolna spójności relacji
+- [ ] Czy każda sekcja z relacją ma wskazaną sekcję źródłową?
+- [ ] Czy relacje nie tworzą sprzecznych wymagań (np. wzajemne wykluczanie)?
+- [ ] Czy relacje cross‑doc mają uzasadnienie i są zgodne z fazą?
+- [ ] Czy relacje wymagają rozwinięć lub streszczeń są odnotowane?
+
+## Artefakty powiązane
+- [Artefakt 1] — [opis i relacja do dokumentu]
+- [Artefakt 2] — [opis i relacja do dokumentu]
+
+## Ścieżka decyzji
+- [Decyzja] → [Uzasadnienie] → [Konsekwencje]
+- [Decyzja] → [Uzasadnienie] → [Konsekwencje]
+
+## Użytkownicy i interesariusze
+- **Product Owner / Manager** — definiuje priorytety i akceptuje wyniki
+- **Technical Lead** — odpowiada za jakość techniczną i decyzje architektoniczne
+- **Development Team** — implementuje i dostarcza wyniki pracy
+- **QA / Reviewer** — weryfikuje jakość i poprawność dokumentu
+
+## Ścieżka akceptacji
+- [Kto zatwierdza] → [kryteria akceptacji] → [status]
+- [Kto zatwierdza] → [kryteria akceptacji] → [status]
+
+## Kryteria ukończenia (DoD)
+- Kalendarz ocen z datami/typami/ownerami/zależnościami jest uzupełniony.
+- DoR/DoD dla każdej oceny opisane; powiązania z rejestrem/mitygacją/acceptance wskazane.
+- Punkty go/no-go i cut-off dla releasów wpisane.
+- Raportowanie (cadence/odbiorcy/format) określone; źródło prawdy na daty ustalone.
+- Metadane aktualne; sekcje N/A uzasadnione.
+
+## Kryteria wejścia (DoR)
+- Metodyka scoringu dostępna (Risk Management Plan).
+- Znane releasy/incydenty/kamienie milowe wymagające oceny.
+- Dostęp do architektury, środowisk i danych potrzebnych do oceny.
+
+## Metryki jakości
+- [Metryka 1] — [cel / próg]
+- [Metryka 2] — [cel / próg]
+
+## Monitoring i utrzymanie
+- [Co monitorujemy] — [narzędzie / częstotliwość]
+- [Kto utrzymuje] — [rola]
+
+## Kontrola zmian
+- [Zmiana] — [powód] — [data] — [akceptacja]
+
+## Wymogi prawne i regulacyjne
+- [Wymóg 1] — [źródło / akt prawny / standard]
+- [Wymóg 2] — [źródło / akt prawny / standard]
+
+## Zasady bezpieczeństwa informacji
+- [Zasada 1] — [opis i wpływ na dokument]
+- [Zasada 2] — [opis i wpływ na dokument]
+
+## Ochrona danych i prywatność
+- [Wymaganie 1] — [opis i sekcja docelowa]
+- [Wymaganie 2] — [opis i sekcja docelowa]
+
+## Wersjonowanie treści
+- [Wersja] — [zmiana] — [autor] — [data]
+- [Wersja] — [zmiana] — [autor] — [data]
+
+## Historia zmian sekcji
+- [Sekcja] — [zmiana] — [data]
+- [Sekcja] — [zmiana] — [data]
+
+## Wymagane aktualizacje
+- [Sekcja] — [powód aktualizacji] — [termin]
+- [Sekcja] — [powód aktualizacji] — [termin]
+
+## Integracje i interfejsy
+- [System / API] — [zakres integracji] — [wymagania]
+- [System / API] — [zakres integracji] — [wymagania]
+
+## Wymagania danych
+- [Dane wejściowe] — [format] — [walidacja]
+- [Dane wyjściowe] — [format] — [walidacja]
+
+## Logowanie i audyt
+- [Zdarzenie] — [poziom] — [retencja]
+- [Zdarzenie] — [poziom] — [retencja]
+
+## Utrzymanie i operacje
+- [Procedura] — [cel] — [częstotliwość]
+- [Procedura] — [cel] — [częstotliwość]
+
+## KPI i SLA
+- [KPI] — [cel] — [pomiar]
+- [SLA] — [cel] — [pomiar]
+
+## Scenariusze awaryjne
+- [Scenariusz] — [objawy] — [reakcja]
+- [Scenariusz] — [objawy] — [reakcja]
+
+## Wpływ na inne systemy
+- [System] — [rodzaj wpływu] — [ryzyko]
+- [System] — [rodzaj wpływu] — [ryzyko]
+
+## Zależności danych między systemami
+- [Źródło danych] → [Odbiorca] — [opis]
+- [Źródło danych] → [Odbiorca] — [opis]
+
+## Harmonogram przeglądów
+- [Obszar] — [częstotliwość] — [właściciel]
+- [Obszar] — [częstotliwość] — [właściciel]
+
+## Wymagania wydajnościowe
+- [Wymaganie] — [metryka] — [próg]
+- [Wymaganie] — [metryka] — [próg]
+
+## Wymagania dostępnościowe
+- [Wymaganie] — [SLA] — [metoda pomiaru]
+- [Wymaganie] — [SLA] — [metoda pomiaru]
+
+## Wymagania skalowalności
+- [Wymaganie] — [cel] — [warunki]
+- [Wymaganie] — [cel] — [warunki]
+
+## Wymagania dostępności danych
+- [Dane] — [częstotliwość dostępu] — [SLA]
+- [Dane] — [częstotliwość dostępu] — [SLA]
+
+## Retencja i archiwizacja
+- [Dane] — [retencja] — [archiwizacja]
+- [Dane] — [retencja] — [archiwizacja]
+
+## Dostępność w sytuacjach awaryjnych
+- [Scenariusz] — [zachowanie] — [priorytet]
+- [Scenariusz] — [zachowanie] — [priorytet]
+
+## Testy i weryfikacja
+- [Test] — [cel] — [wynik oczekiwany]
+- [Test] — [cel] — [wynik oczekiwany]
+
+## Walidacja zgodności
+- [Wymóg] — [metoda weryfikacji]
+- [Wymóg] — [metoda weryfikacji]
+
+## Audyty i przeglądy
+- [Audyty] — [częstotliwość] — [odpowiedzialny]
+- [Audyty] — [częstotliwość] — [odpowiedzialny]

@@ -1,0 +1,34 @@
+# Large generated content
+generated_templates/
+exports/
+mutants/
+
+# Database files
+reports/
+it_doc_matrix.db
+*.db
+*.db-shm
+*.db-wal
+*.db.*backup*
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+.env.*
+
+# Coverage / test artifacts
+.coverage
+.pytest_cache/
+htmlcov/
+coverage.xml
+
+# Large IT doc text files
+IT_Dokumentacja_Czesc_*.md
+odpow*.md

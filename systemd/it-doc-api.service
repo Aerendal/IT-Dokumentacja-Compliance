@@ -1,0 +1,18 @@
+[Unit]
+Description=IT Dokumentacja Compliance API
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/opt/it-dokumentacja/dokumentacja
+Environment="IT_DOC_DB=/opt/it-dokumentacja/dokumentacja/reports/it_doc_matrix.db"
+Environment="IT_DOC_API_TOKEN=change-before-production"
+Environment="IT_DOC_HOST=127.0.0.1"
+Environment="IT_DOC_PORT=8000"
+ExecStart=/usr/bin/python3 -m uvicorn scripts.api.main:app --host ${IT_DOC_HOST} --port ${IT_DOC_PORT}
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

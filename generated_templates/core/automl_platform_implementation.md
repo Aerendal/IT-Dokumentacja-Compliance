@@ -1,0 +1,398 @@
+---
+title: AutoML Platform Implementation
+status: needs_content
+aligned: true
+aligned_rev: 5
+aligned_at: 2026-02-09
+aligned_by: codex
+---
+# AutoML Platform Implementation
+
+
+## Metadane
+
+- Właściciel: ML Engineer
+- Wersja: v0.1
+- Data aktualizacji: RRRR-MM-DD
+- Status: draft | in review | approved
+
+
+> Powiązania: linkage_index.jsonl
+
+
+## Cel dokumentu
+
+AutoML Platform Implementation opisuje jak dostarczyć rozwiązanie (kroki, migrację, testy, ryzyka).
+
+
+
+## Zakres i granice
+
+- Obejmuje: zakres funkcji, architekturę docelową, kroki wdrożeniowe/migrację, dane, testy, monitoring, rollback.
+- Poza zakresem: długoterminowa strategia; szczegółowy kod.
+
+
+
+
+## Użytkownicy i interesariusze
+- Video/Streaming Eng, SRE/Observability, Security/DRM, Product, Ads/Monetization, FinOps.
+## Wejścia i wyjścia
+
+- Wejścia: wymagania, projekt/ADR, inwentarz systemów/danych, okna wdrożeniowe, zasoby.
+- Wyjścia: plan wdrożenia, skrypty/konfiguracje, walidacja/testy, plan rollback, lista ryzyk i właścicieli.
+
+
+
+
+## Założenia
+- Dostępne zasoby sieci/edge.  
+- OT/IT współpracują w zakresie bezpieczeństwa.  
+- Platforma danych obsługuje wolumen/latencję.
+## Otwarte pytania
+- Jak często rotować certy na urządzeniach?  
+- Jakie są wymagania regulacyjne dla danych OT?  
+- Jak łączyć IIoT z digital twin/analytką w czasie rzeczywistym?
+## Powiązania (meta)
+
+- Wymaga odniesienia do: Key Documents
+- Wymaga odniesienia do: Key Document Structures
+- Wymaga odniesienia do: Document Dependencies
+- Wymaga odniesienia do: RACI i role
+- Wymaga odniesienia do: Standardy i compliance
+
+
+## Zależności dokumentu
+
+- Upstream: systemy źródłowe, dane referencyjne, decyzje architektoniczne nadrzędne.
+- Downstream: konsumpcja rezultatów (zespoły, usługi, dokumenty pokrewne).
+- Zewnętrzne: dostawcy, standardy branżowe, umowy/regulacje wpływające na zakres.
+
+
+
+
+## Fazy cyklu życia
+
+- Przygotowanie/migracja danych.
+- Rollout (pilot → fala → pełne wdrożenie).
+- Walidacja i smoke testy.
+- Stabilizacja/monitoring i przekazanie do operacji.
+
+
+
+
+
+## Struktura sekcji (szkielet)
+
+- Cel i zakres wdrożenia
+- Środowiska i okna wdrożeniowe
+- Architektura docelowa i przepływy danych
+- Kroki/migracja (pilot → produkcja)
+- Plan testów i kryteria go/no-go
+- Monitoring/observability i runbooki
+- Rollback/contingency i komunikacja
+- Ryzyka, zależności, RACI
+
+
+
+
+## Szybkie powiązania
+
+- Meta: Key Documents
+- Meta: Key Document Structures
+- Meta: Document Dependencies
+
+
+## Mające zastosowanie standardy i normy
+
+### Standardy międzynarodowe
+- **ISO/IEC 42001** — System Zarządzania Sztuczną Inteligencją (AIMS)
+- **ISO/IEC 25010** — Model Jakości Systemu i Oprogramowania (SQuaRE)
+- **IEEE 829** — Dokumentacja Testowania Oprogramowania i Systemów
+
+## Standardy i compliance
+
+
+Lista standardów i wymagań regulacyjnych mających zastosowanie do tego dokumentu.
+Uzupełnij na podstawie sekcji "Mające zastosowanie standardy i normy" oraz tabeli `doc_standard_mapping`.
+
+- Standard / norma: [kod i nazwa]
+- Wymaganie regulacyjne: [kod i treść]
+- Polityka wewnętrzna: [nazwa polityki]
+
+
+## RACI i role
+
+
+Macierz RACI (Responsible / Accountable / Consulted / Informed) dla działań związanych z tym dokumentem.
+
+| Działanie | Responsible | Accountable | Consulted | Informed |
+|-----------|-------------|-------------|-----------|----------|
+| Tworzenie | [rola]      | [rola]      | [rola]    | [rola]   |
+| Przegląd  | [rola]      | [rola]      | [rola]    | [rola]   |
+| Aktualizacja | [rola]   | [rola]      | [rola]    | [rola]   |
+| Archiwizacja | [rola]   | [rola]      | [rola]    | [rola]   |
+
+## Jak używać dokumentu
+
+- Przeczytaj sekcje "Cel dokumentu" i "Zakres i granice" i upewnij się, że opisują Twój przypadek.
+- Wypełniaj kolejne sekcje zgodnie z guidance i powiązaniami; korzystaj z kryteriów DoR/DoD w `reports/checklist_atomic.jsonl`.
+- Aktualizuj statusy w checklistach (structure/clarity/links, DoR/DoD), gdy sekcje są gotowe lub oznaczone jako N/A.
+
+
+
+## Checklisty jakości
+
+- [ ] Czy cel dokumentu jest jednoznaczny?
+- [ ] Czy zakres i granice są jasno określone?
+- [ ] Czy wszystkie zależności są opisane?
+- [ ] Czy wskazano wymagane rozwinięcia i streszczenia?
+- [ ] Czy powiązania sekcja↔sekcja są spójne?
+
+
+## Definicje robocze
+- IIoT: Industrial Internet of Things.  
+- Edge gateway: punkt agregacji/bezpieczeństwa dla urządzeń OT.  
+- Completeness: procent spodziewanych zdarzeń, które dotarły.
+## Przykłady użycia
+- Platforma IIoT dla fabryki (OPC→MQTT→Data Lake).  
+- Monitoring floty urządzeń z OTA i canary.  
+- Integracja SCADA z analityką predykcyjną.
+## Ryzyka i ograniczenia
+- Brak segmentacji → ryzyko bezpieczeństwa.  
+- Wysoka latencja → bezużyteczne dane operacyjne.  
+- Nieudany OTA → outage urządzeń.  
+- Vendor lock-in brokerów/edge.
+## Decyzje i uzasadnienia
+- Wybór protokołów i brokerów.  
+- Model PKI/kluczy i rotacji.  
+- Wymagania na edge vs cloud processing.  
+- Strategie OTA i canary.
+## Powiązania z innymi dokumentami
+- Streaming Platform Implementation, DRM Policy, CDN Strategy, Player Guidelines, Observability QoE, Cost Optimization, Advertising Playbook.
+## Powiązania z sekcjami innych dokumentów
+- DRM Policy → security; CDN Strategy → routing; Observability QoE → monitoring; Ads → SSAI/CSAI.
+## Słownik pojęć w dokumencie
+- LL‑HLS, LL‑DASH, ABR, DRM, SSAI, CSAI, Token TTL, Origin shield, Rebuffer, Startup time.
+## Wymagane odwołania do standardów
+- HLS/DASH/CMAF/LL, DRM (Widevine/FairPlay/PlayReady), reklamy (VAST/VMAP), licencje kontentu.
+## Mapa relacji sekcja→sekcja
+- QoE/latency → Architektura/ABR → Security/DRM/Ads → Monitoring → Rollout/FinOps.
+## Mapa relacji dokument→dokument
+- Live Streaming Implementation → DRM/CDN/Player/Observability → Release/FinOps/Ads.
+## Ścieżki informacji
+- Wymagania → Architektura → Konfiguracje → Testy → Monitoring/Alerty → Rollout → Operacje.
+## Weryfikacja spójności
+
+- [ ] Czy wszystkie ścieżki informacji są zamknięte?
+- [ ] Czy istnieją pętle lub sprzeczne relacje?
+- [ ] Czy sekcje krytyczne mają wskazane źródła i rozwinięcia?
+
+
+## Lista kontrolna spójności relacji
+
+- [ ] Czy każda sekcja z relacją ma wskazaną sekcję źródłową?
+- [ ] Czy relacje nie tworzą sprzecznych wymagań (np. wzajemne wykluczanie)?
+- [ ] Czy relacje cross‑doc mają uzasadnienie i są zgodne z fazą?
+- [ ] Czy relacje wymagają rozwinięć lub streszczeń są odnotowane?
+
+
+## Artefakty powiązane
+- Diagramy architektury, profile ABR/latency, konfiguracje DRM/ads, monitoring QoE, raporty testów, kalkulacje kosztów.
+## Ścieżka decyzji
+
+- [Decyzja] → [Uzasadnienie] → [Konsekwencje]
+- [Decyzja] → [Uzasadnienie] → [Konsekwencje]
+
+
+## Ścieżka akceptacji
+- Streaming/Video → Security/DRM → SRE/Observability → Product/Ads → Owner sign‑off.
+## Metryki jakości
+- Latency (glass-to-glass), Rebuffer, Error rate, Startup, QoE score, koszty transcode/CDN, sukces rollout bez rollbacków.
+## Kryteria ukończenia
+- [ ] Architektura/live profile gotowe; testy/monitoring/rollout opisane; dokument w linkage_index.
+- [ ] Wersja/data/właściciel aktualne.
+## Powiązania sekcja↔sekcja
+
+- Architektura/requirements → Plan wdrożenia → Testy → Monitoring → Postmortem/lessons.
+
+
+
+
+## Wymagane rozwinięcia
+
+- Diagramy procesów/architektury wspierające zrozumienie kluczowych przepływów.
+- Tabele RACI/odpowiedzialności dla zadań krytycznych.
+- Lista decyzji wraz z uzasadnieniem i alternatywami.
+
+
+
+
+## Wymagane streszczenia
+
+- Executive summary: cel, aktualny status, kluczowe decyzje, ryzyka, następne kroki.
+- One-pager dla sponsorów: zakres, KPI, plan i data go-live.
+
+
+
+
+## Guidance
+
+DoR: środowiska gotowe, okno, dane i skrypty przygotowane, właściciele potwierdzeni.
+DoD: rollout wykonany/zweryfikowany, monitoring aktywny, rollback opisany, decyzje/lessons zapisane, metadane aktualne.
+
+
+
+
+## Monitoring i utrzymanie
+
+- [Co monitorujemy] — [narzędzie / częstotliwość]
+- [Kto utrzymuje] — [rola]
+
+
+## Kontrola zmian
+
+- [Zmiana] — [powód] — [data] — [akceptacja]
+
+
+## Wymogi prawne i regulacyjne
+
+- [Wymóg 1] — [źródło / akt prawny / standard]
+- [Wymóg 2] — [źródło / akt prawny / standard]
+
+
+## Zasady bezpieczeństwa informacji
+
+- [Zasada 1] — [opis i wpływ na dokument]
+- [Zasada 2] — [opis i wpływ na dokument]
+
+
+## Ochrona danych i prywatność
+
+- [Wymaganie 1] — [opis i sekcja docelowa]
+- [Wymaganie 2] — [opis i sekcja docelowa]
+
+
+## Wersjonowanie treści
+
+- [Wersja] — [zmiana] — [autor] — [data]
+- [Wersja] — [zmiana] — [autor] — [data]
+
+
+## Historia zmian sekcji
+
+- [Sekcja] — [zmiana] — [data]
+- [Sekcja] — [zmiana] — [data]
+
+
+## Wymagane aktualizacje
+
+- [Sekcja] — [powód aktualizacji] — [termin]
+- [Sekcja] — [powód aktualizacji] — [termin]
+
+
+## Integracje i interfejsy
+
+- [System / API] — [zakres integracji] — [wymagania]
+- [System / API] — [zakres integracji] — [wymagania]
+
+
+## Wymagania danych
+
+- [Dane wejściowe] — [format] — [walidacja]
+- [Dane wyjściowe] — [format] — [walidacja]
+
+
+## Logowanie i audyt
+
+- [Zdarzenie] — [poziom] — [retencja]
+- [Zdarzenie] — [poziom] — [retencja]
+
+
+## Utrzymanie i operacje
+
+- [Procedura] — [cel] — [częstotliwość]
+- [Procedura] — [cel] — [częstotliwość]
+
+
+## KPI i SLA
+
+- [KPI] — [cel] — [pomiar]
+- [SLA] — [cel] — [pomiar]
+
+
+## Scenariusze awaryjne
+
+- [Scenariusz] — [objawy] — [reakcja]
+- [Scenariusz] — [objawy] — [reakcja]
+
+
+## Wpływ na inne systemy
+
+- [System] — [rodzaj wpływu] — [ryzyko]
+- [System] — [rodzaj wpływu] — [ryzyko]
+
+
+## Zależności danych między systemami
+
+- [Źródło danych] → [Odbiorca] — [opis]
+- [Źródło danych] → [Odbiorca] — [opis]
+
+
+## Harmonogram przeglądów
+
+- [Obszar] — [częstotliwość] — [właściciel]
+- [Obszar] — [częstotliwość] — [właściciel]
+
+
+## Wymagania wydajnościowe
+
+- [Wymaganie] — [metryka] — [próg]
+- [Wymaganie] — [metryka] — [próg]
+
+
+## Wymagania dostępnościowe
+
+- [Wymaganie] — [SLA] — [metoda pomiaru]
+- [Wymaganie] — [SLA] — [metoda pomiaru]
+
+
+## Wymagania skalowalności
+
+- [Wymaganie] — [cel] — [warunki]
+- [Wymaganie] — [cel] — [warunki]
+
+
+## Wymagania dostępności danych
+
+- [Dane] — [częstotliwość dostępu] — [SLA]
+- [Dane] — [częstotliwość dostępu] — [SLA]
+
+
+## Retencja i archiwizacja
+
+- [Dane] — [retencja] — [archiwizacja]
+- [Dane] — [retencja] — [archiwizacja]
+
+
+## Dostępność w sytuacjach awaryjnych
+
+- [Scenariusz] — [zachowanie] — [priorytet]
+- [Scenariusz] — [zachowanie] — [priorytet]
+
+
+## Testy i weryfikacja
+
+- [Test] — [cel] — [wynik oczekiwany]
+- [Test] — [cel] — [wynik oczekiwany]
+
+
+## Walidacja zgodności
+
+- [Wymóg] — [metoda weryfikacji]
+- [Wymóg] — [metoda weryfikacji]
+
+
+## Audyty i przeglądy
+
+- [Audyty] — [częstotliwość] — [odpowiedzialny]
+- [Audyty] — [częstotliwość] — [odpowiedzialny]

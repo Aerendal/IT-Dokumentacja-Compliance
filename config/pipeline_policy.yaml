@@ -1,0 +1,67 @@
+paths:
+  templates_root: "generated_templates"
+  reports_root: "reports"
+  db_path: "reports/it_doc_matrix_clean.db"
+  alignment_log_path: "reports/alignment_log.csv"
+  runs_root: "reports/runs"
+  latest_root: "reports/latest"
+
+commands:
+  # Placeholder: CURRENT już zbudowany; ustaw "true" by nie wywoływać nic.
+  build_current_cmd: ["python3", "scripts/build_current.py", "--db", "reports/it_doc_matrix_clean.db", "--templates-root", "generated_templates", "--alignment-log", "reports/alignment_log.csv", "--mode", "rebuild"]
+
+hashing:
+  rule_version: 2
+  rule_description: "sha256(bytes with CRLF->LF and CR->LF normalization)"
+  normalize_crlf_to_lf: true
+  normalize_cr_to_lf: true
+
+snapshot:
+  enabled: true
+  only_if_changed: true
+  note: "auto snapshot if changed"
+  keep_baseline_snapshot_id: 1
+  store_meta_in_snapshots_table: true
+
+retention:
+  weekly_keep: 12
+  monthly_keep: 12
+  monthly_choice: "first"
+  prune_enabled: true
+
+transitions:
+  enabled: true
+  require_new_snapshot: true
+  identity_kind: "hash_v2"
+
+validation:
+  hard_fail:
+    require_csv_coverage_exact: true
+    require_aligned_all_ones: true
+    require_hash_v2_complete: true
+  regression_thresholds:
+    collisions_title_norm_warn_delta: 20
+    collisions_title_norm_fail_delta: 200
+    anomalies_total_warn_delta: 200
+    anomalies_total_fail_delta: 2000
+    dup_content_hashes_warn_delta: 10
+    dup_content_hashes_fail_delta: 200
+
+db:
+  tables:
+    documents_current: "documents_current"
+    anomalies_current: "anomalies_current"
+    snapshots: "snapshots"
+    documents_snapshot: "documents_snapshot"
+    current_build: "current_build"
+  columns:
+    doc_path: "path"
+    doc_title: "title"
+    doc_title_norm: "title_norm"
+    doc_source: "source"
+    doc_aligned: "aligned"
+    doc_hash_v1: "hash_sha256"
+    doc_hash_v2: "hash_sha256_v2"
+    doc_template_id: "template_id"
+    snapshot_created_at: "created_at_utc"
+    snapshot_note: "note"

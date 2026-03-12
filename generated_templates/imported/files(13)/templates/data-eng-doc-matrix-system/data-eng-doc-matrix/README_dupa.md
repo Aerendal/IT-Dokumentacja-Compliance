@@ -1,0 +1,160 @@
+---
+status: needs_content
+aligned: true
+aligned_rev: 1
+aligned_at: 2026-02-09
+aligned_by: codex
+---
+
+# Data Engineering Documentation Matrix System
+
+> Industry #4: Data Engineering
+> Version: 1.0.0
+> 2024-2025 Standards Compliant
+
+## Overview
+
+A comprehensive documentation framework for Data Engineering teams, covering the entire documentation lifecycle across 23 phases. This system incorporates modern data stack evolution, open table formats, data quality frameworks, orchestration tools, and governance catalogs.
+
+## Key Statistics
+
+| Metric | Count |
+|--------|-------|
+| Total Documents | 171 |
+| Lifecycle Phases | 23 |
+| Document Types | 20 |
+| Document Relationships | 39 |
+| Lifecycle Triggers | 40 |
+| Data Platforms | 15 |
+| Table Formats | 3 |
+| Quality Frameworks | 8 |
+| Orchestration Tools | 6 |
+| Governance Tools | 10 |
+| Pipeline Metrics | 15 |
+| Standards | 10 |
+| Compliance Regulations | 8 |
+| Architecture Patterns | 8 |
+
+## Directory Structure
+
+```
+data-eng-doc-matrix/
+├── README.md                    # This file
+├── db/
+│   ├── data_engineering_docs.db # SQLite database
+│   ├── schema.sql              # Database schema
+│   └── data_*.sql              # Data insert scripts
+├── scripts/
+│   ├── db_manager.py           # CLI management tool
+│   └── build_database.py       # Database builder
+├── exports/
+│   └── data_engineering_matrix.json  # Full JSON export
+├── reference/
+│   └── CONTEXT.md              # Comprehensive context report
+└── research/
+    └── DATA_ENGINEERING_RESEARCH_2024_2025.md  # Research notes
+```
+
+## Quick Start
+
+### Query Documents
+```bash
+python scripts/db_manager.py list-docs
+python scripts/db_manager.py list-docs --phase 1
+python scripts/db_manager.py list-docs --priority CRITICAL
+python scripts/db_manager.py show-doc DE-ARC
+```
+
+### Query Specialized Data
+```bash
+python scripts/db_manager.py list-platforms
+python scripts/db_manager.py list-formats
+python scripts/db_manager.py list-quality-frameworks
+python scripts/db_manager.py list-orchestration
+python scripts/db_manager.py list-governance
+python scripts/db_manager.py list-metrics
+python scripts/db_manager.py list-compliance
+python scripts/db_manager.py list-patterns
+```
+
+### Export Data
+```bash
+python scripts/db_manager.py export --format json
+```
+
+## Technology Coverage
+
+### Data Platforms (15)
+- **Cloud Warehouses**: Snowflake, Databricks, BigQuery, Redshift, Synapse
+- **Object Storage**: AWS S3, Azure ADLS, Google Cloud Storage
+- **Streaming**: Apache Kafka, AWS Kinesis, Confluent Cloud
+- **Processing**: Apache Flink, Trino, Dremio, Firebolt
+
+### Open Table Formats (3)
+| Format | Best For | 2024-2025 Status |
+|--------|----------|------------------|
+| Apache Iceberg | Multi-engine, read-heavy analytics | v3 with Deletion Vectors |
+| Delta Lake | Databricks/Spark, real-time | UniForm interoperability |
+| Apache Hudi | CDC, update-heavy workloads | Incremental processing |
+
+### Quality Frameworks (8)
+- Great Expectations (GX), Soda Core, dbt tests, Elementary
+- Deequ, Monte Carlo, Databand, whylogs
+
+### Orchestration Tools (6)
+- Apache Airflow 3.0 (April 2025 release)
+- Dagster 1.7+ (Components GA October 2025)
+- Prefect 3.x, Mage, Luigi, Kestra
+
+### Governance & Catalogs (10)
+- **Enterprise**: Collibra, Alation, Atlan, Informatica IDMC
+- **Open Source**: DataHub, OpenMetadata, Apache Atlas, Amundsen
+- **Platform-Native**: Unity Catalog, BigID
+
+## Document Categories
+
+### By Priority
+-  **CRITICAL**: 28 documents - Essential for operations
+-  **HIGH**: 58 documents - Important for quality
+- **MEDIUM**: 65 documents - Standard documentation
+- **LOW**: 20 documents - Supporting documentation
+
+### By Type (20 Types)
+Strategy, Architecture, Specification, Design, Plan, Guide, Runbook, Checklist, Report, Reference, Catalog, Policy, SLA, Training, Postmortem, Template, Test, Config, Lineage, Governance
+
+## Compliance Coverage
+
+| Regulation | Region | Impact |
+|------------|--------|--------|
+| GDPR | EU | PII masking, lineage, retention |
+| CCPA | California | PII tracking, deletion |
+| HIPAA | Healthcare | PHI encryption, access logging |
+| PCI-DSS | Payment | Card data security |
+| SOX | Financial | Audit trails |
+| SOC 2 | Global | Security controls |
+
+## Architecture Patterns
+
+1. **Lakehouse** - Object storage + Iceberg/Delta + Spark/Trino
+2. **Data Mesh** - Domain-oriented decentralized ownership
+3. **Medallion** - Bronze → Silver → Gold layers
+4. **ELT Pattern** - Fivetran/Airbyte → Warehouse → dbt
+5. **CDC Pipeline** - Debezium → Kafka → Sink connectors
+6. **Lambda** - Batch + Stream processing
+7. **Kappa** - Stream-only processing
+8. **Event Sourcing** - Immutable event log
+
+## Related Systems
+
+This is part of a documentation matrix system series:
+- Industry #1: Backend/API Development 
+- Industry #2: Frontend/Web Development 
+- Industry #3: Mobile Development 
+- **Industry #4: Data Engineering**  (this system)
+
+## License
+
+MIT License - Free to use and modify for your organization.
+
+---
+*Generated by Documentation Matrix System v1.0.0*

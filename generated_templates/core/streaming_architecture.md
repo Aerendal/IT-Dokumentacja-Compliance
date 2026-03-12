@@ -1,0 +1,212 @@
+---
+title: Streaming Architecture
+status: needs_content
+aligned: true
+aligned_rev: 4
+aligned_at: 2026-02-09
+aligned_by: codex
+---
+# Streaming Architecture
+
+
+## Metadane
+
+- Właściciel: Solution Architect
+- Wersja: v0.1
+- Data aktualizacji: RRRR-MM-DD
+- Status: draft | in review | approved
+
+
+
+## Cel dokumentu
+
+Architektura systemu streamingowego.
+
+
+
+## Zakres i granice
+- Obejmuje: kontekst biznesowy, wymagania funkcjonalne, architekturę/komponenty, integracje, bezpieczeństwo/compliance, NFR (wydajność, dostępność, skalowalność).
+- Poza zakresem: szczegółowa implementacja kodu, runbooki operacyjne (chyba że krytyczne dla projektu).
+## Użytkownicy i interesariusze
+- **Solution / Enterprise Architect** — projektuje i zatwierdza architekturę
+- **Tech Lead** — odpowiada za spójność techniczną implementacji
+- **Product Owner** — definiuje wymagania biznesowe wchodzące na wejście
+- **Development Team** — implementuje na podstawie projektu
+
+## Wejścia i wyjścia
+- Wejścia: use cases/persony, backlog epik, ograniczenia techniczne/prawne, decyzje zależne (ADR), dane i systemy źródłowe.
+- Wyjścia: zaakceptowany projekt, diagramy (kontekst, komponenty, sekwencje, dane), lista decyzji z uzasadnieniem, plan wdrożenia/migracji.
+## Założenia
+- Dostępność kluczy/COMSEC i PKI.  
+- Zapewnione zasilanie/zapas energii dla edge.  
+- Możliwość testów w cyber range i polu.
+## Otwarte pytania
+- Jakie są ograniczenia prawne/eksportowe dla partnerów?  
+- Czy wymagany jest tryb full offline dla konkretnych scenariuszy?  
+- Jak zarządzać aktualizacjami/patchami w środowiskach odciętych?
+## Powiązania (meta)
+- Wymaga odniesienia do: Key Documents
+- Wymaga odniesienia do: Key Document Structures
+- Wymaga odniesienia do: Document Dependencies
+- Wymaga odniesienia do: RACI i role
+- Wymaga odniesienia do: Standardy i compliance
+## Zależności dokumentu
+- Upstream: systemy źródłowe, dane referencyjne, decyzje architektoniczne nadrzędne.
+- Downstream: konsumpcja rezultatów (zespoły, usługi, dokumenty pokrewne).
+- Zewnętrzne: dostawcy, standardy branżowe, umowy/regulacje wpływające na zakres.
+## Fazy cyklu życia
+- Discovery: doprecyzowanie problemu, warianty.
+- Design: wybór wariantu, decyzje, model danych, integracje.
+- Review: security/compliance/architecture board, koszty, performance.
+- Implementation & Test: odbiór spełnienia projektu.
+- Rollout & Ops: migracja, monitoring, zarządzanie zmianą.
+## Struktura sekcji (szkielet)
+
+1. Źródła i ingest.
+2. Processing: stream/batch, dokładność.
+3. Storage: hot/warm/cold, formaty.
+4. Konsumpcja: API, subskrypcje, analityka.
+5. Bezpieczeństwo i SLA.
+6. Observability i DR.
+
+
+## Szybkie powiązania
+
+- Dodaj ręcznie 2–3 kluczowe powiązania doc↔doc lub sekcja↔sekcja, korzystając z linkage_index.jsonl / content_links*.json (decyzje, ryzyka, zależności).
+
+
+## Mające zastosowanie standardy i normy
+
+
+### Standardy międzynarodowe
+- **IEEE 1016** — Standard dla Opisów Projektowania Oprogramowania (SDD)
+- **IEEE 42010** — Opis Architektoniczny Systemów i Oprogramowania
+- **ISO/IEC 15288** — Procesy Cyklu Życia Systemów
+- **TOGAF ADM** — Framework Architektury Korporacyjnej (The Open Group)
+
+> Sekcja generowana automatycznie. Zweryfikuj trafność i uzupełnij o dodatkowe normy/regulacje specyficzne dla kontekstu projektu.
+
+## Standardy i compliance
+
+
+Lista standardów i wymagań regulacyjnych mających zastosowanie do tego dokumentu.
+Uzupełnij na podstawie sekcji "Mające zastosowanie standardy i normy" oraz tabeli `doc_standard_mapping`.
+
+- Standard / norma: [kod i nazwa]
+- Wymaganie regulacyjne: [kod i treść]
+- Polityka wewnętrzna: [nazwa polityki]
+
+
+## RACI i role
+
+
+Macierz RACI (Responsible / Accountable / Consulted / Informed) dla działań związanych z tym dokumentem.
+
+| Działanie | Responsible | Accountable | Consulted | Informed |
+|-----------|-------------|-------------|-----------|----------|
+| Tworzenie | [rola]      | [rola]      | [rola]    | [rola]   |
+| Przegląd  | [rola]      | [rola]      | [rola]    | [rola]   |
+| Aktualizacja | [rola]   | [rola]      | [rola]    | [rola]   |
+| Archiwizacja | [rola]   | [rola]      | [rola]    | [rola]   |
+
+## Jak używać dokumentu
+
+- Przeczytaj sekcje "Cel dokumentu" i "Zakres i granice" i upewnij się, że opisują Twój przypadek.
+- Wypełniaj kolejne sekcje zgodnie z guidance i powiązaniami; korzystaj z kryteriów DoR/DoD w `reports/checklist_atomic.jsonl`.
+- Aktualizuj statusy w checklistach (structure/clarity/links, DoR/DoD), gdy sekcje są gotowe lub oznaczone jako N/A.
+
+
+
+## Checklisty jakości
+
+- [ ] Ścieżka danych end-to-end opisana.
+- [ ] SLA/bezpieczeństwo uwzględnione.
+- [ ] Observability i DR zaplanowane.
+- [ ] Formaty/storage dopasowane do use-case.
+
+## Definicje robocze
+- Interoperacyjność: zdolność do bezpiecznej wymiany danych/komend między systemami sojuszniczymi.  
+- Degraded mode: utrzymanie funkcji krytycznych przy ograniczonej łączności/zapasie energii.  
+- Zero Trust: weryfikacja tożsamości i stanu każdego elementu/połączenia, ciągła autoryzacja.
+## Przykłady użycia
+- Projekt architektury C2 dla ćwiczeń wielonarodowych.  
+- Integracja nowych sensorów ISR w istniejącej sieci taktycznej.  
+- Planowanie degradacji i DR dla baz forward operating.
+## Ryzyka i ograniczenia
+- Ograniczona przepustowość/latencja łącz taktycznych.  
+- Zależność od dostawców sprzętu/crypto (supply chain).  
+- Ryzyka klasyfikacji i eksportu technologii.
+## Decyzje i uzasadnienia
+- Wybór standardów łączności i formatów (Link 16/STANAG/IP).  
+- Poziomy segmentacji i zasady wymiany danych między domenami.  
+- Zakres edge vs cloud przy wymaganiach latency/odporności.
+## Powiązania z innymi dokumentami
+- comms_architecture — szczegół łączności.  
+- zero_trust_architecture — kontrola dostępu/segregacja.  
+- continuity_plan — DR/BCP i degradacja.
+## Powiązania z sekcjami innych dokumentów
+
+- [Dokument X → Sekcja Y] — [powód powiązania i kierunek przepływu informacji]
+- [Dokument Z → Sekcja W] — [powód powiązania i kierunek przepływu informacji]
+
+## Słownik pojęć w dokumencie
+
+- [Pojęcie 1] — [definicja i źródło normalizacyjne lub wewnętrzne]
+- [Pojęcie 2] — [definicja i źródło normalizacyjne lub wewnętrzne]
+
+## Wymagane odwołania do standardów
+- NATO STANAG / DoD (interfejsy, bezpieczeństwo).  
+- Normy kryptograficzne/COMSEC, polityki klasyfikacji i export control.
+## Mapa relacji sekcja→sekcja
+
+- [Sekcja A] -> [Sekcja B] : [typ relacji: rozszerza/streszcza/wymaga/wyklucza]
+- [Sekcja C] -> [Sekcja D] : [typ relacji]
+
+## Mapa relacji dokument→dokument
+
+- [Dokument A] -> [Dokument B] : [typ relacji]
+- [Dokument C] -> [Dokument D] : [typ relacji]
+
+## Ścieżki informacji
+
+- [Wejście] -> [Sekcja źródłowa] -> [Sekcja rozwinięcia] -> [Wyjście]
+- [Wejście] -> [Sekcja źródłowa] -> [Sekcja streszczenia] -> [Wyjście]
+
+## Weryfikacja spójności
+
+- [ ] Czy wszystkie ścieżki informacji są zamknięte (każde wejście ma wyjście)?
+- [ ] Czy istnieją pętle lub sprzeczne relacje między sekcjami?
+- [ ] Czy sekcje kluczowe mają wskazane źródła i odbiorców?
+- [ ] Czy terminologia jest spójna z sekcją "Słownik pojęć"?
+
+## Lista kontrolna spójności relacji
+
+- [ ] Czy każda sekcja z relacją ma wskazaną sekcję źródłową?
+- [ ] Czy relacje nie tworzą sprzecznych wymagań?
+- [ ] Czy wszystkie wymagane standardy mają odwołania?
+- [ ] Czy RACI jest kompletne dla kluczowych działań?
+
+## Artefakty powiązane
+
+- [Artefakt 1, np. diagram architektury] — [opis i relacja do tego dokumentu]
+- [Artefakt 2, np. schemat bazy danych] — [opis i relacja do tego dokumentu]
+
+## Ścieżka decyzji
+
+- [Decyzja] -> [Uzasadnienie] -> [Konsekwencje dla dokumentu i systemu]
+- [Decyzja] -> [Uzasadnienie] -> [Konsekwencje]
+
+## Ścieżka akceptacji
+
+- [Rola zatwierdząca] -> [kryteria akceptacji] -> [status: oczekuje/zatwierdzone/odrzucone]
+- [Rola zatwierdząca] -> [kryteria akceptacji] -> [status]
+
+## Metryki jakości
+
+- [Metryka 1, np. pokrycie testami] — [cel / próg minimalny]
+- [Metryka 2, np. czas przeglądu] — [cel / próg minimalny]
+
+## Kryteria ukończenia
+
+- [ ] Kryterium 1 — [opis stanu ukończenia tej sekcji lub dokumentu]
+- [ ] Kryterium 2 — [opis stanu ukończenia tej sekcji lub dokumentu]

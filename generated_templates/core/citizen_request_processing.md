@@ -1,0 +1,387 @@
+---
+title: Citizen Request Processing
+status: needs_content
+aligned: true
+aligned_rev: 4
+aligned_at: 2026-02-09
+aligned_by: codex
+---
+# Citizen Request Processing
+
+
+## Metadane
+
+- Właściciel: Document Owner
+- Wersja: v0.1
+- Data aktualizacji: RRRR-MM-DD
+- Status: draft | in review | approved
+
+
+> Powiązania: linkage_index.jsonl
+
+
+## Cel dokumentu
+
+Citizen Request Processing standaryzuje sposób działania z jasnymi krokami i kryteriami jakości.
+
+
+
+## Zakres i granice
+
+- Obejmuje: zakres procesu, role/RACI, kroki, checklisty, standardy/normy, wyjątki i eskalacje.
+- Poza zakresem: decyzje strategiczne lub tematy niezwiązane z procesem.
+
+
+
+
+## Użytkownicy i interesariusze
+- Public Engagement, Product/Policy, Comms, Legal/Privacy, Accessibility, Support.
+## Wejścia i wyjścia
+
+- Wejścia: polityki/standardy, narzędzia, dane wejściowe, role.
+- Wyjścia: wykonany proces z dowodami, metryki jakości, decyzje/eskalacje.
+
+
+
+
+## Założenia
+- Budżet kanałów; narzędzia feedback; zgody i privacy spełnione.
+## Otwarte pytania
+- Czy wymagane raporty do regulatorów? 
+- Jak reagować na kryzys reputacyjny?
+## Powiązania (meta)
+
+- Wymaga odniesienia do: Key Documents
+- Wymaga odniesienia do: Key Document Structures
+- Wymaga odniesienia do: Document Dependencies
+- Wymaga odniesienia do: RACI i role
+- Wymaga odniesienia do: Standardy i compliance
+
+
+## Zależności dokumentu
+
+- Upstream: systemy źródłowe, dane referencyjne, decyzje architektoniczne nadrzędne.
+- Downstream: konsumpcja rezultatów (zespoły, usługi, dokumenty pokrewne).
+- Zewnętrzne: dostawcy, standardy branżowe, umowy/regulacje wpływające na zakres.
+
+
+
+
+## Fazy cyklu życia
+
+- Discovery/Analiza: doprecyzowanie problemu, interesariusze, ograniczenia.
+- Projektowanie/Planowanie: decyzje, warianty, kryteria akceptacji, plan wdrożenia.
+- Implementacja/Testy: realizacja, walidacja, kryteria go/no-go.
+- Wdrożenie/Operacje: rollout, monitoring, eskalacje, ciągłe doskonalenie.
+
+
+
+
+
+## Struktura sekcji (szkielet)
+
+- Cel i zakres
+- Definicje i role/RACI
+- Standardy/zasady i narzędzia
+- Kroki procesu / checklisty
+- Kryteria jakości/DoD i wyjątki
+- Komunikacja i eskalacje
+- Rejestr zmian i utrzymanie
+
+
+
+
+## Szybkie powiązania
+
+- Meta: Key Documents
+- Meta: Key Document Structures
+- Meta: Document Dependencies
+
+
+## Mające zastosowanie standardy i normy
+
+### Standardy międzynarodowe
+- **ITIL 4** — Biblioteka Infrastruktury IT (Zarządzanie Usługami)
+- **ISO 20000-1** — System Zarządzania Usługami IT (SMS)
+- **COBIT 2019** — Kontrola nad Informacją i Technologiami (ISACA)
+
+## Standardy i compliance
+
+
+Lista standardów i wymagań regulacyjnych mających zastosowanie do tego dokumentu.
+Uzupełnij na podstawie sekcji "Mające zastosowanie standardy i normy" oraz tabeli `doc_standard_mapping`.
+
+- Standard / norma: [kod i nazwa]
+- Wymaganie regulacyjne: [kod i treść]
+- Polityka wewnętrzna: [nazwa polityki]
+
+
+## RACI i role
+
+
+Macierz RACI (Responsible / Accountable / Consulted / Informed) dla działań związanych z tym dokumentem.
+
+| Działanie | Responsible | Accountable | Consulted | Informed |
+|-----------|-------------|-------------|-----------|----------|
+| Tworzenie | [rola]      | [rola]      | [rola]    | [rola]   |
+| Przegląd  | [rola]      | [rola]      | [rola]    | [rola]   |
+| Aktualizacja | [rola]   | [rola]      | [rola]    | [rola]   |
+| Archiwizacja | [rola]   | [rola]      | [rola]    | [rola]   |
+
+## Jak używać dokumentu
+
+- Przeczytaj sekcje "Cel dokumentu" i "Zakres i granice" i upewnij się, że opisują Twój przypadek.
+- Wypełniaj kolejne sekcje zgodnie z guidance i powiązaniami; korzystaj z kryteriów DoR/DoD w `reports/checklist_atomic.jsonl`.
+- Aktualizuj statusy w checklistach (structure/clarity/links, DoR/DoD), gdy sekcje są gotowe lub oznaczone jako N/A.
+
+
+
+## Checklisty jakości
+
+- [ ] Czy cel dokumentu jest jednoznaczny?
+- [ ] Czy zakres i granice są jasno określone?
+- [ ] Czy wszystkie zależności są opisane?
+- [ ] Czy wskazano wymagane rozwinięcia i streszczenia?
+- [ ] Czy powiązania sekcja↔sekcja są spójne?
+
+
+## Definicje robocze
+- A11y, Consent, Moderacja, Frekwencja, Satysfakcja.
+## Przykłady użycia
+- Konsultacje miejskie: spotkania + ankiety online, KPI frekwencja i liczba feedback, moderacja komentarzy.
+## Ryzyka i ograniczenia
+- Niska frekwencja, dezinformacja, brak A11y/privacy, brak follow‑up.
+## Decyzje i uzasadnienia
+- Progi alertów i retry/backoff.  
+- Które integracje mają tryb degradacji/łagodzenia.  
+- Kryteria rollback vs hotfix.  
+- Zakres komunikacji do klientów/partnerów.
+## Powiązania z innymi dokumentami
+- Communication Plan, Accessibility Standards, Privacy Policy, Moderation Policy, Crisis Communication Template, Stakeholder Map.
+## Powiązania z sekcjami innych dokumentów
+- Privacy → zgody; Accessibility → formaty; Moderation → zasady.
+## Słownik pojęć w dokumencie
+- A11y, Consent, Moderacja, Frekwencja, Satysfakcja.
+## Wymagane odwołania do standardów
+- RODO/priv, WCAG, lokalne prawo dot. konsultacji.
+## Mapa relacji sekcja→sekcja
+- Cele/KPI → Kanały/treści → Harmonogram → Feedback/Moderacja → Raporty.
+## Mapa relacji dokument→dokument
+- Engagement Plan → Comms/Accessibility/Privacy/Moderation → Raporty/Stakeholder.
+## Ścieżki informacji
+- Cele → Kanały → Działania → Feedback → Raport → Korekta planu.
+## Weryfikacja spójności
+
+- [ ] Czy wszystkie ścieżki informacji są zamknięte?
+- [ ] Czy istnieją pętle lub sprzeczne relacje?
+- [ ] Czy sekcje krytyczne mają wskazane źródła i rozwinięcia?
+
+
+## Lista kontrolna spójności relacji
+
+- [ ] Czy każda sekcja z relacją ma wskazaną sekcję źródłową?
+- [ ] Czy relacje nie tworzą sprzecznych wymagań (np. wzajemne wykluczanie)?
+- [ ] Czy relacje cross‑doc mają uzasadnienie i są zgodne z fazą?
+- [ ] Czy relacje wymagają rozwinięć lub streszczeń są odnotowane?
+
+
+## Artefakty powiązane
+- Kalendarz działań, treści, narzędzia feedback, raporty, stakeholder map.
+## Ścieżka decyzji
+
+- [Decyzja] → [Uzasadnienie] → [Konsekwencje]
+- [Decyzja] → [Uzasadnienie] → [Konsekwencje]
+
+
+## Ścieżka akceptacji
+- Engagement/Comms → Legal/Privacy/A11y → Leadership → Owner sign‑off.
+## Metryki jakości
+- Frekwencja, liczba/zróżnicowanie feedback, sentyment, czas reakcji, liczba eskalacji, zgodność z privacy/A11y.
+## Kryteria ukończenia
+- [ ] Plan kanałów/treści/harmonogramu gotowy; KPI/raporty opisane; dokument w linkage_index.
+- [ ] Wersja/data/właściciel aktualne.
+## Powiązania sekcja↔sekcja
+
+- Wejścia → Kroki → Wyjścia → Kontrole jakości/DoD.
+
+
+
+
+## Wymagane rozwinięcia
+
+- Diagramy procesów/architektury wspierające zrozumienie kluczowych przepływów.
+- Tabele RACI/odpowiedzialności dla zadań krytycznych.
+- Lista decyzji wraz z uzasadnieniem i alternatywami.
+
+
+
+
+## Wymagane streszczenia
+
+- Executive summary: cel, aktualny status, kluczowe decyzje, ryzyka, następne kroki.
+- One-pager dla sponsorów: zakres, KPI, plan i data go-live.
+
+
+
+
+## Guidance
+
+DoR: zdefiniowany zakres, role, wejścia/narzędzia.
+DoD: kroki i kryteria jakości opisane, wyjątki/eskalacje, metryki, metadane aktualne.
+
+
+
+
+## Monitoring i utrzymanie
+
+- [Co monitorujemy] — [narzędzie / częstotliwość]
+- [Kto utrzymuje] — [rola]
+
+
+## Kontrola zmian
+
+- [Zmiana] — [powód] — [data] — [akceptacja]
+
+
+## Wymogi prawne i regulacyjne
+
+- [Wymóg 1] — [źródło / akt prawny / standard]
+- [Wymóg 2] — [źródło / akt prawny / standard]
+
+
+## Zasady bezpieczeństwa informacji
+
+- [Zasada 1] — [opis i wpływ na dokument]
+- [Zasada 2] — [opis i wpływ na dokument]
+
+
+## Ochrona danych i prywatność
+
+- [Wymaganie 1] — [opis i sekcja docelowa]
+- [Wymaganie 2] — [opis i sekcja docelowa]
+
+
+## Wersjonowanie treści
+
+- [Wersja] — [zmiana] — [autor] — [data]
+- [Wersja] — [zmiana] — [autor] — [data]
+
+
+## Historia zmian sekcji
+
+- [Sekcja] — [zmiana] — [data]
+- [Sekcja] — [zmiana] — [data]
+
+
+## Wymagane aktualizacje
+
+- [Sekcja] — [powód aktualizacji] — [termin]
+- [Sekcja] — [powód aktualizacji] — [termin]
+
+
+## Integracje i interfejsy
+
+- [System / API] — [zakres integracji] — [wymagania]
+- [System / API] — [zakres integracji] — [wymagania]
+
+
+## Wymagania danych
+
+- [Dane wejściowe] — [format] — [walidacja]
+- [Dane wyjściowe] — [format] — [walidacja]
+
+
+## Logowanie i audyt
+
+- [Zdarzenie] — [poziom] — [retencja]
+- [Zdarzenie] — [poziom] — [retencja]
+
+
+## Utrzymanie i operacje
+
+- [Procedura] — [cel] — [częstotliwość]
+- [Procedura] — [cel] — [częstotliwość]
+
+
+## KPI i SLA
+
+- [KPI] — [cel] — [pomiar]
+- [SLA] — [cel] — [pomiar]
+
+
+## Scenariusze awaryjne
+
+- [Scenariusz] — [objawy] — [reakcja]
+- [Scenariusz] — [objawy] — [reakcja]
+
+
+## Wpływ na inne systemy
+
+- [System] — [rodzaj wpływu] — [ryzyko]
+- [System] — [rodzaj wpływu] — [ryzyko]
+
+
+## Zależności danych między systemami
+
+- [Źródło danych] → [Odbiorca] — [opis]
+- [Źródło danych] → [Odbiorca] — [opis]
+
+
+## Harmonogram przeglądów
+
+- [Obszar] — [częstotliwość] — [właściciel]
+- [Obszar] — [częstotliwość] — [właściciel]
+
+
+## Wymagania wydajnościowe
+
+- [Wymaganie] — [metryka] — [próg]
+- [Wymaganie] — [metryka] — [próg]
+
+
+## Wymagania dostępnościowe
+
+- [Wymaganie] — [SLA] — [metoda pomiaru]
+- [Wymaganie] — [SLA] — [metoda pomiaru]
+
+
+## Wymagania skalowalności
+
+- [Wymaganie] — [cel] — [warunki]
+- [Wymaganie] — [cel] — [warunki]
+
+
+## Wymagania dostępności danych
+
+- [Dane] — [częstotliwość dostępu] — [SLA]
+- [Dane] — [częstotliwość dostępu] — [SLA]
+
+
+## Retencja i archiwizacja
+
+- [Dane] — [retencja] — [archiwizacja]
+- [Dane] — [retencja] — [archiwizacja]
+
+
+## Dostępność w sytuacjach awaryjnych
+
+- [Scenariusz] — [zachowanie] — [priorytet]
+- [Scenariusz] — [zachowanie] — [priorytet]
+
+
+## Testy i weryfikacja
+
+- [Test] — [cel] — [wynik oczekiwany]
+- [Test] — [cel] — [wynik oczekiwany]
+
+
+## Walidacja zgodności
+
+- [Wymóg] — [metoda weryfikacji]
+- [Wymóg] — [metoda weryfikacji]
+
+
+## Audyty i przeglądy
+
+- [Audyty] — [częstotliwość] — [odpowiedzialny]
+- [Audyty] — [częstotliwość] — [odpowiedzialny]
