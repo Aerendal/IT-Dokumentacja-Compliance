@@ -88,7 +88,7 @@ def mock_llm_adapter():
     adapter = AsyncMock(spec=BaseLLMAdapter)
     adapter.provider_name = "mock"
     adapter.model_name = "mock-model-v1"
-    
+
     # Domyślna odpowiedź extract_entities
     adapter.extract_entities = AsyncMock(return_value=ExtractedEntities(
         domains=["fintech", "cloud"],
@@ -98,7 +98,7 @@ def mock_llm_adapter():
         keywords=["payment", "API", "security", "audit"],
         project_type="greenfield_saas",
     ))
-    
+
     # Domyślna odpowiedź generate_template
     adapter.generate_template = AsyncMock(return_value="""---
 title: Test Szablon
@@ -116,10 +116,10 @@ Opis celu.
 
 Opis zakresu.
 """)
-    
+
     # Domyślna odpowiedź rerank_mapping
     adapter.rerank_mapping = AsyncMock(return_value=[])
-    
+
     return adapter
 
 
@@ -157,17 +157,17 @@ async def db_session(postgres_container):
     """Świeża sesja DB dla każdego testu (rollback po teście)."""
     url = postgres_container.get_connection_url().replace("postgresql://", "postgresql+asyncpg://")
     engine = create_async_engine(url, echo=False)
-    
+
     # Uruchom migracje Alembic
     alembic_cfg = Config("alembic.ini")
     alembic_cfg.set_main_option("sqlalchemy.url", url.replace("+asyncpg", ""))
     command.upgrade(alembic_cfg, "head")
-    
+
     async with engine.begin() as conn:
         async with AsyncSession(conn) as session:
             yield session
             await session.rollback()  # Cofnij po każdym teście
-    
+
     await engine.dispose()
 ```
 
@@ -201,7 +201,7 @@ def itdoc_connector(settings_with_itdoc):
     """
     Prawdziwy ItdocConnector z read-only dostępem do it_doc_matrix.db.
     Używany tylko w testach @integration i @slow.
-    
+
     Wymaga że it_doc_matrix.db istnieje w katalogu projektu.
     """
     if not ITDOC_DB_PATH.exists():
@@ -252,41 +252,41 @@ def sample_brief_short() -> bytes:
 
 @pytest.mark.unit
 class TestBriefParser:
-    
+
     def test_detect_format_txt(self, parser, sample_brief_txt):
         assert parser.detect_format("brief.txt", sample_brief_txt) == "txt"
-    
+
     def test_detect_format_md_by_extension(self, parser):
         md_content = b"# Header\n\nContent"
         assert parser.detect_format("brief.md", md_content) == "md"
-    
+
     def test_parse_txt_returns_normalized_text(self, parser, sample_brief_txt):
         result = parser.parse(sample_brief_txt, "txt")
         assert isinstance(result.text, str)
         assert len(result.text) > 0
         assert "\x00" not in result.text
         assert result.word_count > 0
-    
+
     def test_parse_creates_chunks(self, parser):
         long_text = "word " * 5000  # Długi tekst
         result = parser.parse(long_text.encode(), "txt")
         assert len(result.chunks) > 1
         assert all(len(c) <= parser.CHUNK_MAX_CHARS for c in result.chunks)
-    
+
     def test_parse_empty_raises(self, parser):
         with pytest.raises(ParseError):
             parser.parse(b"", "txt")
-    
+
     def test_normalize_removes_null_bytes(self, parser):
         text_with_nulls = b"Hello\x00World"
         result = parser.parse(text_with_nulls, "txt")
         assert "\x00" not in result.text
-    
+
     def test_detect_language_polish(self, parser):
         pl_text = "Ąęóśżźćń lorem ipsum dolor"
         lang = parser._detect_language(pl_text)
         assert lang == "pl"
-    
+
     def test_file_too_large_raises(self, parser):
         huge_content = b"x" * (51 * 1024 * 1024)  # 51 MB
         with pytest.raises(FileTooLargeError):
@@ -300,28 +300,28 @@ class TestBriefParser:
 
 @pytest.mark.unit
 class TestEstimationEngine:
-    
+
     def test_points_to_hours_returns_tuple(self, engine):
         h_min, h_likely, h_max = engine.points_to_hours(4.0)
         assert h_min < h_likely < h_max
         assert h_likely == pytest.approx(4.0 * 0.5)  # 2.0h
-    
+
     def test_classify_complexity_low(self, engine):
         assert engine.classify_complexity(50.0, 20) == "low"
-    
+
     def test_classify_complexity_critical(self, engine):
         assert engine.classify_complexity(700.0, 250) == "critical"
-    
+
     async def test_critical_phases_included(self, engine, mock_mapping_result):
         report = await engine.calculate(mock_mapping_result)
         critical = [p for p in report.by_phase if p.is_critical_path]
         critical_ids = {p.phase_id for p in critical}
         assert 13 in critical_ids  # Security zawsze na critical path
-    
+
     async def test_deduction_basis_not_empty(self, engine, mock_mapping_result):
         report = await engine.calculate(mock_mapping_result)
         assert len(report.deduction_basis) >= 1
-    
+
     async def test_total_h_min_less_than_max(self, engine, mock_mapping_result):
         report = await engine.calculate(mock_mapping_result)
         assert report.total_h_min <= report.total_h_likely <= report.total_h_max
@@ -334,20 +334,20 @@ class TestEstimationEngine:
 
 @pytest.mark.unit
 class TestSemanticMapper:
-    
+
     async def test_map_returns_mapping_result(self, mapper, mock_itdoc_connector, mock_llm_adapter, sample_brief_parsed):
         result = await mapper.map(sample_brief_parsed)
         assert result.status == "done"
         assert result.total_items >= 0
-    
+
     async def test_confidence_threshold_filters(self, mapper, sample_brief_parsed):
         result = await mapper.map(sample_brief_parsed, confidence_threshold=0.99)
         assert all(item.confidence >= 0.99 for item in result.items)
-    
+
     async def test_max_results_respected(self, mapper, sample_brief_parsed):
         result = await mapper.map(sample_brief_parsed, max_results=10)
         assert result.total_items <= 10
-    
+
     async def test_llm_error_propagates(self, mapper_with_error_llm, sample_brief_parsed):
         with pytest.raises(LLMTimeoutError):
             await mapper_with_error_llm.map(sample_brief_parsed)
@@ -362,7 +362,7 @@ class TestSemanticMapper:
 
 @pytest.mark.integration
 class TestBriefAPI:
-    
+
     async def test_upload_brief_txt(self, client, project_id):
         response = await client.post(
             f"/brief/upload?project_id={project_id}",
@@ -374,12 +374,12 @@ class TestBriefAPI:
         assert data["format"] == "txt"
         assert data["parse_status"] == "parsed"
         assert data["word_count"] > 0
-    
+
     async def test_upload_requires_api_key(self, client, project_id):
         response = await client.post(f"/brief/upload?project_id={project_id}",
                                      files={"file": ("b.txt", b"x", "text/plain")})
         assert response.status_code == 403
-    
+
     async def test_map_brief_returns_result(self, client, uploaded_brief_id):
         response = await client.post(
             f"/brief/{uploaded_brief_id}/map",
@@ -392,7 +392,7 @@ class TestBriefAPI:
 
 @pytest.mark.integration
 class TestItdocConnectorIntegration:
-    
+
     async def test_find_by_standard_graceful_empty(self, itdoc_connector):
         """find_by_standard() nie rzuca wyjątku gdy tabela nie istnieje — zwraca []."""
         results = await itdoc_connector.find_by_standard("ISO/IEC 27001")
@@ -406,11 +406,11 @@ class TestItdocConnectorIntegration:
     async def test_find_by_standard_returns_results(self, itdoc_connector):
         results = await itdoc_connector.find_by_standard("ISO/IEC 27001")
         assert len(results) > 0
-    
+
     async def test_get_phases_returns_24(self, itdoc_connector):
         phases = await itdoc_connector.get_phases()
         assert len(phases) == 24
-    
+
     async def test_connector_has_no_write_methods(self, itdoc_connector):
         public_methods = [m for m in dir(itdoc_connector) if not m.startswith("_")]
         write_keywords = ["insert", "update", "delete", "write", "save", "create", "drop"]
@@ -427,7 +427,7 @@ class TestItdocConnectorIntegration:
 
 @pytest.mark.slow
 class TestFullFlow:
-    
+
     async def test_brief_to_work_plan(
         self, client, postgres_db, mock_llm_adapter
     ):
@@ -438,7 +438,7 @@ class TestFullFlow:
         # 1. Utwórz projekt
         project = (await client.post("/projects", json={"name": "Test E2E"})).json()
         project_id = project["id"]
-        
+
         # 2. Upload brief
         upload = (await client.post(
             f"/brief/upload?project_id={project_id}",
@@ -447,7 +447,7 @@ class TestFullFlow:
         )).json()
         brief_id = upload["brief_id"]
         assert upload["parse_status"] == "parsed"
-        
+
         # 3. Map brief
         map_result = (await client.post(
             f"/brief/{brief_id}/map",
@@ -456,7 +456,7 @@ class TestFullFlow:
         )).json()
         assert map_result["status"] == "done"
         assert map_result["total_items"] > 0
-        
+
         # 4. Generuj kosztorys
         report = (await client.post(
             f"/reports/estimate/{brief_id}",
@@ -466,21 +466,21 @@ class TestFullFlow:
         assert report["total_docs"] > 0
         assert report["total_h_likely"] > 0
         assert len(report["deduction_basis"]) >= 1
-        
+
         # 5. Zaakceptuj raport
         accepted = (await client.post(
             f"/reports/{report['id']}/accept",
             headers={"X-API-Key": "test_key"}
         )).json()
         assert accepted["status"] == "accepted"
-        
+
         # 6. Utwórz plan pracy
         plan = (await client.post(
             f"/planning/create/{report['id']}",
             headers={"X-API-Key": "test_key"}
         )).json()
         assert plan["total_packages"] > 0
-        
+
         # 7. Pobierz work packages
         packages = (await client.get(
             f"/planning/{plan['id']}/packages",

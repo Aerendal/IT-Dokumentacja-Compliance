@@ -16,6 +16,17 @@ _DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix.db"
 _CORE_DIR = _REPO_ROOT / "generated_templates" / "core"
 
 
+@pytest.fixture(autouse=True)
+def _reset_itdoc_strict(monkeypatch):
+    """Reset ITDOC_STRICT before each test so strict-mode CI does not bleed
+    into tests that explicitly test normal (non-strict) behaviour.
+
+    Tests that need strict mode call ``monkeypatch.setenv("ITDOC_STRICT", "1")``
+    themselves — that overrides this autouse fixture within the same test.
+    """
+    monkeypatch.delenv("ITDOC_STRICT", raising=False)
+
+
 @pytest.fixture()
 def db_conn():
     """In-memory SQLite z minimalnym schematem potrzebnym do testów jednostkowych."""

@@ -119,4 +119,3 @@ jobs:
 
       - name: mypy itdoc/
         run: mypy itdoc/ --ignore-missing-imports --no-error-summary || true
-

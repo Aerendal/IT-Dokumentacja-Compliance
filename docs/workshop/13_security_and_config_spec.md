@@ -36,7 +36,7 @@ async def verify_api_key(
 ) -> str:
     """
     Dependency do wstrzyknięcia w routery (poza /health).
-    
+
     Raises:
       403 Forbidden — brak klucza lub klucz nieprawidłowy
     """
@@ -45,13 +45,13 @@ async def verify_api_key(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Brakuje nagłówka X-API-Key"
         )
-    
+
     if api_key not in settings.api_keys:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Nieprawidłowy klucz API"
         )
-    
+
     return api_key
 ```
 
@@ -68,7 +68,7 @@ WORKSHOP_API_KEYS=key_agent_primary_abc123,key_pm_secondary_def456
 
 class Settings(BaseSettings):
     workshop_api_keys: str = ""  # "key1,key2,key3"
-    
+
     @property
     def api_keys(self) -> set[str]:
         return {k.strip() for k in self.workshop_api_keys.split(",") if k.strip()}
@@ -165,28 +165,28 @@ MAX_INGESTION_FILE_SIZE_MB=10
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
-    
+
     # Wymagane — aplikacja nie startuje bez nich
     database_url:         str
     itdoc_db_path:        str
     workshop_api_keys:    str
     llm_provider:         str
-    
+
     # Walidacja po inicjalizacji
     @model_validator(mode='after')
     def validate_required_secrets(self) -> 'Settings':
         if not self.api_keys:
             raise ValueError("WORKSHOP_API_KEYS nie może być puste")
-        
+
         if self.llm_provider == "openai" and not self.openai_api_key:
             raise ValueError("LLM_PROVIDER=openai wymaga ustawienia OPENAI_API_KEY")
-        
+
         if self.llm_provider == "anthropic" and not self.anthropic_api_key:
             raise ValueError("LLM_PROVIDER=anthropic wymaga ustawienia ANTHROPIC_API_KEY")
-        
+
         if not Path(self.itdoc_db_path).exists():
             raise ValueError(f"Nie znaleziono bazy itdoc: {self.itdoc_db_path}")
-        
+
         return self
 ```
 
@@ -243,22 +243,22 @@ async def validate_upload(file: UploadFile, settings: Settings) -> bytes:
     Walidacja pliku przed parsowaniem.
     Chroni przed: zbyt dużymi plikami, złośliwymi typami plików.
     """
-    
+
     # 1. Sprawdź rozszerzenie
     ext = Path(file.filename or "").suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(415, f"Nieobsługiwane rozszerzenie: {ext}")
-    
+
     # 2. Odczytaj plik z limitem rozmiaru
     content = await file.read(settings.max_brief_file_size_mb * 1024 * 1024 + 1)
     if len(content) > settings.max_brief_file_size_mb * 1024 * 1024:
         raise HTTPException(413, f"Plik przekracza limit {settings.max_brief_file_size_mb} MB")
-    
+
     # 3. Sprawdź MIME na podstawie magic bytes (nie Content-Type z requestu!)
     detected_mime = magic.from_buffer(content[:1024], mime=True)
     if detected_mime not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(415, f"Wykryty nieobsługiwany typ MIME: {detected_mime}")
-    
+
     return content
 ```
 
@@ -272,25 +272,25 @@ async def validate_upload(file: UploadFile, settings: Settings) -> bytes:
 class SecurityAwareLoggingMiddleware(BaseHTTPMiddleware):
     """
     Loguje requesty/response bez wrażliwych danych.
-    
+
     Nigdy nie loguje:
     - X-API-Key
     - OPENAI_API_KEY, ANTHROPIC_API_KEY
     - Zawartości plików briefów
     - Treści odpowiedzi LLM
     """
-    
+
     SENSITIVE_HEADERS = {"x-api-key", "authorization"}
-    
+
     async def dispatch(self, request: Request, call_next):
         # Filtruj wrażliwe nagłówki z logów
         safe_headers = {
             k: "***" if k.lower() in self.SENSITIVE_HEADERS else v
             for k, v in request.headers.items()
         }
-        
+
         logger.info(f"{request.method} {request.url.path}", extra={"headers": safe_headers})
-        
+
         response = await call_next(request)
         logger.info(f"Response: {response.status_code}")
         return response
@@ -306,11 +306,11 @@ class SecurityAwareLoggingMiddleware(BaseHTTPMiddleware):
 from asyncio import Semaphore
 
 class BaseLLMAdapter(ABC):
-    
+
     def __init__(self, settings: Settings):
         # Semaphore ogranicza współbieżne wywołania LLM
         self._semaphore = Semaphore(settings.llm_max_concurrent_calls or 3)
-    
+
     async def _call_with_semaphore(self, func, *args, **kwargs):
         async with self._semaphore:
             return await func(*args, **kwargs)

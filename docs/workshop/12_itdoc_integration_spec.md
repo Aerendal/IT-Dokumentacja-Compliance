@@ -79,11 +79,11 @@ class ItdocConnector:
     Read-only wrapper na Python API biblioteki itdoc.
     Thread-safe: każde wywołanie otwiera własny context manager get_connection().
     """
-    
+
     def __init__(self, settings: Settings):
         self._db_path = settings.itdoc_db_path  # ścieżka do it_doc_matrix.db
         self._executor = None  # używa default ThreadPoolExecutor event loop
-    
+
     async def _run_sync(self, func, *args, **kwargs):
         """Uruchamia synchroniczną funkcję itdoc w thread executor."""
         loop = asyncio.get_event_loop()
@@ -91,7 +91,7 @@ class ItdocConnector:
             self._executor,
             lambda: func(*args, **kwargs)
         )
-    
+
     async def health_check(self) -> bool:
         """Sprawdza dostępność it_doc_matrix.db. Używane przez /health endpoint."""
         try:
@@ -115,7 +115,7 @@ async def find_by_standard(self, standard_code: str) -> list[DocRef]:
     """
     Mapuje standard_code → lista dokumentów z biblioteki.
     Używa itdoc.find_by_standard() w context manager.
-    
+
     Obsługa błędów:
     - ItDocError → ItdocQueryError (własny wyjątek warsztatu)
     - Pusty wynik → zwraca [] (nie rzuca wyjątku)
@@ -133,7 +133,7 @@ async def find_by_standard(self, standard_code: str) -> list[DocRef]:
                 )
                 for r in results
             ]
-    
+
     try:
         return await self._run_sync(_query)
     except (QueryError, ItDocError) as e:
@@ -157,7 +157,7 @@ async def find_by_regulation(self, regulation_code: str) -> list[DocRef]:
         with get_connection(self._db_path) as conn:
             results = find_by_regulation(conn, regulation_code)
             return [DocRef(...) for r in results]
-    
+
     try:
         return await self._run_sync(_query)
     except (QueryError, ItDocError) as e:
@@ -176,9 +176,9 @@ async def find_by_regulation(self, regulation_code: str) -> list[DocRef]:
 async def get_contract(self, doc_uid: str) -> DocContract | None:
     """
     Pobiera kontrakt dokumentu (inputs/outputs/gates).
-    
+
     Ważne: tabela contracts w it_doc_matrix.db jest częściowo pusta (stub).
-    Zwraca None jeśli kontrakt nie istnieje lub jest pusty — 
+    Zwraca None jeśli kontrakt nie istnieje lub jest pusty —
     WorkPlanner obsługuje ten przypadek przez fallback PHASE_DEFAULT_CONTRACTS.
     """
     def _query():
@@ -190,12 +190,12 @@ async def get_contract(self, doc_uid: str) -> DocContract | None:
             inputs  = json.loads(contract.get("inputs_json",  "[]") or "[]")
             outputs = json.loads(contract.get("outputs_json", "[]") or "[]")
             gates   = json.loads(contract.get("gates_json",   "[]") or "[]")
-            
+
             if not inputs and not outputs and not gates:
                 return None  # Stub — traktuj jako brak kontraktu
-            
+
             return DocContract(inputs=inputs, outputs=outputs, gates=gates)
-    
+
     try:
         return await self._run_sync(_query)
     except (QueryError, ItDocError):
@@ -214,7 +214,7 @@ async def rhythm_upstream(self, doc_uid: str, depth: int = 1) -> list[DocRef]:
         with get_connection(self._db_path) as conn:
             results = rhythm_upstream(conn, doc_uid, depth=depth)
             return [DocRef(doc_uid=r["node"], ...) for r in results]
-    
+
     try:
         return await self._run_sync(_query)
     except (QueryError, ItDocError):
@@ -237,13 +237,13 @@ async def get_phases(self) -> list[Phase]:
     """
     Pobiera wszystkie fazy SDLC z itdoc, posortowane wg ordinal.
     Cachowane w _phases_cache — fazy nie zmieniają się w runtime.
-    
+
     UWAGA: Aktualnie tabela `document_phases` jest pusta.
     Faktyczna tabela faz to `phases` (24 wiersze): (phase_id, name, ordinal)
     """
     if self._phases_cache is not None:
         return self._phases_cache
-    
+
     def _query():
         with get_connection(self._db_path) as conn:
             # Próbuj document_phases (docelowa) — fallback na phases (aktualna)
@@ -254,16 +254,16 @@ async def get_phases(self) -> list[Phase]:
                 rows = cursor.fetchall()
             except sqlite3.OperationalError:
                 rows = []
-            
+
             if not rows:
                 # Fallback na tabelę phases (faktycznie wypełniona w aktualnej DB)
                 cursor = conn.execute(
                     "SELECT rowid as phase_id, name as phase_name, ordinal FROM phases ORDER BY ordinal"
                 )
                 rows = cursor.fetchall()
-            
+
             return [Phase(phase_id=r[0], phase_name=r[1], ordinal=r[2]) for r in rows]
-    
+
     result = await self._run_sync(_query)
     self._phases_cache = result   # cache na czas życia obiektu
     return result
@@ -284,15 +284,15 @@ async def find_by_keyword(
     """
     Fallback document discovery — szuka dokumentów po tytułach gdy
     find_by_standard/find_by_regulation nie zwrócą wyników (puste tabele mapowań).
-    
+
     Używa istniejących tabel: documents + document_phase_mapping + phases.
-    
+
     Args:
         keywords: Lista słów kluczowych z briefu (z LLM entities)
         phase_id: Opcjonalne filtrowanie do konkretnej fazy
         branch_id: Opcjonalne filtrowanie do branch (Backend/Frontend/QA itp.)
         limit: Maks. liczba wyników
-    
+
     Returns:
         Lista DocRef posortowana wg liczby dopasowań keywords w tytule
     """
@@ -301,11 +301,11 @@ async def find_by_keyword(
         with get_connection(self._db_path) as conn:
             if not keywords:
                 return []
-            
+
             safe_kws = keywords[:20]
             placeholders = " OR ".join("LOWER(d.title) LIKE LOWER(?)" for _ in safe_kws)
             params: list = [f"%{kw}%" for kw in safe_kws]
-            
+
             sql = f"""
                 SELECT DISTINCT
                     d.doc_id,
@@ -319,17 +319,17 @@ async def find_by_keyword(
                 LEFT JOIN phases p ON d.phase_id = p.rowid
                 WHERE ({placeholders})
 """
-            
+
             if phase_id is not None:
                 sql += "                AND dpm.phase_id = ?\n"
                 params.append(phase_id)
-            
+
             if branch_id is not None:
                 sql += "                AND d.branch_id = ?\n"
                 params.append(branch_id)
-            
+
             sql += f"                ORDER BY dpm.priority ASC\n                LIMIT {limit}\n            "
-            
+
             cursor = conn.execute(sql, params)
             return [
                 DocRef(
@@ -342,7 +342,7 @@ async def find_by_keyword(
                 )
                 for r in cursor.fetchall()
             ]
-    
+
     try:
         return await self._run_sync(_query)
     except (sqlite3.OperationalError, sqlite3.Error) as e:
@@ -363,7 +363,7 @@ async def get_documents_by_phase(
     """
     Zwraca dokumenty przypisane do danej fazy SDLC.
     Używa istniejącej tabeli document_phase_mapping.
-    
+
     Przydatne gdy brief wskazuje konkretne fazy projektu.
     """
     def _query():
@@ -392,7 +392,7 @@ async def get_documents_by_phase(
                 )
                 for r in cursor.fetchall()
             ]
-    
+
     try:
         return await self._run_sync(_query)
     except (sqlite3.OperationalError, sqlite3.Error):
@@ -452,28 +452,28 @@ ITDOC_DB_PATH=/path/to/dokumentacja/it_doc_matrix.db
 async def lifespan(app: FastAPI):
     # Startup: weryfikuj dostępność biblioteki itdoc
     connector = ItdocConnector(settings)
-    
+
     if not await connector.health_check():
         raise RuntimeError(
             f"Nie można połączyć się z bazą itdoc: {settings.itdoc_db_path}\n"
             "Sprawdź ścieżkę ITDOC_DB_PATH w pliku .env"
         )
-    
+
     # Sprawdź schemat
     def _check_schema():
         with get_connection(settings.itdoc_db_path) as conn:
             from itdoc import validate_schema
             return validate_schema(conn)
-    
+
     loop = asyncio.get_event_loop()
     schema_ok = await loop.run_in_executor(None, _check_schema)
     if not schema_ok:
         raise RuntimeError("Schemat it_doc_matrix.db niezgodny z oczekiwanym przez Warsztat")
-    
+
     print(f"✓ itdoc library connected: {settings.itdoc_db_path}")
-    
+
     yield  # Aplikacja działa
-    
+
     # Shutdown: cleanup
 ```
 

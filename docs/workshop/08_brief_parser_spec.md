@@ -53,7 +53,7 @@ class BriefParser:
         """
         Wykrywa format na podstawie MIME (python-magic) + rozszerzenia.
         MIME ma priorytet nad rozszerzeniem.
-        
+
         Returns: "txt" | "md" | "pdf" | "docx" | "unknown"
         """
 
@@ -66,7 +66,7 @@ class BriefParser:
     def parse(self, content: bytes, format: str, filename: str = "") -> ParsedBrief:
         """
         Parsuje plik do ParsedBrief.
-        
+
         Raises:
           ParseError            — plik uszkodzony, zaszyfrowany, brak treści
           UnsupportedFormatError— format = "unknown"
@@ -84,14 +84,14 @@ class BriefParser:
 def detect_format(self, filename: str, content: bytes) -> str:
     # 1. Próba MIME detection (magic bytes)
     mime = magic.from_buffer(content, mime=True)
-    
+
     mime_map = {
         "text/plain":       "txt",
         "text/markdown":    "md",
         "application/pdf":  "pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
     }
-    
+
     if mime in mime_map:
         detected = mime_map[mime]
         # Jeśli MD → sprawdź czy rozszerzenie to .md (MIME dla MD bywa text/plain)
@@ -99,7 +99,7 @@ def detect_format(self, filename: str, content: bytes) -> str:
         if detected == "txt" and ext == ".md":
             return "md"
         return detected
-    
+
     # 2. Fallback: rozszerzenie
     ext_map = {".txt": "txt", ".md": "md", ".pdf": "pdf", ".docx": "docx"}
     return ext_map.get(Path(filename).suffix.lower(), "unknown")
@@ -117,7 +117,7 @@ def _parse_text(self, content: bytes) -> tuple[str, dict]:
             break
         except UnicodeDecodeError:
             continue
-    
+
     metadata = {
         "encoding": encoding,
         "detected_language": self._detect_language(text),
@@ -139,14 +139,14 @@ def _parse_pdf(self, content: bytes) -> tuple[str, dict]:
             page_text = page.extract_text(x_tolerance=3, y_tolerance=3)
             if page_text:
                 pages_text.append(page_text)
-    
+
     # Sprawdź czy PDF nie jest zaszyfrowany lub skanem bez OCR
     if not pages_text:
         raise ParseError(
             "Nie udało się wyekstrahować tekstu z PDF. "
             "PDF może być zaszyfrowany lub zawierać wyłącznie skany (brak OCR)."
         )
-    
+
     return "\n\n".join(pages_text), metadata
 ```
 
@@ -154,9 +154,9 @@ def _parse_pdf(self, content: bytes) -> tuple[str, dict]:
 ```python
 def _parse_docx(self, content: bytes) -> tuple[str, dict]:
     doc = Document(BytesIO(content))
-    
+
     paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
-    
+
     # Wyciągnij też tabele
     table_texts = []
     for table in doc.tables:
@@ -164,17 +164,17 @@ def _parse_docx(self, content: bytes) -> tuple[str, dict]:
             row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
             if row_text:
                 table_texts.append(row_text)
-    
+
     all_text = "\n\n".join(paragraphs)
     if table_texts:
         all_text += "\n\n## Tabele\n" + "\n".join(table_texts)
-    
+
     metadata = {
         "author":       doc.core_properties.author,
         "title":        doc.core_properties.title,
         "paragraph_count": len(paragraphs),
     }
-    
+
     return all_text, metadata
 ```
 
@@ -191,16 +191,16 @@ def _normalize(self, text: str) -> str:
     5. Strip całego tekstu
     """
     import unicodedata
-    
+
     # Usuń null bytes
     text = text.replace('\x00', '')
-    
+
     # Usuń znaki kontrolne (zachowaj \n \t \r)
     text = ''.join(c for c in text if unicodedata.category(c) != 'Cc' or c in '\n\t\r')
-    
+
     # NFC normalization (polskie znaki: ą→ą, ę→ę)
     text = unicodedata.normalize('NFC', text)
-    
+
     # Napraw typowy mojibake dla polskich znaków (latin-2 → UTF-8)
     mojibake_fixes = {
         'Ä\x85': 'ą', 'Ä\x87': 'ć', 'Ä™': 'ę', 'Å\x82': 'ł',
@@ -208,18 +208,18 @@ def _normalize(self, text: str) -> str:
     }
     for bad, good in mojibake_fixes.items():
         text = text.replace(bad, good)
-    
+
     # Normalizuj whitespace
     import re
     text = re.sub(r'\n{3,}', '\n\n', text)
     text = re.sub(r'[ \t]+', ' ', text)
-    
+
     return text.strip()
 ```
 
 ### Etap 4: Chunking
 
-> **Uwaga Ollama:** Llama3.2 (7B) ma domyślnie context window 4096 tokenów. 
+> **Uwaga Ollama:** Llama3.2 (7B) ma domyślnie context window 4096 tokenów.
 > Polski tekst = ~3-4 znaki/token. Przy `CHUNK_MAX_CHARS=12000` + prompt (~300 tok)
 > ryzyko przekroczenia limitu. Używaj `CHUNK_MAX_CHARS_OLLAMA=7000` gdy `LLM_PROVIDER=ollama`.
 > Aby zwiększyć ctx Ollama: dodaj `num_ctx: 8192` do parametrów wywołania.
@@ -242,7 +242,7 @@ def _normalize(self, text: str) -> str:
 def _chunk(self, text: str) -> list[str]:
     """
     Dzieli tekst na chunki ≤ chunk_size (per provider, via _get_chunk_size).
-    
+
     Strategia: podział na akapity (\n\n), łączenie w chunki do limitu.
     Jeśli akapit > limit: podział na zdania ('. ', '.\n').
     Zachowuje kontekst: ostatnie zdanie chunku N jest pierwszym zdaniem chunku N+1
@@ -253,7 +253,7 @@ def _chunk(self, text: str) -> list[str]:
     chunks = []
     current_chunk = []
     current_len = 0
-    
+
     for para in paragraphs:
         # Obsługa akapitów dłuższych niż CHUNK_MAX_CHARS (ekstremalnie rzadkie)
         if len(para) > chunk_size:
@@ -274,13 +274,13 @@ def _chunk(self, text: str) -> list[str]:
                 # Overlap: ostatni akapit jako początek nowego chunka
                 current_chunk = [current_chunk[-1]] if current_chunk else []
                 current_len = len(current_chunk[0]) if current_chunk else 0
-        
+
         current_chunk.append(para)
         current_len += len(para) + 2
-    
+
     if current_chunk:
         chunks.append('\n\n'.join(current_chunk))
-    
+
     return chunks if chunks else [text]
 ```
 
@@ -295,7 +295,7 @@ def _detect_language(self, text: str) -> str:
     - Sprawdza gęstość polskich znaków diakrytycznych (ą,ę,ó,ś,ż,ź,ć,ń,ł)
     - Jeśli > 0.5% znaków to polskie diakrytyki → "pl"
     - Inaczej → "en" (domyślne)
-    
+
     Dla v2: langdetect lub lingua
     """
     pl_chars = set('ąćęłńóśźżĄĆĘŁŃÓŚŹŻ')

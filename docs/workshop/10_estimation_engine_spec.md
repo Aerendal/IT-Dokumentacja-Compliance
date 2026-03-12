@@ -31,7 +31,7 @@ DOCUMENT_TYPE_POINTS: dict[str, float] = {
     "strategy":          6.0,
     "roadmap":           5.0,
     "requirements":      5.0,
-    
+
     # Compliance / Audit (złożone, dużo treści)
     "audit":             8.0,
     "compliance":        7.0,
@@ -39,20 +39,20 @@ DOCUMENT_TYPE_POINTS: dict[str, float] = {
     "policy":            5.0,
     "rodo":              6.0,
     "nis2":              6.0,
-    
+
     # Techniczne standardowe
     "specification":     4.0,
     "procedure":         3.0,
     "runbook":           3.0,
     "test_plan":         4.0,
     "test_report":       3.0,
-    
+
     # Lekkie
     "checklist":         1.5,
     "meeting_notes":     1.0,
     "status_report":     1.5,
     "changelog":         1.0,
-    
+
     # Domyślne (nieznany typ)
     "default":           3.0,
 }
@@ -79,16 +79,16 @@ def points_to_hours(points: float) -> tuple[float, float, float]:
 COMPLEXITY_MULTIPLIERS: dict[str, float] = {
     # Mnożnik bazowy
     "base":                1.0,
-    
+
     # Mnożnik confidence — wyższy confidence = dokument bardziej potrzebny = standardowa wycena
     # Niski confidence = może nie być potrzebny = wycena discount
     "confidence_high":     1.0,     # confidence ≥ 0.8
     "confidence_medium":   0.9,     # confidence 0.6–0.79
     "confidence_low":      0.7,     # confidence 0.4–0.59 (poniżej progu domyślnego)
-    
+
     # Mnożnik is_required — wymagane przez standard/regulację = +20%
     "required_by_standard": 1.2,
-    
+
     # Mnożnik domeny projektu — niektóre domeny są bardziej złożone
     "domain_fintech":      1.3,     # regulacje + compliance + security
     "domain_healthcare":   1.4,     # 21 CFR, HIPAA, rygor
@@ -106,11 +106,11 @@ def estimate_document(
     entities: ExtractedEntities,
     settings: EstimationSettings
 ) -> DocumentEstimate:
-    
+
     # 1. Determine document type from path/title
     doc_type = _infer_doc_type(item.doc_title, item.doc_path)
     base_points = DOCUMENT_TYPE_POINTS.get(doc_type, DOCUMENT_TYPE_POINTS["default"])
-    
+
     # 2. Confidence multiplier
     if item.confidence >= 0.8:
         conf_mult = COMPLEXITY_MULTIPLIERS["confidence_high"]
@@ -118,19 +118,19 @@ def estimate_document(
         conf_mult = COMPLEXITY_MULTIPLIERS["confidence_medium"]
     else:
         conf_mult = COMPLEXITY_MULTIPLIERS["confidence_low"]
-    
+
     # 3. Required multiplier
     req_mult = COMPLEXITY_MULTIPLIERS["required_by_standard"] if item.is_required else 1.0
-    
+
     # 4. Domain multiplier (z projektu)
     domain_mult = _domain_multiplier(entities.domains)
-    
+
     # 5. Final points
     final_points = base_points * conf_mult * req_mult * domain_mult
-    
+
     # 6. Convert to hours
     h_min, h_likely, h_max = points_to_hours(final_points)
-    
+
     return DocumentEstimate(
         doc_uid=item.doc_uid,
         doc_title=item.doc_title,
@@ -226,24 +226,24 @@ def organize_by_phases(
     doc_estimates: list[DocumentEstimate],
     phases_order: list[Phase]   # 24 fazy z itdoc, posortowane wg ordinal
 ) -> list[PhaseEstimate]:
-    
+
     phase_groups: dict[int, list[DocumentEstimate]] = defaultdict(list)
     for doc in doc_estimates:
         phase_groups[doc.phase_id].append(doc)
-    
+
     result = []
     for phase in phases_order:
         if phase.phase_id not in phase_groups:
             continue
-        
+
         docs = phase_groups[phase.phase_id]
         ph_h_min    = sum(d.h_min for d in docs)
         ph_h_likely = sum(d.h_likely for d in docs)
         ph_h_max    = sum(d.h_max for d in docs)
-        
+
         # Critical path: fazy z wymaganymi dokumentami + fazy w sekwencji rytmu
         is_critical = any(d.is_required for d in docs) or phase.phase_id in CRITICAL_PHASES
-        
+
         result.append(PhaseEstimate(
             phase_id=phase.phase_id,
             phase_name=phase.phase_name,
@@ -254,7 +254,7 @@ def organize_by_phases(
             is_critical_path=is_critical,
             documents=docs,
         ))
-    
+
     return result
 
 # Fazy zawsze na critical path (wymagane dla podstawowej spójności projektu)
@@ -275,9 +275,9 @@ def build_deduction_basis(
     mapping: MappingResult,
     phase_estimates: list[PhaseEstimate],
 ) -> list[DeductionPoint]:
-    
+
     basis = []
-    
+
     # 1. Standard coverage
     if entities.standards:
         std_docs = sum(1 for item in mapping.items if any(
@@ -289,7 +289,7 @@ def build_deduction_basis(
                        f"{std_docs} szablonów dokumentów (mandatory coverage).",
             weight=0.35,
         ))
-    
+
     # 2. Regulation overlap
     if entities.regulations:
         reg_docs = sum(1 for item in mapping.items if any(
@@ -301,7 +301,7 @@ def build_deduction_basis(
                        f"obowiązek {reg_docs} dokumentów compliance.",
             weight=0.25,
         ))
-    
+
     # 3. Phase sequence
     critical_phases = [p for p in phase_estimates if p.is_critical_path]
     if critical_phases:
@@ -312,7 +312,7 @@ def build_deduction_basis(
                        f"sekwencyjnie wg modelu SDLC — determinuje minimalny czas projektu.",
             weight=0.20,
         ))
-    
+
     # 4. Domain complexity
     domain_mults = {d: _domain_multiplier([d]) for d in entities.domains}
     if any(m > 1.0 for m in domain_mults.values()):
@@ -324,7 +324,7 @@ def build_deduction_basis(
                        f"ze względu na rygor regulacyjny.",
             weight=0.15,
         ))
-    
+
     # 5. Confidence distribution
     low_conf = sum(1 for i in mapping.items if i.confidence < 0.7)
     if low_conf > 0:
@@ -334,14 +334,14 @@ def build_deduction_basis(
                        f"wycena zawiera bufor niepewności (+50% h_max).",
             weight=0.05,
         ))
-    
+
     return basis
 ```
 
-> **Uwaga o wagach:** Wagi punktów dedukcji (`weight`) są wartościami cząstkowymi 
-> (nie sumują się do 1.0 gdy nie wszystkie warunki zachodzą). Podczas prezentacji 
-> raportu PM lub klientowi należy je traktować jako *wskaźniki istotności*, 
-> nie jako procenty. Implementacja może opcjonalnie normalizować wagi 
+> **Uwaga o wagach:** Wagi punktów dedukcji (`weight`) są wartościami cząstkowymi
+> (nie sumują się do 1.0 gdy nie wszystkie warunki zachodzą). Podczas prezentacji
+> raportu PM lub klientowi należy je traktować jako *wskaźniki istotności*,
+> nie jako procenty. Implementacja może opcjonalnie normalizować wagi
 > (`w_i = w_i / sum(w_j)`) przed zwróceniem w `EstimationReport`.
 
 ---
@@ -350,11 +350,11 @@ def build_deduction_basis(
 
 ```python
 class EstimationEngine:
-    
+
     def __init__(self, itdoc_connector: ItdocConnector, settings: Settings):
         self._itdoc = itdoc_connector
         self._settings = settings
-    
+
     async def generate_report(self, mapping_id: UUID) -> EstimationReport:
         """Alias calculate() z guardem statusu projektu — główny entry point."""
         # Guard: sprawdź status projektu przed generowaniem raportu
@@ -365,27 +365,27 @@ class EstimationEngine:
             )
         mapping = await self._get_mapping(mapping_id)
         return await self.calculate(mapping)
-    
+
     async def calculate(
         self,
         mapping: MappingResult,
         confidence_threshold: float = 0.6,
         include_phases: list[int] | None = None,
     ) -> EstimationReport:
-        
+
         # 1. Pobierz fazy z itdoc
         all_phases = await self._itdoc.get_phases()
-        
+
         # 2. Filtruj mapping items
         items = [i for i in mapping.items if i.confidence >= confidence_threshold]
         if include_phases:
             items = [i for i in items if i.phase_id in include_phases]
-        
+
         if not items:
             raise InsufficientMappingError(
                 f"Brak zmapowanych szablonów z confidence ≥ {confidence_threshold}"
             )
-        
+
         # V-06: Limit dokumentów per raport
         # Konfigurowalny przez env WORKSHOP_MAX_DOCS_ESTIMATION (domyślnie 500)
         MAX_DOCS = int(os.getenv("WORKSHOP_MAX_DOCS_ESTIMATION", "500"))
@@ -398,29 +398,29 @@ class EstimationEngine:
                 f"Report truncated: {total_before_truncation} documents found, "
                 f"showing top {MAX_DOCS}"
             )
-        
+
         # 3. Wycena per dokument
         doc_estimates = [
             self.estimate_document(item, mapping.extracted_entities, self._settings)
             for item in items
         ]
-        
+
         # 4. Agregacja sumaryczna
         total_h_min    = sum(d.h_min    for d in doc_estimates)
         total_h_likely = sum(d.h_likely for d in doc_estimates)
         total_h_max    = sum(d.h_max    for d in doc_estimates)
-        
+
         # 5. Organizacja po fazach
         phase_estimates = self.organize_by_phases(doc_estimates, all_phases)
-        
+
         # 6. Klasyfikacja złożoności
         complexity = self.classify_complexity(total_h_likely, len(doc_estimates))
-        
+
         # 7. Podstawy dedukcji
         deduction_basis = self.build_deduction_basis(
             mapping.extracted_entities, mapping, phase_estimates
         )
-        
+
         return EstimationReport(
             mapping_id=mapping.id,
             project_id=mapping.project_id,   # przekazywane z MappingResult
@@ -466,7 +466,7 @@ Generowany: 2026-03-11 11:30:00
 ## Podstawy dedukcji
 1. [waga 35%] Standardy [PCI DSS, ISO/IEC 27001] wymagają 47 szablonów dokumentów.
 2. [waga 25%] Regulacje [RODO, KSC] nakładają obowiązek 31 dokumentów compliance.
-3. [waga 20%] Fazy krytyczne (Architecture, Security, Compliance) muszą być wykonane 
+3. [waga 20%] Fazy krytyczne (Architecture, Security, Compliance) muszą być wykonane
    sekwencyjnie wg modelu SDLC.
 4. [waga 15%] Domeny [fintech] wymagają zwiększonego nakładu (mnożnik 1.3x).
 5. [waga 5%]  12 dokumentów z confidence < 0.7 — bufor niepewności (+50% h_max).

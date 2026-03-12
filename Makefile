@@ -125,4 +125,3 @@ clean:
 	find . -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
 	find . -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
 	@echo "✓ Wyczyszczone"
-

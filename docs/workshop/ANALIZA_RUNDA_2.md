@@ -183,7 +183,7 @@ Deweloper musi zgadywać implementację tych funkcji.
 Dodać do dok.10:
 ```python
 def _infer_doc_type(title: str, path: str | None) -> str:
-    """Matching: sprawdź czy dowolny klucz z DOCUMENT_TYPE_POINTS 
+    """Matching: sprawdź czy dowolny klucz z DOCUMENT_TYPE_POINTS
     jest substringiem title.lower(). Kolejność priorytetu jak w słowniku.
     Fallback: 'default'."""
 
@@ -801,7 +801,7 @@ class BriefParser:
         "pdf": _parse_pdf,
         "docx": _parse_docx,
     }
-    
+
     def register_handler(self, format: str, handler: Callable): ...
 ```
 

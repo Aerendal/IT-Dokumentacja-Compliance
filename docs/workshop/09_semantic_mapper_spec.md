@@ -82,23 +82,23 @@ async def _query_itdoc(
     entities: ExtractedEntities,
     connector: ItdocConnector
 ) -> list[RawCandidate]:
-    
+
     candidates: dict[str, RawCandidate] = {}  # doc_uid → candidate
-    
+
     # ŚCIEŻKA A: Zapytania semantyczne (gdy tabele mapowań istnieją i mają dane)
-    
+
     # Zapytania o standardy
     for standard in entities.standards:
         docs = await connector.find_by_standard(standard)
         for doc in docs:
             _add_candidate(candidates, doc, source=f"standard:{standard}")
-    
+
     # Zapytania o regulacje
     for regulation in entities.regulations:
         docs = await connector.find_by_regulation(regulation)
         for doc in docs:
             _add_candidate(candidates, doc, source=f"regulation:{regulation}")
-    
+
     # Rozszerzenie przez rhythm_downstream
     # Dla każdego znalezionego doc_uid: dodaj jego downstream (głębokość 1)
     top_candidates = sorted(candidates.values(), key=lambda c: c.match_count, reverse=True)[:20]
@@ -106,7 +106,7 @@ async def _query_itdoc(
         downstream = await connector.rhythm_downstream(candidate.doc_uid, depth=1)
         for doc in downstream:
             _add_candidate(candidates, doc, source=f"rhythm_downstream:{candidate.doc_uid}")
-    
+
     # ŚCIEŻKA B: Keyword fallback (gdy ścieżka A zwróciła < MIN_CANDIDATES wyników)
     # Używane gdy baza nie ma tabel mapowań lub są puste.
     MIN_CANDIDATES = 10
@@ -119,7 +119,7 @@ async def _query_itdoc(
         for doc in fallback_docs:
             if doc.doc_uid not in candidates:
                 _add_candidate(candidates, doc, source="keyword_fallback")
-    
+
     # ŚCIEŻKA C: Phase fallback (gdy ścieżka A+B nadal < MIN_CANDIDATES)
     # Zwraca dokumenty przypisane do faz wyekstrahowanych z briefu.
     # entities.phases zawiera numery 1-based (LLM output); konwertujemy na 0-based dla DB.
@@ -130,7 +130,7 @@ async def _query_itdoc(
             for doc in phase_docs:
                 if doc.doc_uid not in candidates:
                     _add_candidate(candidates, doc, source=f"phase_fallback:{phase_id}")
-    
+
     return list(candidates.values())
 ```
 
@@ -180,29 +180,29 @@ def _score_candidate(
     candidate: RawCandidate,
     entities: ExtractedEntities
 ) -> float:
-    
+
     # 1. Source score (0.0–0.5)
     unique_source_types = len({s.split(':')[0] for s in candidate.sources})
     # max: standard + regulation + rhythm = 3 typów → 0.5
     source_score = min(unique_source_types / 6.0, 0.5)
-    
+
     # 2. Keyword Jaccard overlap (0.0–0.3)
     # doc_path zawsze None w aktualnym stanie it_doc_matrix.db (brak kolumny 'path')
     # Guard (or "") chroni przed: f-string z None, split na None, LIKE query z None
     doc_words = set(candidate.doc_title.lower().split() +
                     (candidate.doc_path or "").replace('/', ' ').split('_'))
     brief_keywords = set(kw.lower() for kw in entities.keywords)
-    
+
     if doc_words and brief_keywords:
         intersection = len(doc_words & brief_keywords)
         union = len(doc_words | brief_keywords)
         keyword_score = (intersection / union) * 0.3
     else:
         keyword_score = 0.0
-    
+
     # 3. Phase match (0.0–0.2)
     phase_score = 0.2 if candidate.phase_id in entities.phases else 0.0
-    
+
     confidence = source_score + keyword_score + phase_score
     return min(round(confidence, 3), 1.0)
 
@@ -216,7 +216,7 @@ def _compute_match_reason(
     parts = []
     standard_sources = [s for s in candidate.sources if s.startswith("standard:")]
     regulation_sources = [s for s in candidate.sources if s.startswith("regulation:")]
-    
+
     if standard_sources:
         stds = ", ".join(s.split(':')[1] for s in standard_sources)
         parts.append(f"wymagany przez standard: {stds}")
@@ -227,7 +227,7 @@ def _compute_match_reason(
         parts.append(f"należy do fazy {candidate.phase_id} ({candidate.phase_name})")
     if any(s.startswith("rhythm_downstream:") for s in candidate.sources):
         parts.append("wynika z zależności dokumentowej (rhythm)")
-    
+
     return "; ".join(parts) if parts else "dopasowanie słów kluczowych"
 ```
 
@@ -243,17 +243,17 @@ LLM Reranking jest włączany gdy:
 if len(scored_candidates) > 100 and settings.llm_reranking_enabled:
     # Przekaż top-100 (wg Jaccard) do reranking
     top_100 = sorted(scored_candidates, key=lambda c: c.confidence, reverse=True)[:100]
-    
+
     # Skrót briefu (maks. 500 słów) dla promptu
     brief_summary = parsed_brief.chunks[0][:2000]
-    
+
     reranked = await llm_adapter.rerank_mapping(
         brief_text=brief_summary,
         candidates=[MappingCandidate(c.doc_uid, c.doc_title, c.phase_id, c.match_reason)
                     for c in top_100],
         max_candidates=50
     )
-    
+
     # Scalaj score: 0.6 × Jaccard + 0.4 × LLM
     # item.score pochodzi z LLMAdapter.ScoredCandidate (dok.07, pole "score")
     # original.confidence pochodzi z SemanticMapper.ScoredCandidate (ten plik, pole "confidence")
@@ -275,19 +275,19 @@ def _filter_and_deduplicate(
     threshold: float,
     max_results: int
 ) -> list[ScoredCandidate]:
-    
+
     # 1. Filtr confidence
     filtered = [c for c in candidates if c.confidence >= threshold]
-    
+
     # 2. Deduplikacja po doc_uid (zachowaj najwyższe confidence)
     seen = {}
     for c in filtered:
         if c.doc_uid not in seen or c.confidence > seen[c.doc_uid].confidence:
             seen[c.doc_uid] = c
-    
+
     # 3. Sortuj malejąco wg confidence
     deduped = sorted(seen.values(), key=lambda c: c.confidence, reverse=True)
-    
+
     # 4. Ogranicz do max_results
     return deduped[:max_results]
 ```
@@ -298,7 +298,7 @@ def _filter_and_deduplicate(
 
 ```python
 class SemanticMapper:
-    
+
     def __init__(
         self,
         llm_adapter: BaseLLMAdapter,
@@ -308,7 +308,7 @@ class SemanticMapper:
         self._llm = llm_adapter
         self._itdoc = itdoc_connector
         self._settings = settings
-    
+
     async def map(
         self,
         brief: ParsedBrief,
@@ -316,13 +316,13 @@ class SemanticMapper:
         confidence_threshold: float = 0.4,
         max_results: int = 200,
     ) -> MappingResult:
-        
+
         # 1. Ekstrakcja encji przez LLM
         entities = await self._extract_entities(brief)
-        
+
         # 2. Multi-query do itdoc
         raw_candidates = await self._query_itdoc(entities)
-        
+
         # 3. Scoring Jaccard
         scored = [
             ScoredCandidate(
@@ -337,14 +337,14 @@ class SemanticMapper:
             )
             for c in raw_candidates
         ]
-        
+
         # 4. Opcjonalny LLM reranking
         if len(scored) > 100 and self._settings.llm_reranking_enabled:
             scored = await self._llm_rerank(brief, scored)
-        
+
         # 5. Filtr + deduplikacja
         final = self._filter_and_deduplicate(scored, confidence_threshold, max_results)
-        
+
         return MappingResult(
             project_id=project_id,   # ← z parametru, nie z brief.project_id
             extracted_entities=entities,

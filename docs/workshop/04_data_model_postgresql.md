@@ -194,7 +194,7 @@ CREATE INDEX idx_reports_status  ON estimation_reports(status);
 ]
 ```
 
-> Wagi nie sumują się zawsze do 1.0 — zależą od warunków projektu. 
+> Wagi nie sumują się zawsze do 1.0 — zależą od warunków projektu.
 > Patrz dok.10 §5 po szczegóły normalizacji.
 
 ---

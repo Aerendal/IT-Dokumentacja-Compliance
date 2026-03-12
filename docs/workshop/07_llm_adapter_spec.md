@@ -49,7 +49,7 @@ class MappingCandidate:
 class ScoredCandidate:
     """
     Wynik rerankingu zwracany przez LLM Adapter (rerank_mapping).
-    Uwaga: SemanticMapper używa własnej, bogatszej klasy ScoredCandidate 
+    Uwaga: SemanticMapper używa własnej, bogatszej klasy ScoredCandidate
     (dok.09) z polami confidence, phase_id, match_sources itp.
     Ta klasa jest używana WYŁĄCZNIE wewnątrz metody `_llm_rerank` w SemanticMapper
     jako tymczasowy wynik parsowania odpowiedzi LLM przed blendingiem.
@@ -90,13 +90,13 @@ class BaseLLMAdapter(ABC):
     ) -> ExtractedEntities:
         """
         Wyciąga encje semantyczne z tekstu briefu.
-        
+
         Kontrakt:
           - text nie może być pusty
           - text ≤ 100 000 znaków (chunking po stronie wywołującego)
           - Zawsze zwraca ExtractedEntities (puste listy jeśli nic nie znaleziono)
           - Loguje wywołanie w llm_calls_log
-        
+
         Raises:
           LLMTimeoutError    — brak odpowiedzi > 30s
           LLMRateLimitError  — HTTP 429 od providera
@@ -112,12 +112,12 @@ class BaseLLMAdapter(ABC):
     ) -> str:
         """
         Generuje szkielet szablonu Markdown z YAML frontmatter.
-        
+
         Kontrakt:
           - Zwraca poprawny Markdown z blokiem --- YAML ---
           - Frontmatter zawiera co najmniej: title, category, phase_id, standards[]
           - Sekcje szablonu oparte na strukturze itdoc
-        
+
         Raises: LLMTimeoutError, LLMProviderError
         """
 
@@ -130,7 +130,7 @@ class BaseLLMAdapter(ABC):
     ) -> list[ScoredCandidate]:
         """
         Opcjonalny reranking kandydatów mapowania (LLM-as-judge).
-        
+
         Kontrakt:
           - Zwraca listę posortowaną malejąco wg score
           - len(result) ≤ max_candidates
@@ -198,7 +198,7 @@ class OllamaAdapter(BaseLLMAdapter):
     Dostawca: Ollama (lokalne LLM, brak opłat per token)
     Wymagane env: OLLAMA_BASE_URL (default: http://localhost:11434)
     Opcjonalne env: OLLAMA_MODEL (default: llama3.2)
-    
+
     Uwaga: Ollama jest synchroniczne — wrapper przez asyncio.run_in_executor.
     Precision może być niższa niż GPT-4o dla złożonych briefów.
     """
@@ -218,7 +218,7 @@ class OllamaAdapter(BaseLLMAdapter):
 def create_llm_adapter(settings: Settings) -> BaseLLMAdapter:
     """
     Fabryka zwracająca adapter na podstawie LLM_PROVIDER z .env.
-    
+
     Kolejność fallback:
       1. settings.llm_provider ("openai" | "anthropic" | "ollama")
       2. Jeśli klucz API brak → ValueError z jasnym komunikatem
@@ -252,10 +252,10 @@ Jesteś ekspertem analizy wymagań IT. Przeanalizuj poniższy brief projektu i w
 1. Domeny techniczne (np. fintech, cloud, mobile, security, data-engineering)
 2. Standardy/normy wymienione lub sugerowane (np. ISO 27001, PCI DSS, OWASP)
 3. Regulacje prawne (np. RODO, KSC, NIS2, AI Act)
-4. Fazy cyklu życia projektu (podaj numery 0-23: 0=Conception, 1=Requirements, 
+4. Fazy cyklu życia projektu (podaj numery 0-23: 0=Conception, 1=Requirements,
    2=Architecture, 3=Design, 4=Development, 5=Testing, 6=Integration, 7=UAT,
    8=Deployment, 9=Operations, 10=Monitoring, 11=Maintenance, 12=Security,
-   13=Documentation, 14=Training, 15=Support, 16=BCP, 17=Governance, 
+   13=Documentation, 14=Training, 15=Support, 16=BCP, 17=Governance,
    18=Compliance, 19=Risk, 20=Data, 21=ProjectMgmt, 22=Decommission, 23=Phase24)
 5. Słowa kluczowe techniczne (max 20)
 6. Typ projektu (greenfield_saas / migration / integration / audit / modernization / other)
@@ -277,7 +277,7 @@ BRIEF:
 ### 5.2 `generate_template.txt`
 
 ```
-Jesteś ekspertem dokumentacji IT. Na podstawie poniższej specyfikacji wygeneruj szablon 
+Jesteś ekspertem dokumentacji IT. Na podstawie poniższej specyfikacji wygeneruj szablon
 dokumentu w formacie Markdown z YAML frontmatter (zgodny ze standardem biblioteki itdoc).
 
 Wymagania szablonu:

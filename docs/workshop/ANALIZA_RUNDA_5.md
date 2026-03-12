@@ -158,7 +158,7 @@ Ujednolicić WSZYSTKIE listy na wzorzec `page` + `per_page`:
 
 Jedynym wyjątkiem jest test w dok.14 (`test_upload_requires_api_key`) weryfikujący kod 403, ale sam spec nie dokumentuje tej odpowiedzi.
 
-**Wpływ:** 
+**Wpływ:**
 1. Generatory SDK (FastAPI auto-docs, Swagger UI, Redoc) nie pokazują możliwości odpowiedzi błędów autoryzacji — klienci API nie wiedzą jak obsłużyć te przypadki
 2. Niezdefiniowanie 403 dla BOLA oznacza brak kontraktu dla ownership checks (dodanych w R4)
 3. Audyt bezpieczeństwa API wykaże niekompletność specyfikacji
@@ -239,7 +239,7 @@ Endpointy z niekompletnymi odpowiedziami błędów: `POST /brief/upload` (404, 4
 **Naprawa:**  
 Dla WSZYSTKICH odpowiedzi 4xx dodać `content:`:
 ```yaml
-"404": 
+"404":
   description: Brief nie znaleziony
   content:
     application/json:
@@ -253,7 +253,7 @@ Przejrzeć i ustandaryzować WSZYSTKIE kody błędów w dok.06 (ok. 15 miejsc do
 
 **Plik:** dok.06 §info, §servers  
 **Priorytet:** 🟡 WAŻNE  
-**Problem:** 
+**Problem:**
 - Brak prefiksu `/v1/` w URL-ach endpointów (np. `/projects` zamiast `/v1/projects`)
 - `info.version: "1.0.0"` w spec, ale serwer to `http://localhost:8000` bez prefiksu wersji
 - Brak sekcji w dok.06 (ani dok.01) opisującej strategię wersjonowania API: czy przez URL (`/v2/`), header (`Accept: application/vnd.workshop.v2+json`), czy query param (`?version=2`)
@@ -298,7 +298,7 @@ działania obu wersji.
           content:
             application/zip:
               schema: {type: string, format: binary}
-        "404": 
+        "404":
           description: Projekt nie znaleziony
           content:
             application/json:
@@ -450,17 +450,17 @@ Dodaj do dok.14 §6 nowy blok:
 class TestModuleContracts:
     """Testy kontraktowe: weryfikuje że OUTPUT modułu A zawiera
        wszystkie pola oczekiwane przez INPUT modułu B."""
-    
+
     async def test_parsed_brief_satisfies_semantic_mapper_contract(self, ...):
         """ParsedBrief musi mieć: text, chunks (≥1), word_count."""
         brief = await parser.parse(SAMPLE_BRIEF_TXT, "txt")
         assert hasattr(brief, 'chunks') and len(brief.chunks) >= 1
         assert hasattr(brief, 'word_count') and brief.word_count > 0
-    
+
     async def test_mapping_result_satisfies_estimation_engine_contract(self, ...):
         """MappingResult.items muszą mieć: phase_id, confidence, is_required."""
         ...
-    
+
     async def test_estimation_report_satisfies_work_planner_contract(self, ...):
         """EstimationReport musi mieć: by_phase[].phase_id, by_phase[].is_critical_path."""
         ...
@@ -492,7 +492,7 @@ class TestPerformanceSLA:
         start = time.time()
         # ... uruchom mapowanie i czekaj na done
         assert time.time() - start < 30.0
-    
+
     async def test_planning_completes_within_sla(self, client, accepted_report):
         """Generowanie planu pracy < 10s (DB-only, bez LLM)."""
         start = time.time()
@@ -527,15 +527,15 @@ class TestSecurity:
     async def test_rate_limit_returns_429(self, client):
         """Wyślij N+1 requestów powyżej limitu → ostatni dostaje 429."""
         ...
-    
+
     async def test_bola_different_project_returns_403(self, client):
         """Brief projektu A niedostępny dla projektu B."""
         ...
-    
+
     async def test_file_size_limit_returns_413(self, client, project_id):
         """Plik > 50MB → 413 Payload Too Large."""
         ...
-    
+
     async def test_all_endpoints_require_api_key(self, client):
         """Każdy chroniony endpoint bez X-API-Key → 403."""
         protected = ["/projects", "/brief/upload", ...]
@@ -606,26 +606,26 @@ Rozszerz dok.14 §5.3:
 ```python
 @pytest.mark.unit
 class TestSemanticMapperFallback:
-    
+
     async def test_tier1_llm_available(self, mapper, mock_llm_adapter, ...):
         """Tier 1: LLM dostępny → pełne mapowanie semantyczne."""
         result = await mapper.map(sample_brief)
         assert result.status == "done"
         assert result.metadata is None or not result.metadata.get("partial_llm_timeout")
-    
+
     async def test_tier2_keyword_fallback_when_llm_unavailable(self, mapper_no_llm, ...):
         """Tier 2: LLM niedostępny → keyword fallback, status='done',
            metadata.processing_notes zawiera fallback_mode='keyword'."""
         result = await mapper_no_llm.map(sample_brief)
         assert result.status == "done"
         assert result.metadata["processing_notes"].get("fallback_mode") == "keyword"
-    
+
     async def test_tier3_phase_fallback_when_no_keywords(self, mapper_no_llm, empty_brief, ...):
         """Tier 3: Brak LLM i brak kluczowych terminów → fallback na fazy SDLC."""
         result = await mapper_no_llm.map(empty_brief)
         assert result.status == "done"
         assert result.total_items > 0  # Przynajmniej fazy bazowe
-    
+
     async def test_partial_llm_timeout_sets_processing_note(self, mapper_timeout_llm, ...):
         """LLM timeout w trakcie → status='done', partial_llm_timeout=true."""
         result = await mapper_timeout_llm.map(sample_brief)
@@ -1003,7 +1003,7 @@ W dok.12 §5 opisać zmienną `ITDOC_DB_VERSION` (hash pliku lub data modyfikacj
 `EstimationEngine.calculate()` iteruje przez wszystkie `mapping.items` w pamięci bez żadnego limitu:
 ```python
 doc_estimates = [
-    self.estimate_document(item, ...) 
+    self.estimate_document(item, ...)
     for item in items       # może być setki dokumentów
 ]
 ```

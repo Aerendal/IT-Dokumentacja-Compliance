@@ -287,7 +287,7 @@ Preconditions:
   - brief_id musi istnieć
   - parse_status briefa musi być "parsed"
   - LLM provider musi być skonfigurowany
-  - Jeśli istnieje mapping_results rekord ze status='running' dla tego 
+  - Jeśli istnieje mapping_results rekord ze status='running' dla tego
     brief_id → zwróć HTTP 409 Conflict z body:
     {
       "error": "mapping_in_progress",
@@ -857,12 +857,12 @@ Przy starcie aplikacji (`lifespan` event w FastAPI) należy wykonać:
 async def on_startup():
     # 1. Reset zombie mapping tasks (przerwane przez crash/restart)
     await db.execute("""
-        UPDATE mapping_results 
-        SET status = 'failed', 
+        UPDATE mapping_results
+        SET status = 'failed',
             error_message = 'Interrupted by service restart'
         WHERE status = 'running'
     """)
-    
+
     # 2. Log count of recovered tasks
     count = await db.fetchval("SELECT COUNT(*) FROM mapping_results WHERE status='failed' AND error_message LIKE 'Interrupted%'")
     logger.warning(f"Startup recovery: reset {count} zombie mapping tasks")

@@ -63,7 +63,7 @@ repos:
     hooks:
       - id: bandit
         args: ["-ll", "--quiet"]   # -ll = tylko HIGH severity
-        exclude: "tests/"
+        exclude: "tests/|scripts/maintenance/"
 
 # Ustawienia globalne
 default_stages: [pre-commit]

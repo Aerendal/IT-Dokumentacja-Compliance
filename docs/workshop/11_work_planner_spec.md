@@ -52,25 +52,25 @@ async def _build_dependency_graph(
 ) -> dict[str, list[str]]:
     """
     Buduje graf: doc_uid → [doc_uids które muszą być przed nim]
-    
+
     Źródła zależności (według priorytetu):
     1. rhythm_upstream() z it_doc_matrix.db — bezpośrednie zależności dokumentowe
     2. Kolejność faz SDLC — dokumenty fazy N mogą zacząć się dopiero po fazie N-1
     3. Reguły domenowe (hardcoded) — np. Requirements przed Architecture
     """
-    
+
     deps: dict[str, list[str]] = {uid: [] for uid in doc_uids}
     doc_set = set(doc_uids)
-    
+
     for uid in doc_uids:
         # Zapytaj o upstream (poprzedzające) w bibliotece itdoc
         upstream = await connector.rhythm_upstream(uid, depth=1)
-        
+
         for upstream_doc in upstream:
             # Uwzględnij tylko zależności wewnątrz naszego zestawu dokumentów
             if upstream_doc.doc_uid in doc_set:
                 deps[uid].append(upstream_doc.doc_uid)
-    
+
     return deps
 ```
 
@@ -85,26 +85,26 @@ def _topological_sort(
     """
     Sortowanie topologiczne z uwzględnieniem faz SDLC jako tiebreaker.
     Gwarantuje że dokument pojawia się po wszystkich swoich upstream.
-    
+
     Jeśli istnieje cykl (rhythm_edges mogą mieć cykle) → przerwij cykl
     na krawędzi o najniższym weight (fallback: lexicographic).
     """
-    
+
     in_degree = {uid: 0 for uid in doc_uids}
     for uid, prerequisites in deps.items():
         in_degree[uid] = len(prerequisites)
-    
+
     # Kolejka: docs bez zależności, posortowane wg phase_id (ASC)
     queue = sorted(
         [uid for uid, degree in in_degree.items() if degree == 0],
         key=lambda uid: self._get_phase_id(uid)
     )
-    
+
     result = []
     while queue:
         current = queue.pop(0)
         result.append(current)
-        
+
         # Znajdź dokumenty które mają current jako zależność
         for uid in doc_uids:
             if current in deps[uid]:
@@ -112,11 +112,11 @@ def _topological_sort(
                 if in_degree[uid] == 0:
                     # Wstaw posortowany wg fazy
                     _insert_sorted_by_phase(queue, uid, self._get_phase_id)
-    
+
     # Obsługa cykli: pozostałe nieprzetworzone docs dodaj na koniec (wg fazy)
     remaining = [uid for uid in doc_uids if uid not in result]
     result.extend(sorted(remaining, key=lambda uid: self._get_phase_id(uid)))
-    
+
     return result
 ```
 
@@ -133,9 +133,9 @@ async def _enrich_with_contracts(
     Pobiera inputs/outputs/gates z itdoc contracts.
     Fallback jeśli contract = None (stub): generuj na podstawie fazy.
     """
-    
+
     contract = await connector.get_contract(doc_uid)
-    
+
     if contract and contract.inputs:
         inputs  = contract.inputs
         outputs = contract.outputs
@@ -150,7 +150,7 @@ async def _enrich_with_contracts(
             inputs  = contract_data.get("inputs", [])
             outputs = contract_data.get("outputs", [])
             gates   = contract_data.get("gates", [])
-    
+
     return inputs, outputs, gates
 
 
@@ -255,11 +255,11 @@ def _assign_assignee(self, doc_title: str, doc_path: str) -> str:
 
 ```python
 class WorkPlanner:
-    
+
     def __init__(self, itdoc_connector: ItdocConnector, settings: Settings):
         self._itdoc = itdoc_connector
         self._settings = settings
-    
+
     async def create_plan(self, report: EstimationReport) -> WorkPlan:
         """
         Cała operacja musi być wykonana w jednej transakcji bazodanowej:
@@ -280,7 +280,7 @@ class WorkPlanner:
             async with db.transaction():  # atomowe — rollback przy błędzie
                 # V-02: Archiwizuj poprzedni plan jeśli istnieje
                 await db.execute("""
-                    UPDATE work_plans 
+                    UPDATE work_plans
                     SET status = 'archived', updated_at = NOW()
                     WHERE project_id = $1 AND status NOT IN ('archived')
                 """, project.id)
@@ -294,44 +294,44 @@ class WorkPlanner:
 
         Kolumna `work_plans.status`: `active | archived` (dodaj do schematu jeśli nie istnieje).
         """
-        
+
         # 0. Utwórz WorkPlan z nowym ID — plan_id musi istnieć przed tworzeniem pakietów
         plan_id = uuid4()
-        
+
         # 1. Zbierz wszystkie doc_uid z raportu
         all_docs: list[DocumentEstimate] = []
         for phase in report.by_phase:
             all_docs.extend(phase.documents)
-        
+
         doc_uids = [d.doc_uid for d in all_docs]
         # UWAGA: Jeden dokument może być zmapowany do wielu faz (document_phase_mapping).
         # Używamy composite key (doc_uid, phase_id) aby uniknąć nadpisywania duplikatów.
         # Klucz composite (doc_uid, phase_id) obsługuje dokumenty mapowane do wielu faz
         doc_map  = {(d.doc_uid, d.phase_id): d for d in all_docs}
-        
+
         # 2. Zbuduj graf zależności (itdoc rhythm_upstream)
         # Budowanie listy tupli dla topological sort
         ordered_pairs_input: list[tuple[str, int]] = [(d.doc_uid, d.phase_id) for d in all_docs]
         deps = await self._build_dependency_graph(doc_uids)
-        
+
         # 3. Topologiczne sortowanie na parach (doc_uid, phase_id)
         ordered_pairs = self._topological_sort_pairs(ordered_pairs_input, deps)
-        
+
         # 4. Utwórz WorkPackage dla każdego dokumentu
         packages = []
         uid_to_package_id: dict[str, UUID] = {}
-        
+
         for sequence_order, (doc_uid, phase_id) in enumerate(ordered_pairs, start=1):
             doc_est = doc_map.get((doc_uid, phase_id))
-            
+
             inputs, outputs, gates = await self._enrich_with_contracts(
                 doc_uid, self._itdoc, doc_est.phase_id
             )
-            
+
             depends_on_uids = deps.get(doc_uid, [])
             depends_on_ids  = [uid_to_package_id[u] for u in depends_on_uids
                                if u in uid_to_package_id]
-            
+
             pkg = WorkPackage(
                 id=uuid4(),
                 plan_id=plan_id,   # plan_id musi być przekazane do create_plan() przed tworzeniem pakietów
@@ -348,10 +348,10 @@ class WorkPlanner:
                 status="pending",
                 depends_on=depends_on_ids,
             )
-            
+
             packages.append(pkg)
             uid_to_package_id[doc_uid] = pkg.id
-        
+
         return WorkPlan(
             report_id=report.id,
             project_id=report.project_id,

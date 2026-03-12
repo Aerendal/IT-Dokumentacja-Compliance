@@ -486,7 +486,7 @@ Pole `doc_path` będzie **zawsze NULL** w obecnym stanie bazy. Scoring Jaccard w
 3. Klient polling `GET /brief/{id}/mapping` nigdy nie zobaczy zakończenia
 4. Webhook `mapping.done` nigdy nie będzie wysłany
 
-**Rekomendacja:** 
+**Rekomendacja:**
 - **v1 minimum:** Dodaj startup job sprawdzający `SELECT * FROM mapping_results WHERE status='running'` → ustaw na `failed` z `error='interrupted by restart'`
 - **v2:** Migracja na task queue (Celery, arq, SAQ) z persystencją w DB/Redis
 
@@ -520,7 +520,7 @@ Dodaj osobny test warunkowy `@pytest.mark.skipif(not HAS_STANDARDS_TABLE)`.
 
 **Opis:** Export obejmuje: project.json + briefs/ (z `raw_content BYTEA` — do 50MB per brief) + mappings/ + reports/ + plans/. Dla projektu z 5 briefami PDF → potencjalnie 250MB w pamięci podczas budowy ZIP.
 
-**Rekomendacja:** 
+**Rekomendacja:**
 - Użyj streaming ZIP (`zipfile.ZipFile` z `io.BytesIO` per chunk lub `StreamingResponse`)
 - Dodaj limit: max 100MB eksportu; powyżej → HTTP 413
 - Opcjonalnie: `?exclude_raw_content=true` do eksportu bez binarnych plików
@@ -565,7 +565,7 @@ I notatkę: „Migracja wymaga PostgreSQL ≥ 12 dla ARRAY type. pgvector jest o
 
 **Opis:** Endpoint wymaga pobrania dwóch pełnych raportów z ich `report_phase_items` i `mapping_items` aby zbudować diff. Dla raportów z 200 docs każdy → 400 mapping items + 48 phase items. Brak limitu ile raportów użytkownik może porównywać i brak cache.
 
-**Rekomendacja:** 
+**Rekomendacja:**
 - Ogranicz do raportów tego samego projektu (`project_id` check)
 - Cache wyników porównania (hash dwóch report_id → cached diff)
 - Rozważ lazy loading: najpierw totals diff, potem `?include_details=true`
@@ -741,4 +741,3 @@ CREATE TABLE mapping_quality_snapshots (
 ---
 
 *Raport wygenerowany automatycznie. Runda 3 z 3.*
-

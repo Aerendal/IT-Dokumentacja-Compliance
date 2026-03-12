@@ -101,11 +101,11 @@ class ItdocPopulator:
     Wypełnia puste tabele it_doc_matrix.db danymi referencyjnymi.
     Bezpieczny: INSERT OR IGNORE + transakcje atomowe.
     """
-    
+
     def populate_standards(self, standards_csv_path: Path) -> int:
         """Importuje standardy z CSV. Zwraca liczbę dodanych wierszy."""
         ...
-    
+
     def create_document_phases_view(self) -> None:
         """
         Tworzy widok document_phases jako alias do tabeli phases.
@@ -114,7 +114,7 @@ class ItdocPopulator:
         # CREATE VIEW IF NOT EXISTS document_phases AS
         #     SELECT rowid as phase_id, name as phase_name, ordinal FROM phases
         ...
-    
+
     def populate_rhythm_edges_from_template_analysis(
         self,
         templates_dir: Path,
@@ -126,7 +126,7 @@ class ItdocPopulator:
         dry_run=True: tylko wypisuje, nie zapisuje.
         """
         ...
-    
+
     def annotate_standards_via_llm(
         self,
         llm_adapter,
@@ -196,7 +196,7 @@ class EmbeddingScorer:
     Używane jako UZUPEŁNIENIE Jaccard, nie jako zamiennik.
     Konfigurowane przez EMBEDDING_ENABLED=true.
     """
-    
+
     def __init__(self, settings: Settings):
         self._model_name = settings.embedding_model
         # Modele obsługiwane:
@@ -205,7 +205,7 @@ class EmbeddingScorer:
         # - "nomic-embed-text" (Ollama, lokalny)
         self._model = None  # lazy load
         self._cache: dict[str, np.ndarray] = {}  # doc_uid → vector
-    
+
     async def compute_similarity(
         self,
         query_text: str,
@@ -216,14 +216,14 @@ class EmbeddingScorer:
         Cosine similarity ∈ [-1.0, 1.0], normaliz. do [0.0, 1.0].
         """
         ...
-    
+
     async def _get_embedding(self, text: str) -> np.ndarray:
         """Embedding z cache lub obliczony na żądanie."""
         if text in self._cache:
             return self._cache[text]
         # Oblicz embedding (sync → run_in_executor jeśli lokalny model)
         ...
-    
+
     async def precompute_document_embeddings(
         self,
         connector: ItdocConnector,
@@ -274,20 +274,20 @@ async def _score_with_embeddings(
     """
     if not self._embedding_scorer:
         return scored_candidates  # pass-through gdy wyłączone
-    
+
     alpha = self._settings.embedding_blend_alpha  # default 0.5
-    
+
     similarities = await self._embedding_scorer.compute_similarity(
         query_text=brief_text,
         candidates=scored_candidates,
     )
-    
+
     for candidate, sim in similarities:
         candidate.confidence = round(
             alpha * candidate.confidence + (1 - alpha) * sim,
             3
         )
-    
+
     return sorted(scored_candidates, key=lambda c: c.confidence, reverse=True)
 ```
 
