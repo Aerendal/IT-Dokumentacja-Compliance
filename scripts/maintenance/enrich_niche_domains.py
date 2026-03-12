@@ -7,273 +7,413 @@ Użycie:
     python3 enrich_niche_domains.py --apply
     python3 enrich_niche_domains.py --apply --path-filter quantum
 """
+
+import argparse
 import logging
-import re, argparse, sys
+import re
+import sys
 from pathlib import Path
 
 from itdoc._batch import batch_continue
 
 _log = logging.getLogger(__name__)
 
-TDIR        = Path(__file__).parent.parent.parent / "generated_templates"
+TDIR = Path(__file__).parent.parent.parent / "generated_templates"
 PLACEHOLDER = "Opisuje cel, zakres i zastosowanie tego dokumentu"
 
 # ── Archetypy domenowe ─────────────────────────────────────────────────────────
 # (keywords_in_title, guidance_text)  — pierwsze pasujące wygrywa
 ARCHETYPES = [
     # QUANTUM
-    (["quantum key", "qkd"],
-     "Opisuje architekturę dystrybucji klucza kwantowego (QKD) — protokoły BB84/E91, "
-     "wymagania sprzętowe (nadajniki fotonów, detektory), integrację z sieciami kryptograficznymi, "
-     "zarządzanie kanałem kwantowym i klasycznym oraz politykę rotacji kluczy."),
-    (["post-quantum", "post_quantum", "post quantum"],
-     "Definiuje strategię migracji kryptografii do algorytmów odpornych na ataki kwantowe (PQC) — "
-     "harmonogram przejścia z RSA/ECC na CRYSTALS-Kyber/Dilithium, inwentaryzację systemów "
-     "kryptograficznych, priorytety migracji i plan testów kompatybilności."),
-    (["quantum circuit", "circuit transpil"],
-     "Opisuje procesy kompilacji i optymalizacji obwodów kwantowych — transpilację bramek logicznych "
-     "na docelowe bramki sprzętowe, strategie redukcji głębokości obwodu, obsługę szumów kwantowych "
-     "(error mitigation) i metryki jakości (fidelity, gate error rate)."),
-    (["quantum", "classical-quantum", "classical_quantum"],
-     "Opisuje architekturę interfejsu między systemami klasycznymi a kwantowymi — protokoły "
-     "komunikacji, zarządzanie kolejką obliczeń kwantowych, obsługę wyników pomiarów, "
-     "integrację z platformami (IBM Quantum, AWS Braket) i monitoring zasobów obliczeniowych."),
+    (
+        ["quantum key", "qkd"],
+        "Opisuje architekturę dystrybucji klucza kwantowego (QKD) — protokoły BB84/E91, "
+        "wymagania sprzętowe (nadajniki fotonów, detektory), integrację z sieciami kryptograficznymi, "
+        "zarządzanie kanałem kwantowym i klasycznym oraz politykę rotacji kluczy.",
+    ),
+    (
+        ["post-quantum", "post_quantum", "post quantum"],
+        "Definiuje strategię migracji kryptografii do algorytmów odpornych na ataki kwantowe (PQC) — "
+        "harmonogram przejścia z RSA/ECC na CRYSTALS-Kyber/Dilithium, inwentaryzację systemów "
+        "kryptograficznych, priorytety migracji i plan testów kompatybilności.",
+    ),
+    (
+        ["quantum circuit", "circuit transpil"],
+        "Opisuje procesy kompilacji i optymalizacji obwodów kwantowych — transpilację bramek logicznych "
+        "na docelowe bramki sprzętowe, strategie redukcji głębokości obwodu, obsługę szumów kwantowych "
+        "(error mitigation) i metryki jakości (fidelity, gate error rate).",
+    ),
+    (
+        ["quantum", "classical-quantum", "classical_quantum"],
+        "Opisuje architekturę interfejsu między systemami klasycznymi a kwantowymi — protokoły "
+        "komunikacji, zarządzanie kolejką obliczeń kwantowych, obsługę wyników pomiarów, "
+        "integrację z platformami (IBM Quantum, AWS Braket) i monitoring zasobów obliczeniowych.",
+    ),
     # AVIATION
-    (["aircraft maintenance"],
-     "Opisuje procesy zarządzania utrzymaniem statków powietrznych — harmonogramy przeglądów "
-     "(A/B/C/D-check), śledzenie historii napraw (CAMP/MRO), zarządzanie certyfikatami techników "
-     "(EASA Part-66), logistykę części zamiennych (AOG handling) i dokumentację wymaganą przez "
-     "przepisy lotnicze (EASA Part-M, FAR-43)."),
-    (["flight operations", "flight management"],
-     "Definiuje procedury operacyjne lotów — planowanie tras (FMS), zarządzanie załogą (CRM), "
-     "procedury awaryjne, dokumentację wymaganą przez ICAO/EASA (OFP, NOTAM, MEL), "
-     "metryki OTP (On-Time Performance) i raportowanie zdarzeń lotniczych."),
-    (["certyfikacja faa", "certyfikacja easa", "faa", "easa"],
-     "Opisuje proces certyfikacji systemów/oprogramowania lotniczego — wymagania DO-178C "
-     "(software) i DO-254 (hardware), poziomy DAL (Design Assurance Level), "
-     "dokumentację certyfikacyjną (PSAC, SDP, SVP) i relację z autoryzowanymi "
-     "przedstawicielami FAA/EASA."),
+    (
+        ["aircraft maintenance"],
+        "Opisuje procesy zarządzania utrzymaniem statków powietrznych — harmonogramy przeglądów "
+        "(A/B/C/D-check), śledzenie historii napraw (CAMP/MRO), zarządzanie certyfikatami techników "
+        "(EASA Part-66), logistykę części zamiennych (AOG handling) i dokumentację wymaganą przez "
+        "przepisy lotnicze (EASA Part-M, FAR-43).",
+    ),
+    (
+        ["flight operations", "flight management"],
+        "Definiuje procedury operacyjne lotów — planowanie tras (FMS), zarządzanie załogą (CRM), "
+        "procedury awaryjne, dokumentację wymaganą przez ICAO/EASA (OFP, NOTAM, MEL), "
+        "metryki OTP (On-Time Performance) i raportowanie zdarzeń lotniczych.",
+    ),
+    (
+        ["certyfikacja faa", "certyfikacja easa", "faa", "easa"],
+        "Opisuje proces certyfikacji systemów/oprogramowania lotniczego — wymagania DO-178C "
+        "(software) i DO-254 (hardware), poziomy DAL (Design Assurance Level), "
+        "dokumentację certyfikacyjną (PSAC, SDP, SVP) i relację z autoryzowanymi "
+        "przedstawicielami FAA/EASA.",
+    ),
     # MARITIME
-    (["cargo handling", "cargo operations", "cargo tracking"],
-     "Opisuje zarządzanie operacjami cargo — śledzenie ładunków (Bill of Lading, AWB), "
-     "integrację z systemami portowymi (EDI/EDIFACT), kontrolę celną i fitosanitarną, "
-     "obsługę kontenerów (FCL/LCL), raportowanie IMO i powiązania z systemami TOS."),
-    (["fleet management", "fleet tracking", "vessel", "zarządzanie flotą"],
-     "Definiuje zarządzanie flotą jednostek pływających — śledzenie pozycji (AIS/LRIT), "
-     "planowanie tras i optymalizację zużycia paliwa, harmonogramy przeglądów technicznych "
-     "(ISM Code, SOLAS), zarządzanie certyfikatami jednostek i dokumentacją Port State Control."),
-    (["port integration", "integracji portowej"],
-     "Opisuje architekturę integracji systemów portowych — interfejsy z Port Community System "
-     "(PCS), wymianę komunikatów EDI (COPARN, COARRI, CUSCAR), obsługę manifesty celnych, "
-     "synchronizację z terminalami przeładunkowymi i systemami planowania zawinięć."),
+    (
+        ["cargo handling", "cargo operations", "cargo tracking"],
+        "Opisuje zarządzanie operacjami cargo — śledzenie ładunków (Bill of Lading, AWB), "
+        "integrację z systemami portowymi (EDI/EDIFACT), kontrolę celną i fitosanitarną, "
+        "obsługę kontenerów (FCL/LCL), raportowanie IMO i powiązania z systemami TOS.",
+    ),
+    (
+        ["fleet management", "fleet tracking", "vessel", "zarządzanie flotą"],
+        "Definiuje zarządzanie flotą jednostek pływających — śledzenie pozycji (AIS/LRIT), "
+        "planowanie tras i optymalizację zużycia paliwa, harmonogramy przeglądów technicznych "
+        "(ISM Code, SOLAS), zarządzanie certyfikatami jednostek i dokumentacją Port State Control.",
+    ),
+    (
+        ["port integration", "integracji portowej"],
+        "Opisuje architekturę integracji systemów portowych — interfejsy z Port Community System "
+        "(PCS), wymianę komunikatów EDI (COPARN, COARRI, CUSCAR), obsługę manifesty celnych, "
+        "synchronizację z terminalami przeładunkowymi i systemami planowania zawinięć.",
+    ),
     # IoT / SCADA
-    (["ota update", "ota service", "firmware update", "over-the-air", "uslugi ota", "aktywacja uslugi ota"],
-     "Opisuje proces bezpiecznej aktualizacji oprogramowania urządzeń w terenie (OTA) — "
-     "podpisywanie firmware (secure boot chain), delta updates, zarządzanie wersjami, "
-     "rollback w przypadku awarii, metryki powodzenia wdrożenia i wymagania bezpieczeństwa "
-     "(PSA Certified, IEC 62443)."),
-    (["edge device"],
-     "Definiuje kryteria doboru i zarządzania urządzeniami brzegowymi — wymagania sprzętowe "
-     "(procesory, pamięć, łączność), systemy operacyjne (RTOS, Linux embedded), "
-     "protokoły komunikacji (MQTT, OPC-UA, Modbus), zarządzanie cyklem życia urządzenia "
-     "i wymagania środowiskowe (temperature range, certyfikaty EMC/CE)."),
-    (["alarm management"],
-     "Opisuje strategię zarządzania alarmami w systemach przemysłowych/SCADA — "
-     "hierarchię alarmów (EEMUA 191, ISA-18.2), rationalization (flooding prevention), "
-     "priorytety eskalacji, suppression logic, metryki jakości alarmów "
-     "(AAR, flood rate) i proces zarządzania zmianami konfiguracji alarmów."),
-    (["scada", "industrial control", "plc", "hmi"],
-     "Opisuje architekturę systemu sterowania przemysłowego — topologię sieci OT "
-     "(strefy Purdue Model), integrację PLC/DCS z systemami nadzoru (SCADA/HMI), "
-     "wymagania bezpieczeństwa IEC 62443, strategie redundancji i procedury testowania "
-     "zmian w środowisku produkcyjnym."),
+    (
+        [
+            "ota update",
+            "ota service",
+            "firmware update",
+            "over-the-air",
+            "uslugi ota",
+            "aktywacja uslugi ota",
+        ],
+        "Opisuje proces bezpiecznej aktualizacji oprogramowania urządzeń w terenie (OTA) — "
+        "podpisywanie firmware (secure boot chain), delta updates, zarządzanie wersjami, "
+        "rollback w przypadku awarii, metryki powodzenia wdrożenia i wymagania bezpieczeństwa "
+        "(PSA Certified, IEC 62443).",
+    ),
+    (
+        ["edge device"],
+        "Definiuje kryteria doboru i zarządzania urządzeniami brzegowymi — wymagania sprzętowe "
+        "(procesory, pamięć, łączność), systemy operacyjne (RTOS, Linux embedded), "
+        "protokoły komunikacji (MQTT, OPC-UA, Modbus), zarządzanie cyklem życia urządzenia "
+        "i wymagania środowiskowe (temperature range, certyfikaty EMC/CE).",
+    ),
+    (
+        ["alarm management"],
+        "Opisuje strategię zarządzania alarmami w systemach przemysłowych/SCADA — "
+        "hierarchię alarmów (EEMUA 191, ISA-18.2), rationalization (flooding prevention), "
+        "priorytety eskalacji, suppression logic, metryki jakości alarmów "
+        "(AAR, flood rate) i proces zarządzania zmianami konfiguracji alarmów.",
+    ),
+    (
+        ["scada", "industrial control", "plc", "hmi"],
+        "Opisuje architekturę systemu sterowania przemysłowego — topologię sieci OT "
+        "(strefy Purdue Model), integrację PLC/DCS z systemami nadzoru (SCADA/HMI), "
+        "wymagania bezpieczeństwa IEC 62443, strategie redundancji i procedury testowania "
+        "zmian w środowisku produkcyjnym.",
+    ),
     # HEALTHCARE
-    (["clinical trial"],
-     "Opisuje zarządzanie dokumentacją badań klinicznych — zgodność z ICH-GCP (E6 R2), "
-     "zarządzanie protokołem badania, randomizację i zaślepienie, zbieranie danych "
-     "(EDC/eCRF), monitorowanie (monitoring visit reports), raportowanie zdarzeń "
-     "niepożądanych (SAE) do EMA/FDA."),
-    (["clinical data", "clinical_data"],
-     "Definiuje architekturę hurtowni danych klinicznych — integrację z EHR (HL7 FHIR "
-     "R4, HL7 v2), modele danych OMOP CDM, anonimizację danych (HIPAA Safe Harbor, "
-     "pseudonimizacja wg RODO), procesy ETL z systemów szpitalnych i metryki jakości danych."),
-    (["medical records", "ehr", "patient records"],
-     "Opisuje zarządzanie dokumentacją medyczną pacjenta — wymagania prawne (ustawa o "
-     "prawach pacjenta), struktury danych HL7 FHIR, uprawnienia dostępu (RBAC dla "
-     "personelu medycznego), retencję danych i procesy wymiany dokumentacji między placówkami."),
-    (["lims", "laboratory", "lab management"],
-     "Opisuje zarządzanie procesami laboratoryjnymi — śledzenie próbek (chain of custody), "
-     "integrację z aparaturą analityczną, kalibrację instrumentów, zarządzanie odczynnikami, "
-     "dokumentację GLP/GMP i walidację metod analitycznych (IQ/OQ/PQ)."),
+    (
+        ["clinical trial"],
+        "Opisuje zarządzanie dokumentacją badań klinicznych — zgodność z ICH-GCP (E6 R2), "
+        "zarządzanie protokołem badania, randomizację i zaślepienie, zbieranie danych "
+        "(EDC/eCRF), monitorowanie (monitoring visit reports), raportowanie zdarzeń "
+        "niepożądanych (SAE) do EMA/FDA.",
+    ),
+    (
+        ["clinical data", "clinical_data"],
+        "Definiuje architekturę hurtowni danych klinicznych — integrację z EHR (HL7 FHIR "
+        "R4, HL7 v2), modele danych OMOP CDM, anonimizację danych (HIPAA Safe Harbor, "
+        "pseudonimizacja wg RODO), procesy ETL z systemów szpitalnych i metryki jakości danych.",
+    ),
+    (
+        ["medical records", "ehr", "patient records"],
+        "Opisuje zarządzanie dokumentacją medyczną pacjenta — wymagania prawne (ustawa o "
+        "prawach pacjenta), struktury danych HL7 FHIR, uprawnienia dostępu (RBAC dla "
+        "personelu medycznego), retencję danych i procesy wymiany dokumentacji między placówkami.",
+    ),
+    (
+        ["lims", "laboratory", "lab management"],
+        "Opisuje zarządzanie procesami laboratoryjnymi — śledzenie próbek (chain of custody), "
+        "integrację z aparaturą analityczną, kalibrację instrumentów, zarządzanie odczynnikami, "
+        "dokumentację GLP/GMP i walidację metod analitycznych (IQ/OQ/PQ).",
+    ),
     # LEGAL TECH
-    (["attorney", "privilege"],
-     "Opisuje zasady ochrony tajemnicy adwokackiej w systemach IT — klasyfikację dokumentów "
-     "objętych privilege, kontrolę dostępu, procedury e-discovery z zachowaniem privilege "
-     "i wymagania dla systemów DMS w kancelariach prawnych."),
-    (["legal research", "legal tech", "ai ethics in legal"],
-     "Definiuje procesy i narzędzia wspomagające pracę prawników — systemy wyszukiwania "
-     "orzecznictwa, automatyzację analizy dokumentów (AI-assisted review), etyczne zasady "
-     "stosowania AI w praktyce prawnej (Bar Association guidelines) i zgodność z RODO "
-     "w kontekście danych klientów."),
+    (
+        ["attorney", "privilege"],
+        "Opisuje zasady ochrony tajemnicy adwokackiej w systemach IT — klasyfikację dokumentów "
+        "objętych privilege, kontrolę dostępu, procedury e-discovery z zachowaniem privilege "
+        "i wymagania dla systemów DMS w kancelariach prawnych.",
+    ),
+    (
+        ["legal research", "legal tech", "ai ethics in legal"],
+        "Definiuje procesy i narzędzia wspomagające pracę prawników — systemy wyszukiwania "
+        "orzecznictwa, automatyzację analizy dokumentów (AI-assisted review), etyczne zasady "
+        "stosowania AI w praktyce prawnej (Bar Association guidelines) i zgodność z RODO "
+        "w kontekście danych klientów.",
+    ),
     # GAMING / EVENTS
-    (["game breaking", "game-breaking", "player feedback", "game flow", "esport"],
-     "Opisuje procesy zarządzania jakością w produkcji gier — klasyfikację bugów "
-     "(critical/blocker/major), pipeline raportowania defektów, priorytety hotfixów, "
-     "zbieranie feedbacku graczy, metryki retencji i metryki stabilności (crash rate, ANR rate)."),
-    (["venue management", "attendee satisfaction"],
-     "Opisuje zarządzanie obiektami i wydarzeniami — planowanie pojemności, harmonogramowanie "
-     "rezerwacji sal, zarządzanie dostawcami AV/catering, systemy rejestracji uczestników, "
-     "metryki satysfakcji (NPS post-event) i powiązania z systemami ticketingowymi."),
+    (
+        ["game breaking", "game-breaking", "player feedback", "game flow", "esport"],
+        "Opisuje procesy zarządzania jakością w produkcji gier — klasyfikację bugów "
+        "(critical/blocker/major), pipeline raportowania defektów, priorytety hotfixów, "
+        "zbieranie feedbacku graczy, metryki retencji i metryki stabilności (crash rate, ANR rate).",
+    ),
+    (
+        ["venue management", "attendee satisfaction"],
+        "Opisuje zarządzanie obiektami i wydarzeniami — planowanie pojemności, harmonogramowanie "
+        "rezerwacji sal, zarządzanie dostawcami AV/catering, systemy rejestracji uczestników, "
+        "metryki satysfakcji (NPS post-event) i powiązania z systemami ticketingowymi.",
+    ),
     # BIM / REAL ESTATE
-    (["bim", "building information"],
-     "Opisuje standardy zarządzania modelami BIM — wymagania ISO 19650, poziomy szczegółowości "
-     "(LOD 100-500), formaty wymiany (IFC, BCF), protokoły koordynacji modeli (clash detection), "
-     "Common Data Environment (CDE) i zarządzanie prawami dostępu do modeli."),
-    (["smart building", "building maintenance", "tenant portal", "facility"],
-     "Opisuje systemy zarządzania nieruchomościami — integrację z BMS (Building Management "
-     "System), obsługę zgłoszeń serwisowych, zarządzanie dostępem, metryki zużycia mediów "
-     "i raportowanie efektywności energetycznej budynku."),
+    (
+        ["bim", "building information"],
+        "Opisuje standardy zarządzania modelami BIM — wymagania ISO 19650, poziomy szczegółowości "
+        "(LOD 100-500), formaty wymiany (IFC, BCF), protokoły koordynacji modeli (clash detection), "
+        "Common Data Environment (CDE) i zarządzanie prawami dostępu do modeli.",
+    ),
+    (
+        ["smart building", "building maintenance", "tenant portal", "facility"],
+        "Opisuje systemy zarządzania nieruchomościami — integrację z BMS (Building Management "
+        "System), obsługę zgłoszeń serwisowych, zarządzanie dostępem, metryki zużycia mediów "
+        "i raportowanie efektywności energetycznej budynku.",
+    ),
     # E-GOVERNMENT
-    (["citizen app", "citizen digital", "citizen portal", "portal obywatel", "obywatela"],
-     "Opisuje projektowanie i wdrożenie usług cyfrowych dla obywateli — architekturę e-usług "
-     "(ePUAP/gov.pl API), integrację z węzłem krajowym (profil zaufany, mObywatel), "
-     "dostępność WCAG 2.1 AA, zarządzanie wnioskami administracyjnymi i wymagania RODO."),
-    (["government", "public sector", "danych rzad", "digital government", "przetwarzanie wnioskow"],
-     "Opisuje systemy informacyjne administracji publicznej — architekturę opartą o standardy "
-     "GovIT, integrację z rejestrami państwowymi (PESEL, KRS), wymagania KSC, zgodność z RODO "
-     "i przepisami o dostępie do informacji publicznej."),
+    (
+        ["citizen app", "citizen digital", "citizen portal", "portal obywatel", "obywatela"],
+        "Opisuje projektowanie i wdrożenie usług cyfrowych dla obywateli — architekturę e-usług "
+        "(ePUAP/gov.pl API), integrację z węzłem krajowym (profil zaufany, mObywatel), "
+        "dostępność WCAG 2.1 AA, zarządzanie wnioskami administracyjnymi i wymagania RODO.",
+    ),
+    (
+        [
+            "government",
+            "public sector",
+            "danych rzad",
+            "digital government",
+            "przetwarzanie wnioskow",
+        ],
+        "Opisuje systemy informacyjne administracji publicznej — architekturę opartą o standardy "
+        "GovIT, integrację z rejestrami państwowymi (PESEL, KRS), wymagania KSC, zgodność z RODO "
+        "i przepisami o dostępie do informacji publicznej.",
+    ),
     # HR
-    (["ats", "applicant tracking", "recruitment system"],
-     "Opisuje wdrożenie systemu śledzenia kandydatów (ATS) — pipeline rekrutacyjny "
-     "(requisition-to-offer), integrację z tablicami ogłoszeń, procesy scoringu CV "
-     "(AI-assisted screening), RODO dla danych kandydatów i metryki efektywności rekrutacji."),
-    (["payroll", "placow", "przetwarzanie payroll"],
-     "Opisuje procesy przetwarzania wynagrodzeń — integrację z systemami HR, kalkulację "
-     "składek ZUS i zaliczek PIT, obsługę świadczeń pracowniczych, generowanie przelewów "
-     "i raportów GUS, wymagania bezpieczeństwa danych płacowych."),
-    (["attendance", "workforce management", "benefits admin", "administracja benefitami"],
-     "Opisuje zarządzanie czasem pracy i świadczeniami — ewidencję czasu pracy (zgodną z "
-     "Kodeksem pracy), integrację z czytnikami RCP, zarządzanie wnioskami urlopowymi, "
-     "administrację kafeteriami benefitów i powiązania z systemami kadrowo-płacowymi."),
+    (
+        ["ats", "applicant tracking", "recruitment system"],
+        "Opisuje wdrożenie systemu śledzenia kandydatów (ATS) — pipeline rekrutacyjny "
+        "(requisition-to-offer), integrację z tablicami ogłoszeń, procesy scoringu CV "
+        "(AI-assisted screening), RODO dla danych kandydatów i metryki efektywności rekrutacji.",
+    ),
+    (
+        ["payroll", "placow", "przetwarzanie payroll"],
+        "Opisuje procesy przetwarzania wynagrodzeń — integrację z systemami HR, kalkulację "
+        "składek ZUS i zaliczek PIT, obsługę świadczeń pracowniczych, generowanie przelewów "
+        "i raportów GUS, wymagania bezpieczeństwa danych płacowych.",
+    ),
+    (
+        ["attendance", "workforce management", "benefits admin", "administracja benefitami"],
+        "Opisuje zarządzanie czasem pracy i świadczeniami — ewidencję czasu pracy (zgodną z "
+        "Kodeksem pracy), integrację z czytnikami RCP, zarządzanie wnioskami urlopowymi, "
+        "administrację kafeteriami benefitów i powiązania z systemami kadrowo-płacowymi.",
+    ),
     # ESG / ENERGY
-    (["carbon", "carbon offset", "emission"],
-     "Opisuje zarządzanie śladem węglowym i offsetami emisji CO2 — metodologię pomiarów "
-     "(GHG Protocol Scope 1/2/3), integrację z licznikami energii, weryfikację certyfikatów "
-     "offsetowych (Gold Standard, VCS), raportowanie ESG (GRI, CSRD) i śledzenie celów net-zero."),
-    (["green software", "sustainability", "circular economy", "ai for sustainability", "ai energy"],
-     "Opisuje praktyki zrównoważonego rozwoju w IT — wskaźniki efektywności energetycznej "
-     "(PUE, SCI), strategie optymalizacji zużycia mocy przez systemy AI/ML, circular economy "
-     "w zarządzaniu sprzętem i raportowanie ESG (CSRD, TCFD)."),
+    (
+        ["carbon", "carbon offset", "emission"],
+        "Opisuje zarządzanie śladem węglowym i offsetami emisji CO2 — metodologię pomiarów "
+        "(GHG Protocol Scope 1/2/3), integrację z licznikami energii, weryfikację certyfikatów "
+        "offsetowych (Gold Standard, VCS), raportowanie ESG (GRI, CSRD) i śledzenie celów net-zero.",
+    ),
+    (
+        [
+            "green software",
+            "sustainability",
+            "circular economy",
+            "ai for sustainability",
+            "ai energy",
+        ],
+        "Opisuje praktyki zrównoważonego rozwoju w IT — wskaźniki efektywności energetycznej "
+        "(PUE, SCI), strategie optymalizacji zużycia mocy przez systemy AI/ML, circular economy "
+        "w zarządzaniu sprzętem i raportowanie ESG (CSRD, TCFD).",
+    ),
     # AUTONOMOUS VEHICLES
-    (["autonomous vehicle", "autonomous haul", "self-driving"],
-     "Opisuje wymagania bezpieczeństwa pojazdów autonomicznych — poziomy autonomii (SAE J3016 "
-     "L1-L5), architekturę systemów percepcji (LIDAR/kamera/radar fusion), testowanie "
-     "(ISO 26262, ISO 21448 SOTIF), wymagania regulacyjne (UE 2019/2144) i zarządzanie incydentami."),
-    (["battery power", "battery management"],
-     "Opisuje zarządzanie systemami bateryjnymi — monitoring BMS, algorytmy estymacji SoC/SoH, "
-     "protokoły ładowania (CCS/CHAdeMO/ISO 15118), zarządzanie termiczne, cykl życia baterii "
-     "i wymagania bezpieczeństwa (UN 38.3, IEC 62619)."),
+    (
+        ["autonomous vehicle", "autonomous haul", "self-driving"],
+        "Opisuje wymagania bezpieczeństwa pojazdów autonomicznych — poziomy autonomii (SAE J3016 "
+        "L1-L5), architekturę systemów percepcji (LIDAR/kamera/radar fusion), testowanie "
+        "(ISO 26262, ISO 21448 SOTIF), wymagania regulacyjne (UE 2019/2144) i zarządzanie incydentami.",
+    ),
+    (
+        ["battery power", "battery management"],
+        "Opisuje zarządzanie systemami bateryjnymi — monitoring BMS, algorytmy estymacji SoC/SoH, "
+        "protokoły ładowania (CCS/CHAdeMO/ISO 15118), zarządzanie termiczne, cykl życia baterii "
+        "i wymagania bezpieczeństwa (UN 38.3, IEC 62619).",
+    ),
     # ADTECH
-    (["ad optimization", "ad platform", "budget pacing", "aktywacja platform reklamowych"],
-     "Opisuje zarządzanie platformami reklamowymi — integrację z DSP/SSP (programmatic), "
-     "strategie bidowania (target CPA, ROAS), zarządzanie budżetem (pacing, allocation), "
-     "brand safety, pomiar viewability (MRC standards) i raportowanie IAB Tech Lab."),
-    (["attribution engine"],
-     "Definiuje modele atrybucji konwersji — metodologie (Last-Click, Data-Driven, Shapley "
-     "Value), integrację ze źródłami danych (GA4, Meta Pixel, server-side tagging), "
-     "zarządzanie oknem atrybucji, obsługę ograniczeń prywatności (cookieless) i raportowanie ROI."),
-    (["audience management", "cdp development", "customer data platform", "clienteling"],
-     "Opisuje zarządzanie danymi o odbiorcach — segmentację, architekturę CDP, integrację ze "
-     "źródłami first-party data, zarządzanie zgodami RODO (consent management platform), "
-     "aktywację segmentów w kanałach reklamowych i metryki jakości danych audience."),
+    (
+        ["ad optimization", "ad platform", "budget pacing", "aktywacja platform reklamowych"],
+        "Opisuje zarządzanie platformami reklamowymi — integrację z DSP/SSP (programmatic), "
+        "strategie bidowania (target CPA, ROAS), zarządzanie budżetem (pacing, allocation), "
+        "brand safety, pomiar viewability (MRC standards) i raportowanie IAB Tech Lab.",
+    ),
+    (
+        ["attribution engine"],
+        "Definiuje modele atrybucji konwersji — metodologie (Last-Click, Data-Driven, Shapley "
+        "Value), integrację ze źródłami danych (GA4, Meta Pixel, server-side tagging), "
+        "zarządzanie oknem atrybucji, obsługę ograniczeń prywatności (cookieless) i raportowanie ROI.",
+    ),
+    (
+        ["audience management", "cdp development", "customer data platform", "clienteling"],
+        "Opisuje zarządzanie danymi o odbiorcach — segmentację, architekturę CDP, integrację ze "
+        "źródłami first-party data, zarządzanie zgodami RODO (consent management platform), "
+        "aktywację segmentów w kanałach reklamowych i metryki jakości danych audience.",
+    ),
     # ML / AI
-    (["ml use case", "ai use case", "big data use case", "blockchain use case"],
-     "Opisuje definiowanie i ocenę przypadków użycia systemów AI/ML — Canvas modelu biznesowego "
-     "(problem, dane, metryki sukcesu), ocenę wykonalności technicznej (data readiness), "
-     "analizę ryzyk etycznych (AI Act EU), plan pilotażu i kryteria skalowania."),
-    (["data pipeline", "real-time data pipeline", "bioinformatics pipeline"],
-     "Opisuje architekturę potoku danych — źródła i formaty ingestion, transformacje "
-     "(batch vs. streaming), orkiestrację (Airflow, Prefect), monitoring jakości danych, "
-     "zarządzanie schematem (schema registry), testy i SLA czasu dostarczenia danych."),
-    (["digital twin", "twin optim"],
-     "Opisuje architekturę cyfrowego bliźniaka — synchronizację z fizycznym obiektem (sensory "
-     "IoT, OPC-UA), modele symulacyjne (physics-based + ML), API do zapytań o stan, scenariusze "
-     "what-if, zarządzanie dryftem modelu i integrację z systemami SCADA/ERP."),
+    (
+        ["ml use case", "ai use case", "big data use case", "blockchain use case"],
+        "Opisuje definiowanie i ocenę przypadków użycia systemów AI/ML — Canvas modelu biznesowego "
+        "(problem, dane, metryki sukcesu), ocenę wykonalności technicznej (data readiness), "
+        "analizę ryzyk etycznych (AI Act EU), plan pilotażu i kryteria skalowania.",
+    ),
+    (
+        ["data pipeline", "real-time data pipeline", "bioinformatics pipeline"],
+        "Opisuje architekturę potoku danych — źródła i formaty ingestion, transformacje "
+        "(batch vs. streaming), orkiestrację (Airflow, Prefect), monitoring jakości danych, "
+        "zarządzanie schematem (schema registry), testy i SLA czasu dostarczenia danych.",
+    ),
+    (
+        ["digital twin", "twin optim"],
+        "Opisuje architekturę cyfrowego bliźniaka — synchronizację z fizycznym obiektem (sensory "
+        "IoT, OPC-UA), modele symulacyjne (physics-based + ML), API do zapytań o stan, scenariusze "
+        "what-if, zarządzanie dryftem modelu i integrację z systemami SCADA/ERP.",
+    ),
     # BIOINFORMATICS
-    (["bioinformatics", "genomic", "sequencing", "scientific data"],
-     "Opisuje infrastrukturę obliczeniową dla danych biologicznych — pipeline analizy sekwencji "
-     "(NGS: alignment, variant calling, annotation), zarządzanie danymi genomicznymi (FAIR, "
-     "GA4GH), obliczenia HPC/cloud, zarządzanie wersjami narzędzi bioinformatycznych i wymogi ELSI."),
+    (
+        ["bioinformatics", "genomic", "sequencing", "scientific data"],
+        "Opisuje infrastrukturę obliczeniową dla danych biologicznych — pipeline analizy sekwencji "
+        "(NGS: alignment, variant calling, annotation), zarządzanie danymi genomicznymi (FAIR, "
+        "GA4GH), obliczenia HPC/cloud, zarządzanie wersjami narzędzi bioinformatycznych i wymogi ELSI.",
+    ),
     # BLOCKCHAIN
-    (["blockchain", "smart contract", "distributed ledger", "web3"],
-     "Opisuje wdrożenie rozwiązań blockchain — wybór platformy (Ethereum, Hyperledger Fabric, "
-     "Solana), architekturę smart kontraktów, zarządzanie kluczami i portfelami, audyt "
-     "bezpieczeństwa kontraktów (Slither, Mythril), optymalizację gas i integrację off-chain."),
+    (
+        ["blockchain", "smart contract", "distributed ledger", "web3"],
+        "Opisuje wdrożenie rozwiązań blockchain — wybór platformy (Ethereum, Hyperledger Fabric, "
+        "Solana), architekturę smart kontraktów, zarządzanie kluczami i portfelami, audyt "
+        "bezpieczeństwa kontraktów (Slither, Mythril), optymalizację gas i integrację off-chain.",
+    ),
     # RETAIL / E-COMMERCE
-    (["bopis", "buy online", "order fulfillment", "order management"],
-     "Opisuje zarządzanie zamówieniami omnichannel — przepływ BOPIS (Buy Online, Pick Up In "
-     "Store), integrację OMS z POS i WMS, obsługę wyjątków (stockout, late pickup), "
-     "metryki SLA fulfilmentu i powiadomienia klienta."),
-    (["checkout", "payment", "billing system", "billing"],
-     "Opisuje procesy płatności i fakturowania — integrację z bramkami płatniczymi (Stripe, "
-     "PayU, Przelewy24), obsługę błędów transakcji, zgodność PCI DSS, zarządzanie zwrotami, "
-     "fakturowanie elektroniczne (KSeF) i raportowanie finansowe."),
-    (["booking engine", "channel manager", "channel sync", "reservation"],
-     "Opisuje systemy zarządzania rezerwacjami — integrację z Channel Manager (Booking.com, "
-     "Expedia), zarządzanie dostępnością i cenami (rate parity), obsługę konfliktów rezerwacji, "
-     "API dla GDS (Amadeus, Sabre) i procesy rozliczeń z kanałami dystrybucji."),
+    (
+        ["bopis", "buy online", "order fulfillment", "order management"],
+        "Opisuje zarządzanie zamówieniami omnichannel — przepływ BOPIS (Buy Online, Pick Up In "
+        "Store), integrację OMS z POS i WMS, obsługę wyjątków (stockout, late pickup), "
+        "metryki SLA fulfilmentu i powiadomienia klienta.",
+    ),
+    (
+        ["checkout", "payment", "billing system", "billing"],
+        "Opisuje procesy płatności i fakturowania — integrację z bramkami płatniczymi (Stripe, "
+        "PayU, Przelewy24), obsługę błędów transakcji, zgodność PCI DSS, zarządzanie zwrotami, "
+        "fakturowanie elektroniczne (KSeF) i raportowanie finansowe.",
+    ),
+    (
+        ["booking engine", "channel manager", "channel sync", "reservation"],
+        "Opisuje systemy zarządzania rezerwacjami — integrację z Channel Manager (Booking.com, "
+        "Expedia), zarządzanie dostępnością i cenami (rate parity), obsługę konfliktów rezerwacji, "
+        "API dla GDS (Amadeus, Sabre) i procesy rozliczeń z kanałami dystrybucji.",
+    ),
     # HOSPITALITY
-    (["guest services", "hotel", "property management system", "housekeeping"],
-     "Opisuje procesy obsługi gości i zarządzanie obiektem hotelowym — integrację z PMS "
-     "(Opera, Protel), procedury check-in/check-out, zarządzanie pokojami (housekeeping), "
-     "upselling, obsługę reklamacji gości, metryki (RevPAR, NPS) i systemy lojalnościowe."),
+    (
+        ["guest services", "hotel", "property management system", "housekeeping"],
+        "Opisuje procesy obsługi gości i zarządzanie obiektem hotelowym — integrację z PMS "
+        "(Opera, Protel), procedury check-in/check-out, zarządzanie pokojami (housekeeping), "
+        "upselling, obsługę reklamacji gości, metryki (RevPAR, NPS) i systemy lojalnościowe.",
+    ),
     # BROADCASTING / MEDIA
-    (["broadcast production", "broadcast workflow", "media production", "c2 platform"],
-     "Opisuje zarządzanie produkcją medialną — workflow produkcji (pre-production, production, "
-     "post-production), zarządzanie zasobami medialnymi (MAM/DAM), integrację z systemami "
-     "emisji (playout, MCR), standardy branżowe (SMPTE, EBU) i archiwizację materiałów."),
+    (
+        ["broadcast production", "broadcast workflow", "media production", "c2 platform"],
+        "Opisuje zarządzanie produkcją medialną — workflow produkcji (pre-production, production, "
+        "post-production), zarządzanie zasobami medialnymi (MAM/DAM), integrację z systemami "
+        "emisji (playout, MCR), standardy branżowe (SMPTE, EBU) i archiwizację materiałów.",
+    ),
     # NETWORK / INFRASTRUCTURE
-    (["network segmentation", "network security", "networking for virtual"],
-     "Opisuje architekturę i bezpieczeństwo sieci — strategie segmentacji (VLAN, micro-segmentation, "
-     "zero trust), polityki firewall i ACL, zarządzanie certyfikatami TLS, monitoring ruchu "
-     "(NetFlow, SIEM) i procedury zmiany konfiguracji sieci."),
-    (["server virtualization", "virtual infrastructure", "virtualization"],
-     "Opisuje zarządzanie infrastrukturą wirtualizowaną — architekturę hypervisorów "
-     "(VMware vSphere, Proxmox, KVM), zarządzanie zasobami (CPU/RAM/storage provisioning), "
-     "wysoką dostępność (HA/DRS), snapshoty, migrację live i monitoring wydajności VM."),
+    (
+        ["network segmentation", "network security", "networking for virtual"],
+        "Opisuje architekturę i bezpieczeństwo sieci — strategie segmentacji (VLAN, micro-segmentation, "
+        "zero trust), polityki firewall i ACL, zarządzanie certyfikatami TLS, monitoring ruchu "
+        "(NetFlow, SIEM) i procedury zmiany konfiguracji sieci.",
+    ),
+    (
+        ["server virtualization", "virtual infrastructure", "virtualization"],
+        "Opisuje zarządzanie infrastrukturą wirtualizowaną — architekturę hypervisorów "
+        "(VMware vSphere, Proxmox, KVM), zarządzanie zasobami (CPU/RAM/storage provisioning), "
+        "wysoką dostępność (HA/DRS), snapshoty, migrację live i monitoring wydajności VM.",
+    ),
     # FINANCE
-    (["budget proposal", "budget tracking", "budget pacing", "client assets", "claims management",
-      "broker maintenance", "finansow"],
-     "Opisuje zarządzanie budżetem i aktywami finansowymi — planowanie budżetu (top-down / "
-     "bottom-up), śledzenie wydatków vs. planu, raportowanie CFO, zarządzanie roszczeniami "
-     "i reconciliation z systemami księgowymi (ERP)."),
+    (
+        [
+            "budget proposal",
+            "budget tracking",
+            "budget pacing",
+            "client assets",
+            "claims management",
+            "broker maintenance",
+            "finansow",
+        ],
+        "Opisuje zarządzanie budżetem i aktywami finansowymi — planowanie budżetu (top-down / "
+        "bottom-up), śledzenie wydatków vs. planu, raportowanie CFO, zarządzanie roszczeniami "
+        "i reconciliation z systemami księgowymi (ERP).",
+    ),
     # CUSTOMER SERVICE / SUPPORT
-    (["help desk", "itsm tools", "case management", "support operations", "client service"],
-     "Opisuje procesy centrum wsparcia — zarządzanie zgłoszeniami (ITIL Service Desk), "
-     "SLA per priorytet (P1-P4), escalation matrix, zarządzanie bazą wiedzy (Knowledge Base), "
-     "metryki jakości (CSAT, First Contact Resolution) i integrację z systemami ITSM."),
+    (
+        ["help desk", "itsm tools", "case management", "support operations", "client service"],
+        "Opisuje procesy centrum wsparcia — zarządzanie zgłoszeniami (ITIL Service Desk), "
+        "SLA per priorytet (P1-P4), escalation matrix, zarządzanie bazą wiedzy (Knowledge Base), "
+        "metryki jakości (CSAT, First Contact Resolution) i integrację z systemami ITSM.",
+    ),
     # SMART CITY / GEOSPATIAL
-    (["geospatial", "geocoding", "map data", "spatial data", "gis"],
-     "Opisuje zarządzanie danymi przestrzennymi — systemy GIS i API (Google Maps, HERE, "
-     "OpenStreetMap), procesy aktualizacji map, jakość danych geocodingu, standardy "
-     "OGC (WMS, WFS, GeoJSON), bezpieczeństwo danych lokalizacyjnych i RODO."),
+    (
+        ["geospatial", "geocoding", "map data", "spatial data", "gis"],
+        "Opisuje zarządzanie danymi przestrzennymi — systemy GIS i API (Google Maps, HERE, "
+        "OpenStreetMap), procesy aktualizacji map, jakość danych geocodingu, standardy "
+        "OGC (WMS, WFS, GeoJSON), bezpieczeństwo danych lokalizacyjnych i RODO.",
+    ),
     # IoT CONNECTED / SMART
-    (["connected services", "smart city", "smart grid", "smart", "iot"],
-     "Opisuje architekturę połączonych urządzeń i usług IoT — platformy zarządzania "
-     "urządzeniami (AWS IoT Core, Azure IoT Hub), protokoły (MQTT, CoAP, LwM2M), "
-     "zarządzanie tożsamością urządzeń (X.509, TPM), przetwarzanie brzegowe i edge-to-cloud "
-     "pipeline oraz bezpieczeństwo (IEC 62443, PSA Certified)."),
+    (
+        ["connected services", "smart city", "smart grid", "smart", "iot"],
+        "Opisuje architekturę połączonych urządzeń i usług IoT — platformy zarządzania "
+        "urządzeniami (AWS IoT Core, Azure IoT Hub), protokoły (MQTT, CoAP, LwM2M), "
+        "zarządzanie tożsamością urządzeń (X.509, TPM), przetwarzanie brzegowe i edge-to-cloud "
+        "pipeline oraz bezpieczeństwo (IEC 62443, PSA Certified).",
+    ),
     # COMPETITVE INTEL / ANALYTICS
-    (["competitive intelligence", "customer journey analytics", "analytics approach", "query success"],
-     "Opisuje procesy i metodologię analityki — źródła danych (1st, 2nd, 3rd party), "
-     "modele analityczne (descriptive, predictive, prescriptive), narzędzia BI (Tableau, "
-     "Power BI, Looker), governance danych analitycznych, metryki jakości analiz i procesy "
-     "dystrybucji insightów do interesariuszy."),
+    (
+        [
+            "competitive intelligence",
+            "customer journey analytics",
+            "analytics approach",
+            "query success",
+        ],
+        "Opisuje procesy i metodologię analityki — źródła danych (1st, 2nd, 3rd party), "
+        "modele analityczne (descriptive, predictive, prescriptive), narzędzia BI (Tableau, "
+        "Power BI, Looker), governance danych analitycznych, metryki jakości analiz i procesy "
+        "dystrybucji insightów do interesariuszy.",
+    ),
 ]
 
 
-
 # ── Pattern matchers dla typowych struktur tytułów ─────────────────────────────
+
 
 def match_archetype(title: str) -> str | None:
     """Dopasowuje tytuł do archetypu. Zwraca guidance text lub None."""
@@ -389,7 +529,9 @@ def pattern_guidance(title: str) -> str:
 
     # Policy / Standard / Guidelines / Best Practices
     if re.search(r"\bpolicy\b|\bstandard\b|\bguidelines\b|\bbest practices\b", tl):
-        obj = re.sub(r"\b(policy|standard|guidelines|best practices)\b", "", title, flags=re.I).strip(" -_")
+        obj = re.sub(
+            r"\b(policy|standard|guidelines|best practices)\b", "", title, flags=re.I
+        ).strip(" -_")
         return (
             f"Definiuje politykę i standardy dla {obj} — zasady obowiązujące "
             f"wszystkich pracowników i systemy objęte polityką, wymagania minimalne, "
@@ -399,7 +541,9 @@ def pattern_guidance(title: str) -> str:
 
     # Migration / Deployment / Release / Rollout
     if re.search(r"\bmigration\b|\bdeployment\b|\brelease\b|\brollout\b", tl):
-        obj = re.sub(r"\b(migration|deployment|release|rollout)\b", "", title, flags=re.I).strip(" -_")
+        obj = re.sub(r"\b(migration|deployment|release|rollout)\b", "", title, flags=re.I).strip(
+            " -_"
+        )
         return (
             f"Opisuje plan wdrożenia lub migracji dla {obj} — zakres zmian, "
             f"harmonogram i kamienie milowe, strategie wdrożenia (blue-green, "
@@ -444,6 +588,7 @@ def enrich_file(fpath: Path, dry_run: bool) -> bool:
     if m:
         with batch_continue(f"yaml frontmatter {fpath.name}", logger=_log):
             import yaml
+
             fm = yaml.safe_load(m.group(1))
             title = fm.get("title", "")
     if not title:
@@ -457,18 +602,18 @@ def enrich_file(fpath: Path, dry_run: bool) -> bool:
     # Zbuduj nowy blok celu — zachowaj pierwszą linię (tytuł + "— szablon dokumentu IT.")
     # i zastąp placeholder nowym tekstem
     # Placeholder pojawia się jako osobny paragraf — może być wieloliniowy
-    placeholder_re = re.compile(
+    re.compile(
         r"(Opisuje cel, zakres i zastosowanie tego dokumentu[^\n]*\n?"
         r"(?:[^\n]+\n)*?)"
         r"(?=\n\n|\n>|\n##|\Z)",
-        re.DOTALL
+        re.DOTALL,
     )
     new_content = content.replace(
         "Opisuje cel, zakres i zastosowanie tego dokumentu w kontekście procesu lub systemu IT. "
         "Zawiera: definicję problemu lub potrzeby biznesowej adresowanej przez ten dokument, "
         "kluczowe decyzje które wspiera, ryzyka które ogranicza i wartość dostarczaną interesariuszom.",
         guidance,
-        1
+        1,
     )
 
     if new_content == content:
@@ -479,7 +624,7 @@ def enrich_file(fpath: Path, dry_run: bool) -> bool:
         end_idx = content.find("\n\n", idx)
         if end_idx == -1:
             end_idx = len(content)
-        old_para = content[idx:end_idx]
+        content[idx:end_idx]
         new_content = content[:idx] + guidance + content[end_idx:]
 
     if dry_run:
@@ -495,7 +640,9 @@ def enrich_file(fpath: Path, dry_run: bool) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(description="Wzbogaca niszowe szablony dokumentów IT.")
-    parser.add_argument("--dry-run", action="store_true", help="Pokaż co zostanie zmienione bez zapisu")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Pokaż co zostanie zmienione bez zapisu"
+    )
     parser.add_argument("--apply", action="store_true", help="Zastosuj zmiany")
     parser.add_argument("--path-filter", default="", help="Filtruj po fragmencie ścieżki")
     args = parser.parse_args()
@@ -508,7 +655,7 @@ def main():
         files = [f for f in files if args.path_filter.lower() in str(f).lower()]
 
     changed = 0
-    errors  = 0
+    errors = 0
     skipped = 0
 
     for fpath in files:

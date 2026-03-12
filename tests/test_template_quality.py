@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from itdoc.template import load_template, validate_template, get_required_sections
 from itdoc.exceptions import TemplateError
+from itdoc.template import get_required_sections, load_template, validate_template
 
 _CORE_DIR = Path(__file__).parent.parent / "generated_templates" / "core"
 
@@ -81,34 +81,39 @@ class TestRequiredSections:
     def test_cel_dokumentu_present(self, ten_sample_templates):
         for tmpl in ten_sample_templates:
             headings = [h.lower() for h in tmpl["headings"]]
-            assert any("cel dokumentu" in h for h in headings), \
+            assert any("cel dokumentu" in h for h in headings), (
                 f"{tmpl['path']}: brak sekcji '## Cel dokumentu'"
+            )
 
     def test_zakres_present(self, ten_sample_templates):
         for tmpl in ten_sample_templates:
             headings = [h.lower() for h in tmpl["headings"]]
-            assert any("zakres" in h for h in headings), \
+            assert any("zakres" in h for h in headings), (
                 f"{tmpl['path']}: brak sekcji '## Zakres...'"
+            )
 
     def test_wejscia_wyjscia_present(self, ten_sample_templates):
         for tmpl in ten_sample_templates:
             headings = [h.lower() for h in tmpl["headings"]]
-            assert any("wej" in h or "wyj" in h for h in headings), \
+            assert any("wej" in h or "wyj" in h for h in headings), (
                 f"{tmpl['path']}: brak sekcji wejścia/wyjścia"
+            )
 
 
 class TestNoForbiddenPlaceholders:
     def test_no_rola_interesariusz_placeholder(self, ten_sample_templates):
         """[Rola / interesariusz] musi być zastąpiony konkretnymi rolami."""
         for tmpl in ten_sample_templates:
-            assert "[Rola / interesariusz]" not in tmpl["body"], \
+            assert "[Rola / interesariusz]" not in tmpl["body"], (
                 f"{tmpl['path']}: zawiera niedozwolony placeholder [Rola / interesariusz]"
+            )
 
     def test_no_osoba_rola_placeholder(self, ten_sample_templates):
         """[osoba/rola] musi być zastąpiony konkretną rolą."""
         for tmpl in ten_sample_templates:
-            assert "[osoba/rola]" not in tmpl["body"], \
+            assert "[osoba/rola]" not in tmpl["body"], (
                 f"{tmpl['path']}: zawiera niedozwolony placeholder [osoba/rola]"
+            )
 
 
 class TestNoEmoji:
@@ -125,8 +130,9 @@ class TestNoEmoji:
 
     def test_no_emoji_in_body(self, ten_sample_templates):
         for tmpl in ten_sample_templates:
-            assert not self._EMOJI_RE.search(tmpl["body"]), \
+            assert not self._EMOJI_RE.search(tmpl["body"]), (
                 f"{tmpl['path']}: zawiera emoji (hard gate)"
+            )
 
 
 class TestValidateTemplate:
@@ -142,8 +148,9 @@ class TestValidateTemplate:
             "headings": ["Jakieś info"],
         }
         errors = validate_template(bad_tmpl)
-        assert any("Cel dokumentu" in e for e in errors), \
+        assert any("Cel dokumentu" in e for e in errors), (
             f"Oczekiwano błędu o braku 'Cel dokumentu', got: {errors}"
+        )
 
     def test_validate_detects_placeholder(self):
         bad_tmpl = {
@@ -153,5 +160,6 @@ class TestValidateTemplate:
             "headings": ["Cel dokumentu", "Zakres i granice", "Wejścia i wyjścia"],
         }
         errors = validate_template(bad_tmpl)
-        assert any("interesariusz" in e for e in errors), \
+        assert any("interesariusz" in e for e in errors), (
             f"Oczekiwano błędu o placeholderze, got: {errors}"
+        )

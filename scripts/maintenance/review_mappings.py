@@ -21,7 +21,7 @@ import io
 import sqlite3
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 # ---------------------------------------------------------------------------
 # DB path helpers
@@ -33,20 +33,29 @@ DB_PATH = _SCRIPT_DIR.parent.parent / "reports" / "it_doc_matrix.db"
 # Reason codes that are already authoritative — excluded from pending export
 AUDITED_REASONS = {"explicit_audit", "expert_reviewed", "primary_standard"}
 
-CSV_FIELDNAMES = ["id", "doc_path", "standard_code", "confidence", "match_reason",
-                  "evidence", "approved", "notes"]
+CSV_FIELDNAMES = [
+    "id",
+    "doc_path",
+    "standard_code",
+    "confidence",
+    "match_reason",
+    "evidence",
+    "approved",
+    "notes",
+]
 
 
 # ---------------------------------------------------------------------------
 # Core logic — callable with any sqlite3.Connection (including :memory:)
 # ---------------------------------------------------------------------------
 
+
 def export_pending(
     conn: sqlite3.Connection,
     threshold: float = 0.4,
     standard: Optional[str] = None,
     limit: Optional[int] = None,
-) -> List[Dict]:
+) -> list[dict]:
     """Return rows pending expert review as list of dicts.
 
     Args:
@@ -84,10 +93,12 @@ def export_pending(
         if hasattr(row, "keys"):
             d = dict(row)
         else:
-            d = dict(zip(
-                ["id", "doc_path", "standard_code", "confidence", "match_reason", "evidence"],
-                row,
-            ))
+            d = dict(
+                zip(
+                    ["id", "doc_path", "standard_code", "confidence", "match_reason", "evidence"],
+                    row,
+                )
+            )
         d["approved"] = ""
         d["notes"] = ""
         d.setdefault("evidence", "")
@@ -97,10 +108,10 @@ def export_pending(
 
 def import_reviewed(
     conn: sqlite3.Connection,
-    rows: List[Dict],
+    rows: list[dict],
     dry_run: bool = False,
     keep_rejected: bool = False,
-) -> Dict:
+) -> dict:
     """Apply expert decisions from a list of CSV rows.
 
     Args:
@@ -163,7 +174,7 @@ def import_reviewed(
     return counts
 
 
-def stats(conn: sqlite3.Connection) -> Dict:
+def stats(conn: sqlite3.Connection) -> dict:
     """Return mapping statistics as a dict.
 
     Returns:
@@ -181,11 +192,20 @@ def stats(conn: sqlite3.Connection) -> Dict:
     by_reason = {r[0] if r[0] else "": r[1] for r in reason_rows}
 
     tiers = [
-        (">=0.9",  "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence >= 0.9"),
-        (">=0.7",  "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence >= 0.7 AND confidence < 0.9"),
-        (">=0.5",  "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence >= 0.5 AND confidence < 0.7"),
-        (">=0.3",  "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence >= 0.3 AND confidence < 0.5"),
-        ("<0.3",   "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence < 0.3"),
+        (">=0.9", "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence >= 0.9"),
+        (
+            ">=0.7",
+            "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence >= 0.7 AND confidence < 0.9",
+        ),
+        (
+            ">=0.5",
+            "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence >= 0.5 AND confidence < 0.7",
+        ),
+        (
+            ">=0.3",
+            "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence >= 0.3 AND confidence < 0.5",
+        ),
+        ("<0.3", "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence < 0.3"),
     ]
     by_confidence_tier = {}
     for label, query in tiers:
@@ -210,13 +230,15 @@ def stats(conn: sqlite3.Connection) -> Dict:
 # CSV helpers
 # ---------------------------------------------------------------------------
 
-def rows_to_csv(rows: List[Dict], out=None) -> Optional[str]:
+
+def rows_to_csv(rows: list[dict], out=None) -> Optional[str]:
     """Write rows as CSV to `out` (file-like) or return string if out is None."""
     return_str = out is None
     if return_str:
         out = io.StringIO()
-    writer = csv.DictWriter(out, fieldnames=CSV_FIELDNAMES, extrasaction="ignore",
-                            lineterminator="\n")
+    writer = csv.DictWriter(
+        out, fieldnames=CSV_FIELDNAMES, extrasaction="ignore", lineterminator="\n"
+    )
     writer.writeheader()
     writer.writerows(rows)
     if return_str:
@@ -224,7 +246,7 @@ def rows_to_csv(rows: List[Dict], out=None) -> Optional[str]:
     return None
 
 
-def read_csv(path: str) -> List[Dict]:
+def read_csv(path: str) -> list[dict]:
     """Read CSV file and return list of dicts."""
     with open(path, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
@@ -234,7 +256,8 @@ def read_csv(path: str) -> List[Dict]:
 # CLI rendering
 # ---------------------------------------------------------------------------
 
-def _format_stats(s: Dict) -> str:
+
+def _format_stats(s: dict) -> str:
     total = s["total"]
     lines = [
         "Mapping Review Statistics",
@@ -258,6 +281,7 @@ def _format_stats(s: Dict) -> str:
 # main / CLI
 # ---------------------------------------------------------------------------
 
+
 def _open_db(db_path: Optional[Path] = None) -> sqlite3.Connection:
     path = Path(db_path) if db_path else DB_PATH
     if not path.exists():
@@ -278,22 +302,22 @@ def main(argv=None):
     mode.add_argument("--stats", action="store_true")
 
     # export options
-    parser.add_argument("--threshold", type=float, default=0.4,
-                        help="Confidence threshold for export (default: 0.4)")
-    parser.add_argument("--standard", metavar="CODE",
-                        help="Filter export to one standard_code")
-    parser.add_argument("--limit", type=int, default=None,
-                        help="Max rows to export")
-    parser.add_argument("--output", metavar="PATH",
-                        help="Write CSV to file instead of stdout")
+    parser.add_argument(
+        "--threshold",
+        type=float,
+        default=0.4,
+        help="Confidence threshold for export (default: 0.4)",
+    )
+    parser.add_argument("--standard", metavar="CODE", help="Filter export to one standard_code")
+    parser.add_argument("--limit", type=int, default=None, help="Max rows to export")
+    parser.add_argument("--output", metavar="PATH", help="Write CSV to file instead of stdout")
 
     # import options
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Show what would happen, no writes")
-    parser.add_argument("--apply", action="store_true",
-                        help="Actually write changes")
-    parser.add_argument("--keep-rejected", action="store_true",
-                        help="UPDATE rejected rows instead of DELETE")
+    parser.add_argument("--dry-run", action="store_true", help="Show what would happen, no writes")
+    parser.add_argument("--apply", action="store_true", help="Actually write changes")
+    parser.add_argument(
+        "--keep-rejected", action="store_true", help="UPDATE rejected rows instead of DELETE"
+    )
 
     args = parser.parse_args(argv)
 

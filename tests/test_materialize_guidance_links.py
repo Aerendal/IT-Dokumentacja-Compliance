@@ -16,12 +16,12 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent / "scripts" / "maintenance
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from materialize_guidance_links import materialize, _ensure_schema  # noqa: E402
-
+from materialize_guidance_links import materialize  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Fixture
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def conn():
@@ -54,6 +54,7 @@ def conn():
 # ---------------------------------------------------------------------------
 # Testy
 # ---------------------------------------------------------------------------
+
 
 def test_single_standard_ref(conn):
     """Jeden wiersz z jednym standardem → 1 wiersz w guidance_standard_links."""

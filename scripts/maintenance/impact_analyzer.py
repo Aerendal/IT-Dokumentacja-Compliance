@@ -35,10 +35,13 @@ def connect() -> sqlite3.Connection:
 def analyze_standard(conn: sqlite3.Connection, code: str) -> dict:
     cur = conn.cursor()
     # Exact and partial match
-    cur.execute("""
+    cur.execute(
+        """
         SELECT standard_code, standard_name FROM standards
         WHERE standard_code LIKE ? OR standard_name LIKE ?
-    """, (f"%{code}%", f"%{code}%"))
+    """,
+        (f"%{code}%", f"%{code}%"),
+    )
     matched = cur.fetchall()
     if not matched:
         return {"error": f"Standard '{code}' nie znaleziony w tabeli standards"}
@@ -46,23 +49,28 @@ def analyze_standard(conn: sqlite3.Connection, code: str) -> dict:
     results = []
     for std in matched:
         sc = std["standard_code"]
-        cur.execute("""
+        cur.execute(
+            """
             SELECT m.doc_path, m.match_reason, d.title
             FROM doc_standard_mapping m
             LEFT JOIN docs d ON d.path = m.doc_path
             WHERE m.standard_code = ?
             ORDER BY m.doc_path
-        """, (sc,))
+        """,
+            (sc,),
+        )
         docs = cur.fetchall()
-        results.append({
-            "standard_code": sc,
-            "standard_name": std["standard_name"],
-            "affected_templates": [
-                {"path": r["doc_path"], "title": r["title"], "reason": r["match_reason"]}
-                for r in docs
-            ],
-            "count": len(docs),
-        })
+        results.append(
+            {
+                "standard_code": sc,
+                "standard_name": std["standard_name"],
+                "affected_templates": [
+                    {"path": r["doc_path"], "title": r["title"], "reason": r["match_reason"]}
+                    for r in docs
+                ],
+                "count": len(docs),
+            }
+        )
 
     return {
         "query_type": "standard",
@@ -74,10 +82,13 @@ def analyze_standard(conn: sqlite3.Connection, code: str) -> dict:
 
 def analyze_regulation(conn: sqlite3.Connection, code: str) -> dict:
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT regulation_code, regulation_name FROM compliance_regulations
         WHERE regulation_code LIKE ? OR regulation_name LIKE ?
-    """, (f"%{code}%", f"%{code}%"))
+    """,
+        (f"%{code}%", f"%{code}%"),
+    )
     matched = cur.fetchall()
     if not matched:
         return {"error": f"Regulacja '{code}' nie znaleziona w tabeli compliance_regulations"}
@@ -85,23 +96,28 @@ def analyze_regulation(conn: sqlite3.Connection, code: str) -> dict:
     results = []
     for reg in matched:
         rc = reg["regulation_code"]
-        cur.execute("""
+        cur.execute(
+            """
             SELECT m.doc_path, m.match_reason, d.title
             FROM doc_regulation_mapping m
             LEFT JOIN docs d ON d.path = m.doc_path
             WHERE m.regulation_code = ?
             ORDER BY m.doc_path
-        """, (rc,))
+        """,
+            (rc,),
+        )
         docs = cur.fetchall()
-        results.append({
-            "regulation_code": rc,
-            "regulation_name": reg["regulation_name"],
-            "affected_templates": [
-                {"path": r["doc_path"], "title": r["title"], "reason": r["match_reason"]}
-                for r in docs
-            ],
-            "count": len(docs),
-        })
+        results.append(
+            {
+                "regulation_code": rc,
+                "regulation_name": reg["regulation_name"],
+                "affected_templates": [
+                    {"path": r["doc_path"], "title": r["title"], "reason": r["match_reason"]}
+                    for r in docs
+                ],
+                "count": len(docs),
+            }
+        )
 
     return {
         "query_type": "regulation",
@@ -114,27 +130,38 @@ def analyze_regulation(conn: sqlite3.Connection, code: str) -> dict:
 def analyze_section(conn: sqlite3.Connection, section_name: str) -> dict:
     cur = conn.cursor()
     # Find all docs that have this section heading
-    cur.execute("""
+    cur.execute(
+        """
         SELECT s.doc_uid, s.heading_text, s.anchor, d.title, d.path
         FROM sections s
         JOIN docs d ON s.doc_uid = d.doc_uid
         WHERE s.heading_text LIKE ?
         ORDER BY d.path
-    """, (f"%{section_name}%",))
+    """,
+        (f"%{section_name}%",),
+    )
     rows = cur.fetchall()
 
     # Also find content_links that reference this section
-    cur.execute("""
+    cur.execute(
+        """
         SELECT COUNT(*) FROM content_links
         WHERE to_ref LIKE ?
-    """, (f"%::section::{section_name}%",))
+    """,
+        (f"%::section::{section_name}%",),
+    )
     link_count = cur.fetchone()[0]
 
     return {
         "query_type": "section",
         "query": section_name,
         "templates_with_section": [
-            {"path": r["path"], "title": r["title"], "heading": r["heading_text"], "anchor": r["anchor"]}
+            {
+                "path": r["path"],
+                "title": r["title"],
+                "heading": r["heading_text"],
+                "anchor": r["anchor"],
+            }
             for r in rows
         ],
         "templates_count": len(rows),
@@ -145,12 +172,15 @@ def analyze_section(conn: sqlite3.Connection, section_name: str) -> dict:
 
 def analyze_doc(conn: sqlite3.Connection, doc_title: str) -> dict:
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT doc_uid, title, path FROM docs
         WHERE title LIKE ? OR path LIKE ?
         ORDER BY title
         LIMIT 20
-    """, (f"%{doc_title}%", f"%{doc_title}%"))
+    """,
+        (f"%{doc_title}%", f"%{doc_title}%"),
+    )
     docs = cur.fetchall()
     if not docs:
         return {"error": f"Dokument '{doc_title}' nie znaleziony"}
@@ -159,46 +189,63 @@ def analyze_doc(conn: sqlite3.Connection, doc_title: str) -> dict:
     for doc in docs:
         uid = doc["doc_uid"]
         # Incoming links (who links TO this doc?)
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(*) FROM content_links
             WHERE to_ref LIKE ?
-        """, (f"document::{doc['title']}::%",))
+        """,
+            (f"document::{doc['title']}::%",),
+        )
         incoming = cur.fetchone()[0]
 
         # Outgoing links (what does this doc link TO?)
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(*) FROM content_links
             WHERE context_doc_uid = ?
-        """, (uid,))
+        """,
+            (uid,),
+        )
         outgoing = cur.fetchone()[0]
 
         # Standards applied
-        cur.execute("""
+        cur.execute(
+            """
             SELECT standard_code FROM doc_standard_mapping WHERE doc_path = ?
-        """, (doc["path"],))
+        """,
+            (doc["path"],),
+        )
         standards = [r[0] for r in cur.fetchall()]
 
         # Regulations applied
-        cur.execute("""
+        cur.execute(
+            """
             SELECT regulation_code FROM doc_regulation_mapping WHERE doc_path = ?
-        """, (doc["path"],))
+        """,
+            (doc["path"],),
+        )
         regs = [r[0] for r in cur.fetchall()]
 
         # Sections in this doc
-        cur.execute("""
+        cur.execute(
+            """
             SELECT heading_text, anchor FROM sections WHERE doc_uid = ? ORDER BY ordinal
-        """, (uid,))
+        """,
+            (uid,),
+        )
         sections = [{"heading": r["heading_text"], "anchor": r["anchor"]} for r in cur.fetchall()]
 
-        results.append({
-            "title": doc["title"],
-            "path": doc["path"],
-            "incoming_links": incoming,
-            "outgoing_links": outgoing,
-            "standards": standards,
-            "regulations": regs,
-            "sections": sections,
-        })
+        results.append(
+            {
+                "title": doc["title"],
+                "path": doc["path"],
+                "incoming_links": incoming,
+                "outgoing_links": outgoing,
+                "standards": standards,
+                "regulations": regs,
+                "sections": sections,
+            }
+        )
 
     return {
         "query_type": "document",
@@ -264,12 +311,22 @@ def print_table(result: dict):
 def main():
     parser = argparse.ArgumentParser(description="Analiza wpływu zmian na szablony IT Dokumentacja")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--standard", metavar="CODE", help="Kod lub nazwa standardu (np. 'ISO/IEC 27001')")
-    group.add_argument("--regulation", metavar="CODE", help="Kod lub nazwa regulacji (np. 'KSC-PL')")
-    group.add_argument("--section", metavar="NAME", help="Nazwa sekcji (np. 'Standardy i compliance')")
+    group.add_argument(
+        "--standard", metavar="CODE", help="Kod lub nazwa standardu (np. 'ISO/IEC 27001')"
+    )
+    group.add_argument(
+        "--regulation", metavar="CODE", help="Kod lub nazwa regulacji (np. 'KSC-PL')"
+    )
+    group.add_argument(
+        "--section", metavar="NAME", help="Nazwa sekcji (np. 'Standardy i compliance')"
+    )
     group.add_argument("--doc", metavar="TITLE", help="Tytuł lub fragment ścieżki dokumentu")
-    parser.add_argument("--output", choices=["table", "json"], default="table",
-                        help="Format wyjścia: table (domyślnie) lub json")
+    parser.add_argument(
+        "--output",
+        choices=["table", "json"],
+        default="table",
+        help="Format wyjścia: table (domyślnie) lub json",
+    )
     parser.add_argument("--save", metavar="FILE", help="Zapisz wynik JSON do pliku")
     args = parser.parse_args()
 

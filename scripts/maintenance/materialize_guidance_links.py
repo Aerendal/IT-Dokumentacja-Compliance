@@ -50,6 +50,7 @@ CREATE INDEX IF NOT EXISTS idx_grl_regulation ON guidance_regulation_links(regul
 # Pomocnicze
 # ---------------------------------------------------------------------------
 
+
 def _parse_json_list(raw: str | None, row_id: int, field: str, json_errors: list) -> list[str]:
     """Parsuje kolumnę JSON → lista stringów. Zwraca [] przy NULL / pustej liście."""
     if raw is None:
@@ -86,6 +87,7 @@ def _load_known_standards(conn: sqlite3.Connection) -> set[str] | None:
 # ---------------------------------------------------------------------------
 # Główna logika
 # ---------------------------------------------------------------------------
+
 
 def materialize(
     conn: sqlite3.Connection,
@@ -142,7 +144,9 @@ def materialize(
                 std_inserted += 1
 
             if not standards_only:
-                reg_codes = _parse_json_list(regulations_raw, row_id, "regulations_refs", json_errors)
+                reg_codes = _parse_json_list(
+                    regulations_raw, row_id, "regulations_refs", json_errors
+                )
                 for code in reg_codes:
                     reg_batch.append((row_id, code))
                     reg_inserted += 1
@@ -167,9 +171,11 @@ def materialize(
 
     if stats and not dry_run:
         std_count = conn.execute("SELECT COUNT(*) FROM guidance_standard_links").fetchone()[0]
-        reg_count = 0 if standards_only else conn.execute(
-            "SELECT COUNT(*) FROM guidance_regulation_links"
-        ).fetchone()[0]
+        reg_count = (
+            0
+            if standards_only
+            else conn.execute("SELECT COUNT(*) FROM guidance_regulation_links").fetchone()[0]
+        )
         print(f"guidance_standard_links:  {std_count:,} rows")
         if not standards_only:
             print(f"guidance_regulation_links: {reg_count:,} rows")
@@ -194,6 +200,7 @@ def materialize(
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="Materializuje linki guidance → standards / regulations.",
@@ -201,7 +208,9 @@ def _build_parser() -> argparse.ArgumentParser:
     mode = p.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="Policz wiersze bez zapisu do DB")
     mode.add_argument("--apply", action="store_true", help="Zapisz do DB (domyślne)")
-    p.add_argument("--standards-only", action="store_true", help="Tylko standards_refs, pomiń regulations")
+    p.add_argument(
+        "--standards-only", action="store_true", help="Tylko standards_refs, pomiń regulations"
+    )
     p.add_argument("--stats", action="store_true", help="Wydrukuj końcowe liczniki z tabel")
     p.add_argument("--db", default=str(_DB_PATH), help="Ścieżka do bazy SQLite")
     return p

@@ -16,7 +16,6 @@ import sqlite3
 from collections import defaultdict
 from pathlib import Path
 
-
 # ---------------------------------------------------------------------------
 # Publiczne API
 # ---------------------------------------------------------------------------
@@ -138,14 +137,14 @@ def library_health_report(conn: sqlite3.Connection) -> str:
     lines = [
         "# Raport zdrowia biblioteki szablonów IT",
         "",
-        f"_Wygenerowano automatycznie przez `itdoc.analytics`_",
+        "_Wygenerowano automatycznie przez `itdoc.analytics`_",
         "",
         "---",
         "",
         "## Podsumowanie",
         "",
-        f"| Metryka | Wartość |",
-        f"|---------|---------|",
+        "| Metryka | Wartość |",
+        "|---------|---------|",
         f"| Łączna liczba szablonów | **{total_docs:,}** |",
         f"| Zmapowane szablony | **{mapped_docs:,}** ({coverage_pct:.1f}%) |",
         f"| Niezmapowane szablony | **{unmapped:,}** |",
@@ -180,7 +179,7 @@ def library_health_report(conn: sqlite3.Connection) -> str:
             "",
             "---",
             "",
-            f"## Standardy poniżej progu (< 5 szablonów)",
+            "## Standardy poniżej progu (< 5 szablonów)",
             "",
             "| Standard | Szablony |",
             "|----------|----------|",
@@ -253,6 +252,7 @@ def main(argv=None) -> int:
     if not db_path.exists():
         print(f"[BŁĄD] Baza danych nie istnieje: {db_path}", flush=True)
         import sys
+
         sys.stderr.write(f"Brak pliku: {db_path}\n")
         return 1
 
@@ -284,4 +284,5 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

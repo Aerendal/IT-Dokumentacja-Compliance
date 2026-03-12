@@ -23,7 +23,7 @@ import subprocess
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Any, Optional
 
 # ---------------------------------------------------------------------------
 # Stale
@@ -47,6 +47,7 @@ STATUS_LABELS = {
 # Narzedzia pomocnicze
 # ---------------------------------------------------------------------------
 
+
 def log_info(msg: str) -> None:
     print(f"[INFO] {msg}", file=sys.stderr)
 
@@ -63,7 +64,8 @@ def log_err(msg: str) -> None:
 # Funkcje top-level (exportowane do testow)
 # ---------------------------------------------------------------------------
 
-def parse_git_log(output: str) -> List[Dict[str, Any]]:
+
+def parse_git_log(output: str) -> list[dict[str, Any]]:
     """
     Parsuje stdout polecenia:
       git log --no-merges --name-status --pretty=format:COMMIT|%H|%cd|%s|%an --date=short
@@ -72,8 +74,8 @@ def parse_git_log(output: str) -> List[Dict[str, Any]]:
       {"hash": str, "date": str, "subject": str, "author": str, "files": [...]}
     Kazdy element "files": {"status": str, "path": str, "old_path": str|None}
     """
-    commits: List[Dict[str, Any]] = []
-    current: Optional[Dict[str, Any]] = None
+    commits: list[dict[str, Any]] = []
+    current: Optional[dict[str, Any]] = None
 
     for line in output.splitlines():
         line = line.rstrip()
@@ -82,29 +84,33 @@ def parse_git_log(output: str) -> List[Dict[str, Any]]:
                 commits.append(current)
             parts = line.split("|", 4)
             current = {
-                "hash":    parts[1] if len(parts) > 1 else "",
-                "date":    parts[2] if len(parts) > 2 else "",
+                "hash": parts[1] if len(parts) > 1 else "",
+                "date": parts[2] if len(parts) > 2 else "",
                 "subject": parts[3] if len(parts) > 3 else "",
-                "author":  parts[4] if len(parts) > 4 else "",
-                "files":   [],
+                "author": parts[4] if len(parts) > 4 else "",
+                "files": [],
             }
         elif current is not None and line:
             parts = line.split("\t")
             if len(parts) >= 2:
                 status_raw = parts[0]
                 if status_raw.startswith("R") and len(parts) >= 3:
-                    current["files"].append({
-                        "status":   "R",
-                        "path":     parts[2],
-                        "old_path": parts[1],
-                    })
+                    current["files"].append(
+                        {
+                            "status": "R",
+                            "path": parts[2],
+                            "old_path": parts[1],
+                        }
+                    )
                 else:
                     status = status_raw[0] if status_raw else "?"
-                    current["files"].append({
-                        "status":   status,
-                        "path":     parts[1],
-                        "old_path": None,
-                    })
+                    current["files"].append(
+                        {
+                            "status": status,
+                            "path": parts[1],
+                            "old_path": None,
+                        }
+                    )
 
     if current is not None:
         commits.append(current)
@@ -113,9 +119,9 @@ def parse_git_log(output: str) -> List[Dict[str, Any]]:
 
 
 def group_into_sessions(
-    commits: List[Dict[str, Any]],
+    commits: list[dict[str, Any]],
     gap_minutes: int = 60,
-) -> List[List[Dict[str, Any]]]:
+) -> list[list[dict[str, Any]]]:
     """
     Grupuje commity w sesje robocze.
     Dwa kolejne commity naleza do tej samej sesji jesli roznica dat
@@ -124,8 +130,8 @@ def group_into_sessions(
     if not commits:
         return []
 
-    sessions: List[List[Dict[str, Any]]] = []
-    current_session: List[Dict[str, Any]] = [commits[0]]
+    sessions: list[list[dict[str, Any]]] = []
+    current_session: list[dict[str, Any]] = [commits[0]]
 
     for commit in commits[1:]:
         try:
@@ -161,15 +167,15 @@ def format_date_range(since: Optional[str], until: Optional[str]) -> str:
 
 
 def render_markdown(
-    sessions: List[List[Dict[str, Any]]],
-    changelog_rows: List[Dict[str, Any]],
+    sessions: list[list[dict[str, Any]]],
+    changelog_rows: list[dict[str, Any]],
 ) -> str:
     """
     Renderuje raport Markdown.
     - sessions: wynik group_into_sessions (commity Git)
     - changelog_rows: rekordy z tabeli template_changelog
     """
-    lines: List[str] = []
+    lines: list[str] = []
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     lines.append("# Raport Zmian Biblioteki Szablonow\n")
@@ -205,18 +211,13 @@ def render_markdown(
             if len(sessions) > 1:
                 lines.append(f"### Sesja {s_idx}\n")
             for commit in session:
-                lines.append(
-                    f"#### {commit['date']} — {commit['subject']} "
-                    f"({commit['author']})"
-                )
+                lines.append(f"#### {commit['date']} — {commit['subject']} ({commit['author']})")
                 lines.append(f"*Commit: `{commit['hash'][:8]}`*\n")
                 for f in commit["files"]:
                     status = f["status"]
                     label = STATUS_LABELS.get(status, status)
                     if status == "R":
-                        lines.append(
-                            f"- **Przemianowano**: z `{f['old_path']}` na `{f['path']}`"
-                        )
+                        lines.append(f"- **Przemianowano**: z `{f['old_path']}` na `{f['path']}`")
                     else:
                         lines.append(f"- **{label}**: `{f['path']}`")
                 lines.append("")
@@ -228,8 +229,8 @@ def render_markdown(
 
 
 def render_json(
-    sessions: List[List[Dict[str, Any]]],
-    changelog_rows: List[Dict[str, Any]],
+    sessions: list[list[dict[str, Any]]],
+    changelog_rows: list[dict[str, Any]],
 ) -> str:
     """
     Renderuje raport JSON.
@@ -248,8 +249,8 @@ def render_json(
 
 
 def render_csv(
-    sessions: List[List[Dict[str, Any]]],
-    changelog_rows: List[Dict[str, Any]],
+    sessions: list[list[dict[str, Any]]],
+    changelog_rows: list[dict[str, Any]],
 ) -> str:
     """Renderuje raport CSV (polaczone dane Git i template_changelog)."""
     buf = io.StringIO()
@@ -259,26 +260,30 @@ def render_csv(
     for session in sessions:
         for commit in session:
             for f in commit["files"]:
-                writer.writerow([
-                    "git",
-                    commit["date"],
-                    f["path"],
-                    STATUS_LABELS.get(f["status"], f["status"]),
-                    commit["subject"],
-                    commit["hash"][:8],
-                    commit["author"],
-                ])
+                writer.writerow(
+                    [
+                        "git",
+                        commit["date"],
+                        f["path"],
+                        STATUS_LABELS.get(f["status"], f["status"]),
+                        commit["subject"],
+                        commit["hash"][:8],
+                        commit["author"],
+                    ]
+                )
 
     for row in changelog_rows:
-        writer.writerow([
-            "template_changelog",
-            (row.get("changed_at") or "")[:10],
-            row.get("template_path", ""),
-            row.get("change_type", ""),
-            row.get("change_reason", ""),
-            "",
-            "",
-        ])
+        writer.writerow(
+            [
+                "template_changelog",
+                (row.get("changed_at") or "")[:10],
+                row.get("template_path", ""),
+                row.get("change_type", ""),
+                row.get("change_reason", ""),
+                "",
+                "",
+            ]
+        )
 
     return buf.getvalue()
 
@@ -287,7 +292,8 @@ def render_csv(
 # Git — pobieranie commitow
 # ---------------------------------------------------------------------------
 
-def _run_git(args: List[str], cwd: Optional[str] = None) -> Optional[str]:
+
+def _run_git(args: list[str], cwd: Optional[str] = None) -> Optional[str]:
     """
     Wykonuje polecenie git. Zwraca stdout lub None jesli Git niedostepny/blad.
     Nigdy nie rzuca wyjatku — zapewnia graceful degradation.
@@ -310,13 +316,15 @@ def get_git_commits(
     since: Optional[str] = None,
     until: Optional[str] = None,
     repo_root: Optional[str] = None,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Pobiera commity z Git dla podanego katalogu i zakresu dat.
     Zwraca pusta liste jesli Git jest niedostepny.
     """
     git_args = [
-        "log", "--no-merges", "--name-status",
+        "log",
+        "--no-merges",
+        "--name-status",
         "--pretty=format:COMMIT|%H|%cd|%s|%an",
         "--date=short",
     ]
@@ -344,11 +352,12 @@ def _get_repo_root(path: str) -> Optional[str]:
 # template_changelog — pobieranie
 # ---------------------------------------------------------------------------
 
+
 def fetch_changelog_rows(
     db_path: str,
     since: Optional[str] = None,
     until: Optional[str] = None,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Pobiera rekordy z template_changelog w zadanym zakresie dat.
     Zwraca pusta liste jesli baza niedostepna lub tabela nie istnieje.
@@ -359,7 +368,7 @@ def fetch_changelog_rows(
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         query = "SELECT * FROM template_changelog WHERE 1=1"
-        params: List[str] = []
+        params: list[str] = []
         if since:
             query += " AND changed_at >= ?"
             params.append(since)
@@ -379,6 +388,7 @@ def fetch_changelog_rows(
 # ---------------------------------------------------------------------------
 # Glowna logika
 # ---------------------------------------------------------------------------
+
 
 def generate_changelog(
     db_path: str,
@@ -416,6 +426,7 @@ def generate_changelog(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(

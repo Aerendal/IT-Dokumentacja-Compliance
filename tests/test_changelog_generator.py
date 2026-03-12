@@ -2,18 +2,20 @@
 tests/test_changelog_generator.py — unit tests for scripts/maintenance/changelog_generator.py
 All tests use in-memory SQLite and no real Git calls.
 """
+
 import json
 import sqlite3
+
 import pytest
 
 from scripts.maintenance.changelog_generator import (
-    parse_git_log,
-    group_into_sessions,
-    format_date_range,
-    render_markdown,
-    render_json,
-    render_csv,
     fetch_changelog_rows,
+    format_date_range,
+    group_into_sessions,
+    parse_git_log,
+    render_csv,
+    render_json,
+    render_markdown,
 )
 
 pytestmark = pytest.mark.unit
@@ -67,9 +69,9 @@ def db_with_changelog(tmp_path):
     conn.executemany(
         "INSERT INTO template_changelog (template_path, changed_at, change_type, change_reason) VALUES (?,?,?,?)",
         [
-            ("core/auth.md",  "2026-03-15T10:00:00", "mapping_add",    "standard=ISO27001"),
-            ("core/gdpr.md",  "2026-03-14T09:00:00", "mapping_add",    "regulation=GDPR"),
-            ("core/nis2.md",  "2026-01-05T08:00:00", "mapping_remove", "standard=NIS2"),
+            ("core/auth.md", "2026-03-15T10:00:00", "mapping_add", "standard=ISO27001"),
+            ("core/gdpr.md", "2026-03-14T09:00:00", "mapping_add", "regulation=GDPR"),
+            ("core/nis2.md", "2026-01-05T08:00:00", "mapping_remove", "standard=NIS2"),
         ],
     )
     conn.commit()
@@ -80,6 +82,7 @@ def db_with_changelog(tmp_path):
 # ---------------------------------------------------------------------------
 # parse_git_log
 # ---------------------------------------------------------------------------
+
 
 class TestParseGitLog:
     def test_returns_list_of_commits(self):
@@ -124,6 +127,7 @@ class TestParseGitLog:
 # group_into_sessions
 # ---------------------------------------------------------------------------
 
+
 class TestGroupIntoSessions:
     def _make_commit(self, date):
         return {"hash": "aaa", "date": date, "subject": "x", "author": "X", "files": []}
@@ -163,6 +167,7 @@ class TestGroupIntoSessions:
 # format_date_range
 # ---------------------------------------------------------------------------
 
+
 class TestFormatDateRange:
     def test_both_dates(self):
         result = format_date_range("2026-01-01", "2026-03-31")
@@ -187,6 +192,7 @@ class TestFormatDateRange:
 # ---------------------------------------------------------------------------
 # render_markdown
 # ---------------------------------------------------------------------------
+
 
 class TestRenderMarkdown:
     def test_contains_header(self):
@@ -220,6 +226,7 @@ class TestRenderMarkdown:
 # render_json
 # ---------------------------------------------------------------------------
 
+
 class TestRenderJson:
     def test_valid_json(self):
         commits = parse_git_log(SAMPLE_GIT_LOG)
@@ -247,6 +254,7 @@ class TestRenderJson:
 # render_csv
 # ---------------------------------------------------------------------------
 
+
 class TestRenderCsv:
     def test_returns_string(self):
         output = render_csv([], [])
@@ -267,6 +275,7 @@ class TestRenderCsv:
 # ---------------------------------------------------------------------------
 # fetch_changelog_rows
 # ---------------------------------------------------------------------------
+
 
 class TestFetchChangelogRows:
     def test_returns_all_rows(self, db_with_changelog):

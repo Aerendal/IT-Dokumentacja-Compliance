@@ -1,14 +1,16 @@
 """Tests for scripts/maintenance/changelog_tracker.py."""
-import pytest
-import sqlite3
+
 import json
+import sqlite3
 import sys
-from pathlib import Path
 from argparse import Namespace
+from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scripts.maintenance.changelog_tracker import ensure_table, cmd_list, cmd_stats, cmd_export
+from scripts.maintenance.changelog_tracker import cmd_export, cmd_list, cmd_stats, ensure_table
 
 pytestmark = pytest.mark.unit
 
@@ -26,11 +28,39 @@ def populated_conn(mem_conn):
     mem_conn.executemany(
         "INSERT INTO template_changelog (template_path, changed_at, change_type, change_reason, diff_summary, patch_args) VALUES (?,?,?,?,?,?)",
         [
-            ("core/security_policy.md", "2026-03-01T10:00:00", "bulk_patch", "Reason A", "Added section", None),
-            ("core/access_control.md", "2026-03-02T11:00:00", "regulation_update", "Reason B", "Updated regulation ref", None),
-            ("core/security_policy.md", "2026-03-03T12:00:00", "bulk_patch", "Reason C", "Modified intro", None),
-            ("docs/incident_response.md", "2026-02-15T09:00:00", "inject_aspirational", "Reason D", "Injected section", None),
-        ]
+            (
+                "core/security_policy.md",
+                "2026-03-01T10:00:00",
+                "bulk_patch",
+                "Reason A",
+                "Added section",
+                None,
+            ),
+            (
+                "core/access_control.md",
+                "2026-03-02T11:00:00",
+                "regulation_update",
+                "Reason B",
+                "Updated regulation ref",
+                None,
+            ),
+            (
+                "core/security_policy.md",
+                "2026-03-03T12:00:00",
+                "bulk_patch",
+                "Reason C",
+                "Modified intro",
+                None,
+            ),
+            (
+                "docs/incident_response.md",
+                "2026-02-15T09:00:00",
+                "inject_aspirational",
+                "Reason D",
+                "Injected section",
+                None,
+            ),
+        ],
     )
     mem_conn.commit()
     return mem_conn
@@ -39,7 +69,9 @@ def populated_conn(mem_conn):
 class TestEnsureTable:
     def test_creates_table(self, mem_conn):
         ensure_table(mem_conn)
-        cur = mem_conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='template_changelog'")
+        cur = mem_conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='template_changelog'"
+        )
         assert cur.fetchone() is not None
 
     def test_idempotent(self, mem_conn):
@@ -64,7 +96,9 @@ class TestCmdList:
         assert "access_control" in out
 
     def test_list_filter_by_template(self, populated_conn, capsys):
-        args = Namespace(template="security_policy", since=None, type=None, limit=50, output="table")
+        args = Namespace(
+            template="security_policy", since=None, type=None, limit=50, output="table"
+        )
         cmd_list(populated_conn, args)
         out = capsys.readouterr().out
         assert "security_policy" in out
@@ -91,7 +125,9 @@ class TestCmdList:
         assert len(data) > 0
 
     def test_list_empty_result(self, populated_conn, capsys):
-        args = Namespace(template="nonexistent_file_xyz", since=None, type=None, limit=50, output="table")
+        args = Namespace(
+            template="nonexistent_file_xyz", since=None, type=None, limit=50, output="table"
+        )
         cmd_list(populated_conn, args)
         out = capsys.readouterr().out
         assert "Brak" in out or len(out.strip()) > 0

@@ -9,14 +9,14 @@ Rebuild sections for a single document with diagnostics.
 
 import argparse
 import json
+import os
 import re
 import sqlite3
+import subprocess
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-import os
-import subprocess
-import sys
 
 HDR_RE = re.compile(r"^(#{1,6})\s*(.+?)\s*$")  # allow '#Title' or '# Title'
 
@@ -190,7 +190,9 @@ def main():
         row = cur.fetchone()
         if not row:
             dbg["error"] = "Doc not found in docs for given identifier"
-            debug_out.write_text(json.dumps(dbg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            debug_out.write_text(
+                json.dumps(dbg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
             raise SystemExit("Doc not found in docs")
 
         doc_uid, rel_path, title = row
@@ -203,7 +205,9 @@ def main():
         dbg["file_exists"] = fp.exists()
 
         if not fp.exists():
-            debug_out.write_text(json.dumps(dbg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            debug_out.write_text(
+                json.dumps(dbg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
             raise SystemExit(f"File not found: {fp}")
 
         md_text = fp.read_text(encoding="utf-8")

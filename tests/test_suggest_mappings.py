@@ -13,14 +13,14 @@ import sqlite3
 import pytest
 
 from scripts.maintenance.suggest_mappings import (
-    tokenize,
+    apply_suggestions,
+    build_idf_profiles,
+    generate_suggestions,
+    get_unmapped_docs,
     jaccard,
     overlap_coefficient,
-    build_idf_profiles,
-    get_unmapped_docs,
-    generate_suggestions,
-    apply_suggestions,
     render_report,
+    tokenize,
 )
 
 pytestmark = pytest.mark.unit
@@ -29,6 +29,7 @@ pytestmark = pytest.mark.unit
 # ---------------------------------------------------------------------------
 # Fixture
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def suggest_db():
@@ -79,6 +80,7 @@ def suggest_db():
 # Testy tokenize
 # ---------------------------------------------------------------------------
 
+
 class TestTokenize:
     def test_basic_tokenization(self):
         result = tokenize("API Reference Documentation")
@@ -117,6 +119,7 @@ class TestTokenize:
 # Testy jaccard i overlap_coefficient
 # ---------------------------------------------------------------------------
 
+
 class TestSimilarityFunctions:
     def test_jaccard_identical(self):
         s = {"a", "b", "c"}
@@ -150,6 +153,7 @@ class TestSimilarityFunctions:
 # Testy build_idf_profiles
 # ---------------------------------------------------------------------------
 
+
 class TestBuildIdfProfiles:
     def test_returns_two_dicts(self, suggest_db):
         profiles, idf = build_idf_profiles(suggest_db)
@@ -164,7 +168,7 @@ class TestBuildIdfProfiles:
 
     def test_profile_words_are_floats(self, suggest_db):
         profiles, _ = build_idf_profiles(suggest_db)
-        for word, weight in profiles["OpenAPI"].items():
+        for _word, weight in profiles["OpenAPI"].items():
             assert isinstance(weight, float)
             break
 
@@ -173,13 +177,14 @@ class TestBuildIdfProfiles:
         # ale słowo które jest w KAŻDYM standardzie powinno mieć niższe IDF
         _, idf = build_idf_profiles(suggest_db)
         # Sprawdzamy że IDF nie jest 0 dla żadnego słowa
-        for word, score in idf.items():
+        for _word, score in idf.items():
             assert score >= 0
 
 
 # ---------------------------------------------------------------------------
 # Testy get_unmapped_docs
 # ---------------------------------------------------------------------------
+
 
 class TestGetUnmappedDocs:
     def test_returns_unmapped_only(self, suggest_db):
@@ -202,6 +207,7 @@ class TestGetUnmappedDocs:
 # ---------------------------------------------------------------------------
 # Testy generate_suggestions
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateSuggestions:
     def test_returns_list(self, suggest_db):
@@ -244,6 +250,7 @@ class TestGenerateSuggestions:
 # Testy apply_suggestions
 # ---------------------------------------------------------------------------
 
+
 class TestApplySuggestions:
     def test_inserts_into_db(self, suggest_db):
         suggestions = [
@@ -264,13 +271,15 @@ class TestApplySuggestions:
         assert row["match_reason"] == "candidate_match"
 
     def test_no_duplicate_insert(self, suggest_db):
-        s = [{
-            "doc_path": "core/api_reference.md",  # już zmapowany!
-            "title": "API Reference",
-            "best_standard": "OpenAPI",
-            "confidence": 0.9,
-            "alternatives": [],
-        }]
+        s = [
+            {
+                "doc_path": "core/api_reference.md",  # już zmapowany!
+                "title": "API Reference",
+                "best_standard": "OpenAPI",
+                "confidence": 0.9,
+                "alternatives": [],
+            }
+        ]
         count = apply_suggestions(suggest_db, s)
         assert count == 0  # nie wstawia duplikatu
 
@@ -278,6 +287,7 @@ class TestApplySuggestions:
 # ---------------------------------------------------------------------------
 # Testy render_report
 # ---------------------------------------------------------------------------
+
 
 class TestRenderReport:
     def test_returns_string(self):
@@ -289,13 +299,15 @@ class TestRenderReport:
         assert "# Raport" in result
 
     def test_with_suggestions_contains_table(self):
-        suggestions = [{
-            "doc_path": "core/test.md",
-            "title": "Test Document",
-            "best_standard": "OpenAPI",
-            "confidence": 0.75,
-            "alternatives": [("PMBOK", 0.3)],
-        }]
+        suggestions = [
+            {
+                "doc_path": "core/test.md",
+                "title": "Test Document",
+                "best_standard": "OpenAPI",
+                "confidence": 0.75,
+                "alternatives": [("PMBOK", 0.3)],
+            }
+        ]
         result = render_report(suggestions, 100)
         assert "Test Document" in result
         assert "OpenAPI" in result

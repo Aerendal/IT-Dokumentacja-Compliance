@@ -31,8 +31,10 @@ _DEFAULT_DB = _REPO_ROOT / "reports" / "it_doc_matrix.db"
 # Core metric functions (importable / testable)
 # ---------------------------------------------------------------------------
 
-def compute_standard_metrics(conn: sqlite3.Connection, standard_code: str,
-                              min_confidence: float = 0.5) -> dict:
+
+def compute_standard_metrics(
+    conn: sqlite3.Connection, standard_code: str, min_confidence: float = 0.5
+) -> dict:
     """Return coverage metrics for a single standard.
 
     Returns dict with keys:
@@ -40,24 +42,32 @@ def compute_standard_metrics(conn: sqlite3.Connection, standard_code: str,
     """
     cur = conn.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE standard_code = ?",
-                (standard_code,))
+    cur.execute(
+        "SELECT COUNT(*) FROM doc_standard_mapping WHERE standard_code = ?", (standard_code,)
+    )
     total_mappings = cur.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE standard_code = ? AND confidence >= 0.5",
-                (standard_code,))
+    cur.execute(
+        "SELECT COUNT(*) FROM doc_standard_mapping WHERE standard_code = ? AND confidence >= 0.5",
+        (standard_code,),
+    )
     high_conf_50 = cur.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE standard_code = ? AND confidence >= 0.7",
-                (standard_code,))
+    cur.execute(
+        "SELECT COUNT(*) FROM doc_standard_mapping WHERE standard_code = ? AND confidence >= 0.7",
+        (standard_code,),
+    )
     high_conf_70 = cur.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE standard_code = ? AND confidence >= 0.9",
-                (standard_code,))
+    cur.execute(
+        "SELECT COUNT(*) FROM doc_standard_mapping WHERE standard_code = ? AND confidence >= 0.9",
+        (standard_code,),
+    )
     high_conf_90 = cur.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM guidance_standard_links WHERE standard_code = ?",
-                (standard_code,))
+    cur.execute(
+        "SELECT COUNT(*) FROM guidance_standard_links WHERE standard_code = ?", (standard_code,)
+    )
     guidance_sections = cur.fetchone()[0]
 
     return {
@@ -78,16 +88,21 @@ def compute_regulation_metrics(conn: sqlite3.Connection, regulation_code: str) -
     """
     cur = conn.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM guidance_regulation_links WHERE regulation_code = ?",
-                (regulation_code,))
+    cur.execute(
+        "SELECT COUNT(*) FROM guidance_regulation_links WHERE regulation_code = ?",
+        (regulation_code,),
+    )
     guidance_sections = cur.fetchone()[0]
 
-    cur.execute("""
+    cur.execute(
+        """
         SELECT COUNT(DISTINCT g.doc_title)
         FROM guidance_regulation_links gl
         JOIN doc_section_guidance g ON gl.guidance_id = g.id
         WHERE gl.regulation_code = ?
-    """, (regulation_code,))
+    """,
+        (regulation_code,),
+    )
     unique_docs = cur.fetchone()[0]
 
     return {
@@ -109,7 +124,8 @@ def compute_control_metrics(conn: sqlite3.Connection, standard_code: str) -> lis
     """
     try:
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT sc.control_id, sc.control_name, sc.theme,
                    COUNT(dcm.id) as template_count,
                    ROUND(AVG(dcm.confidence), 3) as avg_confidence,
@@ -120,7 +136,9 @@ def compute_control_metrics(conn: sqlite3.Connection, standard_code: str) -> lis
             WHERE sc.standard_code = ?
             GROUP BY sc.control_id, sc.control_name, sc.theme
             ORDER BY sc.theme ASC, sc.control_id ASC
-        """, (standard_code,))
+        """,
+            (standard_code,),
+        )
         rows = cur.fetchall()
     except sqlite3.OperationalError:
         return []
@@ -136,15 +154,17 @@ def compute_control_metrics(conn: sqlite3.Connection, standard_code: str) -> lis
             tier = "medium"
         else:
             tier = "high"
-        result.append({
-            "control_id": control_id,
-            "control_name": control_name,
-            "theme": theme,
-            "template_count": template_count,
-            "avg_confidence": avg_conf,
-            "max_confidence": max_conf,
-            "coverage_tier": tier,
-        })
+        result.append(
+            {
+                "control_id": control_id,
+                "control_name": control_name,
+                "theme": theme,
+                "template_count": template_count,
+                "avg_confidence": avg_conf,
+                "max_confidence": max_conf,
+                "coverage_tier": tier,
+            }
+        )
     return result
 
 
@@ -161,8 +181,10 @@ def _get_standards_with_controls(conn: sqlite3.Connection) -> list[str]:
 def _get_standards(conn: sqlite3.Connection, standard_code: str | None = None) -> list[dict]:
     cur = conn.cursor()
     if standard_code:
-        cur.execute("SELECT standard_code, standard_name FROM standards WHERE standard_code = ?",
-                    (standard_code,))
+        cur.execute(
+            "SELECT standard_code, standard_name FROM standards WHERE standard_code = ?",
+            (standard_code,),
+        )
     else:
         cur.execute("SELECT standard_code, standard_name FROM standards ORDER BY standard_code")
     return [{"standard_code": r[0], "standard_name": r[1]} for r in cur.fetchall()]
@@ -171,10 +193,14 @@ def _get_standards(conn: sqlite3.Connection, standard_code: str | None = None) -
 def _get_regulations(conn: sqlite3.Connection, regulation_code: str | None = None) -> list[dict]:
     cur = conn.cursor()
     if regulation_code:
-        cur.execute("SELECT regulation_code, regulation_name FROM compliance_regulations WHERE regulation_code = ?",
-                    (regulation_code,))
+        cur.execute(
+            "SELECT regulation_code, regulation_name FROM compliance_regulations WHERE regulation_code = ?",
+            (regulation_code,),
+        )
     else:
-        cur.execute("SELECT regulation_code, regulation_name FROM compliance_regulations ORDER BY regulation_code")
+        cur.execute(
+            "SELECT regulation_code, regulation_name FROM compliance_regulations ORDER BY regulation_code"
+        )
     return [{"regulation_code": r[0], "regulation_name": r[1]} for r in cur.fetchall()]
 
 
@@ -189,10 +215,13 @@ def _total_docs(conn: sqlite3.Connection) -> int:
 # Report generators
 # ---------------------------------------------------------------------------
 
-def generate_json_report(conn: sqlite3.Connection,
-                         standards: list[dict],
-                         regulations: list[dict],
-                         min_confidence: float = 0.5) -> dict:
+
+def generate_json_report(
+    conn: sqlite3.Connection,
+    standards: list[dict],
+    regulations: list[dict],
+    min_confidence: float = 0.5,
+) -> dict:
     """Return the full report as a Python dict (JSON-serialisable)."""
     total_templates = _total_docs(conn)
 
@@ -223,10 +252,12 @@ def generate_json_report(conn: sqlite3.Connection,
     }
 
 
-def generate_text_report(conn: sqlite3.Connection,
-                         standards: list[dict],
-                         regulations: list[dict],
-                         min_confidence: float = 0.5) -> str:
+def generate_text_report(
+    conn: sqlite3.Connection,
+    standards: list[dict],
+    regulations: list[dict],
+    min_confidence: float = 0.5,
+) -> str:
     """Return the full report as a formatted text string."""
     total_templates = _total_docs(conn)
     lines: list[str] = []
@@ -274,25 +305,40 @@ def generate_text_report(conn: sqlite3.Connection,
     return "\n".join(lines)
 
 
-def generate_csv_report(conn: sqlite3.Connection,
-                        standards: list[dict],
-                        regulations: list[dict],
-                        min_confidence: float = 0.5) -> tuple[str, str]:
+def generate_csv_report(
+    conn: sqlite3.Connection,
+    standards: list[dict],
+    regulations: list[dict],
+    min_confidence: float = 0.5,
+) -> tuple[str, str]:
     """Return (standards_csv, regulations_csv) as strings."""
     # Standards CSV
     std_buf = io.StringIO()
     std_writer = csv.writer(std_buf)
-    std_writer.writerow([
-        "standard_code", "standard_name", "total_mappings",
-        "high_conf_50", "high_conf_70", "high_conf_90", "guidance_sections"
-    ])
+    std_writer.writerow(
+        [
+            "standard_code",
+            "standard_name",
+            "total_mappings",
+            "high_conf_50",
+            "high_conf_70",
+            "high_conf_90",
+            "guidance_sections",
+        ]
+    )
     for s in standards:
         m = compute_standard_metrics(conn, s["standard_code"], min_confidence)
-        std_writer.writerow([
-            s["standard_code"], s["standard_name"],
-            m["total_mappings"], m["high_conf_50"], m["high_conf_70"],
-            m["high_conf_90"], m["guidance_sections"],
-        ])
+        std_writer.writerow(
+            [
+                s["standard_code"],
+                s["standard_name"],
+                m["total_mappings"],
+                m["high_conf_50"],
+                m["high_conf_70"],
+                m["high_conf_90"],
+                m["guidance_sections"],
+            ]
+        )
 
     # Regulations CSV
     reg_buf = io.StringIO()
@@ -300,27 +346,33 @@ def generate_csv_report(conn: sqlite3.Connection,
     reg_writer.writerow(["regulation_code", "regulation_name", "guidance_sections", "unique_docs"])
     for r in regulations:
         m = compute_regulation_metrics(conn, r["regulation_code"])
-        reg_writer.writerow([
-            r["regulation_code"], r["regulation_name"],
-            m["guidance_sections"], m["unique_docs"],
-        ])
+        reg_writer.writerow(
+            [
+                r["regulation_code"],
+                r["regulation_name"],
+                m["guidance_sections"],
+                m["unique_docs"],
+            ]
+        )
 
     return std_buf.getvalue(), reg_buf.getvalue()
 
 
 def _coverage_color(ratio: float) -> str:
     if ratio >= 0.5:
-        return "#2e7d32"   # green
+        return "#2e7d32"  # green
     elif ratio >= 0.2:
-        return "#f57c00"   # orange/yellow
+        return "#f57c00"  # orange/yellow
     else:
-        return "#c62828"   # red
+        return "#c62828"  # red
 
 
-def generate_html_report(conn: sqlite3.Connection,
-                         standards: list[dict],
-                         regulations: list[dict],
-                         min_confidence: float = 0.5) -> str:
+def generate_html_report(
+    conn: sqlite3.Connection,
+    standards: list[dict],
+    regulations: list[dict],
+    min_confidence: float = 0.5,
+) -> str:
     """Return the full report as an HTML string with inline styles."""
     total_templates = _total_docs(conn)
 
@@ -331,39 +383,31 @@ def generate_html_report(conn: sqlite3.Connection,
         color = _coverage_color(ratio)
         pct = f"{ratio * 100:.1f}%"
         std_rows_html.append(
-            f'<tr>'
-            f'<td>{s["standard_code"]}</td>'
-            f'<td>{s["standard_name"]}</td>'
+            f"<tr>"
+            f"<td>{s['standard_code']}</td>"
+            f"<td>{s['standard_name']}</td>"
             f'<td style="text-align:right">{m["total_mappings"]:,}</td>'
             f'<td style="text-align:right;color:{color};font-weight:bold">{m["high_conf_50"]:,}</td>'
             f'<td style="text-align:right">{m["high_conf_70"]:,}</td>'
             f'<td style="text-align:right">{m["high_conf_90"]:,}</td>'
             f'<td style="text-align:right">{m["guidance_sections"]:,}</td>'
             f'<td style="text-align:right;color:{color};font-weight:bold">{pct}</td>'
-            f'</tr>'
+            f"</tr>"
         )
 
     reg_rows_html: list[str] = []
     for r in regulations:
         m = compute_regulation_metrics(conn, r["regulation_code"])
         reg_rows_html.append(
-            f'<tr>'
-            f'<td>{r["regulation_code"]}</td>'
-            f'<td>{r["regulation_name"]}</td>'
+            f"<tr>"
+            f"<td>{r['regulation_code']}</td>"
+            f"<td>{r['regulation_name']}</td>"
             f'<td style="text-align:right">{m["guidance_sections"]:,}</td>'
             f'<td style="text-align:right">{m["unique_docs"]:,}</td>'
-            f'</tr>'
+            f"</tr>"
         )
 
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    table_style = (
-        'style="border-collapse:collapse;width:100%;font-family:sans-serif;font-size:13px"'
-    )
-    th_style = (
-        'style="background:#1565c0;color:white;padding:8px 12px;text-align:left;'
-        'border:1px solid #ccc"'
-    )
-    td_style = 'style="padding:6px 12px;border:1px solid #ddd"'
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -406,7 +450,7 @@ def generate_html_report(conn: sqlite3.Connection,
       </tr>
     </thead>
     <tbody>
-      {''.join(std_rows_html)}
+      {"".join(std_rows_html)}
     </tbody>
   </table>
 
@@ -418,7 +462,7 @@ def generate_html_report(conn: sqlite3.Connection,
       </tr>
     </thead>
     <tbody>
-      {''.join(reg_rows_html)}
+      {"".join(reg_rows_html)}
     </tbody>
   </table>
 
@@ -448,13 +492,13 @@ def _build_control_sections_html(conn: sqlite3.Connection) -> str:
             avg = m["avg_confidence"] if m["avg_confidence"] is not None else "-"
             rows_html.append(
                 f'<tr class="tier-{tier}">'
-                f'<td>{m["control_id"]}</td>'
-                f'<td>{m["control_name"]}</td>'
-                f'<td>{m["theme"]}</td>'
+                f"<td>{m['control_id']}</td>"
+                f"<td>{m['control_name']}</td>"
+                f"<td>{m['theme']}</td>"
                 f'<td style="text-align:right">{m["template_count"]}</td>'
                 f'<td style="text-align:right">{avg}</td>'
-                f'<td>{tier}</td>'
-                f'</tr>'
+                f"<td>{tier}</td>"
+                f"</tr>"
             )
 
         sections.append(f"""
@@ -465,7 +509,7 @@ def _build_control_sections_html(conn: sqlite3.Connection) -> str:
       <tr><th>Control ID</th><th>Name</th><th>Theme</th><th>Templates</th><th>Avg Conf</th><th>Tier</th></tr>
     </thead>
     <tbody>
-      {''.join(rows_html)}
+      {"".join(rows_html)}
     </tbody>
   </table>""")
 
@@ -476,8 +520,10 @@ def _build_control_sections_html(conn: sqlite3.Connection) -> str:
 # Gap filtering helper
 # ---------------------------------------------------------------------------
 
-def _filter_gaps(conn: sqlite3.Connection, standards: list[dict],
-                 regulations: list[dict], min_confidence: float) -> tuple[list[dict], list[dict]]:
+
+def _filter_gaps(
+    conn: sqlite3.Connection, standards: list[dict], regulations: list[dict], min_confidence: float
+) -> tuple[list[dict], list[dict]]:
     """Keep only entries with coverage below min_confidence threshold."""
     total = _total_docs(conn)
 
@@ -501,21 +547,30 @@ def _filter_gaps(conn: sqlite3.Connection, standards: list[dict],
 # CLI entry point
 # ---------------------------------------------------------------------------
 
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Generate Compliance Coverage Report from it_doc_matrix.db"
     )
     parser.add_argument("--standard", metavar="CODE", help="Report for single standard")
     parser.add_argument("--regulation", metavar="CODE", help="Report for single regulation")
-    parser.add_argument("--format", dest="fmt", choices=["text", "csv", "json", "html"],
-                        default="text")
+    parser.add_argument(
+        "--format", dest="fmt", choices=["text", "csv", "json", "html"], default="text"
+    )
     parser.add_argument("--output", metavar="PATH", help="Output file (default: stdout/auto)")
-    parser.add_argument("--show-gaps", action="store_true",
-                        help="Show only standards/regulations with low coverage")
-    parser.add_argument("--min-confidence", type=float, default=0.5,
-                        metavar="F", help="Coverage threshold (default: 0.5)")
-    parser.add_argument("--db", default=str(_DEFAULT_DB), metavar="PATH",
-                        help="Path to SQLite database")
+    parser.add_argument(
+        "--show-gaps", action="store_true", help="Show only standards/regulations with low coverage"
+    )
+    parser.add_argument(
+        "--min-confidence",
+        type=float,
+        default=0.5,
+        metavar="F",
+        help="Coverage threshold (default: 0.5)",
+    )
+    parser.add_argument(
+        "--db", default=str(_DEFAULT_DB), metavar="PATH", help="Path to SQLite database"
+    )
     args = parser.parse_args(argv)
 
     conn = sqlite3.connect(args.db)
@@ -544,16 +599,30 @@ def main(argv=None):
         ctrl_path = reports_dir / "compliance_report_controls.csv"
         ctrl_buf = io.StringIO()
         ctrl_writer = csv.writer(ctrl_buf)
-        ctrl_writer.writerow([
-            "standard_code", "control_id", "control_name", "theme",
-            "template_count", "avg_confidence", "coverage_tier"
-        ])
+        ctrl_writer.writerow(
+            [
+                "standard_code",
+                "control_id",
+                "control_name",
+                "theme",
+                "template_count",
+                "avg_confidence",
+                "coverage_tier",
+            ]
+        )
         for code in _get_standards_with_controls(conn):
             for m in compute_control_metrics(conn, code):
-                ctrl_writer.writerow([
-                    code, m["control_id"], m["control_name"], m["theme"],
-                    m["template_count"], m["avg_confidence"], m["coverage_tier"],
-                ])
+                ctrl_writer.writerow(
+                    [
+                        code,
+                        m["control_id"],
+                        m["control_name"],
+                        m["theme"],
+                        m["template_count"],
+                        m["avg_confidence"],
+                        m["coverage_tier"],
+                    ]
+                )
         ctrl_path.write_text(ctrl_buf.getvalue(), encoding="utf-8")
         print(f"JSON report written to {out_path}")
 
@@ -574,16 +643,30 @@ def main(argv=None):
         ctrl_path = reports_dir / "compliance_report_controls.csv"
         ctrl_buf = io.StringIO()
         ctrl_writer = csv.writer(ctrl_buf)
-        ctrl_writer.writerow([
-            "standard_code", "control_id", "control_name", "theme",
-            "template_count", "avg_confidence", "coverage_tier"
-        ])
+        ctrl_writer.writerow(
+            [
+                "standard_code",
+                "control_id",
+                "control_name",
+                "theme",
+                "template_count",
+                "avg_confidence",
+                "coverage_tier",
+            ]
+        )
         for code in _get_standards_with_controls(conn):
             for m in compute_control_metrics(conn, code):
-                ctrl_writer.writerow([
-                    code, m["control_id"], m["control_name"], m["theme"],
-                    m["template_count"], m["avg_confidence"], m["coverage_tier"],
-                ])
+                ctrl_writer.writerow(
+                    [
+                        code,
+                        m["control_id"],
+                        m["control_name"],
+                        m["theme"],
+                        m["template_count"],
+                        m["avg_confidence"],
+                        m["coverage_tier"],
+                    ]
+                )
         ctrl_path.write_text(ctrl_buf.getvalue(), encoding="utf-8")
         print(f"CSV reports written to:\n  {std_path}\n  {reg_path}\n  {ctrl_path}")
 
@@ -595,16 +678,30 @@ def main(argv=None):
         ctrl_path = reports_dir / "compliance_report_controls.csv"
         ctrl_buf = io.StringIO()
         ctrl_writer = csv.writer(ctrl_buf)
-        ctrl_writer.writerow([
-            "standard_code", "control_id", "control_name", "theme",
-            "template_count", "avg_confidence", "coverage_tier"
-        ])
+        ctrl_writer.writerow(
+            [
+                "standard_code",
+                "control_id",
+                "control_name",
+                "theme",
+                "template_count",
+                "avg_confidence",
+                "coverage_tier",
+            ]
+        )
         for code in _get_standards_with_controls(conn):
             for m in compute_control_metrics(conn, code):
-                ctrl_writer.writerow([
-                    code, m["control_id"], m["control_name"], m["theme"],
-                    m["template_count"], m["avg_confidence"], m["coverage_tier"],
-                ])
+                ctrl_writer.writerow(
+                    [
+                        code,
+                        m["control_id"],
+                        m["control_name"],
+                        m["theme"],
+                        m["template_count"],
+                        m["avg_confidence"],
+                        m["coverage_tier"],
+                    ]
+                )
         ctrl_path.write_text(ctrl_buf.getvalue(), encoding="utf-8")
         print(f"HTML report written to {out_path}")
 

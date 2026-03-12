@@ -66,29 +66,21 @@ class TestSectionChecks:
 
     def test_missing_cel_dokumentu(self):
         content = (
-            VALID_FRONTMATTER
-            + "## Zakres i granice\nScope.\n\n"
-            + "## Wejścia i wyjścia\nIO.\n"
+            VALID_FRONTMATTER + "## Zakres i granice\nScope.\n\n" + "## Wejścia i wyjścia\nIO.\n"
         )
         violations = check_sections(content)
         missing = [v for v in violations if v[0] == "SECTION_MISSING"]
         assert any("Cel dokumentu" in v[1] for v in missing)
 
     def test_missing_zakres(self):
-        content = (
-            VALID_FRONTMATTER
-            + "## Cel dokumentu\nGoal.\n\n"
-            + "## Wejścia i wyjścia\nIO.\n"
-        )
+        content = VALID_FRONTMATTER + "## Cel dokumentu\nGoal.\n\n" + "## Wejścia i wyjścia\nIO.\n"
         violations = check_sections(content)
         missing = [v for v in violations if v[0] == "SECTION_MISSING"]
         assert any("Zakres i granice" in v[1] for v in missing)
 
     def test_missing_wejscia_wyjscia(self):
         content = (
-            VALID_FRONTMATTER
-            + "## Cel dokumentu\nGoal.\n\n"
-            + "## Zakres i granice\nScope.\n"
+            VALID_FRONTMATTER + "## Cel dokumentu\nGoal.\n\n" + "## Zakres i granice\nScope.\n"
         )
         violations = check_sections(content)
         missing = [v for v in violations if v[0] == "SECTION_MISSING"]
@@ -110,8 +102,7 @@ class TestValidateFile:
     def test_valid_file_returns_empty_violations(self, tmp_path):
         md = tmp_path / "valid.md"
         md.write_text(
-            VALID_FRONTMATTER
-            + REQUIRED_SECTIONS_CONTENT,
+            VALID_FRONTMATTER + REQUIRED_SECTIONS_CONTENT,
             encoding="utf-8",
         )
         violations = validate_file(md)

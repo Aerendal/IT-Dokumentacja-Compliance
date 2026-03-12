@@ -3,11 +3,13 @@
 Uses title from YAML front-matter (title:) or first H1 as fallback.
 Stores collisions of title_norm for audit.
 """
+
 import csv
 import re
 import sqlite3
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
+
 from ulid import ulid
 
 BASE = Path(__file__).resolve().parent.parent
@@ -125,8 +127,13 @@ def main():
 
     cur.execute(
         "INSERT INTO sync_runs(sync_id,ran_at_utc,kind,status,notes) VALUES(?,?,?,?,?)",
-        (ulid(), now, "file_index", "OK",
-         f"inserted={inserted}, missing_files={missing_files}, missing_titles={missing_titles}, collisions={coll}"),
+        (
+            ulid(),
+            now,
+            "file_index",
+            "OK",
+            f"inserted={inserted}, missing_files={missing_files}, missing_titles={missing_titles}, collisions={coll}",
+        ),
     )
 
     conn.commit()

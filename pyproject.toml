@@ -77,7 +77,13 @@ select = [
 ]
 ignore = [
     "E501",  # line too long (ruff format handles it)
+    "E402",  # module-level import not at top (conditional imports pattern)
+    "E701",  # multiple statements on one line (colon) — pre-existing
+    "E702",  # multiple statements on one line (semicolon) — pre-existing
+    "B005",  # strip with multi-char string — pre-existing (BOM stripping pattern)
+    "B007",  # loop control variable not used in loop body — intentional
     "B008",  # do not perform function calls in default args
+    "E741",  # ambiguous variable name (l, O, I) — pre-existing
     "UP007", # use X | Y instead of Optional[X] (requires py3.10+)
 ]
 

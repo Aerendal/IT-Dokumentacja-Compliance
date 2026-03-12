@@ -45,16 +45,18 @@ Macierz RACI (Responsible / Accountable / Consulted / Informed) dla działań zw
 
 # Anchor patterns for detection
 HEADING_PATTERNS = {
-    "## Standardy i compliance": re.compile(r'^##\s+Standardy\s+i\s+compliance', re.MULTILINE | re.IGNORECASE),
-    "## RACI i role": re.compile(r'^##\s+RACI\s+i\s+role', re.MULTILINE | re.IGNORECASE),
+    "## Standardy i compliance": re.compile(
+        r"^##\s+Standardy\s+i\s+compliance", re.MULTILINE | re.IGNORECASE
+    ),
+    "## RACI i role": re.compile(r"^##\s+RACI\s+i\s+role", re.MULTILINE | re.IGNORECASE),
 }
 
 # Where to inject — try to insert BEFORE these markers (first match wins)
 INJECTION_ANCHORS = [
-    re.compile(r'^##\s+Fazy\s+\(1', re.MULTILINE),       # ## Fazy (1–23)
-    re.compile(r'^##\s+Struktura\s+sekcji', re.MULTILINE),
-    re.compile(r'^##\s+Wymagane\s+streszczenia', re.MULTILINE),
-    re.compile(r'^##\s+Kontrola\s+emoji', re.MULTILINE),
+    re.compile(r"^##\s+Fazy\s+\(1", re.MULTILINE),  # ## Fazy (1–23)
+    re.compile(r"^##\s+Struktura\s+sekcji", re.MULTILINE),
+    re.compile(r"^##\s+Wymagane\s+streszczenia", re.MULTILINE),
+    re.compile(r"^##\s+Kontrola\s+emoji", re.MULTILINE),
 ]
 
 
@@ -77,8 +79,8 @@ def inject_sections(filepath: Path) -> tuple[bool, list[str]]:
     Returns (changed: bool, sections_added: list[str]).
     """
     try:
-        content = filepath.read_text(encoding='utf-8')
-    except Exception as e:
+        content = filepath.read_text(encoding="utf-8")
+    except Exception:
         return False, []
 
     missing = [h for h in SECTION_CONTENT if not has_section(content, h)]
@@ -89,14 +91,19 @@ def inject_sections(filepath: Path) -> tuple[bool, list[str]]:
     pos = find_injection_pos(content)
 
     # Ensure we don't break in the middle of a line
-    if pos < len(content) and content[pos] != '\n':
+    if pos < len(content) and content[pos] != "\n":
         # back up to nearest newline
-        nl = content.rfind('\n', 0, pos)
+        nl = content.rfind("\n", 0, pos)
         if nl != -1:
             pos = nl + 1
 
-    new_content = content[:pos] + inject_text + ("\n" if not inject_text.endswith('\n') else "") + content[pos:]
-    filepath.write_text(new_content, encoding='utf-8')
+    new_content = (
+        content[:pos]
+        + inject_text
+        + ("\n" if not inject_text.endswith("\n") else "")
+        + content[pos:]
+    )
+    filepath.write_text(new_content, encoding="utf-8")
     return True, missing
 
 
@@ -111,11 +118,10 @@ def main():
 
     changed = 0
     skipped = 0
-    error_count = 0
     added_sic = 0
     added_raci = 0
 
-    for i, (doc_uid, rel_path) in enumerate(all_docs):
+    for i, (_doc_uid, rel_path) in enumerate(all_docs):
         if not rel_path:
             skipped += 1
             continue
@@ -133,11 +139,11 @@ def main():
                 added_raci += 1
 
         if (i + 1) % 1000 == 0:
-            print(f"  {i+1}/{len(all_docs)} processed, {changed} changed so far...")
+            print(f"  {i + 1}/{len(all_docs)} processed, {changed} changed so far...")
 
     conn.close()
 
-    print(f"\nDone.")
+    print("\nDone.")
     print(f"  Total processed: {len(all_docs)}")
     print(f"  Files changed:   {changed}")
     print(f"  Files skipped:   {skipped} (not found)")

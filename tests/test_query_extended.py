@@ -28,8 +28,8 @@ from itdoc.query import (
     rhythm_upstream,
 )
 
-
 # ─── Fixtures ──────────────────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def chain_db():
@@ -291,5 +291,6 @@ class TestExtensionPoints:
         """Klucze kontraktu są stabilne — gwarantuje backward compatibility."""
         r1 = get_contract(chain_db, "A")
         r2 = get_contract(chain_db, "B")
-        assert set(r1.keys()) == set(r2.keys()), \
+        assert set(r1.keys()) == set(r2.keys()), (
             f"Różne klucze kontraktu: {set(r1.keys())} vs {set(r2.keys())}"
+        )

@@ -8,50 +8,55 @@ Logika:
   3. Zapisz do standards_refs / regulations_refs jako JSON-liste kodow.
 """
 
-import sqlite3
 import json
+import sqlite3
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
 
 # Sekcja -> dodatkowe standardy miedzynarodowe (kody z tabeli standards)
 SECTION_STANDARDS: dict[str, list[str]] = {
-    "faza 1: koncepcja i wizja":      ["ISO 20000-1", "PMBOK 7", "PRINCE2 7", "TOGAF ADM"],
-    "faza 2: analiza wymagan":        ["IEEE 830", "ISO/IEC 12207", "PMBOK 7"],
-    "faza 3: projekt / design":       ["IEEE 1016", "IEEE 42010", "TOGAF ADM"],
-    "faza 4: planowanie":             ["PMBOK 7", "PRINCE2 7", "SAFe 6.0", "ISO 20000-1"],
-    "faza 5: implementacja":          ["ISO/IEC 12207", "SAFe 6.0", "SCRUM Guide"],
-    "faza 6: testowanie / qa":        ["IEEE 829", "ISO/IEC 12207", "OWASP ASVS"],
+    "faza 1: koncepcja i wizja": ["ISO 20000-1", "PMBOK 7", "PRINCE2 7", "TOGAF ADM"],
+    "faza 2: analiza wymagan": ["IEEE 830", "ISO/IEC 12207", "PMBOK 7"],
+    "faza 3: projekt / design": ["IEEE 1016", "IEEE 42010", "TOGAF ADM"],
+    "faza 4: planowanie": ["PMBOK 7", "PRINCE2 7", "SAFe 6.0", "ISO 20000-1"],
+    "faza 5: implementacja": ["ISO/IEC 12207", "SAFe 6.0", "SCRUM Guide"],
+    "faza 6: testowanie / qa": ["IEEE 829", "ISO/IEC 12207", "OWASP ASVS"],
     "faza 7: bezpieczenstwo / compliance": [
-        "ISO/IEC 27001", "ISO/IEC 27002", "NIS2", "DORA", "CIS Controls v8", "OWASP ASVS"
+        "ISO/IEC 27001",
+        "ISO/IEC 27002",
+        "NIS2",
+        "DORA",
+        "CIS Controls v8",
+        "OWASP ASVS",
     ],
     "faza 8: wdrozenie / deployment": ["ISO 20000-1", "ITIL 4", "ISO/IEC 27001"],
     "faza 9: operacje / maintenance": ["ITIL 4", "ISO 20000-1", "ISO/IEC 27001"],
-    "faza 10: incident management":   ["ITIL 4", "ISO 20000-1", "NIST CSF", "ISO 22301"],
+    "faza 10: incident management": ["ITIL 4", "ISO 20000-1", "NIST CSF", "ISO 22301"],
     "faza 11: monitoring / observability": ["ITIL 4", "ISO 20000-1", "NIST SP 800-53"],
     "faza 12: dokumentacja referencyjna": ["ISO/IEC 12207", "IEEE 1016", "ISO 20000-1"],
     "faza 13: szkolenie / onboarding": ["ISO 20000-1", "ITIL 4"],
     "faza 14: komunikacja stakeholders": ["PMBOK 7", "PRINCE2 7"],
-    "faza 15: knowledge management":  ["ITIL 4", "ISO 20000-1"],
+    "faza 15: knowledge management": ["ITIL 4", "ISO 20000-1"],
     "faza 16: postmortem / retrospektywa": ["ITIL 4", "SCRUM Guide", "PMBOK 7"],
     "faza 17: budzetowanie / cost management": ["COBIT 2019", "PMBOK 7", "ISO/IEC 38500"],
-    "faza 18: vendor management":     ["ISO 20000-1", "ISO/IEC 38500", "COBIT 2019"],
+    "faza 18: vendor management": ["ISO 20000-1", "ISO/IEC 38500", "COBIT 2019"],
     "faza 19: governance / compliance": ["COBIT 2019", "ISO/IEC 38500", "ISO/IEC 27001", "ITIL 4"],
     "faza 20: decommission / sunset": ["ISO 20000-1", "ISO/IEC 27001", "COBIT 2019"],
-    "faza 21: dr / bcp":              ["ISO 22301", "NIST CSF", "ITIL 4", "ISO/IEC 27001"],
-    "faza 22: change management":     ["ITIL 4", "ISO 20000-1", "COBIT 2019"],
-    "faza 23: capacity planning":     ["ITIL 4", "ISO 20000-1", "COBIT 2019"],
-    "raci i role":                    ["COBIT 2019", "ITIL 4", "PMBOK 7"],
-    "standardy i compliance":         ["ISO/IEC 27001", "ISO 9001", "COBIT 2019", "ITIL 4"],
+    "faza 21: dr / bcp": ["ISO 22301", "NIST CSF", "ITIL 4", "ISO/IEC 27001"],
+    "faza 22: change management": ["ITIL 4", "ISO 20000-1", "COBIT 2019"],
+    "faza 23: capacity planning": ["ITIL 4", "ISO 20000-1", "COBIT 2019"],
+    "raci i role": ["COBIT 2019", "ITIL 4", "PMBOK 7"],
+    "standardy i compliance": ["ISO/IEC 27001", "ISO 9001", "COBIT 2019", "ITIL 4"],
 }
 
 # Sekcja -> dodatkowe regulacje PL (kody z tabeli compliance_regulations)
 SECTION_REGULATIONS: dict[str, list[str]] = {
     "faza 7: bezpieczenstwo / compliance": ["KSC-PL", "UODO-PL", "CERT-PL-WYTYCZNE"],
-    "faza 19: governance / compliance":    ["KSC-PL", "UODO-PL", "PZP-PL"],
-    "standardy i compliance":             ["KSC-PL", "UODO-PL"],
-    "raci i role":                        ["UODO-PL"],
-    "faza 21: dr / bcp":                  ["KSC-PL", "UŚUDE-PL"],
+    "faza 19: governance / compliance": ["KSC-PL", "UODO-PL", "PZP-PL"],
+    "standardy i compliance": ["KSC-PL", "UODO-PL"],
+    "raci i role": ["UODO-PL"],
+    "faza 21: dr / bcp": ["KSC-PL", "UŚUDE-PL"],
 }
 
 
@@ -59,8 +64,15 @@ def normalize(s: str) -> str:
     s = s.lower().strip()
     # Strip diacritics for comparison
     replacements = [
-        ("ą","a"),("ć","c"),("ę","e"),("ł","l"),("ń","n"),
-        ("ó","o"),("ś","s"),("ź","z"),("ż","z"),
+        ("ą", "a"),
+        ("ć", "c"),
+        ("ę", "e"),
+        ("ł", "l"),
+        ("ń", "n"),
+        ("ó", "o"),
+        ("ś", "s"),
+        ("ź", "z"),
+        ("ż", "z"),
     ]
     for a, b in replacements:
         s = s.replace(a, b)
@@ -134,8 +146,7 @@ def main():
 
     print("Zapisuję...")
     cur.executemany(
-        "UPDATE doc_section_guidance SET standards_refs=?, regulations_refs=? WHERE id=?",
-        updates
+        "UPDATE doc_section_guidance SET standards_refs=?, regulations_refs=? WHERE id=?", updates
     )
     conn.commit()
 

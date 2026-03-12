@@ -158,14 +158,18 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="Wiecej: python -m itdoc <polecenie> --help",
     )
-    p.add_argument("--db", metavar="PATH", help="Sciezka do pliku .db (domyslnie: reports/it_doc_matrix.db)")
+    p.add_argument(
+        "--db", metavar="PATH", help="Sciezka do pliku .db (domyslnie: reports/it_doc_matrix.db)"
+    )
     sub = p.add_subparsers(dest="command", metavar="polecenie")
 
     pf = sub.add_parser("find", help="Znajdz szablony po standardzie lub regulacji")
     grp = pf.add_mutually_exclusive_group(required=True)
     grp.add_argument("--standard", metavar="KOD", help="Kod standardu (np. 'ISO/IEC 27001')")
     grp.add_argument("--regulation", metavar="KOD", help="Kod regulacji (np. 'UODO-PL')")
-    pf.add_argument("--limit", type=int, default=20, metavar="N", help="Maks. wynikow (domyslnie: 20)")
+    pf.add_argument(
+        "--limit", type=int, default=20, metavar="N", help="Maks. wynikow (domyslnie: 20)"
+    )
 
     pc = sub.add_parser("contract", help="Pokaz kontrakt dokumentu")
     pc.add_argument("uid", help="ULID dokumentu")
@@ -178,7 +182,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     pr = sub.add_parser("rhythm", help="Pokaz przeplyw informacji (upstream/downstream)")
     pr.add_argument("uid", help="ULID dokumentu")
-    pr.add_argument("--depth", type=int, default=2, metavar="N", help="Glebokosc przeszukiwania (domyslnie: 2)")
+    pr.add_argument(
+        "--depth", type=int, default=2, metavar="N", help="Glebokosc przeszukiwania (domyslnie: 2)"
+    )
 
     return p
 

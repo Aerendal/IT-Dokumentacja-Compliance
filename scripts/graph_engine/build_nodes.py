@@ -80,7 +80,9 @@ def insert_sync_run(cur: sqlite3.Cursor, status: str, notes: str, now: str) -> N
     )
 
 
-def insert_sync_run_with_id(cur: sqlite3.Cursor, sync_id: str, status: str, notes: str, now: str) -> None:
+def insert_sync_run_with_id(
+    cur: sqlite3.Cursor, sync_id: str, status: str, notes: str, now: str
+) -> None:
     cur.execute(
         "INSERT INTO sync_runs(sync_id,ran_at_utc,kind,status,notes) VALUES(?,?,?,?,?)",
         (sync_id, now, RUN_KIND, status, notes),
@@ -222,7 +224,9 @@ def recreate_nodes_objects(cur: sqlite3.Cursor) -> None:
     cur.execute("CREATE INDEX IF NOT EXISTS idx_nodes_key_norm ON nodes(key_norm)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_nodes_status ON nodes(status)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_node_map_docs_node_uid ON node_map_docs(node_uid)")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_node_map_sections_node_uid ON node_map_sections(node_uid)")
+    cur.execute(
+        "CREATE INDEX IF NOT EXISTS idx_node_map_sections_node_uid ON node_map_sections(node_uid)"
+    )
 
     # Nodes guard triggers are attached to the dropped old table; recreate for the swapped table.
     cur.execute(
@@ -295,7 +299,9 @@ def flush_doc_map(cur: sqlite3.Cursor, rows: list[tuple], table: str = "node_map
     )
 
 
-def flush_section_map(cur: sqlite3.Cursor, rows: list[tuple], table: str = "node_map_sections") -> None:
+def flush_section_map(
+    cur: sqlite3.Cursor, rows: list[tuple], table: str = "node_map_sections"
+) -> None:
     cur.executemany(  # nosec B608 -- table is hardcoded default; no user-controlled input reaches this parameter
         f"""
         INSERT INTO {table}(section_uid,node_uid,created_at_utc,updated_at_utc)
@@ -327,8 +333,12 @@ def main() -> None:
         conn.execute("BEGIN IMMEDIATE")
         conn.execute("PRAGMA defer_foreign_keys = ON")
         apply_ddl(cur)
-        require_tables(cur, ["sync_runs", "docs", "sections", "nodes", "node_map_docs", "node_map_sections"])
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_sections_doc_start ON sections(doc_uid, start_line)")
+        require_tables(
+            cur, ["sync_runs", "docs", "sections", "nodes", "node_map_docs", "node_map_sections"]
+        )
+        cur.execute(
+            "CREATE INDEX IF NOT EXISTS idx_sections_doc_start ON sections(doc_uid, start_line)"
+        )
 
         target_nodes = "nodes"
         target_map_docs = "node_map_docs"
@@ -356,7 +366,10 @@ def main() -> None:
         if limit_docs > 0:
             cur.execute("DROP TABLE IF EXISTS selected_docs_tmp")
             cur.execute("CREATE TEMP TABLE selected_docs_tmp(doc_uid TEXT PRIMARY KEY)")
-            cur.executemany("INSERT INTO selected_docs_tmp(doc_uid) VALUES (?)", [(doc_uid,) for doc_uid, *_ in docs])
+            cur.executemany(
+                "INSERT INTO selected_docs_tmp(doc_uid) VALUES (?)",
+                [(doc_uid,) for doc_uid, *_ in docs],
+            )
         tm.mark("prepare_doc_filter")
 
         doc_count = 0
@@ -469,7 +482,9 @@ def main() -> None:
             level = int(heading_level) if heading_level is not None else None
             kind = section_kind(level)
             parent_uid = section_parent(doc_uid, level, stack)
-            metrics = json.dumps({"heading_path": heading_path, "heading_level": level}, ensure_ascii=False)
+            metrics = json.dumps(
+                {"heading_path": heading_path, "heading_level": level}, ensure_ascii=False
+            )
             normalized_status = normalize_status(status)
 
             section_node_batch.append(

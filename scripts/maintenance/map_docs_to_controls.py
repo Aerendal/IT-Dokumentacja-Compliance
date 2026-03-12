@@ -9,6 +9,7 @@ na podstawie keyword overlap między title(doc) a control_name+description.
 Użycie:
   python3 map_docs_to_controls.py [--db PATH] [--apply] [--dry-run] [--standard CODE] [--min-confidence FLOAT]
 """
+
 import argparse
 import re
 import sqlite3
@@ -28,11 +29,47 @@ CREATE TABLE IF NOT EXISTS doc_control_mapping (
 """
 
 STOPWORDS = {
-    "and", "or", "of", "the", "in", "to", "for", "a", "an", "with", "on",
-    "at", "by", "from", "as", "is", "are", "be", "it", "its", "this", "that",
-    "their", "other", "use", "used", "using", "within", "during", "after",
-    "before", "not", "no", "any", "all", "each", "into", "via", "per",
-    "information", "security",
+    "and",
+    "or",
+    "of",
+    "the",
+    "in",
+    "to",
+    "for",
+    "a",
+    "an",
+    "with",
+    "on",
+    "at",
+    "by",
+    "from",
+    "as",
+    "is",
+    "are",
+    "be",
+    "it",
+    "its",
+    "this",
+    "that",
+    "their",
+    "other",
+    "use",
+    "used",
+    "using",
+    "within",
+    "during",
+    "after",
+    "before",
+    "not",
+    "no",
+    "any",
+    "all",
+    "each",
+    "into",
+    "via",
+    "per",
+    "information",
+    "security",
 }
 
 
@@ -58,8 +95,9 @@ def load_doc_titles(conn):
     return {row[0]: row[1] for row in cur.fetchall()}
 
 
-def map_docs_to_controls(db_path, apply=False, dry_run=False, standard=None,
-                          min_confidence=0.05, limit=None, _conn=None):
+def map_docs_to_controls(
+    db_path, apply=False, dry_run=False, standard=None, min_confidence=0.05, limit=None, _conn=None
+):
     """Main mapping function. Pass _conn to use an existing connection (testing)."""
     _external_conn = _conn is not None
     conn = _conn if _external_conn else sqlite3.connect(db_path)
@@ -110,7 +148,9 @@ def map_docs_to_controls(db_path, apply=False, dry_run=False, standard=None,
             title = doc_titles.get(doc_path)
             if not title:
                 # Derive from path filename
-                title = doc_path.split("/")[-1].replace(".md", "").replace("-", " ").replace("_", " ")
+                title = (
+                    doc_path.split("/")[-1].replace(".md", "").replace("-", " ").replace("_", " ")
+                )
 
             doc_tokens = tokenize(title)
             if not doc_tokens:

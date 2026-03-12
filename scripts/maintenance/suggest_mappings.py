@@ -32,11 +32,49 @@ DB_PATH = BASE_DIR / "reports" / "it_doc_matrix.db"
 
 # Słowa stop dla języka polskiego i angielskiego
 STOP_WORDS = {
-    "i", "w", "z", "do", "na", "nie", "się", "to", "jest", "dla",
-    "oraz", "lub", "przy", "po", "jak", "co", "by", "ale", "ze",
-    "the", "a", "an", "and", "or", "of", "in", "for", "to", "is",
-    "with", "on", "at", "by", "be", "as", "from", "that", "this",
-    "it", "are", "was", "will", "can", "has", "have",
+    "i",
+    "w",
+    "z",
+    "do",
+    "na",
+    "nie",
+    "się",
+    "to",
+    "jest",
+    "dla",
+    "oraz",
+    "lub",
+    "przy",
+    "po",
+    "jak",
+    "co",
+    "by",
+    "ale",
+    "ze",
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "of",
+    "in",
+    "for",
+    "is",
+    "with",
+    "on",
+    "at",
+    "be",
+    "as",
+    "from",
+    "that",
+    "this",
+    "it",
+    "are",
+    "was",
+    "will",
+    "can",
+    "has",
+    "have",
 }
 
 # Minimalna długość słowa do uwzględnienia w profilu
@@ -53,7 +91,7 @@ def tokenize(text: str) -> set:
     """Tokenizuje tekst do zbioru słów kluczowych (lowercase, bez stop-words)."""
     if not text:
         return set()
-    words = re.findall(r'[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+', text.lower())
+    words = re.findall(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+", text.lower())
     return {w for w in words if len(w) >= MIN_WORD_LEN and w not in STOP_WORDS}
 
 
@@ -102,12 +140,13 @@ def build_standard_profiles(conn: sqlite3.Connection) -> dict:
 def build_idf_profiles(conn: sqlite3.Connection) -> tuple:
     """
     Buduje profile TF-IDF dla każdego standardu.
-    
+
     Zwraca:
       standard_profiles: {standard_code: {word: tf_score}}
       idf: {word: idf_score}  — niższe IDF = słowo mniej dyskryminujące
     """
     import math
+
     cur = conn.cursor()
     cur.execute("""
         SELECT m.standard_code, d.title_norm, d.path
@@ -134,19 +173,13 @@ def build_idf_profiles(conn: sqlite3.Connection) -> tuple:
             word_in_standards[word] += 1
 
     # IDF: słowa w wielu standardach = mało dyskryminujące
-    idf = {
-        word: math.log((1 + num_standards) / (1 + df))
-        for word, df in word_in_standards.items()
-    }
+    idf = {word: math.log((1 + num_standards) / (1 + df)) for word, df in word_in_standards.items()}
 
     # TF-IDF profil per standard (top N najdyskryminujących słów)
     standard_profiles = {}
     for code, wc in standard_word_counts.items():
         total = sum(wc.values()) or 1
-        tfidf = {
-            word: (count / total) * idf.get(word, 0.0)
-            for word, count in wc.items()
-        }
+        tfidf = {word: (count / total) * idf.get(word, 0.0) for word, count in wc.items()}
         # Zachowaj tylko top 200 słów per standard dla wydajności
         top_words = sorted(tfidf.items(), key=lambda x: x[1], reverse=True)[:200]
         standard_profiles[code] = dict(top_words)
@@ -190,7 +223,7 @@ def score_doc_against_profiles(
         # Suma TF-IDF dla słów które są w doc I w profilu
         match_score = sum(profile[w] for w in doc_words if w in profile)
         # Normalizacja: podziel przez max możliwy score dla tego standardu
-        max_score = sum(sorted(profile.values(), reverse=True)[:len(doc_words)])
+        max_score = sum(sorted(profile.values(), reverse=True)[: len(doc_words)])
         if max_score > 0 and match_score > 0:
             normalized = match_score / max_score
             scores.append((code, round(normalized, 4)))
@@ -222,13 +255,15 @@ def generate_suggestions(
         if best_score < min_confidence:
             continue
 
-        suggestions.append({
-            "doc_path": row["path"],
-            "title": row["title"] or row["title_norm"] or row["path"],
-            "best_standard": best_code,
-            "confidence": best_score,
-            "alternatives": scores[1:max_candidates],
-        })
+        suggestions.append(
+            {
+                "doc_path": row["path"],
+                "title": row["title"] or row["title_norm"] or row["path"],
+                "best_standard": best_code,
+                "confidence": best_score,
+                "alternatives": scores[1:max_candidates],
+            }
+        )
 
     return sorted(suggestions, key=lambda x: x["confidence"], reverse=True)
 
@@ -246,7 +281,7 @@ def apply_suggestions(
         # Sprawdź czy nie istnieje już takie mapowanie
         existing = conn.execute(
             "SELECT id FROM doc_standard_mapping WHERE doc_path=? AND standard_code=?",
-            (s["doc_path"], s["best_standard"])
+            (s["doc_path"], s["best_standard"]),
         ).fetchone()
         if existing:
             continue
@@ -254,7 +289,7 @@ def apply_suggestions(
         conn.execute(
             """INSERT INTO doc_standard_mapping (doc_path, standard_code, match_reason, confidence)
                VALUES (?, ?, 'candidate_match', ?)""",
-            (s["doc_path"], s["best_standard"], s["confidence"])
+            (s["doc_path"], s["best_standard"], s["confidence"]),
         )
         inserted += 1
 
@@ -269,7 +304,9 @@ def render_report(suggestions: list, total_unmapped: int) -> str:
         "",
         f"**Niezmapowane szablony łącznie:** {total_unmapped}  ",
         f"**Szablony z sugestiami (confidence ≥ próg):** {len(suggestions)}  ",
-        f"**Potencjalny wzrost pokrycia:** {len(suggestions)/total_unmapped*100:.1f}%" if total_unmapped else "",
+        f"**Potencjalny wzrost pokrycia:** {len(suggestions) / total_unmapped * 100:.1f}%"
+        if total_unmapped
+        else "",
         "",
         "## Top 50 sugestii z najwyższą pewnością",
         "",
@@ -279,9 +316,7 @@ def render_report(suggestions: list, total_unmapped: int) -> str:
     for s in suggestions[:50]:
         alts = ", ".join(f"{c} ({sc:.2f})" for c, sc in s["alternatives"])
         title = s["title"][:60]
-        lines.append(
-            f"| {title} | {s['best_standard']} | {s['confidence']:.2f} | {alts} |"
-        )
+        lines.append(f"| {title} | {s['best_standard']} | {s['confidence']:.2f} | {alts} |")
 
     lines += [
         "",
@@ -291,6 +326,7 @@ def render_report(suggestions: list, total_unmapped: int) -> str:
         "|----------|---------------:|",
     ]
     from collections import Counter
+
     by_std = Counter(s["best_standard"] for s in suggestions)
     for code, cnt in by_std.most_common(20):
         lines.append(f"| {code} | {cnt} |")
@@ -317,23 +353,24 @@ def main():
         description="Sugestie mapowań dla niezmapowanych szablonów IT Dokumentacja"
     )
     mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--analyze", action="store_true",
-                      help="Pokaż sugestie bez zapisu do DB")
-    mode.add_argument("--auto-approve", action="store_true",
-                      help="Zapisz sugestie do DB (match_reason=candidate_match)")
-    mode.add_argument("--dry-run", action="store_true",
-                      help="Jak --analyze, alias dla czytelności")
-    mode.add_argument("--report", action="store_true",
-                      help="Wygeneruj raport Markdown na stdout")
+    mode.add_argument("--analyze", action="store_true", help="Pokaż sugestie bez zapisu do DB")
+    mode.add_argument(
+        "--auto-approve",
+        action="store_true",
+        help="Zapisz sugestie do DB (match_reason=candidate_match)",
+    )
+    mode.add_argument("--dry-run", action="store_true", help="Jak --analyze, alias dla czytelności")
+    mode.add_argument("--report", action="store_true", help="Wygeneruj raport Markdown na stdout")
 
-    parser.add_argument("--min-confidence", type=float, default=0.30,
-                        help="Minimalny próg pewności 0.0-1.0 (domyślnie 0.30)")
-    parser.add_argument("--top", type=int, default=30,
-                        help="Pokaż top N sugestii (domyślnie 30)")
-    parser.add_argument("--db", metavar="PATH", default=str(DB_PATH),
-                        help="Ścieżka do bazy danych")
-    parser.add_argument("--save", metavar="FILE",
-                        help="Zapisz raport Markdown do pliku")
+    parser.add_argument(
+        "--min-confidence",
+        type=float,
+        default=0.30,
+        help="Minimalny próg pewności 0.0-1.0 (domyślnie 0.30)",
+    )
+    parser.add_argument("--top", type=int, default=30, help="Pokaż top N sugestii (domyślnie 30)")
+    parser.add_argument("--db", metavar="PATH", default=str(DB_PATH), help="Ścieżka do bazy danych")
+    parser.add_argument("--save", metavar="FILE", help="Zapisz raport Markdown do pliku")
 
     args = parser.parse_args()
 
@@ -370,12 +407,12 @@ def main():
     if args.auto_approve:
         inserted = apply_suggestions(conn, suggestions)
         print(f"Wstawiono {inserted} nowych mapowań (candidate_match) do DB.")
-        print(f"Użyj interactive_audit.py aby zweryfikować jakość sugestii.")
+        print("Użyj interactive_audit.py aby zweryfikować jakość sugestii.")
         conn.close()
         return 0
 
     # --analyze lub --dry-run: pokaż tabelę
-    top = suggestions[:args.top]
+    top = suggestions[: args.top]
     if not top:
         print(f"Brak sugestii powyżej progu pewności {args.min_confidence}.")
         conn.close()
@@ -384,12 +421,18 @@ def main():
     print(f"\n{'Szablon':<55} {'Standard':<25} {'Pewność':>8}  {'Alternatywa #1'}")
     print("-" * 115)
     for s in top:
-        alt = f"{s['alternatives'][0][0]} ({s['alternatives'][0][1]:.2f})" if s["alternatives"] else ""
+        alt = (
+            f"{s['alternatives'][0][0]} ({s['alternatives'][0][1]:.2f})"
+            if s["alternatives"]
+            else ""
+        )
         title = (s["title"] or s["doc_path"])[:54]
         print(f"{title:<55} {s['best_standard']:<25} {s['confidence']:>8.3f}  {alt}")
 
     print(f"\nŁącznie: {len(suggestions)} sugestii ≥ {args.min_confidence}")
-    print(f"Aby zastosować: python3 suggest_mappings.py --auto-approve --min-confidence {args.min_confidence}")
+    print(
+        f"Aby zastosować: python3 suggest_mappings.py --auto-approve --min-confidence {args.min_confidence}"
+    )
 
     conn.close()
     return 0

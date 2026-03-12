@@ -1,4 +1,5 @@
 """Tests for scripts/generate_audit_report.py — run() function with in-memory DB."""
+
 import sqlite3
 
 from scripts.generate_audit_report import run
@@ -64,13 +65,9 @@ def _make_full_db(
     if standards_catalog:
         conn.executemany("INSERT INTO standards_catalog VALUES (?,?,?,?)", standards_catalog)
     if gap_analysis:
-        conn.executemany(
-            "INSERT INTO gap_analysis VALUES (?,?,?,?,?,?,?,?,?)", gap_analysis
-        )
+        conn.executemany("INSERT INTO gap_analysis VALUES (?,?,?,?,?,?,?,?,?)", gap_analysis)
     if doc_standard_mapping:
-        conn.executemany(
-            "INSERT INTO doc_standard_mapping VALUES (?,?,?,?)", doc_standard_mapping
-        )
+        conn.executemany("INSERT INTO doc_standard_mapping VALUES (?,?,?,?)", doc_standard_mapping)
 
     conn.commit()
     return conn
@@ -83,6 +80,7 @@ def _empty_db():
 # ---------------------------------------------------------------------------
 # Basic return type and structure
 # ---------------------------------------------------------------------------
+
 
 class TestRunReturnType:
     def test_returns_string(self):
@@ -120,6 +118,7 @@ class TestRunReturnType:
 # Coverage percentage calculation
 # ---------------------------------------------------------------------------
 
+
 class TestCoverageCalculation:
     def test_zero_catalog_zero_coverage(self):
         conn = _empty_db()
@@ -129,7 +128,19 @@ class TestCoverageCalculation:
     def test_100_percent_coverage(self):
         conn = _make_full_db(
             standards_catalog=[(1, "ISO27001", "Policy", "governance")],
-            gap_analysis=[(1, "ISO27001", "Policy", "policy.md", "docs/policy.md", "present", 0, "exact", "governance")],
+            gap_analysis=[
+                (
+                    1,
+                    "ISO27001",
+                    "Policy",
+                    "policy.md",
+                    "docs/policy.md",
+                    "present",
+                    0,
+                    "exact",
+                    "governance",
+                )
+            ],
         )
         result = run(conn)
         assert "100.0%" in result
@@ -141,7 +152,17 @@ class TestCoverageCalculation:
                 (2, "ISO27001", "Procedure", "governance"),
             ],
             gap_analysis=[
-                (1, "ISO27001", "Policy", "policy.md", "docs/policy.md", "present", 0, "exact", "governance"),
+                (
+                    1,
+                    "ISO27001",
+                    "Policy",
+                    "policy.md",
+                    "docs/policy.md",
+                    "present",
+                    0,
+                    "exact",
+                    "governance",
+                ),
                 (2, "ISO27001", "Procedure", None, None, "missing", 1, None, "governance"),
             ],
         )
@@ -152,6 +173,7 @@ class TestCoverageCalculation:
 # ---------------------------------------------------------------------------
 # Missing templates section
 # ---------------------------------------------------------------------------
+
 
 class TestMissingSection:
     def test_no_missing_shows_checkmark(self):
@@ -184,6 +206,7 @@ class TestMissingSection:
 # Extra docs section
 # ---------------------------------------------------------------------------
 
+
 class TestExtraDocsSection:
     def test_extra_doc_listed(self):
         conn = _make_full_db(
@@ -213,11 +236,22 @@ class TestExtraDocsSection:
 # Low-confidence rows
 # ---------------------------------------------------------------------------
 
+
 class TestLowConfidenceSection:
     def test_low_confidence_row_shown(self):
         conn = _make_full_db(
             gap_analysis=[
-                (1, "GDPR", "Privacy Policy", "Privacy Procedures", "docs/priv.md", "present", 0, "low", "legal"),
+                (
+                    1,
+                    "GDPR",
+                    "Privacy Policy",
+                    "Privacy Procedures",
+                    "docs/priv.md",
+                    "present",
+                    0,
+                    "low",
+                    "legal",
+                ),
             ],
         )
         result = run(conn)
@@ -233,6 +267,7 @@ class TestLowConfidenceSection:
 # ---------------------------------------------------------------------------
 # Summary per-standard section
 # ---------------------------------------------------------------------------
+
 
 class TestSummarySection:
     def test_ok_status_when_no_missing(self):

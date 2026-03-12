@@ -9,7 +9,9 @@ Sekcje:
   4. Dopasowania niskiej pewności (low/medium) — do weryfikacji ręcznej
   5. Tabela podsumowująca per standard
 """
+
 from __future__ import annotations
+
 import argparse
 import sqlite3
 from datetime import datetime, timezone
@@ -26,9 +28,9 @@ def run(conn: sqlite3.Connection) -> str:
     # ── Nagłówek ──────────────────────────────────────────────────────────
     lines += [
         "# Raport Audytu Standardów — IT_Dokumentacja",
-        f"",
+        "",
         f"**Wygenerowano:** {ts}  ",
-        f"**Źródło:** `scripts/gap_analysis.py` + `scripts/build_standards_catalog.py`",
+        "**Źródło:** `scripts/gap_analysis.py` + `scripts/build_standards_catalog.py`",
         "",
     ]
 
@@ -41,11 +43,19 @@ def run(conn: sqlite3.Connection) -> str:
     req_missing = conn.execute(
         "SELECT COUNT(*) FROM gap_analysis WHERE status='missing' AND is_required=1"
     ).fetchone()[0]
-    conf_exact  = conn.execute("SELECT COUNT(*) FROM gap_analysis WHERE confidence='exact'").fetchone()[0]
-    conf_high   = conn.execute("SELECT COUNT(*) FROM gap_analysis WHERE confidence='high'").fetchone()[0]
-    conf_medium = conn.execute("SELECT COUNT(*) FROM gap_analysis WHERE confidence='medium'").fetchone()[0]
-    conf_low    = conn.execute("SELECT COUNT(*) FROM gap_analysis WHERE confidence='low'").fetchone()[0]
-    extra_docs  = conn.execute("""
+    conf_exact = conn.execute(
+        "SELECT COUNT(*) FROM gap_analysis WHERE confidence='exact'"
+    ).fetchone()[0]
+    conf_high = conn.execute(
+        "SELECT COUNT(*) FROM gap_analysis WHERE confidence='high'"
+    ).fetchone()[0]
+    conf_medium = conn.execute(
+        "SELECT COUNT(*) FROM gap_analysis WHERE confidence='medium'"
+    ).fetchone()[0]
+    conf_low = conn.execute("SELECT COUNT(*) FROM gap_analysis WHERE confidence='low'").fetchone()[
+        0
+    ]
+    extra_docs = conn.execute("""
         SELECT COUNT(*) FROM docs d WHERE d.path != 'ORPHAN'
         AND NOT EXISTS (SELECT 1 FROM doc_standard_mapping m WHERE m.doc_path = d.path)
     """).fetchone()[0]
@@ -57,8 +67,8 @@ def run(conn: sqlite3.Connection) -> str:
         "",
         "## 1. Streszczenie wykonawcze",
         "",
-        f"| Metryka | Wartość |",
-        f"|---------|---------|",
+        "| Metryka | Wartość |",
+        "|---------|---------|",
         f"| Szablony w bazie (non-orphan) | **{total_docs:,}** |",
         f"| Standardów w DB | **{total_stds}** |",
         f"| Wpisów w katalogu standardów | **{total_catalog}** |",
@@ -69,14 +79,14 @@ def run(conn: sqlite3.Connection) -> str:
         "",
         "### Pewność dopasowań",
         "",
-        f"| Poziom | Liczba | Opis |",
-        f"|--------|--------|------|",
+        "| Poziom | Liczba | Opis |",
+        "|--------|--------|------|",
         f"| `exact`  | {conf_exact} | Dokładny match slug tytułu |",
         f"| `high`   | {conf_high} | Bigram Jaccard ≥ 0.50 |",
         f"| `medium` | {conf_medium} | Keyword overlap ≥ 0.40 — **wymaga weryfikacji** |",
         f"| `low`    | {conf_low} | Keyword overlap ≥ 0.25 — **wymaga weryfikacji** |",
         "",
-        "> **Uwaga:** Dopasowania `medium` i `low` (łącznie {}) oznaczają że algorytm".format(conf_medium + conf_low),
+        f"> **Uwaga:** Dopasowania `medium` i `low` (łącznie {conf_medium + conf_low}) oznaczają że algorytm",
         "> znalazł podobny szablon ale nie jest pewny dopasowania. Warto zweryfikować ręcznie",
         "> sekcje wymienione w tabeli per standard poniżej.",
         "",
@@ -98,8 +108,8 @@ def run(conn: sqlite3.Connection) -> str:
     """).fetchall()
 
     if missing_rows:
-        lines.append(f"| Standard | Dokument | Typ | Kategoria |")
-        lines.append(f"|----------|----------|-----|-----------|")
+        lines.append("| Standard | Dokument | Typ | Kategoria |")
+        lines.append("|----------|----------|-----|-----------|")
         for code, title, req, cat in missing_rows:
             req_label = "**REQUIRED**" if req else "recommended"
             lines.append(f"| {code} | {title} | {req_label} | {cat} |")
@@ -216,7 +226,7 @@ def run(conn: sqlite3.Connection) -> str:
         "",
         "### Dopasowania do ręcznej weryfikacji",
         "",
-        f"77 dopasowań z pewnością `low` + 150 z `medium` — priorytetyzuj standardy z ⚠️ przy Gap Analysis.",
+        "77 dopasowań z pewnością `low` + 150 z `medium` — priorytetyzuj standardy z ⚠️ przy Gap Analysis.",
         "",
     ]
 
@@ -226,18 +236,26 @@ def run(conn: sqlite3.Connection) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--db", default=DB_DEFAULT)
-    ap.add_argument("--output", default=None, help="Output .md file (default: reports/standards_audit_report.md)")
+    ap.add_argument(
+        "--output",
+        default=None,
+        help="Output .md file (default: reports/standards_audit_report.md)",
+    )
     args = ap.parse_args()
 
     conn = sqlite3.connect(args.db)
 
     # Sprawdź czy tabele istnieją
-    tables = [r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+    tables = [
+        r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+    ]
     if "gap_analysis" not in tables:
         print("ERROR: Tabela gap_analysis nie istnieje. Uruchom najpierw gap_analysis.py")
         return
     if "standards_catalog" not in tables:
-        print("ERROR: Tabela standards_catalog nie istnieje. Uruchom najpierw build_standards_catalog.py")
+        print(
+            "ERROR: Tabela standards_catalog nie istnieje. Uruchom najpierw build_standards_catalog.py"
+        )
         return
 
     report_md = run(conn)

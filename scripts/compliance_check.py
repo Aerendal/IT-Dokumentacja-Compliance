@@ -14,11 +14,12 @@ Użycie:
   python3 compliance_check.py backfill [--apply] [--dry-run] [--db PATH]
   python3 compliance_check.py full-audit [--apply] [--db PATH] [--ci]
 """
+
 import argparse
 import logging
+import sqlite3
 import subprocess
 import sys
-import sqlite3
 from pathlib import Path
 
 from itdoc._batch import batch_continue
@@ -59,7 +60,9 @@ def get_db_stats(db_path: Path) -> dict:
             cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence IS NULL")
             stats["null_confidence"] = cur.fetchone()[0]
         except sqlite3.OperationalError as exc:
-            _log.debug("doc_standard_mapping.confidence column unavailable: %s", exc)  # table may not exist
+            _log.debug(
+                "doc_standard_mapping.confidence column unavailable: %s", exc
+            )  # table may not exist
 
         try:
             cur.execute("SELECT COUNT(*) FROM template_violations WHERE severity='ERROR'")
@@ -78,8 +81,13 @@ def run_check_schema(db_path: Path, strict: bool = False) -> dict:
     Runs validate_template_schema.py --report [--strict] --db PATH
     Returns: {'violations_error': N, 'violations_warning': N, 'exit_code': 0|1}
     """
-    cmd = [sys.executable, str(SCRIPTS_DIR / "validate_template_schema.py"),
-           "--report", "--db", str(db_path)]
+    cmd = [
+        sys.executable,
+        str(SCRIPTS_DIR / "validate_template_schema.py"),
+        "--report",
+        "--db",
+        str(db_path),
+    ]
     if strict:
         cmd.append("--strict")
 
@@ -92,11 +100,13 @@ def run_check_schema(db_path: Path, strict: bool = False) -> dict:
         line_lower = line.lower()
         if "error" in line_lower:
             import re
+
             m = re.search(r"(\d+)", line)
             if m:
                 violations_error = int(m.group(1))
         if "warning" in line_lower:
             import re
+
             m = re.search(r"(\d+)", line)
             if m:
                 violations_warning = int(m.group(1))
@@ -113,15 +123,27 @@ def run_coverage_report(db_path: Path, fmt: str = "html") -> dict:
     Runs compliance_coverage_report.py --format FMT --db PATH
     Returns: {'output_file': PATH, 'exit_code': 0|1}
     """
-    cmd = [sys.executable, str(SCRIPTS_DIR / "compliance_coverage_report.py"),
-           "--format", fmt, "--db", str(db_path)]
+    cmd = [
+        sys.executable,
+        str(SCRIPTS_DIR / "compliance_coverage_report.py"),
+        "--format",
+        fmt,
+        "--db",
+        str(db_path),
+    ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)
     output = result.stdout + result.stderr
 
     output_file = ""
     for line in output.splitlines():
-        if "report" in line.lower() or "output" in line.lower() or ".html" in line or ".json" in line or ".csv" in line:
+        if (
+            "report" in line.lower()
+            or "output" in line.lower()
+            or ".html" in line
+            or ".json" in line
+            or ".csv" in line
+        ):
             parts = line.split()
             for part in parts:
                 if part.endswith((".html", ".json", ".csv")):
@@ -140,14 +162,20 @@ def run_backfill(db_path: Path, apply: bool = False) -> dict:
     Returns: {'rows_updated': N, 'exit_code': 0|1}
     """
     flag = "--apply" if apply else "--dry-run"
-    cmd = [sys.executable, str(MAINTENANCE_DIR / "backfill_mapping_confidence.py"),
-           flag, "--db", str(db_path)]
+    cmd = [
+        sys.executable,
+        str(MAINTENANCE_DIR / "backfill_mapping_confidence.py"),
+        flag,
+        "--db",
+        str(db_path),
+    ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)
     output = result.stdout + result.stderr
 
     rows_updated = 0
     import re
+
     for line in output.splitlines():
         m = re.search(r"(\d+)\s*(rows?|row)", line, re.IGNORECASE)
         if m:
@@ -168,8 +196,8 @@ def run_full_audit(db_path: Path, apply_backfill: bool = False, ci_mode: bool = 
     print("Running compliance full audit…")
 
     schema_result = run_check_schema(db_path)
-    cov_result = run_coverage_report(db_path)
-    bf_result = run_backfill(db_path, apply=apply_backfill)
+    run_coverage_report(db_path)
+    run_backfill(db_path, apply=apply_backfill)
     stats = get_db_stats(db_path)
 
     err = schema_result["violations_error"]

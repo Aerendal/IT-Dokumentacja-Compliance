@@ -3,10 +3,11 @@
 - Deterministic, DB-first, offline.
 - Assumes earlier steps already ran: file_index -> sync_docs_ids -> extract_sections -> materialize_edges -> resolve_content_links -> extract_section_metrics.
 """
+
 import json
 import sqlite3
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
 
 BASE = Path(__file__).resolve().parent.parent
 DB = BASE / "reports" / "it_doc_matrix.db"
@@ -99,9 +100,9 @@ def compute_edge_health(conn):
     cur.execute("DELETE FROM edge_health")
 
     cur.execute("SELECT doc_uid FROM docs")
-    docs_set = set(r[0] for r in cur.fetchall())
+    docs_set = {r[0] for r in cur.fetchall()}
     cur.execute("SELECT section_uid FROM sections")
-    sec_set = set(r[0] for r in cur.fetchall())
+    sec_set = {r[0] for r in cur.fetchall()}
 
     cur.execute(
         """
@@ -110,7 +111,7 @@ def compute_edge_health(conn):
         FROM edges
         """
     )
-    for edge_uid, fk, fu, tk, tu, lt, dr, rat, strength, source in cur.fetchall():
+    for edge_uid, _fk, _fu, tk, tu, _lt, _dr, rat, strength, source in cur.fetchall():
         reasons = []
         status = "ok"
 
@@ -152,9 +153,9 @@ def compute_blockers(conn):
     now = utc_now_iso()
 
     cur.execute("SELECT doc_uid, status FROM doc_quality")
-    doc_q = {du: st for du, st in cur.fetchall()}
+    doc_q = dict(cur.fetchall())
     cur.execute("SELECT section_uid, status FROM section_quality")
-    sec_q = {su: st for su, st in cur.fetchall()}
+    sec_q = dict(cur.fetchall())
 
     def is_ok(kind, uid):
         if kind == "doc":
@@ -202,14 +203,19 @@ def compute_blockers(conn):
 def summarize(conn) -> dict:
     cur = conn.cursor()
     cur.execute("SELECT status, COUNT(*) FROM doc_quality GROUP BY status")
-    doc_status = {s: c for s, c in cur.fetchall()}
+    doc_status = dict(cur.fetchall())
     cur.execute("SELECT status, COUNT(*) FROM section_quality GROUP BY status")
-    sec_status = {s: c for s, c in cur.fetchall()}
+    sec_status = dict(cur.fetchall())
     cur.execute("SELECT status, COUNT(*) FROM edge_health GROUP BY status")
-    edge_status = {s: c for s, c in cur.fetchall()}
+    edge_status = dict(cur.fetchall())
     cur.execute("SELECT severity, COUNT(*) FROM blockers GROUP BY severity")
-    blocker_sev = {s: c for s, c in cur.fetchall()}
-    return {"doc_quality": doc_status, "section_quality": sec_status, "edge_health": edge_status, "blockers": blocker_sev}
+    blocker_sev = dict(cur.fetchall())
+    return {
+        "doc_quality": doc_status,
+        "section_quality": sec_status,
+        "edge_health": edge_status,
+        "blockers": blocker_sev,
+    }
 
 
 def main():

@@ -1,4 +1,5 @@
 """Tests for scripts/build_standards_catalog.py and scripts/sync_docs_ids.py."""
+
 import sqlite3
 import sys
 from unittest.mock import MagicMock
@@ -16,19 +17,21 @@ if "ulid" not in sys.modules:
     sys.modules["ulid"] = _ulid_mock
 
 from scripts.build_standards_catalog import (  # noqa: E402
-    create_table,
-    count_existing,
-    load_catalog,
     CATALOG,
+    count_existing,
+    create_table,
+    load_catalog,
+)
+from scripts.sync_docs_ids import (
+    load_file_index,
+    normalize_title_norm,
 )
 from scripts.sync_docs_ids import (  # noqa: E402
     utc_now_iso as sync_utc_now_iso,
-    normalize_title_norm,
-    load_file_index,
 )
 
-
 # ── Fixtures ──────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def catalog_conn():
@@ -40,6 +43,7 @@ def catalog_conn():
 
 
 # ── create_table ──────────────────────────────────────────────────────────────
+
 
 def test_create_table_creates_standards_catalog(catalog_conn):
     cur = catalog_conn.execute(
@@ -67,6 +71,7 @@ def test_create_table_has_expected_columns(catalog_conn):
 
 # ── count_existing ────────────────────────────────────────────────────────────
 
+
 def test_count_existing_empty(catalog_conn):
     assert count_existing(catalog_conn) == 0
 
@@ -92,6 +97,7 @@ def test_count_existing_after_two_inserts(catalog_conn):
 
 
 # ── load_catalog ──────────────────────────────────────────────────────────────
+
 
 def test_load_catalog_returns_dict(catalog_conn):
     stats = load_catalog(catalog_conn)
@@ -129,13 +135,12 @@ def test_load_catalog_replace_clears_and_reloads(catalog_conn):
 
 def test_load_catalog_is_required_stored_as_int(catalog_conn):
     load_catalog(catalog_conn)
-    row = catalog_conn.execute(
-        "SELECT is_required FROM standards_catalog LIMIT 1"
-    ).fetchone()
+    row = catalog_conn.execute("SELECT is_required FROM standards_catalog LIMIT 1").fetchone()
     assert isinstance(row[0], int)
 
 
 # ── CATALOG data integrity ────────────────────────────────────────────────────
+
 
 def test_catalog_has_multiple_standards():
     assert len(CATALOG) >= 5
@@ -155,6 +160,7 @@ def test_catalog_is_required_is_bool():
 
 # ── sync_docs_ids: utc_now_iso ────────────────────────────────────────────────
 
+
 def test_sync_utc_now_iso_format():
     ts = sync_utc_now_iso()
     assert ts.endswith("Z")
@@ -167,6 +173,7 @@ def test_sync_utc_now_iso_returns_string():
 
 
 # ── normalize_title_norm ──────────────────────────────────────────────────────
+
 
 def test_normalize_title_norm_lowercases():
     assert normalize_title_norm("Hello World") == "hello world"
@@ -194,12 +201,11 @@ def test_normalize_title_norm_already_normalized():
 
 # ── load_file_index ───────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def file_index_conn():
     conn = sqlite3.connect(":memory:")
-    conn.execute(
-        "CREATE TABLE file_index (title_norm TEXT, path TEXT, source TEXT)"
-    )
+    conn.execute("CREATE TABLE file_index (title_norm TEXT, path TEXT, source TEXT)")
     conn.executemany(
         "INSERT INTO file_index VALUES (?, ?, ?)",
         [

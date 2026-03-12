@@ -3,11 +3,13 @@
 - No content is written back to DB; only counts and statuses.
 - Designed to run after: build_file_index -> sync_docs_ids -> extract_sections -> materialize_edges -> resolve_content_links.
 """
+
 import logging
 import re
 import sqlite3
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
+
 from ulid import ulid
 
 from itdoc._batch import batch_continue
@@ -64,7 +66,16 @@ def profile_for_origin(origin: str) -> str:
     return "default"
 
 
-def score_and_status(profile, sections_count, placeholder_sections, missing_required, checkbox_count, phase_bullets, req_links_missing_rationale, unresolved_content_links):
+def score_and_status(
+    profile,
+    sections_count,
+    placeholder_sections,
+    missing_required,
+    checkbox_count,
+    phase_bullets,
+    req_links_missing_rationale,
+    unresolved_content_links,
+):
     score = 100
     if sections_count < profile["min_sections"]:
         score -= 20
@@ -105,7 +116,9 @@ def main():
     now = utc_now_iso()
 
     # sections grouped by doc
-    cur.execute("SELECT section_uid, doc_uid, start_line, end_line, status, heading_norm FROM sections")
+    cur.execute(
+        "SELECT section_uid, doc_uid, start_line, end_line, status, heading_norm FROM sections"
+    )
     by_doc = {}
     for su, du, sl, el, st, hn in cur.fetchall():
         by_doc.setdefault(du, []).append((su, int(sl or 0), int(el or 0), st, hn))

@@ -122,7 +122,10 @@ def gate_sync_runs(cur: sqlite3.Cursor) -> tuple[bool, str]:
     if not edges_ts:
         return False, "missing sync_runs kind=migrate_edges_manual (OK/WARN)"
     if edges_ts < nodes_ts:
-        return False, f"migrate_edges_manual older than build_nodes: edges_ts={edges_ts} < nodes_ts={nodes_ts}"
+        return (
+            False,
+            f"migrate_edges_manual older than build_nodes: edges_ts={edges_ts} < nodes_ts={nodes_ts}",
+        )
     return True, "ok"
 
 
@@ -136,7 +139,7 @@ def doc_related_confidence(shared: int) -> float:
 
 def infer_doc_related(cur: sqlite3.Cursor, now: str) -> dict[str, int]:
     cur.execute("SELECT doc_uid,node_uid FROM node_map_docs")
-    doc_map = {doc_uid: node_uid for doc_uid, node_uid in cur.fetchall()}
+    doc_map = dict(cur.fetchall())
     pair_shared: dict[tuple[str, str], int] = {}
     skipped_common_headings = 0
     skipped_stoplist_headings = 0
@@ -433,7 +436,10 @@ def main() -> None:
             conn.commit()
             return
 
-        cur.execute("DELETE FROM edges_inferred WHERE source=? OR algorithm_version=?", (SOURCE_TAG, ALGORITHM_VERSION))
+        cur.execute(
+            "DELETE FROM edges_inferred WHERE source=? OR algorithm_version=?",
+            (SOURCE_TAG, ALGORITHM_VERSION),
+        )
         deleted_previous = cur.rowcount if cur.rowcount != -1 else 0
 
         stats_doc = infer_doc_related(cur, now)

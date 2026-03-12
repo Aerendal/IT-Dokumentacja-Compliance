@@ -8,11 +8,12 @@ Usage:
 Exits with code 1 when at least one emoji is found; prints offending files.
 Scans common text extensions; skips binary/undecodable files.
 """
+
 from __future__ import annotations
 
 import sys
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 TEXT_EXTS = {
     ".md",

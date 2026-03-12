@@ -12,7 +12,9 @@ Matching heurystyki (w kolejności pewności):
   2. Fuzzy n-gram overlap > 0.6
   3. Keyword overlap (znaczące słowa)
 """
+
 from __future__ import annotations
+
 import argparse
 import re
 import sqlite3
@@ -26,14 +28,24 @@ DB_DEFAULT = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
 # Text utils
 # ---------------------------------------------------------------------------
 
+
 def slugify(text: str) -> str:
     """Normalizuj tytuł do slug lowercase ascii."""
     text = text.lower()
     # transliteracja PL (explicit mapping dla znaków których NFKD nie obsługuje)
-    pl = str.maketrans({
-        "ą": "a", "ć": "c", "ę": "e", "ł": "l", "ń": "n",
-        "ó": "o", "ś": "s", "ź": "z", "ż": "z",
-    })
+    pl = str.maketrans(
+        {
+            "ą": "a",
+            "ć": "c",
+            "ę": "e",
+            "ł": "l",
+            "ń": "n",
+            "ó": "o",
+            "ś": "s",
+            "ź": "z",
+            "ż": "z",
+        }
+    )
     text = text.translate(pl)
     text = unicodedata.normalize("NFKD", text)
     text = "".join(c for c in text if not unicodedata.combining(c))
@@ -44,11 +56,34 @@ def slugify(text: str) -> str:
 def tokens(text: str) -> set[str]:
     """Zwróć set tokenów (słów >=3 znaki, bez stopwords)."""
     STOP = {
-        "the", "and", "for", "with", "this", "that", "from", "are", "its",
-        "per", "plan", "plans", "doc", "docs", "document", "dokumentacja",
-        "dokumentu", "system", "systems", "management", "zarządzanie",
-        "zarządzania", "opis", "specyfikacja", "procedura", "polityka",
-        "raport", "rejestr",
+        "the",
+        "and",
+        "for",
+        "with",
+        "this",
+        "that",
+        "from",
+        "are",
+        "its",
+        "per",
+        "plan",
+        "plans",
+        "doc",
+        "docs",
+        "document",
+        "dokumentacja",
+        "dokumentu",
+        "system",
+        "systems",
+        "management",
+        "zarządzanie",
+        "zarządzania",
+        "opis",
+        "specyfikacja",
+        "procedura",
+        "polityka",
+        "raport",
+        "rejestr",
     }
     words = re.findall(r"[a-z]{3,}", slugify(text))
     return {w for w in words if w not in STOP}
@@ -56,6 +91,7 @@ def tokens(text: str) -> set[str]:
 
 def ngram_score(title_a: str, title_b: str, n: int = 2) -> float:
     """Jaccard similarity na n-gramach słownych."""
+
     def ngrams(t: str) -> set[tuple]:
         ws = slugify(t).split()
         return set(zip(*[ws[i:] for i in range(n)])) if len(ws) >= n else set()
@@ -78,15 +114,15 @@ def keyword_score(title_a: str, title_b: str) -> float:
     return len(a & b) / len(a | b)
 
 
-CONFIDENCE_EXACT   = "exact"
-CONFIDENCE_HIGH    = "high"    # bigram >= 0.5
-CONFIDENCE_MEDIUM  = "medium"  # keyword >= 0.4
-CONFIDENCE_LOW     = "low"     # keyword >= 0.25
-CONFIDENCE_MISS    = "missing"
+CONFIDENCE_EXACT = "exact"
+CONFIDENCE_HIGH = "high"  # bigram >= 0.5
+CONFIDENCE_MEDIUM = "medium"  # keyword >= 0.4
+CONFIDENCE_LOW = "low"  # keyword >= 0.25
+CONFIDENCE_MISS = "missing"
 
-THRESHOLD_HIGH   = 0.50
+THRESHOLD_HIGH = 0.50
 THRESHOLD_MEDIUM = 0.40
-THRESHOLD_LOW    = 0.25
+THRESHOLD_LOW = 0.25
 
 
 def match_catalog_entry(
@@ -140,14 +176,23 @@ def match_catalog_entry(
         # 4. Keyword overlap
         kw = keyword_score(doc_title, doc_db_title)
         effective_kw = kw + mapping_boost
-        if effective_kw >= THRESHOLD_MEDIUM and best_conf not in (CONFIDENCE_EXACT, CONFIDENCE_HIGH):
+        if effective_kw >= THRESHOLD_MEDIUM and best_conf not in (
+            CONFIDENCE_EXACT,
+            CONFIDENCE_HIGH,
+        ):
             if kw > best_score:
                 best_score = kw
                 best_path = doc_path
                 best_title = doc_db_title
                 # Upgrade medium→high when mapping confirms standard
-                best_conf = CONFIDENCE_HIGH if (in_mapping and kw >= THRESHOLD_LOW) else CONFIDENCE_MEDIUM
-        elif effective_kw >= THRESHOLD_LOW and best_conf not in (CONFIDENCE_EXACT, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM):
+                best_conf = (
+                    CONFIDENCE_HIGH if (in_mapping and kw >= THRESHOLD_LOW) else CONFIDENCE_MEDIUM
+                )
+        elif effective_kw >= THRESHOLD_LOW and best_conf not in (
+            CONFIDENCE_EXACT,
+            CONFIDENCE_HIGH,
+            CONFIDENCE_MEDIUM,
+        ):
             if kw > best_score:
                 best_score = kw
                 best_path = doc_path
@@ -160,6 +205,7 @@ def match_catalog_entry(
 
 
 # ---------------------------------------------------------------------------
+
 
 def create_tables(conn: sqlite3.Connection) -> None:
     conn.execute("""
@@ -209,7 +255,7 @@ def run_gap_analysis(conn: sqlite3.Connection, verbose: bool = False) -> None:
 
     stats = {"present": 0, "missing": 0, "by_conf": {}}
 
-    for (standard_code, doc_type_id, doc_title, category, is_required) in catalog:
+    for standard_code, doc_type_id, doc_title, category, is_required in catalog:
         mapped_for_standard = mapping_index.get(standard_code, set())
         result = match_catalog_entry(doc_title, all_docs, standard_code, mapped_for_standard)
 
@@ -220,7 +266,9 @@ def run_gap_analysis(conn: sqlite3.Connection, verbose: bool = False) -> None:
             stats["by_conf"][confidence] = stats["by_conf"].get(confidence, 0) + 1
             if verbose:
                 mark = "✅" if confidence in (CONFIDENCE_EXACT, CONFIDENCE_HIGH) else "~"
-                print(f"  {mark} [{standard_code}] {doc_title[:50]} → {matched_title[:50]} ({confidence})")
+                print(
+                    f"  {mark} [{standard_code}] {doc_title[:50]} → {matched_title[:50]} ({confidence})"
+                )
         else:
             doc_path = None
             matched_title = None
@@ -234,15 +282,25 @@ def run_gap_analysis(conn: sqlite3.Connection, verbose: bool = False) -> None:
             """INSERT INTO gap_analysis
                (standard_code, doc_type_id, doc_title, catalog_category, is_required, status, matched_doc_path, matched_doc_title, confidence)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (standard_code, doc_type_id, doc_title, category, is_required, status, doc_path, matched_title, confidence),
+            (
+                standard_code,
+                doc_type_id,
+                doc_title,
+                category,
+                is_required,
+                status,
+                doc_path,
+                matched_title,
+                confidence,
+            ),
         )
 
     conn.commit()
 
-    print(f"\n=== Gap Analysis Results ===")
+    print("\n=== Gap Analysis Results ===")
     print(f"Present (matched):  {stats['present']:4d}")
     print(f"Missing (no match): {stats['missing']:4d}")
-    print(f"\nConfidence breakdown (present only):")
+    print("\nConfidence breakdown (present only):")
     for conf in [CONFIDENCE_EXACT, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM, CONFIDENCE_LOW]:
         n = stats["by_conf"].get(conf, 0)
         print(f"  {conf:8s}: {n}")
@@ -274,7 +332,7 @@ def print_missing_report(conn: sqlite3.Connection) -> None:
         ORDER BY d.title
     """).fetchall()
     print(f"  Count: {len(extra)}")
-    for title, path in extra:
+    for title, _path in extra:
         print(f"  {title}")
 
 

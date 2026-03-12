@@ -1,24 +1,25 @@
 """Tests for pure helper functions in scripts/maintenance/interactive_audit.py."""
+
 import sqlite3
 import sys
 
 from scripts.maintenance.interactive_audit import (
-    format_preview,
-    build_filter_query,
-    parse_keypress,
-    _colored,
-    _progress_bar,
+    ANSI_GREEN,
+    ANSI_RED,
+    ANSI_RESET,
     VALID_CONFIDENCE,
     VALID_REASONS,
-    ANSI_GREEN,
-    ANSI_RESET,
-    ANSI_RED,
+    _colored,
+    _progress_bar,
+    build_filter_query,
+    format_preview,
+    parse_keypress,
 )
-
 
 # ---------------------------------------------------------------------------
 # parse_keypress
 # ---------------------------------------------------------------------------
+
 
 class TestParseKeypress:
     def test_y_confirm(self):
@@ -62,6 +63,7 @@ class TestParseKeypress:
 # _progress_bar
 # ---------------------------------------------------------------------------
 
+
 class TestProgressBar:
     def test_zero_total(self):
         assert _progress_bar(0, 0) == "[brak wpisow]"
@@ -99,6 +101,7 @@ class TestProgressBar:
 # _colored
 # ---------------------------------------------------------------------------
 
+
 class TestColored:
     def test_non_tty_returns_plain_text(self, monkeypatch):
         monkeypatch.setattr(sys.stdout, "isatty", lambda: False)
@@ -120,6 +123,7 @@ class TestColored:
 # ---------------------------------------------------------------------------
 # format_preview
 # ---------------------------------------------------------------------------
+
 
 class TestFormatPreview:
     def test_basic_output_contains_path(self):
@@ -156,6 +160,7 @@ class TestFormatPreview:
 # ---------------------------------------------------------------------------
 # build_filter_query
 # ---------------------------------------------------------------------------
+
 
 class TestBuildFilterQuery:
     def test_no_filters(self):
@@ -227,6 +232,7 @@ class TestBuildFilterQuery:
 # ---------------------------------------------------------------------------
 # VALID_CONFIDENCE / VALID_REASONS constants
 # ---------------------------------------------------------------------------
+
 
 class TestConstants:
     def test_valid_confidence_contains_expected(self):

@@ -1,11 +1,13 @@
 """Tests for pure functions in scripts/fix_ghost_docs.py."""
-import pytest
+
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scripts.fix_ghost_docs import to_slug, build_slug_map, find_path
+from scripts.fix_ghost_docs import build_slug_map, find_path, to_slug
 
 pytestmark = pytest.mark.unit
 

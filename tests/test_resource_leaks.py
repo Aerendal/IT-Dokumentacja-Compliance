@@ -18,7 +18,6 @@ from itdoc.db import get_connection, open_connection
 from itdoc.query import find_by_standard, rhythm_downstream
 from itdoc.template import load_template
 
-
 _REPO_ROOT = Path(__file__).parent.parent
 _DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix.db"
 
@@ -98,6 +97,7 @@ class TestFileHandleLeaks:
     def test_load_after_delete_raises_gracefully(self, tmp_path):
         """Plik usunięty po załadowaniu — kolejna próba raise TemplateError."""
         from itdoc.exceptions import TemplateError
+
         p = self._make_template(tmp_path)
         # Załaduj raz (ok)
         load_template(p)
@@ -129,7 +129,7 @@ class TestLargeResultLeaks:
         # Łańcuch 1000 węzłów: N0→N1→N2→...→N999
         conn.executemany(
             "INSERT INTO rhythm_edges VALUES (?,?,?,'triggers',1.0,'','','')",
-            [(i, f"N{i}", f"N{i+1}") for i in range(999)],
+            [(i, f"N{i}", f"N{i + 1}") for i in range(999)],
         )
         conn.commit()
 

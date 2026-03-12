@@ -14,8 +14,8 @@ Wszystkie testy używają real_db_conn (pomijane gdy brak DB).
 """
 
 import pytest
-from itdoc.query import find_by_standard
 
+from itdoc.query import find_by_standard
 
 pytestmark = pytest.mark.usefixtures()
 
@@ -51,8 +51,9 @@ class TestGroupAOnboarding:
         results = find_by_standard(real_db_conn, "OWASP ASVS")
         assert len(results) >= 5, f"Zbyt mało szablonów OWASP ASVS: {len(results)}"
         paths = _paths(results)
-        assert "api_security_design.md" in paths or "security_requirements_specification.md" in paths, \
-            "Brak szablonu API security / security requirements"
+        assert (
+            "api_security_design.md" in paths or "security_requirements_specification.md" in paths
+        ), "Brak szablonu API security / security requirements"
 
     def test_a3_pm_prince2_pmbok_starter(self, real_db_conn):
         """A3: PM — szablony startowe PRINCE2 i PMBOK."""
@@ -69,8 +70,9 @@ class TestGroupAOnboarding:
         high_conf = _high_exact(results)
         assert len(high_conf) >= 5, f"Za mało wysokiej jakości szablonów ASVS: {len(high_conf)}"
         paths = _paths(high_conf)
-        assert "owasp_asvs_cryptography_policy.md" in paths, \
+        assert "owasp_asvs_cryptography_policy.md" in paths, (
             "Brak owasp_asvs_cryptography_policy.md w wynikach wysokiej pewności"
+        )
 
 
 # ===========================================================================
@@ -112,7 +114,9 @@ class TestGroupBAudit:
         results = find_by_standard(real_db_conn, "NIS2")
         assert len(results) >= 4, f"Za mało szablonów NIS2: {len(results)}"
         paths = _paths(results)
-        assert "incident_transparency_report.md" in paths, "Brak szablonu raportowania incydentów NIS2"
+        assert "incident_transparency_report.md" in paths, (
+            "Brak szablonu raportowania incydentów NIS2"
+        )
         assert "risk_assessment.md" in paths, "Brak szablonu oceny ryzyka NIS2"
 
     def test_b4_dora_eba_artifacts(self, real_db_conn):
@@ -224,7 +228,11 @@ class TestGroupEAI:
         results = find_by_standard(real_db_conn, "ISO/IEC 42001")
         assert len(results) >= 5, f"Za mało szablonów ISO 42001: {len(results)}"
         paths = _paths(results)
-        required = ["ai_governance_framework.md", "iso42001_ai_policy.md", "ai_ethics_assessment.md"]
+        required = [
+            "ai_governance_framework.md",
+            "iso42001_ai_policy.md",
+            "ai_ethics_assessment.md",
+        ]
         missing = [r for r in required if r not in paths]
         assert not missing, f"Brakujące szablony AI: {missing}"
 
@@ -282,8 +290,12 @@ class TestGroupFBCM:
         results = find_by_standard(real_db_conn, "ISO 22301")
         paths = _paths(results)
         # compliance_testing_report lub inny szablon testowania BCP
-        test_templates = [p for p in paths if "test" in p or "exercise" in p or "compliance_test" in p]
-        assert len(test_templates) >= 1, f"Brak szablonu testowania/ćwiczenia DRP w ISO 22301. Dostępne: {sorted(paths)[:10]}"
+        test_templates = [
+            p for p in paths if "test" in p or "exercise" in p or "compliance_test" in p
+        ]
+        assert len(test_templates) >= 1, (
+            f"Brak szablonu testowania/ćwiczenia DRP w ISO 22301. Dostępne: {sorted(paths)[:10]}"
+        )
 
     def test_f4_major_incident_report_bcm(self, real_db_conn):
         """F4: Raport po incydencie ciągłości (ISO 22301 + ITIL 4)."""
@@ -309,8 +321,9 @@ class TestGroupGSecDevOps:
         assert len(results) >= 5, f"Za mało szablonów OWASP ASVS: {len(results)}"
         paths = _paths(results)
         assert "owasp_asvs_cryptography_policy.md" in paths, "Brak Crypto Policy ASVS"
-        assert "api_security_design.md" in paths or "security_requirements_specification.md" in paths, \
-            "Brak szablonu security requirements"
+        assert (
+            "api_security_design.md" in paths or "security_requirements_specification.md" in paths
+        ), "Brak szablonu security requirements"
 
     def test_g2_api_design_openapi_asyncapi(self, real_db_conn):
         """G2: API design — szablony OpenAPI i AsyncAPI."""
@@ -357,18 +370,21 @@ class TestGroupHCloud:
         iso20000 = find_by_standard(real_db_conn, "ISO 20000-1")
         itil_paths = _paths(itil4)
         iso20000_paths = _paths(iso20000)
-        assert "configuration_management_document.md" in itil_paths, \
+        assert "configuration_management_document.md" in itil_paths, (
             "Brak Configuration Management Document w ITIL 4"
-        assert "iso20000_availability_plan.md" in iso20000_paths, \
+        )
+        assert "iso20000_availability_plan.md" in iso20000_paths, (
             "Brak Availability Plan ISO 20000-1"
+        )
 
     def test_h3_pci_dss_compliance_package(self, real_db_conn):
         """H3: PCI DSS — komplet dokumentów dla środowiska CDE."""
         results = find_by_standard(real_db_conn, "PCI DSS")
         assert len(results) >= 7, f"Za mało szablonów PCI DSS: {len(results)}"
         paths = _paths(results)
-        assert "payment_card_security_pci_dss.md" in paths or "pci_dss_compliance.md" in paths, \
+        assert "payment_card_security_pci_dss.md" in paths or "pci_dss_compliance.md" in paths, (
             "Brak podstawowego szablonu PCI DSS compliance"
+        )
         assert "access_control.md" in paths, "Brak szablonu kontroli dostępu"
         assert "data_flow_diagram.md" in paths, "Brak Data Flow Diagram (wymagany PCI DSS req. 1)"
 

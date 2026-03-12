@@ -84,15 +84,18 @@ class TestToAnchorPhaseFormat:
 class TestToAnchorIdempotence:
     """to_anchor(to_anchor(x)) == to_anchor(x) — idempotentność."""
 
-    @pytest.mark.parametrize("text", [
-        "Cel dokumentu",
-        "Zakres i granice",
-        "Standardy i compliance",
-        "ISO 27001 Security Policy",
-        "Faza 3: Design",
-        "",
-        "Użytkownicy i interesariusze",
-    ])
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "Cel dokumentu",
+            "Zakres i granice",
+            "Standardy i compliance",
+            "ISO 27001 Security Policy",
+            "Faza 3: Design",
+            "",
+            "Użytkownicy i interesariusze",
+        ],
+    )
     def test_idempotent(self, text):
         once = to_anchor(text)
         twice = to_anchor(once)

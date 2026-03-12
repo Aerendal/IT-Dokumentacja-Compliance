@@ -43,7 +43,8 @@ def find_by_standard(conn: sqlite3.Connection, code: str) -> list:
         raise QueryError("Kod standardu nie może być pusty")
 
     like = f"%{code.strip()}%"
-    cur = conn.execute("""
+    cur = conn.execute(
+        """
         SELECT m.doc_path,
                m.standard_code,
                s.standard_name,
@@ -56,7 +57,9 @@ def find_by_standard(conn: sqlite3.Connection, code: str) -> list:
            OR s.standard_name LIKE ?
            OR s.standard_code LIKE ?
         ORDER BY m.doc_path
-    """, (like, like, like))
+    """,
+        (like, like, like),
+    )
     return [dict(r) for r in cur.fetchall()]
 
 
@@ -86,7 +89,8 @@ def find_curated_by_standard(conn: sqlite3.Connection, code: str) -> list:
     like = f"%{code.strip()}%"
 
     # 1. gap_analysis results (exact + high confidence)
-    gap_rows = conn.execute("""
+    gap_rows = conn.execute(
+        """
         SELECT g.matched_doc_path  AS doc_path,
                g.standard_code,
                g.confidence,
@@ -100,7 +104,9 @@ def find_curated_by_standard(conn: sqlite3.Connection, code: str) -> list:
         ORDER BY
             CASE g.confidence WHEN 'exact' THEN 0 ELSE 1 END,
             g.matched_doc_path
-    """, (like, like)).fetchall()
+    """,
+        (like, like),
+    ).fetchall()
 
     seen: set[str] = set()
     results: list[dict] = []
@@ -115,7 +121,8 @@ def find_curated_by_standard(conn: sqlite3.Connection, code: str) -> list:
             results.append(entry)
 
     # 2. doc_standard_mapping with primary_standard / explicit_audit
-    map_rows = conn.execute("""
+    map_rows = conn.execute(
+        """
         SELECT m.doc_path,
                m.standard_code,
                m.match_reason,
@@ -125,7 +132,9 @@ def find_curated_by_standard(conn: sqlite3.Connection, code: str) -> list:
         WHERE (m.standard_code LIKE ?)
           AND m.match_reason IN ('primary_standard', 'explicit_audit')
         ORDER BY m.doc_path
-    """, (like,)).fetchall()
+    """,
+        (like,),
+    ).fetchall()
 
     for r in map_rows:
         path = r["doc_path"]
@@ -156,7 +165,8 @@ def find_by_regulation(conn: sqlite3.Connection, code: str) -> list:
         raise QueryError("Kod regulacji nie może być pusty")
 
     like = f"%{code.strip()}%"
-    cur = conn.execute("""
+    cur = conn.execute(
+        """
         SELECT m.doc_path,
                m.regulation_code,
                r.regulation_name,
@@ -168,7 +178,9 @@ def find_by_regulation(conn: sqlite3.Connection, code: str) -> list:
         WHERE m.regulation_code LIKE ?
            OR r.regulation_name LIKE ?
         ORDER BY m.doc_path
-    """, (like, like))
+    """,
+        (like, like),
+    )
     return [dict(r) for r in cur.fetchall()]
 
 
@@ -189,9 +201,7 @@ def get_contract(conn: sqlite3.Connection, doc_uid: str) -> dict:
     if not doc_uid or not doc_uid.strip():
         raise QueryError("doc_uid nie może być pusty")
 
-    row = conn.execute(
-        "SELECT * FROM contracts WHERE scope_uid = ?", (doc_uid.strip(),)
-    ).fetchone()
+    row = conn.execute("SELECT * FROM contracts WHERE scope_uid = ?", (doc_uid.strip(),)).fetchone()
 
     if row is None:
         raise QueryError(f"Brak kontraktu dla doc_uid: {doc_uid}")
@@ -251,12 +261,15 @@ def rhythm_upstream(
             edge_filter = " AND re.rhythm_type = ?"
             params.append(edge_type)
         # nosec B608 -- f-string builds ?-placeholders ("?,?,?") and hardcoded edge_filter only; all user data bound via params list
-        rows = conn.execute(f"""
+        rows = conn.execute(
+            f"""
             SELECT re.from_node AS from_uid, re.to_node AS to_uid,
                    re.rhythm_type AS edge_type, re.weight
             FROM rhythm_edges re
             WHERE re.to_node IN ({placeholders}){edge_filter}
-        """, params).fetchall()
+        """,
+            params,
+        ).fetchall()
 
         next_frontier = []
         for row in rows:
@@ -307,12 +320,15 @@ def rhythm_downstream(
             edge_filter = " AND re.rhythm_type = ?"
             params.append(edge_type)
         # nosec B608 -- f-string builds ?-placeholders ("?,?,?") and hardcoded edge_filter only; all user data bound via params list
-        rows = conn.execute(f"""
+        rows = conn.execute(
+            f"""
             SELECT re.from_node AS from_uid, re.to_node AS to_uid,
                    re.rhythm_type AS edge_type, re.weight
             FROM rhythm_edges re
             WHERE re.from_node IN ({placeholders}){edge_filter}
-        """, params).fetchall()
+        """,
+            params,
+        ).fetchall()
 
         next_frontier = []
         for row in rows:
@@ -378,7 +394,8 @@ def find_unmapped(conn: sqlite3.Connection, limit: int = 50) -> list:
     if limit <= 0:
         raise QueryError("limit musi być > 0")
 
-    rows = conn.execute("""
+    rows = conn.execute(
+        """
         SELECT d.path, d.title, d.title_norm
         FROM docs d
         WHERE d.path IS NOT NULL
@@ -390,7 +407,9 @@ def find_unmapped(conn: sqlite3.Connection, limit: int = 50) -> list:
           )
         ORDER BY d.path
         LIMIT ?
-    """, (limit,)).fetchall()
+    """,
+        (limit,),
+    ).fetchall()
 
     return [dict(r) for r in rows]
 
@@ -415,14 +434,17 @@ def find_by_category(conn: sqlite3.Connection, category: str) -> list:
         raise QueryError("Kategoria nie może być pusta")
 
     like = f"%/{category.strip()}/%"
-    rows = conn.execute("""
+    rows = conn.execute(
+        """
         SELECT path, title, doc_uid
         FROM docs
         WHERE (path LIKE ? OR path LIKE ?)
           AND path IS NOT NULL
           AND path != 'ORPHAN'
         ORDER BY path
-    """, (like, f"{category.strip()}/%")).fetchall()
+    """,
+        (like, f"{category.strip()}/%"),
+    ).fetchall()
 
     return [dict(r) for r in rows]
 
@@ -447,12 +469,15 @@ def suggest_for_doc(conn: sqlite3.Connection, doc_path: str) -> list:
     if not doc_path or not doc_path.strip():
         raise QueryError("doc_path nie może być pusty")
 
-    rows = conn.execute("""
+    rows = conn.execute(
+        """
         SELECT standard_code, confidence, match_reason
         FROM doc_standard_mapping
         WHERE doc_path = ?
           AND match_reason = 'candidate_match'
         ORDER BY confidence DESC
-    """, (doc_path.strip(),)).fetchall()
+    """,
+        (doc_path.strip(),),
+    ).fetchall()
 
     return [dict(r) for r in rows]

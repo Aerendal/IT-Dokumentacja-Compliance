@@ -1,4 +1,5 @@
 """Tests for pure utility functions in scripts/resolve_content_links.py."""
+
 import sqlite3
 import sys
 from unittest.mock import MagicMock
@@ -15,15 +16,15 @@ _ulid_mock.ulid = MagicMock(return_value="01TEST0000000000000000000A")
 sys.modules.setdefault("ulid", _ulid_mock)
 
 from scripts.resolve_content_links import (  # noqa: E402
+    build_section_indexes,
     norm_label,
     strength_from_required,
     table_exists,
-    build_section_indexes,
     utc_now_iso,
 )
 
-
 # ── utc_now_iso ──────────────────────────────────────────────────────────────
+
 
 def test_utc_now_iso_format():
     ts = utc_now_iso()
@@ -37,6 +38,7 @@ def test_utc_now_iso_returns_string():
 
 
 # ── norm_label ────────────────────────────────────────────────────────────────
+
 
 def test_norm_label_lowercases():
     assert norm_label("Hello World") == "hello world"
@@ -76,12 +78,13 @@ def test_norm_label_removes_bom():
 
 
 def test_norm_label_strips_emoji():
-    result = norm_label("\U0001F680 Launch")
-    assert "\U0001F680" not in result
+    result = norm_label("\U0001f680 Launch")
+    assert "\U0001f680" not in result
     assert "launch" in result
 
 
 # ── strength_from_required ────────────────────────────────────────────────────
+
 
 def test_strength_required_returns_required():
     assert strength_from_required(1) == "required"
@@ -96,6 +99,7 @@ def test_strength_other_value_returns_navigational():
 
 
 # ── table_exists ──────────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def mem_conn():
@@ -123,6 +127,7 @@ def test_table_exists_after_drop(mem_conn):
 
 
 # ── build_section_indexes ─────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def sections_conn():

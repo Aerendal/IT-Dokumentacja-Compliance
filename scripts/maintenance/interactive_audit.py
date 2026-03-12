@@ -15,16 +15,15 @@ Przyklady:
     python interactive_audit.py --stats
 """
 
-import sqlite3
-import os
-import subprocess
-import platform
 import argparse
+import os
+import platform
+import sqlite3
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict, Tuple
-
+from typing import Optional
 
 # ---------------------------------------------------------------------------
 # Stale
@@ -36,17 +35,15 @@ VALID_CONFIDENCE = ("exact", "high", "medium", "low")
 
 VALID_REASONS = ("keyword_match", "explicit_audit", "extracted_from_section", "primary_standard")
 
-ANSI_RESET  = "\033[0m"
-ANSI_RED    = "\033[91m"
+ANSI_RESET = "\033[0m"
+ANSI_RED = "\033[91m"
 ANSI_YELLOW = "\033[93m"
-ANSI_GREEN  = "\033[92m"
-ANSI_CYAN   = "\033[96m"
-ANSI_BOLD   = "\033[1m"
-ANSI_DIM    = "\033[2m"
+ANSI_GREEN = "\033[92m"
+ANSI_CYAN = "\033[96m"
+ANSI_BOLD = "\033[1m"
+ANSI_DIM = "\033[2m"
 
-_DEFAULT_DB = (
-    Path(__file__).parent.parent.parent / "reports" / "it_doc_matrix.db"
-)
+_DEFAULT_DB = Path(__file__).parent.parent.parent / "reports" / "it_doc_matrix.db"
 
 COMMANDS = (
     "y  - zatwierdz (ustaw match_reason='explicit_audit')",
@@ -61,6 +58,7 @@ COMMANDS = (
 # ---------------------------------------------------------------------------
 # Funkcje pomocnicze (publiczne, na potrzeby testow jednostkowych)
 # ---------------------------------------------------------------------------
+
 
 def format_preview(
     doc_path: str,
@@ -90,13 +88,13 @@ def build_filter_query(
     standard: Optional[str],
     reason: Optional[str],
     limit: int,
-) -> Tuple[str, list]:
+) -> tuple[str, list]:
     """
     Buduje sparametryzowane zapytanie SELECT na doc_standard_mapping.
 
     Zwraca (sql, params).
     """
-    conditions: List[str] = []
+    conditions: list[str] = []
     params: list = []
 
     if standard:
@@ -148,6 +146,7 @@ def parse_keypress(key: str) -> str:
 # Wewnetrzne narzedzia UI
 # ---------------------------------------------------------------------------
 
+
 def _colored(text: str, color: str) -> str:
     if not sys.stdout.isatty():
         return text
@@ -196,6 +195,7 @@ def _open_file_in_editor(filepath: str, base_dir: str) -> None:
 # ---------------------------------------------------------------------------
 # Klasa glowna
 # ---------------------------------------------------------------------------
+
 
 class InteractiveAuditor:
     """Interaktywny audytor wpisow doc_standard_mapping."""
@@ -264,7 +264,7 @@ class InteractiveAuditor:
         _print_separator()
         print("Wpisz '?' aby zobaczyc dostepne komendy.\n")
 
-        stats: Dict[str, int] = {"processed": 0, "confirmed": 0, "deleted": 0, "skipped": 0}
+        stats: dict[str, int] = {"processed": 0, "confirmed": 0, "deleted": 0, "skipped": 0}
 
         index = 0
         while index < len(rows):
@@ -273,12 +273,14 @@ class InteractiveAuditor:
 
             print(f"\n{_progress_bar(position - 1, total)}")
             _print_separator()
-            print(format_preview(
-                doc_path=row["doc_path"],
-                standard_code=row["standard_code"],
-                match_reason=row["match_reason"],
-                title=row["title"],
-            ))
+            print(
+                format_preview(
+                    doc_path=row["doc_path"],
+                    standard_code=row["standard_code"],
+                    match_reason=row["match_reason"],
+                    title=row["title"],
+                )
+            )
 
             full_path = os.path.join(self.base_dir, row["doc_path"])
             if not os.path.exists(full_path):
@@ -293,7 +295,7 @@ class InteractiveAuditor:
         self.show_stats(stats)
         self.conn.close()
 
-    def process_item(self, row: sqlite3.Row, stats: Dict[str, int]) -> str:
+    def process_item(self, row: sqlite3.Row, stats: dict[str, int]) -> str:
         """
         Interaktywnie przetwarza jeden wpis.
 
@@ -355,7 +357,7 @@ class InteractiveAuditor:
 
             print(_colored("  Nieznana komenda. Wpisz '?' po pomoc.", ANSI_YELLOW))
 
-    def show_stats(self, stats: Dict[str, int]) -> None:
+    def show_stats(self, stats: dict[str, int]) -> None:
         """Wyswietla statystyki po zakonczeniu sesji."""
         _print_separator("=")
         print(_colored("PODSUMOWANIE SESJI", ANSI_BOLD))
@@ -401,6 +403,7 @@ class InteractiveAuditor:
 # Statystyki bez sesji interaktywnej
 # ---------------------------------------------------------------------------
 
+
 def _print_stats_only(conn: sqlite3.Connection) -> None:
     _print_separator("=")
     print(_colored("STATYSTYKI DOC_STANDARD_MAPPING", ANSI_BOLD))
@@ -427,9 +430,7 @@ def _print_stats_only(conn: sqlite3.Connection) -> None:
         for row in top_standards:
             print(f"    {row[0]:<30} {row[1]}")
 
-    pending = conn.execute(
-        "SELECT COUNT(*) FROM audit_log"
-    ).fetchone()[0]
+    pending = conn.execute("SELECT COUNT(*) FROM audit_log").fetchone()[0]
     print(f"\n  Wpisow w audit_log: {pending}")
 
     last_sessions = conn.execute(

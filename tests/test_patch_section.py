@@ -2,17 +2,19 @@
 tests/test_patch_section.py — unit tests for scripts/maintenance/patch_section.py
 All tests use tmp_path for file operations.
 """
-import pytest
+
 from pathlib import Path
 
+import pytest
+
 from scripts.maintenance.patch_section import (
-    strip_frontmatter,
-    find_section,
     apply_operation,
-    build_diff,
     atomic_write,
-    similarity_ratio,
+    build_diff,
     file_hash,
+    find_section,
+    similarity_ratio,
+    strip_frontmatter,
 )
 
 pytestmark = pytest.mark.unit
@@ -73,6 +75,7 @@ def md_file(tmp_path) -> Path:
 # strip_frontmatter
 # ---------------------------------------------------------------------------
 
+
 class TestStripFrontmatter:
     def test_splits_frontmatter_and_body(self):
         fm, body = strip_frontmatter(SIMPLE_MD)
@@ -99,6 +102,7 @@ class TestStripFrontmatter:
 # ---------------------------------------------------------------------------
 # find_section
 # ---------------------------------------------------------------------------
+
 
 class TestFindSection:
     def test_finds_existing_section(self):
@@ -137,6 +141,7 @@ class TestFindSection:
 # ---------------------------------------------------------------------------
 # apply_operation
 # ---------------------------------------------------------------------------
+
 
 class TestApplyOperation:
     def _get_body(self):
@@ -177,8 +182,7 @@ class TestApplyOperation:
     def test_replace_substring_within_section(self):
         body = self._get_body()
         new_body = apply_operation(
-            body, "Standards", "replace",
-            old="ISO27001 applies here.", new="NIST CSF applies here."
+            body, "Standards", "replace", old="ISO27001 applies here.", new="NIST CSF applies here."
         )
         assert "NIST CSF applies here." in new_body
 
@@ -192,6 +196,7 @@ class TestApplyOperation:
 # ---------------------------------------------------------------------------
 # build_diff
 # ---------------------------------------------------------------------------
+
 
 class TestBuildDiff:
     def test_returns_unified_diff(self):
@@ -213,6 +218,7 @@ class TestBuildDiff:
 # ---------------------------------------------------------------------------
 # atomic_write
 # ---------------------------------------------------------------------------
+
 
 class TestAtomicWrite:
     def test_writes_file(self, tmp_path):
@@ -236,6 +242,7 @@ class TestAtomicWrite:
 # ---------------------------------------------------------------------------
 # similarity_ratio / file_hash
 # ---------------------------------------------------------------------------
+
 
 class TestUtilityFunctions:
     def test_similarity_identical(self):

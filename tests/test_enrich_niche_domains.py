@@ -1,11 +1,13 @@
 """Tests for scripts/maintenance/enrich_niche_domains.py pure functions."""
-import pytest
+
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scripts.maintenance.enrich_niche_domains import match_archetype, pattern_guidance, PLACEHOLDER
+from scripts.maintenance.enrich_niche_domains import PLACEHOLDER, match_archetype, pattern_guidance
 
 pytestmark = pytest.mark.unit
 
@@ -105,11 +107,17 @@ class TestPatternGuidance:
 
     def test_security_pattern(self):
         result = pattern_guidance("API Security Guidelines")
-        assert "ISO 27001" in result or "bezpiecze" in result.lower() or "security" in result.lower()
+        assert (
+            "ISO 27001" in result or "bezpiecze" in result.lower() or "security" in result.lower()
+        )
 
     def test_policy_pattern(self):
         result = pattern_guidance("Data Retention Policy")
-        assert "polityk" in result.lower() or "policy" in result.lower() or "standard" in result.lower()
+        assert (
+            "polityk" in result.lower()
+            or "policy" in result.lower()
+            or "standard" in result.lower()
+        )
 
     def test_migration_pattern(self):
         result = pattern_guidance("Database Migration Plan")
@@ -117,7 +125,11 @@ class TestPatternGuidance:
 
     def test_development_pattern(self):
         result = pattern_guidance("API Development Implementation Guide")
-        assert "architektur" in result.lower() or "stack" in result.lower() or "wymagania" in result.lower()
+        assert (
+            "architektur" in result.lower()
+            or "stack" in result.lower()
+            or "wymagania" in result.lower()
+        )
 
     def test_generic_fallback(self):
         result = pattern_guidance("Some Completely Random Document Title")
@@ -129,7 +141,11 @@ class TestPatternGuidance:
 
     def test_announcement_pattern(self):
         result = pattern_guidance("System Downtime Announcement")
-        assert "kanał" in result.lower() or "komunikat" in result.lower() or "announcement" in result.lower()
+        assert (
+            "kanał" in result.lower()
+            or "komunikat" in result.lower()
+            or "announcement" in result.lower()
+        )
 
 
 class TestPlaceholder:

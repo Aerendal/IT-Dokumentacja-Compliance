@@ -16,9 +16,10 @@ Uzycie (klasyczne — wymaga recznego .close()):
 """
 
 import sqlite3
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Callable, Generator, List, Optional
+from typing import Callable, Optional
 
 from itdoc.exceptions import SchemaError
 
@@ -81,7 +82,7 @@ def validate_schema(
     Returns:
         Lista bledow (stringow). Pusta lista = schema OK.
     """
-    errors: List[str] = []
+    errors: list[str] = []
     cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
     existing = {row[0] for row in cur.fetchall()}
 

@@ -1,7 +1,9 @@
 """Tests for pure functions in scripts/enrich_small_templates.py."""
-import pytest
+
 import sys
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 

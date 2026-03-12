@@ -76,8 +76,8 @@ def test_export_pending_excludes_explicit_audit(conn):
 def test_export_threshold_filter(conn):
     rows = export_pending(conn, threshold=0.3)
     ids = {r["id"] for r in rows}
-    assert 1 in ids   # 0.25 < 0.3
-    assert 2 in ids   # 0.15 < 0.3
+    assert 1 in ids  # 0.25 < 0.3
+    assert 2 in ids  # 0.15 < 0.3
     assert 4 not in ids  # 0.50 >= 0.3
     assert 3 not in ids  # explicit_audit excluded regardless
 
@@ -102,9 +102,7 @@ def test_export_standard_filter(conn):
 def test_import_approved_updates_match_reason(conn):
     rows = [{"id": 1, "approved": "yes", "confidence": 0.25, "notes": "looks good"}]
     import_reviewed(conn, rows, dry_run=False)
-    row = conn.execute(
-        "SELECT match_reason FROM doc_standard_mapping WHERE id=1"
-    ).fetchone()
+    row = conn.execute("SELECT match_reason FROM doc_standard_mapping WHERE id=1").fetchone()
     assert row[0] == "expert_reviewed"
 
 
@@ -116,9 +114,7 @@ def test_import_approved_updates_match_reason(conn):
 def test_import_approved_sets_min_confidence_08(conn):
     rows = [{"id": 1, "approved": "yes", "confidence": 0.25, "notes": ""}]
     import_reviewed(conn, rows, dry_run=False)
-    row = conn.execute(
-        "SELECT confidence FROM doc_standard_mapping WHERE id=1"
-    ).fetchone()
+    row = conn.execute("SELECT confidence FROM doc_standard_mapping WHERE id=1").fetchone()
     assert row[0] == pytest.approx(0.8)
 
 
@@ -130,9 +126,7 @@ def test_import_approved_sets_min_confidence_08(conn):
 def test_import_rejected_deletes_row(conn):
     rows = [{"id": 2, "approved": "no", "confidence": 0.15, "notes": "false positive"}]
     import_reviewed(conn, rows, dry_run=False, keep_rejected=False)
-    row = conn.execute(
-        "SELECT id FROM doc_standard_mapping WHERE id=2"
-    ).fetchone()
+    row = conn.execute("SELECT id FROM doc_standard_mapping WHERE id=2").fetchone()
     assert row is None, "Row should have been deleted"
 
 
@@ -173,9 +167,7 @@ def test_import_dry_run_no_changes(conn):
     assert row1[0] == "keyword_match_scored"
     assert row1[1] == pytest.approx(0.25)
 
-    row2 = conn.execute(
-        "SELECT id FROM doc_standard_mapping WHERE id=2"
-    ).fetchone()
+    row2 = conn.execute("SELECT id FROM doc_standard_mapping WHERE id=2").fetchone()
     assert row2 is not None, "Row 2 should still exist after dry run"
 
 

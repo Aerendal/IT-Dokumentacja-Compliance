@@ -44,8 +44,9 @@ class TestTemplateAuditor:
         if not script.exists():
             pytest.skip(f"Skrypt nie istnieje: {script}")
         result = _run_script(script, ["--glob", "core/21_cfr_part_11_compliance.md"])
-        assert result.returncode == 0, \
+        assert result.returncode == 0, (
             f"template_auditor.py zakończył się kodem {result.returncode}\n{result.stderr}"
+        )
 
     def test_produces_output(self):
         _skip_if_no_db()
@@ -64,14 +65,21 @@ class TestBulkSectionPatcher:
         script = _MAINTENANCE_DIR / "bulk_section_patcher.py"
         if not script.exists():
             pytest.skip(f"Skrypt nie istnieje: {script}")
-        result = _run_script(script, [
-            "--filter-glob", "core/21_cfr_part_11_compliance.md",
-            "--add-section", "## Test sekcja DRY",
-            "--section-content", "Treść testowa dry-run",
-            "--dry-run",
-        ])
-        assert result.returncode == 0, \
+        result = _run_script(
+            script,
+            [
+                "--filter-glob",
+                "core/21_cfr_part_11_compliance.md",
+                "--add-section",
+                "## Test sekcja DRY",
+                "--section-content",
+                "Treść testowa dry-run",
+                "--dry-run",
+            ],
+        )
+        assert result.returncode == 0, (
             f"bulk_section_patcher.py (dry-run) zakończył się kodem {result.returncode}\n{result.stderr}"
+        )
 
     def test_dry_run_does_not_modify_files(self):
         _skip_if_no_db()
@@ -83,12 +91,18 @@ class TestBulkSectionPatcher:
             pytest.skip(f"Szablon nie istnieje: {target}")
 
         before = target.read_text(encoding="utf-8")
-        _run_script(script, [
-            "--filter-glob", "core/21_cfr_part_11_compliance.md",
-            "--add-section", "## Test sekcja DRY",
-            "--section-content", "Treść testowa",
-            "--dry-run",
-        ])
+        _run_script(
+            script,
+            [
+                "--filter-glob",
+                "core/21_cfr_part_11_compliance.md",
+                "--add-section",
+                "## Test sekcja DRY",
+                "--section-content",
+                "Treść testowa",
+                "--dry-run",
+            ],
+        )
         after = target.read_text(encoding="utf-8")
         assert before == after, "Dry-run zmodyfikował plik (niedozwolone!)"
 
@@ -100,8 +114,9 @@ class TestImpactAnalyzer:
         if not script.exists():
             pytest.skip(f"Skrypt nie istnieje: {script}")
         result = _run_script(script, ["--standard", "ISO/IEC 27001"])
-        assert result.returncode == 0, \
+        assert result.returncode == 0, (
             f"impact_analyzer.py zakończył się kodem {result.returncode}\n{result.stderr}"
+        )
 
     def test_produces_nonempty_output(self):
         _skip_if_no_db()

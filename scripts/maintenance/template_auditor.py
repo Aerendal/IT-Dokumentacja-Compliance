@@ -39,7 +39,7 @@ REQUIRED_SECTIONS = [
     ("Cel dokumentu", 10),
     ("Zakres i granice", 10),
     ("Wejścia i wyjścia", 10),
-    ("Powiązania", 5),      # partial match — covers all ## Powiązania* variants
+    ("Powiązania", 5),  # partial match — covers all ## Powiązania* variants
     ("Standardy i compliance", 10),
     ("RACI i role", 5),
     ("Metadane", 5),
@@ -47,19 +47,16 @@ REQUIRED_SECTIONS = [
 
 # Penalty patterns
 PLACEHOLDER_PATTERNS = [
-    re.compile(r'\[TODO.*?\]', re.IGNORECASE),
-    re.compile(r'TODO:', re.IGNORECASE),
-    re.compile(r'\[PLACEHOLDER\]', re.IGNORECASE),
-    re.compile(r'\[wypełnij\]', re.IGNORECASE),
-    re.compile(r'\[rola\]', re.IGNORECASE),
+    re.compile(r"\[TODO.*?\]", re.IGNORECASE),
+    re.compile(r"TODO:", re.IGNORECASE),
+    re.compile(r"\[PLACEHOLDER\]", re.IGNORECASE),
+    re.compile(r"\[wypełnij\]", re.IGNORECASE),
+    re.compile(r"\[rola\]", re.IGNORECASE),
 ]
 
 EMOJI_RE = re.compile(
-    "[\U0001F300-\U0001F9FF"
-    "\U00002700-\U000027BF"
-    "\U0001FA00-\U0001FA9F"
-    "\U00002600-\U000026FF]+",
-    flags=re.UNICODE
+    "[\U0001f300-\U0001f9ff\U00002700-\U000027bf\U0001fa00-\U0001fa9f\U00002600-\U000026ff]+",
+    flags=re.UNICODE,
 )
 
 
@@ -79,7 +76,7 @@ def audit_file(filepath: Path, rel_path: str, conn: sqlite3.Connection) -> dict:
     score = 0
 
     # 1. Required sections (50 pts max)
-    headings = re.findall(r'^##\s+(.+)', content, re.MULTILINE)
+    headings = re.findall(r"^##\s+(.+)", content, re.MULTILINE)
     headings_lower = [h.lower() for h in headings]
     sections_found = []
     sections_missing = []
@@ -100,13 +97,13 @@ def audit_file(filepath: Path, rel_path: str, conn: sqlite3.Connection) -> dict:
         issues.append(f"Placeholdery: {placeholder_count} wystąpień")
 
     # 3. Standardy i compliance — is it filled? (10 pts)
-    m_std = re.search(r'^##\s+Standardy\s+i\s+compliance\b', content, re.MULTILINE)
+    m_std = re.search(r"^##\s+Standardy\s+i\s+compliance\b", content, re.MULTILINE)
     standards_filled = False
     if m_std:
-        m_next = re.search(r'^#{1,3} ', content[m_std.end():], re.MULTILINE)
+        m_next = re.search(r"^#{1,3} ", content[m_std.end() :], re.MULTILINE)
         section_end = m_std.end() + m_next.start() if m_next else len(content)
-        section_body = content[m_std.end():section_end].strip()
-        bullet_count = section_body.count('\n-')
+        section_body = content[m_std.end() : section_end].strip()
+        bullet_count = section_body.count("\n-")
         if bullet_count >= 1:
             score += 10
             standards_filled = True
@@ -115,13 +112,13 @@ def audit_file(filepath: Path, rel_path: str, conn: sqlite3.Connection) -> dict:
     # (no extra penalty — sekcja already penalized as missing if not present)
 
     # 4. RACI filled? (5 pts)
-    m_raci = re.search(r'^##\s+RACI\s+i\s+role\b', content, re.MULTILINE)
+    m_raci = re.search(r"^##\s+RACI\s+i\s+role\b", content, re.MULTILINE)
     raci_filled = False
     if m_raci:
-        m_next = re.search(r'^#{1,3} ', content[m_raci.end():], re.MULTILINE)
+        m_next = re.search(r"^#{1,3} ", content[m_raci.end() :], re.MULTILINE)
         section_end = m_raci.end() + m_next.start() if m_next else len(content)
-        section_body = content[m_raci.end():section_end].strip()
-        if '|' in section_body or '-' in section_body:
+        section_body = content[m_raci.end() : section_end].strip()
+        if "|" in section_body or "-" in section_body:
             score += 5
             raci_filled = True
         else:
@@ -129,18 +126,24 @@ def audit_file(filepath: Path, rel_path: str, conn: sqlite3.Connection) -> dict:
 
     # 5. Guidance completeness — check doc_section_guidance (10 pts)
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT COUNT(*) FROM doc_section_guidance dsg
         JOIN docs d ON d.title = dsg.doc_title
         WHERE d.path = ? AND (dsg.guidance IS NOT NULL AND length(dsg.guidance) > 20)
-    """, (rel_path,))
+    """,
+        (rel_path,),
+    )
     guidance_rows = cur.fetchone()[0]
 
-    cur.execute("""
+    cur.execute(
+        """
         SELECT COUNT(*) FROM doc_section_guidance dsg
         JOIN docs d ON d.title = dsg.doc_title
         WHERE d.path = ?
-    """, (rel_path,))
+    """,
+        (rel_path,),
+    )
     total_guidance_rows = cur.fetchone()[0]
 
     guidance_score = 0
@@ -192,26 +195,37 @@ def audit_file(filepath: Path, rel_path: str, conn: sqlite3.Connection) -> dict:
 def collect_targets(conn: sqlite3.Connection, args) -> list[tuple[str, Path]]:
     cur = conn.cursor()
     if args.doc:
-        cur.execute("SELECT path FROM docs WHERE title LIKE ? AND path IS NOT NULL",
-                    (f"%{args.doc}%",))
+        cur.execute(
+            "SELECT path FROM docs WHERE title LIKE ? AND path IS NOT NULL", (f"%{args.doc}%",)
+        )
     else:
         cur.execute("SELECT path FROM docs WHERE path IS NOT NULL")
 
     paths = [(r[0], TEMPLATES_DIR / r[0]) for r in cur.fetchall() if r[0]]
 
     if args.glob:
-        paths = [(p, fp) for p, fp in paths
-                 if fnmatch.fnmatch(p, args.glob) or fnmatch.fnmatch(Path(p).name, args.glob)]
+        paths = [
+            (p, fp)
+            for p, fp in paths
+            if fnmatch.fnmatch(p, args.glob) or fnmatch.fnmatch(Path(p).name, args.glob)
+        ]
 
     return paths
 
 
 def main():
     parser = argparse.ArgumentParser(description="Audit jakości szablonów IT Dokumentacja")
-    parser.add_argument("--glob", metavar="PATTERN", help="Filtr ścieżki (np. 'core/security_*.md')")
+    parser.add_argument(
+        "--glob", metavar="PATTERN", help="Filtr ścieżki (np. 'core/security_*.md')"
+    )
     parser.add_argument("--doc", metavar="TITLE", help="Filtr tytułu dokumentu")
-    parser.add_argument("--min-score", type=int, default=0, metavar="N",
-                        help="Pokaż tylko szablony z score < N (filtr problemów)")
+    parser.add_argument(
+        "--min-score",
+        type=int,
+        default=0,
+        metavar="N",
+        help="Pokaż tylko szablony z score < N (filtr problemów)",
+    )
     parser.add_argument("--output", choices=["table", "json"], default="table")
     parser.add_argument("--save", metavar="FILE", help="Zapisz wyniki do pliku JSON")
     parser.add_argument("--limit", type=int, default=0, help="Ogranicz do N szablonów")
@@ -220,7 +234,7 @@ def main():
     conn = connect()
     targets = collect_targets(conn, args)
     if args.limit:
-        targets = targets[:args.limit]
+        targets = targets[: args.limit]
 
     print(f"Audyt: {len(targets)} szablonów...", file=sys.stderr)
 
@@ -229,12 +243,14 @@ def main():
         r = audit_file(filepath, rel_path, conn)
         results.append(r)
         if (i + 1) % 500 == 0:
-            print(f"  {i+1}/{len(targets)}...", file=sys.stderr)
+            print(f"  {i + 1}/{len(targets)}...", file=sys.stderr)
 
     conn.close()
 
     # Filter by min-score
-    display = [r for r in results if r.get("score", 100) < args.min_score] if args.min_score else results
+    display = (
+        [r for r in results if r.get("score", 100) < args.min_score] if args.min_score else results
+    )
 
     # Summary stats
     scores = [r["score"] for r in results if "error" not in r]
@@ -247,7 +263,9 @@ def main():
         "grade_D": sum(1 for r in results if r.get("grade") == "D"),
         "with_emoji": sum(1 for r in results if r.get("emoji")),
         "with_placeholders": sum(1 for r in results if r.get("placeholder_count", 0) > 0),
-        "missing_standardy": sum(1 for r in results if "Standardy i compliance" in r.get("sections_missing", [])),
+        "missing_standardy": sum(
+            1 for r in results if "Standardy i compliance" in r.get("sections_missing", [])
+        ),
         "missing_raci": sum(1 for r in results if "RACI i role" in r.get("sections_missing", [])),
     }
 
@@ -256,7 +274,7 @@ def main():
     if args.output == "json":
         print(json.dumps(output, ensure_ascii=False, indent=2))
     else:
-        print(f"\n=== Podsumowanie audytu ===")
+        print("\n=== Podsumowanie audytu ===")
         print(f"  Łącznie szablonów: {summary['total']}")
         print(f"  Średni score:      {summary['avg_score']}/100")
         print(f"  Ocena A (≥80):     {summary['grade_A']}")

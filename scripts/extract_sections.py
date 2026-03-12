@@ -2,14 +2,15 @@
 """Extract headings from markdown into sections table (ULID-based).
 Rebuilds sections table from current docs with paths.
 """
+
 import re
 import sqlite3
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import List, Dict
 
 # ensure local scripts (including ulid.py) are importable
 import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
@@ -18,8 +19,10 @@ try:
     from ulid import ulid
 except Exception:  # fallback if ulid module missing
     import uuid
+
     def ulid():
         return uuid.uuid4().hex
+
 
 BASE = Path(__file__).resolve().parent.parent
 MASTER_DB = BASE / "reports" / "it_doc_matrix.db"
@@ -75,7 +78,7 @@ def extract_phase_bullets(lines, start_line: int, end_line: int):
     return phases
 
 
-def extract_sections_from_md(md_text: str) -> List[Dict]:
+def extract_sections_from_md(md_text: str) -> list[dict]:
     lines = md_text.splitlines()
     headers = []
     for i, line in enumerate(lines, start=1):

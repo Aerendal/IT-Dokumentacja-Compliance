@@ -26,12 +26,12 @@ TEMPLATES_DIR = Path(__file__).parent.parent / "generated_templates" / "core"
 DEFAULT_RACI_BY_KEYWORD = {
     "bezpiecze": ("SEC", "CISO", "ARCH", "DEVOPS"),
     "architekt": ("ARCH", "CTO", "DEV", "OPS"),
-    "test":       ("QA", "PM", "DEV", "BA"),
-    "incident":   ("SRE", "CISO", "OPS", "MGR"),
-    "zmian":      ("PM", "CTO", "DEV", "OPS"),
-    "dane":       ("DPO", "CISO", "DEV", "LEGAL"),
-    "wymagani":   ("BA", "PM", "DEV", "CLIENT"),
-    "zgodnos":    ("AUDIT", "CISO", "MGR", "LEGAL"),
+    "test": ("QA", "PM", "DEV", "BA"),
+    "incident": ("SRE", "CISO", "OPS", "MGR"),
+    "zmian": ("PM", "CTO", "DEV", "OPS"),
+    "dane": ("DPO", "CISO", "DEV", "LEGAL"),
+    "wymagani": ("BA", "PM", "DEV", "CLIENT"),
+    "zgodnos": ("AUDIT", "CISO", "MGR", "LEGAL"),
 }
 DEFAULT_RACI = ("DEV", "PM", "BA", "OPS")
 
@@ -58,8 +58,17 @@ def parse_raci_table(md_text: str) -> list[tuple[str, str, str, str, str]]:
         if not header_found:
             # Check if this looks like a RACI header
             combined = " ".join(cells).lower()
-            if any(k in combined for k in ("responsible", "accountable", "consulted", "informed",
-                                            "odpowiedzial", "akceptuj")):
+            if any(
+                k in combined
+                for k in (
+                    "responsible",
+                    "accountable",
+                    "consulted",
+                    "informed",
+                    "odpowiedzial",
+                    "akceptuj",
+                )
+            ):
                 header_found = True
                 in_table = True
                 # Map header cells to positions
@@ -82,11 +91,29 @@ def parse_raci_table(md_text: str) -> list[tuple[str, str, str, str, str]]:
             continue
 
         if in_table and len(cells) >= 2:
-            action = cells[col_map.get("action", 0)] if col_map.get("action", 0) < len(cells) else cells[0]
-            resp   = cells[col_map.get("responsible", 1)] if col_map.get("responsible", 1) < len(cells) else ""
-            acc    = cells[col_map.get("accountable", 2)] if col_map.get("accountable", 2) < len(cells) else ""
-            cons   = cells[col_map.get("consulted", 3)] if col_map.get("consulted", 3) < len(cells) else ""
-            inf    = cells[col_map.get("informed", 4)] if col_map.get("informed", 4) < len(cells) else ""
+            action = (
+                cells[col_map.get("action", 0)]
+                if col_map.get("action", 0) < len(cells)
+                else cells[0]
+            )
+            resp = (
+                cells[col_map.get("responsible", 1)]
+                if col_map.get("responsible", 1) < len(cells)
+                else ""
+            )
+            acc = (
+                cells[col_map.get("accountable", 2)]
+                if col_map.get("accountable", 2) < len(cells)
+                else ""
+            )
+            cons = (
+                cells[col_map.get("consulted", 3)]
+                if col_map.get("consulted", 3) < len(cells)
+                else ""
+            )
+            inf = (
+                cells[col_map.get("informed", 4)] if col_map.get("informed", 4) < len(cells) else ""
+            )
 
             # Skip rows that look like guidance text (very long cells)
             if len(action) > 100:
@@ -136,8 +163,7 @@ def main():
                 text = md_file.read_text(encoding="utf-8")
                 # Find RACI i role section
                 raci_match = re.search(
-                    r'##\s+RACI\s+i\s+role\b(.*?)(?=\n##\s|\Z)',
-                    text, re.DOTALL | re.IGNORECASE
+                    r"##\s+RACI\s+i\s+role\b(.*?)(?=\n##\s|\Z)", text, re.DOTALL | re.IGNORECASE
                 )
                 if raci_match:
                     rows = parse_raci_table(raci_match.group(1))
@@ -151,18 +177,24 @@ def main():
         for action, resp, acc, cons, inf in rows:
             try:
                 if "doc_id" in raci_cols and "responsible" in raci_cols:
-                    cur.execute("""
+                    cur.execute(
+                        """
                         INSERT OR IGNORE INTO document_raci
                           (doc_id, role_name, responsible, accountable, consulted, informed)
                         VALUES (?, ?, ?, ?, ?, ?)
-                    """, (doc_uid, action, resp, acc, cons, inf))
+                    """,
+                        (doc_uid, action, resp, acc, cons, inf),
+                    )
                 elif "doc_id" in raci_cols and "raci_id" in raci_cols:
                     # Has raci_id as PK — skip, needs auto-id
-                    cur.execute("""
+                    cur.execute(
+                        """
                         INSERT OR IGNORE INTO document_raci
                           (doc_id, role_name, responsible, accountable, consulted, informed)
                         VALUES (?, ?, ?, ?, ?, ?)
-                    """, (doc_uid, action, resp, acc, cons, inf))
+                    """,
+                        (doc_uid, action, resp, acc, cons, inf),
+                    )
                 if cur.rowcount:
                     inserted += 1
             except Exception as e:

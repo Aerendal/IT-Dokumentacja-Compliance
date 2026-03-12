@@ -119,9 +119,9 @@ def main() -> None:
         require_tables(cur, ["sync_runs", "nodes", "edges", "node_map_docs", "node_map_sections"])
 
         cur.execute("SELECT doc_uid, node_uid FROM node_map_docs")
-        doc_map = {doc_uid: node_uid for doc_uid, node_uid in cur.fetchall()}
+        doc_map = dict(cur.fetchall())
         cur.execute("SELECT section_uid, node_uid FROM node_map_sections")
-        sec_map = {section_uid: node_uid for section_uid, node_uid in cur.fetchall()}
+        sec_map = dict(cur.fetchall())
 
         cur.execute(
             """
@@ -140,8 +140,7 @@ def main() -> None:
             SELECT from_kind,from_uid,to_kind,to_uid,link_type,strength,direction,rationale,source,source_row_id
             FROM edges
             WHERE source IN (?,?,?)
-            """
-            ,
+            """,
             MIGRATION_SOURCES,
         )
 

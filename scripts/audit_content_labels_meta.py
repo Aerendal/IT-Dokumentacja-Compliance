@@ -103,7 +103,7 @@ def build_report(labels, idx):
     """Return report rows: (label_norm, raw_label, status, candidates)."""
     report = []
     seen = {}
-    for content_id, side, raw_label, norm in labels:
+    for _content_id, _side, raw_label, norm in labels:
         if norm in seen:
             continue
         seen[norm] = raw_label
@@ -124,16 +124,12 @@ def write_outputs(report):
     out_csv.parent.mkdir(parents=True, exist_ok=True)
 
     with out_csv.open("w", encoding="utf-8", newline="") as f:
-        f.write(
-            "label_norm,raw_label,status,candidates_count,first_section_uid,first_anchor\n"
-        )
+        f.write("label_norm,raw_label,status,candidates_count,first_section_uid,first_anchor\n")
         for norm, raw, status, candidates in report:
             first = candidates[0] if candidates else ("", "", "", "")
             first_uid, _ht, first_anchor, _ord = first
             safe_raw = raw.replace(",", " ")
-            f.write(
-                f"{norm},{safe_raw},{status},{len(candidates)},{first_uid},{first_anchor}\n"
-            )
+            f.write(f"{norm},{safe_raw},{status},{len(candidates)},{first_uid},{first_anchor}\n")
 
     json_report = []
     for norm, raw, status, candidates in report:

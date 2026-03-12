@@ -54,7 +54,7 @@ def check_sections(content: str) -> list[tuple[str, str]]:
     if content.startswith("---"):
         end = content.find("\n---", 3)
         if end != -1:
-            body = content[end + 4:]
+            body = content[end + 4 :]
 
     for section in REQUIRED_SECTIONS:
         pattern = re.compile(r"^" + re.escape(section) + r"\s*$", re.MULTILINE)
@@ -63,7 +63,7 @@ def check_sections(content: str) -> list[tuple[str, str]]:
             violations.append(("SECTION_MISSING", section))
         else:
             # Find content between this heading and the next ## heading
-            after = body[match.end():]
+            after = body[match.end() :]
             next_heading = re.search(r"^##", after, re.MULTILINE)
             if next_heading:
                 content_block = after[: next_heading.start()]
@@ -198,9 +198,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Validate .md template schema (frontmatter + required sections)."
     )
-    parser.add_argument("--report", action="store_true", help="Print violations report (default behavior)")
+    parser.add_argument(
+        "--report", action="store_true", help="Print violations report (default behavior)"
+    )
     parser.add_argument("--file", metavar="PATH", help="Validate a single file only (no DB write)")
-    parser.add_argument("--strict", action="store_true", help="Exit 1 if any ERROR violations found")
+    parser.add_argument(
+        "--strict", action="store_true", help="Exit 1 if any ERROR violations found"
+    )
     parser.add_argument(
         "--dir",
         metavar="PATH",

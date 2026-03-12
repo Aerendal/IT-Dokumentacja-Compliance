@@ -3,10 +3,11 @@
 Outputs to ../exports/branże_md/IT_Dokumentacja_Branze_Pakiet_{i}.md
 Format inspired by existing IT_Dokumentacja_Czesc_* files.
 """
+
 import math
 import sqlite3
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
 ISIC_NAMES = {
     "01": "Crop and animal production, hunting and related services",
@@ -142,6 +143,7 @@ def fetch_titles(code):
     )
     return [t[0] for t in cur_titles.fetchall()]
 
+
 for idx, bucket in enumerate(buckets, start=1):
     codes = [b["code"] for b in bucket]
     total_bucket = sum(b["count"] for b in bucket)
@@ -166,26 +168,28 @@ for idx, bucket in enumerate(buckets, start=1):
             body_lines.append(f"- {t}")
         body_lines.append("")
 
-    content = "\n".join([
-        "---",
-        f"title: IT Documentation Matrix - Branże (Pakiet {idx}/{total_files})",
-        f"subtitle: Branże ISIC — Pakiet {idx}/{total_files}",
-        "version: 1.0",
-        f"generated: {TODAY}",
-        f"branze: {branze_desc}",
-        "status: Generated",
-        "description: >",
-        f"  Pakiet branż ISIC: {branze_desc}. Łącznie dokumentów: {total_bucket}.",
-        "---",
-        "",
-        "# IT Documentation Matrix - Branże",
-        f"## Pakiet {idx}/{total_files}",
-        "",
-        "### Spis treści",
-        *toc_lines,
-        "",
-        *body_lines,
-    ])
+    content = "\n".join(
+        [
+            "---",
+            f"title: IT Documentation Matrix - Branże (Pakiet {idx}/{total_files})",
+            f"subtitle: Branże ISIC — Pakiet {idx}/{total_files}",
+            "version: 1.0",
+            f"generated: {TODAY}",
+            f"branze: {branze_desc}",
+            "status: Generated",
+            "description: >",
+            f"  Pakiet branż ISIC: {branze_desc}. Łącznie dokumentów: {total_bucket}.",
+            "---",
+            "",
+            "# IT Documentation Matrix - Branże",
+            f"## Pakiet {idx}/{total_files}",
+            "",
+            "### Spis treści",
+            *toc_lines,
+            "",
+            *body_lines,
+        ]
+    )
 
     filename.write_text(content, encoding="utf-8")
 

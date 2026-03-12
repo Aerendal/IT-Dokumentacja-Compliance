@@ -1,13 +1,13 @@
 """Tests for pure functions in scripts/rebuild_sections_for_doc.py."""
-import pytest
+
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scripts.rebuild_sections_for_doc import (
-    utc_now_iso, heading_norm, slugify, extract_sections
-)
+from scripts.rebuild_sections_for_doc import extract_sections, heading_norm, slugify, utc_now_iso
 
 pytestmark = pytest.mark.unit
 
@@ -21,6 +21,7 @@ class TestUtcNowIso:
 
     def test_contains_date(self):
         import re
+
         assert re.match(r"\d{4}-\d{2}-\d{2}T", utc_now_iso())
 
 

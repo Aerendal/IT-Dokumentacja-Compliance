@@ -7,14 +7,16 @@
 Stores results in content_links_resolved; unresolved remain implicit (ambiguous/missing counters).
 Adds SLA metric for manual/meta links.
 """
+
 import json
-import sqlite3
 import re
-from pathlib import Path
+import sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
+
 from ulid import ulid
 
-MASTER_DB = (Path(__file__).resolve().parent.parent / "reports" / "it_doc_matrix.db")
+MASTER_DB = Path(__file__).resolve().parent.parent / "reports" / "it_doc_matrix.db"
 META_DOC_UID = "01KH6M5X8S920N682CBQN2ZDJC"
 SLA_KIND = "manual_meta_sla"
 SLA_OUT = Path(__file__).resolve().parent.parent / "reports" / "latest" / "manual_meta_sla.json"
@@ -150,7 +152,7 @@ def main():
     overrides = {}
     if table_exists(cur, "section_label_overrides"):
         cur.execute("SELECT label_norm, section_uid FROM section_label_overrides")
-        overrides = {ln: su for ln, su in cur.fetchall()}
+        overrides = dict(cur.fetchall())
 
     now = utc_now_iso()
 
@@ -218,7 +220,19 @@ def main():
 
         return None
 
-    for cid, from_type, from_ref, to_type, to_ref, link_type, direction, rationale, required, source, context_doc_uid in rows:
+    for (
+        cid,
+        from_type,
+        from_ref,
+        to_type,
+        to_ref,
+        link_type,
+        direction,
+        rationale,
+        required,
+        _source,
+        context_doc_uid,
+    ) in rows:
         strength = strength_from_required(required)
 
         fr = resolve_ref(from_ref, context_doc_uid) if from_type == "section" else None
@@ -237,10 +251,17 @@ def main():
                 """,
                 (
                     cid,
-                    "section", fr[1],
-                    "section", tr[1],
-                    link_type, direction, rationale, strength,
-                    method if method in ("explicit", "global_unique", "manual", "context_doc") else "mixed",
+                    "section",
+                    fr[1],
+                    "section",
+                    tr[1],
+                    link_type,
+                    direction,
+                    rationale,
+                    strength,
+                    method
+                    if method in ("explicit", "global_unique", "manual", "context_doc")
+                    else "mixed",
                     conf,
                     context_doc_uid if method == "context_doc" else None,
                 ),
@@ -254,7 +275,13 @@ def main():
 
     cur.execute(
         "INSERT INTO sync_runs(sync_id,ran_at_utc,kind,status,notes) VALUES(?,?,?,?,?)",
-        (ulid(), now, "content_links_resolved", "OK", f"resolved={resolved}, ambiguous={ambiguous}, missing={missing}"),
+        (
+            ulid(),
+            now,
+            "content_links_resolved",
+            "OK",
+            f"resolved={resolved}, ambiguous={ambiguous}, missing={missing}",
+        ),
     )
 
     # SLA for manual/meta links

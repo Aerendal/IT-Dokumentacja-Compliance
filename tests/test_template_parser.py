@@ -30,8 +30,8 @@ from itdoc.template import (
     validate_template,
 )
 
-
 # ─── Helpers ──────────────────────────────────────────────────────────────
+
 
 def _write(tmp_path, content: str, name: str = "test.md") -> Path:
     p = tmp_path / name
@@ -198,6 +198,7 @@ class TestParseFrontmatterUnit:
 
 # ─── load_template ─────────────────────────────────────────────────────────
 
+
 class TestLoadTemplate:
     def test_valid_file_loads(self, tmp_path):
         p = _write(tmp_path, _valid_template())
@@ -221,6 +222,7 @@ class TestLoadTemplate:
     def test_no_file_handle_leak(self, tmp_path):
         """load_template nie może zostawiać otwartego file handle."""
         import gc
+
         p = _write(tmp_path, _valid_template())
         for _ in range(50):
             load_template(p)
@@ -242,6 +244,7 @@ class TestLoadTemplate:
 
 
 # ─── validate_template ────────────────────────────────────────────────────
+
 
 class TestValidateTemplate:
     def test_valid_template_no_errors(self, tmp_path):
@@ -366,6 +369,7 @@ class TestEPValidateTemplatePluggable:
 
     def test_custom_validator_adds_error(self):
         """Validator może dodać własny błąd."""
+
         def no_version_check(t: dict) -> list:
             if "version" not in t.get("frontmatter", {}):
                 return [f"{t['path']}: brak pola 'version'"]
@@ -377,6 +381,7 @@ class TestEPValidateTemplatePluggable:
 
     def test_multiple_validators_combined(self):
         """Wiele walidatorów — błędy z każdego sumują się."""
+
         def v1(t):
             return ["v1: błąd"]
 
@@ -396,6 +401,7 @@ class TestEPValidateTemplatePluggable:
 
     def test_failing_validator_captured_as_error(self):
         """Wyjątek w validatorze jest przechwycony i dodany jako błąd."""
+
         def bad_validator(t):
             raise RuntimeError("crash!")
 

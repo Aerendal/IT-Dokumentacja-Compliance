@@ -128,7 +128,7 @@ class TestUnmappedByCategory:
 
     def test_orphan_path_excluded(self, analytics_db):
         result = unmapped_by_category(analytics_db)
-        for cat, paths in result.items():
+        for _cat, paths in result.items():
             assert "ORPHAN" not in paths
 
     def test_mapped_docs_excluded(self, analytics_db):
@@ -156,7 +156,7 @@ class TestStandardGaps:
 
     def test_all_below_threshold(self, analytics_db):
         result = standard_gaps(analytics_db, min_coverage=10)
-        for code, cnt in result:
+        for _code, cnt in result:
             assert cnt < 10
 
     def test_high_threshold_catches_all(self, analytics_db):
@@ -232,7 +232,14 @@ class TestLibraryHealthReport:
 class TestCoverageStats:
     def test_returns_dict_with_keys(self, analytics_db):
         stats = coverage_stats(analytics_db)
-        for key in ("total_docs", "mapped_docs", "unmapped_docs", "coverage_pct", "total_mappings", "unique_standards"):
+        for key in (
+            "total_docs",
+            "mapped_docs",
+            "unmapped_docs",
+            "coverage_pct",
+            "total_mappings",
+            "unique_standards",
+        ):
             assert key in stats
 
     def test_total_minus_mapped_equals_unmapped(self, analytics_db):

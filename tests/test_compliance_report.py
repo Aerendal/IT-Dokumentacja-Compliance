@@ -17,22 +17,23 @@ pytestmark = pytest.mark.unit
 # Make sure the scripts package is importable regardless of working directory
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from compliance_coverage_report import (
+    _filter_gaps,
     compute_control_metrics,
     compute_regulation_metrics,
     compute_standard_metrics,
     generate_csv_report,
     generate_json_report,
     generate_text_report,
-    _filter_gaps,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def conn():
@@ -98,6 +99,7 @@ def conn():
 # Tests: compute_standard_metrics
 # ---------------------------------------------------------------------------
 
+
 def test_compute_standard_metrics_empty(conn):
     """No mappings → all counts are zero."""
     m = compute_standard_metrics(conn, "ISO/IEC 27001")
@@ -117,9 +119,9 @@ def test_compute_standard_metrics_with_data(conn):
     """)
     m = compute_standard_metrics(conn, "ISO/IEC 27001")
     assert m["total_mappings"] == 3
-    assert m["high_conf_50"] == 2   # 0.6 and 0.8
-    assert m["high_conf_70"] == 1   # only 0.8
-    assert m["high_conf_90"] == 0   # none
+    assert m["high_conf_50"] == 2  # 0.6 and 0.8
+    assert m["high_conf_70"] == 1  # only 0.8
+    assert m["high_conf_90"] == 0  # none
 
 
 def test_high_confidence_threshold(conn):
@@ -171,6 +173,7 @@ def test_compute_standard_metrics_guidance_sections(conn):
 # Tests: compute_regulation_metrics
 # ---------------------------------------------------------------------------
 
+
 def test_compute_regulation_metrics_empty(conn):
     """No guidance links → zeros."""
     m = compute_regulation_metrics(conn, "RODO")
@@ -190,18 +193,21 @@ def test_compute_regulation_metrics_with_data(conn):
     """)
     m = compute_regulation_metrics(conn, "RODO")
     assert m["guidance_sections"] == 3
-    assert m["unique_docs"] == 2   # DocA and DocB
+    assert m["unique_docs"] == 2  # DocA and DocB
 
 
 # ---------------------------------------------------------------------------
 # Tests: generate_json_report
 # ---------------------------------------------------------------------------
 
+
 def test_generate_json_report_structure(conn):
     """Returned dict must have required top-level keys."""
-    data = generate_json_report(conn,
-                                [{"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"}],
-                                [{"regulation_code": "RODO", "regulation_name": "GDPR PL"}])
+    data = generate_json_report(
+        conn,
+        [{"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"}],
+        [{"regulation_code": "RODO", "regulation_name": "GDPR PL"}],
+    )
     assert "standards" in data
     assert "regulations" in data
     assert "generated_at" in data
@@ -213,9 +219,9 @@ def test_generate_json_report_standard_fields(conn):
     conn.executescript("""
         INSERT INTO doc_standard_mapping VALUES (1, 'a.md', 'ISO/IEC 27001', 'k', 0.8);
     """)
-    data = generate_json_report(conn,
-                                [{"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"}],
-                                [])
+    data = generate_json_report(
+        conn, [{"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"}], []
+    )
     std = data["standards"][0]
     assert "standard_code" in std
     assert "name" in std
@@ -231,9 +237,11 @@ def test_generate_json_report_standard_fields(conn):
 
 def test_generate_json_report_is_serialisable(conn):
     """generate_json_report output must be JSON-serialisable."""
-    data = generate_json_report(conn,
-                                [{"standard_code": "NIST CSF", "standard_name": "NIST"}],
-                                [{"regulation_code": "KSC-PL", "regulation_name": "KSC"}])
+    data = generate_json_report(
+        conn,
+        [{"standard_code": "NIST CSF", "standard_name": "NIST"}],
+        [{"regulation_code": "KSC-PL", "regulation_name": "KSC"}],
+    )
     serialised = json.dumps(data)
     parsed = json.loads(serialised)
     assert parsed["standards"][0]["standard_code"] == "NIST CSF"
@@ -243,24 +251,27 @@ def test_generate_json_report_is_serialisable(conn):
 # Tests: generate_text_report
 # ---------------------------------------------------------------------------
 
+
 def test_generate_text_report_contains_standard_name(conn):
     """Text output should include the standard name."""
-    text = generate_text_report(conn,
-                                [{"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"}],
-                                [])
+    text = generate_text_report(
+        conn, [{"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"}], []
+    )
     assert "ISMS" in text
 
 
 def test_generate_text_report_contains_regulation(conn):
     """Text output should include the regulation code."""
-    text = generate_text_report(conn, [],
-                                [{"regulation_code": "RODO", "regulation_name": "GDPR PL"}])
+    text = generate_text_report(
+        conn, [], [{"regulation_code": "RODO", "regulation_name": "GDPR PL"}]
+    )
     assert "RODO" in text
 
 
 # ---------------------------------------------------------------------------
 # Tests: gap filtering
 # ---------------------------------------------------------------------------
+
 
 def test_show_gaps_filters_correctly(conn):
     """_filter_gaps: standards with low coverage should be kept; high coverage removed."""
@@ -280,7 +291,7 @@ def test_show_gaps_filters_correctly(conn):
     # 10 total docs; ISO has 6 high-conf (60%) → above 0.5; NIST has 0 high-conf → gap
     standards = [
         {"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"},
-        {"standard_code": "NIST CSF",      "standard_name": "NIST Framework"},
+        {"standard_code": "NIST CSF", "standard_name": "NIST Framework"},
     ]
     filtered_std, _ = _filter_gaps(conn, standards, [], min_confidence=0.5)
     codes = [s["standard_code"] for s in filtered_std]
@@ -292,21 +303,32 @@ def test_show_gaps_filters_correctly(conn):
 # Tests: generate_csv_report
 # ---------------------------------------------------------------------------
 
+
 def test_csv_output_has_headers(conn):
     """Standards CSV must start with the correct column headers."""
-    std_csv, reg_csv = generate_csv_report(conn,
-                                           [{"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"}],
-                                           [{"regulation_code": "RODO", "regulation_name": "GDPR PL"}])
+    std_csv, reg_csv = generate_csv_report(
+        conn,
+        [{"standard_code": "ISO/IEC 27001", "standard_name": "ISMS"}],
+        [{"regulation_code": "RODO", "regulation_name": "GDPR PL"}],
+    )
     reader = csv.reader(io.StringIO(std_csv))
     header = next(reader)
-    assert header == ["standard_code", "standard_name", "total_mappings",
-                      "high_conf_50", "high_conf_70", "high_conf_90", "guidance_sections"]
+    assert header == [
+        "standard_code",
+        "standard_name",
+        "total_mappings",
+        "high_conf_50",
+        "high_conf_70",
+        "high_conf_90",
+        "guidance_sections",
+    ]
 
 
 def test_csv_regulations_has_headers(conn):
     """Regulations CSV must start with the correct column headers."""
-    _, reg_csv = generate_csv_report(conn, [],
-                                     [{"regulation_code": "RODO", "regulation_name": "GDPR PL"}])
+    _, reg_csv = generate_csv_report(
+        conn, [], [{"regulation_code": "RODO", "regulation_name": "GDPR PL"}]
+    )
     reader = csv.reader(io.StringIO(reg_csv))
     header = next(reader)
     assert header == ["regulation_code", "regulation_name", "guidance_sections", "unique_docs"]
@@ -316,13 +338,14 @@ def test_csv_regulations_has_headers(conn):
 # Integration tests (require real DB at reports/it_doc_matrix.db)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.integration
 class TestComplianceE2E:
     """Integration tests: require real DB at reports/it_doc_matrix.db"""
 
     @pytest.fixture
     def real_conn(self):
-        db = Path('reports/it_doc_matrix.db')
+        db = Path("reports/it_doc_matrix.db")
         if not db.exists():
             pytest.skip("Real DB not available")
         return sqlite3.connect(str(db))
@@ -330,7 +353,9 @@ class TestComplianceE2E:
     def test_no_null_confidence_keyword_match(self, real_conn):
         """After backfill: zero keyword_match rows with NULL confidence"""
         cur = real_conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence IS NULL AND match_reason='keyword_match'")
+        cur.execute(
+            "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence IS NULL AND match_reason='keyword_match'"
+        )
         assert cur.fetchone()[0] == 0
 
     def test_guidance_standard_links_populated(self, real_conn):
@@ -342,9 +367,10 @@ class TestComplianceE2E:
     def test_iso27001_has_substantial_mappings(self, real_conn):
         """ISO/IEC 27001 has >500 total mappings and at least some with confidence >= 0.3"""
         from scripts.compliance_coverage_report import compute_standard_metrics
-        metrics = compute_standard_metrics(real_conn, 'ISO/IEC 27001', min_confidence=0.5)
+
+        metrics = compute_standard_metrics(real_conn, "ISO/IEC 27001", min_confidence=0.5)
         # Total mappings must be substantial
-        assert metrics['total_mappings'] >= 500
+        assert metrics["total_mappings"] >= 500
         # At least some with confidence >= 0.3 (keyword_match_scored + candidate_match)
         cur = real_conn.cursor()
         cur.execute(
@@ -354,18 +380,20 @@ class TestComplianceE2E:
 
     def test_compliance_report_json_valid(self):
         """compliance_report.json exists and has correct structure"""
-        report_path = Path('reports/compliance_report.json')
+        report_path = Path("reports/compliance_report.json")
         if not report_path.exists():
             pytest.skip("Report not generated yet")
         data = json.loads(report_path.read_text())
-        assert 'standards' in data
-        assert 'regulations' in data
-        assert len(data['standards']) > 0
+        assert "standards" in data
+        assert "regulations" in data
+        assert len(data["standards"]) > 0
 
     def test_template_violations_table_exists(self, real_conn):
         """template_violations table exists in DB"""
         cur = real_conn.cursor()
-        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='template_violations'")
+        cur.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='template_violations'"
+        )
         assert cur.fetchone() is not None
 
 
@@ -373,8 +401,8 @@ class TestComplianceE2E:
 # Tests: compute_control_metrics
 # ---------------------------------------------------------------------------
 
-class TestControlMetrics:
 
+class TestControlMetrics:
     @pytest.fixture
     def conn(self):
         c = sqlite3.connect(":memory:")

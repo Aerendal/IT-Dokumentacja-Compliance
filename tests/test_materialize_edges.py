@@ -1,13 +1,15 @@
 """Tests for pure functions in scripts/materialize_edges.py."""
-import pytest
+
 import re
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from scripts.materialize_edges import utc_now_iso, norm, strength_from_required
+from scripts.materialize_edges import norm, strength_from_required, utc_now_iso
 
 pytestmark = pytest.mark.unit
 
@@ -25,6 +27,7 @@ class TestUtcNowIso:
 
     def test_different_calls_not_equal(self):
         import time
+
         t1 = utc_now_iso()
         time.sleep(1.1)
         t2 = utc_now_iso()

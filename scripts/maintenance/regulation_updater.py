@@ -38,9 +38,7 @@ VALID_MATCH_REASONS = (
     "inferred",
 )
 
-DEFAULT_DB = (
-    Path(__file__).parent.parent.parent / "reports" / "it_doc_matrix.db"
-)
+DEFAULT_DB = Path(__file__).parent.parent.parent / "reports" / "it_doc_matrix.db"
 
 
 # ---------------------------------------------------------------------------
@@ -113,13 +111,15 @@ def format_row_csv(row: dict) -> str:
     """Formatuje wiersz mappingu jako linię CSV (bez nagłówka)."""
     buf = io.StringIO()
     writer = csv.writer(buf)
-    writer.writerow([
-        row.get("doc_path") or "",
-        row.get("standard_code") or "",
-        row.get("match_reason") or "",
-        row.get("confidence") or "",
-        row.get("status") or "",
-    ])
+    writer.writerow(
+        [
+            row.get("doc_path") or "",
+            row.get("standard_code") or "",
+            row.get("match_reason") or "",
+            row.get("confidence") or "",
+            row.get("status") or "",
+        ]
+    )
     return buf.getvalue().rstrip("\r\n")
 
 
@@ -129,24 +129,20 @@ def format_row_table(row: dict, widths: dict) -> str:
     widths: dict z kluczami "doc_path", "standard_code", "match_reason",
             "confidence", "status" i wartościami int.
     """
-    w_doc    = widths.get("doc_path",       50)
-    w_std    = widths.get("standard_code",  22)
-    w_reason = widths.get("match_reason",   20)
-    w_conf   = widths.get("confidence",     10)
-    w_status = widths.get("status",         10)
+    w_doc = widths.get("doc_path", 50)
+    w_std = widths.get("standard_code", 22)
+    w_reason = widths.get("match_reason", 20)
+    w_conf = widths.get("confidence", 10)
+    w_status = widths.get("status", 10)
 
-    doc    = (row.get("doc_path")       or "")[:w_doc]
-    std    = (row.get("standard_code")  or "")[:w_std]
-    reason = (row.get("match_reason")   or "")[:w_reason]
-    conf   = (row.get("confidence")     or "-")[:w_conf]
-    status = (row.get("status")         or "-")[:w_status]
+    doc = (row.get("doc_path") or "")[:w_doc]
+    std = (row.get("standard_code") or "")[:w_std]
+    reason = (row.get("match_reason") or "")[:w_reason]
+    conf = (row.get("confidence") or "-")[:w_conf]
+    status = (row.get("status") or "-")[:w_status]
 
     return (
-        f"{doc:<{w_doc}} "
-        f"{std:<{w_std}} "
-        f"{reason:<{w_reason}} "
-        f"{conf:<{w_conf}} "
-        f"{status:<{w_status}}"
+        f"{doc:<{w_doc}} {std:<{w_std}} {reason:<{w_reason}} {conf:<{w_conf}} {status:<{w_status}}"
     )
 
 
@@ -233,9 +229,7 @@ class RegulationUpdater:
         if cur.rowcount:
             print(f"[OK]   Odpieto '{doc_path}' od standardu '{standard_code}'")
         else:
-            print(
-                f"[WARN] Nie znaleziono powiązania: '{doc_path}' / '{standard_code}'"
-            )
+            print(f"[WARN] Nie znaleziono powiązania: '{doc_path}' / '{standard_code}'")
 
     def list_mappings(
         self,
@@ -276,21 +270,13 @@ class RegulationUpdater:
             f"regulation={regulation_code} reason={match_reason}",
         )
         self.conn.commit()
-        print(
-            f"[OK]   Przypisano '{doc_path}' do regulacji '{regulation_code}'"
-        )
+        print(f"[OK]   Przypisano '{doc_path}' do regulacji '{regulation_code}'")
 
     def show_stats(self) -> None:
         """Wyświetla statystyki mappingów w bazie."""
-        std_count = self.conn.execute(
-            "SELECT COUNT(*) FROM doc_standard_mapping"
-        ).fetchone()[0]
-        reg_count = self.conn.execute(
-            "SELECT COUNT(*) FROM doc_regulation_mapping"
-        ).fetchone()[0]
-        gap_count = self.conn.execute(
-            "SELECT COUNT(*) FROM gap_analysis"
-        ).fetchone()[0]
+        std_count = self.conn.execute("SELECT COUNT(*) FROM doc_standard_mapping").fetchone()[0]
+        reg_count = self.conn.execute("SELECT COUNT(*) FROM doc_regulation_mapping").fetchone()[0]
+        gap_count = self.conn.execute("SELECT COUNT(*) FROM gap_analysis").fetchone()[0]
 
         sep = "=" * 55
         print(f"\n{sep}")
@@ -351,11 +337,11 @@ class RegulationUpdater:
 # ---------------------------------------------------------------------------
 
 _DEFAULT_WIDTHS = {
-    "doc_path":      50,
+    "doc_path": 50,
     "standard_code": 22,
-    "match_reason":  20,
-    "confidence":    10,
-    "status":        10,
+    "match_reason": 20,
+    "confidence": 10,
+    "status": 10,
 }
 
 
@@ -365,11 +351,11 @@ def _print_table(rows: list) -> None:
         return
     header = format_row_table(
         {
-            "doc_path":      "DOKUMENT",
+            "doc_path": "DOKUMENT",
             "standard_code": "STANDARD",
-            "match_reason":  "POWÓD",
-            "confidence":    "CONF",
-            "status":        "STATUS",
+            "match_reason": "POWÓD",
+            "confidence": "CONF",
+            "status": "STATUS",
         },
         _DEFAULT_WIDTHS,
     )
@@ -409,7 +395,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     # --- add ---
     p_add = sub.add_parser("add", help="Dodaj przypisanie dokumentu do standardu")
-    p_add.add_argument("--doc",      required=True, help="Ścieżka dokumentu (np. core/X.md)")
+    p_add.add_argument("--doc", required=True, help="Ścieżka dokumentu (np. core/X.md)")
     p_add.add_argument("--standard", required=True, help="Kod standardu (np. NIS2, ISO27001)")
     p_add.add_argument(
         "--reason",
@@ -419,20 +405,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     # --- remove ---
     p_rem = sub.add_parser("remove", help="Usuń przypisanie dokumentu od standardu")
-    p_rem.add_argument("--doc",      required=True, help="Ścieżka dokumentu")
+    p_rem.add_argument("--doc", required=True, help="Ścieżka dokumentu")
     p_rem.add_argument("--standard", required=True, help="Kod standardu")
 
     # --- list ---
     p_list = sub.add_parser("list", help="Listuj przypisania do standardów")
-    p_list.add_argument(
-        "--standard",   default=None, help="Filtruj po kodzie standardu"
-    )
-    p_list.add_argument(
-        "--regulation", default=None, help="Filtruj po kodzie regulacji"
-    )
-    p_list.add_argument(
-        "--reason",     default=None, help="Filtruj po powodzie przypisania"
-    )
+    p_list.add_argument("--standard", default=None, help="Filtruj po kodzie standardu")
+    p_list.add_argument("--regulation", default=None, help="Filtruj po kodzie regulacji")
+    p_list.add_argument("--reason", default=None, help="Filtruj po powodzie przypisania")
     p_list.add_argument(
         "--format",
         choices=["table", "csv"],
@@ -442,12 +422,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     # --- add-regulation ---
-    p_reg = sub.add_parser(
-        "add-regulation", help="Dodaj przypisanie dokumentu do regulacji"
-    )
-    p_reg.add_argument(
-        "--doc",        required=True, help="Ścieżka dokumentu"
-    )
+    p_reg = sub.add_parser("add-regulation", help="Dodaj przypisanie dokumentu do regulacji")
+    p_reg.add_argument("--doc", required=True, help="Ścieżka dokumentu")
     p_reg.add_argument(
         "--regulation", required=True, help="Kod regulacji (np. GDPR / RODO, AML/KYC)"
     )
@@ -480,9 +456,7 @@ def main() -> None:
     try:
         if args.command == "add":
             if not validate_match_reason(args.reason):
-                print(
-                    f"[WARN] Nieznany powód '{args.reason}' — kontynuuję mimo to."
-                )
+                print(f"[WARN] Nieznany powód '{args.reason}' — kontynuuję mimo to.")
             updater.add_standard_mapping(args.doc, args.standard, args.reason)
 
         elif args.command == "remove":
@@ -502,12 +476,8 @@ def main() -> None:
 
         elif args.command == "add-regulation":
             if not validate_match_reason(args.reason):
-                print(
-                    f"[WARN] Nieznany powód '{args.reason}' — kontynuuję mimo to."
-                )
-            updater.add_regulation_mapping(
-                args.doc, args.regulation, args.reason
-            )
+                print(f"[WARN] Nieznany powód '{args.reason}' — kontynuuję mimo to.")
+            updater.add_regulation_mapping(args.doc, args.regulation, args.reason)
 
         elif args.command == "stats":
             updater.show_stats()

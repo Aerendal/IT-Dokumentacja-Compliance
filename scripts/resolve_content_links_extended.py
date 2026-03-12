@@ -14,23 +14,24 @@ Podejscie:
 
 Nie nadpisuje istniejacych resolved wpisow.
 """
+
 import logging
 import re
 import sqlite3
 import sys
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
 
 from itdoc._batch import batch_continue
 
 _log = logging.getLogger(__name__)
 
-DB_PATH = Path(__file__).parent.parent / 'reports' / 'it_doc_matrix.db'
-DOC_TITLE_SECTION_RE = re.compile(r'^document::(.+?)::section::(.+)$', re.IGNORECASE)
+DB_PATH = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
+DOC_TITLE_SECTION_RE = re.compile(r"^document::(.+?)::section::(.+)$", re.IGNORECASE)
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def to_anchor(s: str) -> str:
@@ -38,18 +39,18 @@ def to_anchor(s: str) -> str:
     Usuwa znaki non-ASCII (polskie znaki diakrytyczne), zamienia spacje na '-'."""
     s = s.lower().strip()
     # Usun wszystkie znaki non-ASCII (tak jak robi to generator anchorow w DB)
-    s = s.encode('ascii', 'ignore').decode('ascii')
+    s = s.encode("ascii", "ignore").decode("ascii")
     # Usun znaki specjalne oprocz alfanumerycznych, spacji i myslnikow
-    s = re.sub(r'[^a-z0-9\s\-]', '', s)
+    s = re.sub(r"[^a-z0-9\s\-]", "", s)
     # Spacje -> myslnik, kolaps wielokrotnych myslnikow
-    s = re.sub(r'\s+', '-', s.strip())
-    s = re.sub(r'-+', '-', s)
+    s = re.sub(r"\s+", "-", s.strip())
+    s = re.sub(r"-+", "-", s)
     return s
 
 
 def norm_title(s: str) -> str:
     """Normalizuje tytul dokumentu do porownania (lowercase, strip)."""
-    return s.lower().strip() if s else ''
+    return s.lower().strip() if s else ""
 
 
 def build_doc_title_index(cur) -> dict[str, str]:
@@ -74,7 +75,7 @@ def strength_from_required(required) -> str:
 
 
 def main():
-    dry_run = '--dry-run' in sys.argv
+    dry_run = "--dry-run" in sys.argv
 
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -102,7 +103,6 @@ def main():
     resolved = 0
     missing_doc = 0
     missing_section = 0
-    ambiguous = 0
 
     def resolve_doc_title_ref(ref: str):
         """Zwraca (section_uid, method, confidence) lub None."""
@@ -115,60 +115,85 @@ def main():
 
         doc_uid = doc_index.get(norm_title(doc_title_raw))
         if not doc_uid:
-            return None, 'missing_doc', 0.0
+            return None, "missing_doc", 0.0
 
         anchor = to_anchor(section_name_raw)
         section_uid = section_index.get((doc_uid, anchor))
 
         if section_uid:
-            return section_uid, 'context_doc', 0.85
+            return section_uid, "context_doc", 0.85
         else:
-            return None, 'missing_section', 0.0
+            return None, "missing_section", 0.0
 
     inserts = []
-    for (cid, from_type, from_ref, to_type, to_ref,
-         link_type, direction, rationale, required, context_doc_uid) in rows:
-
+    for (
+        cid,
+        from_type,
+        from_ref,
+        to_type,
+        to_ref,
+        link_type,
+        direction,
+        rationale,
+        required,
+        context_doc_uid,
+    ) in rows:
         strength = strength_from_required(required)
 
         # Resolve from_ref
-        if from_type == 'section' and from_ref and '::section::' in from_ref:
+        if from_type == "section" and from_ref and "::section::" in from_ref:
             fr_result = resolve_doc_title_ref(from_ref)
         else:
-            fr_result = (None, 'skip', 0.0)
+            fr_result = (None, "skip", 0.0)
 
         # Resolve to_ref
-        if to_type == 'section' and to_ref and '::section::' in to_ref:
+        if to_type == "section" and to_ref and "::section::" in to_ref:
             tr_result = resolve_doc_title_ref(to_ref)
         else:
-            tr_result = (None, 'skip', 0.0)
+            tr_result = (None, "skip", 0.0)
 
-        from_uid, from_method, from_conf = (fr_result if fr_result else (None, 'skip', 0.0))
-        to_uid, to_method, to_conf = (tr_result if tr_result else (None, 'skip', 0.0))
+        from_uid, from_method, from_conf = fr_result if fr_result else (None, "skip", 0.0)
+        to_uid, to_method, to_conf = tr_result if tr_result else (None, "skip", 0.0)
 
         if from_uid and to_uid:
-            method = from_method if from_method == to_method else 'mixed'
+            method = from_method if from_method == to_method else "mixed"
             # Upewnij sie ze method jest na liscie dozwolonych wartosci CHECK
-            allowed = {'explicit','global_unique','manual','ambiguous','missing','mixed','context_doc'}
+            allowed = {
+                "explicit",
+                "global_unique",
+                "manual",
+                "ambiguous",
+                "missing",
+                "mixed",
+                "context_doc",
+            }
             if method not in allowed:
-                method = 'mixed'
+                method = "mixed"
             conf = min(from_conf, to_conf)
-            inserts.append((
-                cid,
-                'section', from_uid,
-                'section', to_uid,
-                link_type, direction, rationale, strength,
-                method, conf,
-                context_doc_uid
-            ))
+            inserts.append(
+                (
+                    cid,
+                    "section",
+                    from_uid,
+                    "section",
+                    to_uid,
+                    link_type,
+                    direction,
+                    rationale,
+                    strength,
+                    method,
+                    conf,
+                    context_doc_uid,
+                )
+            )
             resolved += 1
         else:
-            if from_method == 'missing_doc' or to_method == 'missing_doc':
+            if from_method == "missing_doc" or to_method == "missing_doc":
                 missing_doc += 1
-            elif from_method == 'missing_section' or to_method == 'missing_section':
+            elif from_method == "missing_section" or to_method == "missing_section":
                 missing_section += 1
 
-    print(f"\nWyniki:")
+    print("\nWyniki:")
     print(f"  Rozwiązano:       {resolved}")
     print(f"  Brak dokumentu:   {missing_doc}")
     print(f"  Brak sekcji:      {missing_section}")
@@ -176,13 +201,16 @@ def main():
 
     if not dry_run and inserts:
         print(f"\nWstawianie {len(inserts)} rekordow do content_links_resolved...")
-        cur.executemany("""
+        cur.executemany(
+            """
             INSERT OR IGNORE INTO content_links_resolved
             (content_link_id, from_kind, from_uid, to_kind, to_uid,
              link_type, direction, rationale, strength,
              resolution_method, resolution_confidence, notes)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
-        """, inserts)
+        """,
+            inserts,
+        )
         conn.commit()
 
         # Stan po resolucji
@@ -195,10 +223,16 @@ def main():
         # Zapisz do sync_runs
         with batch_continue("sync_run telemetry insert", logger=_log):
             from ulid import ulid
+
             cur.execute(
                 "INSERT INTO sync_runs(sync_id,ran_at_utc,kind,status,notes) VALUES(?,?,?,?,?)",
-                (ulid(), utc_now(), 'content_links_extended',
-                 'OK', f"resolved={resolved}, missing_doc={missing_doc}, missing_section={missing_section}")
+                (
+                    ulid(),
+                    utc_now(),
+                    "content_links_extended",
+                    "OK",
+                    f"resolved={resolved}, missing_doc={missing_doc}, missing_section={missing_section}",
+                ),
             )
             conn.commit()
     elif dry_run:
@@ -208,5 +242,5 @@ def main():
     print("\nGotowe.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

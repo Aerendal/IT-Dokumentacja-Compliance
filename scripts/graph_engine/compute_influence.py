@@ -81,7 +81,10 @@ def gate_sync_runs(cur: sqlite3.Cursor) -> tuple[bool, str]:
     if not edges_ts:
         return False, "missing sync_runs kind=migrate_edges_manual (OK/WARN)"
     if edges_ts < nodes_ts:
-        return False, f"migrate_edges_manual older than build_nodes: edges_ts={edges_ts} < nodes_ts={nodes_ts}"
+        return (
+            False,
+            f"migrate_edges_manual older than build_nodes: edges_ts={edges_ts} < nodes_ts={nodes_ts}",
+        )
     return True, "ok"
 
 
@@ -147,7 +150,9 @@ def compute_v1(cur: sqlite3.Cursor, now: str) -> tuple[int, int, int, int]:
         doc_quality = {doc_uid: normalize_quality(status) for doc_uid, status in cur.fetchall()}
     if table_exists(cur, "section_quality"):
         cur.execute("SELECT section_uid,status FROM section_quality")
-        section_quality = {section_uid: normalize_quality(status) for section_uid, status in cur.fetchall()}
+        section_quality = {
+            section_uid: normalize_quality(status) for section_uid, status in cur.fetchall()
+        }
 
     ancestors_cache: dict[str, list[str]] = {}
 
@@ -196,7 +201,14 @@ def compute_v1(cur: sqlite3.Cursor, now: str) -> tuple[int, int, int, int]:
 
     aggregate: dict[tuple[str, str, str], dict[str, object]] = {}
 
-    def upsert(src: str, dst: str, influence_type: str, severity: int, details: dict[str, object], notes: str) -> None:
+    def upsert(
+        src: str,
+        dst: str,
+        influence_type: str,
+        severity: int,
+        details: dict[str, object],
+        notes: str,
+    ) -> None:
         key = (src, dst, influence_type)
         current = aggregate.get(key)
         if current is None or severity > int(current["severity"]):
@@ -223,7 +235,9 @@ def compute_v1(cur: sqlite3.Cursor, now: str) -> tuple[int, int, int, int]:
             "source": source,
             "aggregation_distance": 0,
         }
-        upsert(from_node_uid, to_node_uid, "blocks", base_severity, base_details, f"manual:{strength}")
+        upsert(
+            from_node_uid, to_node_uid, "blocks", base_severity, base_details, f"manual:{strength}"
+        )
 
         src_anc = ancestors(from_node_uid)
         dst_anc = ancestors(to_node_uid)
@@ -248,7 +262,9 @@ def compute_v1(cur: sqlite3.Cursor, now: str) -> tuple[int, int, int, int]:
                     "src_base": from_node_uid,
                     "dst_base": to_node_uid,
                 }
-                upsert(src_uid, dst_uid, "blocks", agg_severity, agg_details, f"agg:{strength}:d{dist}")
+                upsert(
+                    src_uid, dst_uid, "blocks", agg_severity, agg_details, f"agg:{strength}:d{dist}"
+                )
 
     rows: list[tuple] = []
     for (src_uid, dst_uid, influence_type), payload in aggregate.items():

@@ -95,8 +95,24 @@ def seed_minimal_data(conn: sqlite3.Connection) -> None:
         VALUES(?,?,?,?,?,?,?)
         """,
         [
-            ("doc-1", "Doc One", "doc one", "a.md", "core", "2026-01-01T00:00:00Z", "2026-01-01T00:00:00Z"),
-            ("doc-2", "Doc Two", "doc two", "b.md", "core", "2026-01-01T00:00:00Z", "2026-01-01T00:00:00Z"),
+            (
+                "doc-1",
+                "Doc One",
+                "doc one",
+                "a.md",
+                "core",
+                "2026-01-01T00:00:00Z",
+                "2026-01-01T00:00:00Z",
+            ),
+            (
+                "doc-2",
+                "Doc Two",
+                "doc two",
+                "b.md",
+                "core",
+                "2026-01-01T00:00:00Z",
+                "2026-01-01T00:00:00Z",
+            ),
         ],
     )
     cur.executemany(
@@ -118,9 +134,51 @@ def seed_minimal_data(conn: sqlite3.Connection) -> None:
         ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
         """,
         [
-            ("e1", "doc", "doc-1", "section", "sec-1", "depends_on", "forward", "ok", "required", None, None, "doc_section_links", 1),
-            ("e2", "doc", "doc-1", "section", "missing-node", "depends_on", "forward", "skip", "required", None, None, "doc_section_links", 2),
-            ("e3", "section", "section::raw-ref", "doc", "doc-2", "references", "forward", "raw", "navigational", None, None, "content_links_resolved", 3),
+            (
+                "e1",
+                "doc",
+                "doc-1",
+                "section",
+                "sec-1",
+                "depends_on",
+                "forward",
+                "ok",
+                "required",
+                None,
+                None,
+                "doc_section_links",
+                1,
+            ),
+            (
+                "e2",
+                "doc",
+                "doc-1",
+                "section",
+                "missing-node",
+                "depends_on",
+                "forward",
+                "skip",
+                "required",
+                None,
+                None,
+                "doc_section_links",
+                2,
+            ),
+            (
+                "e3",
+                "section",
+                "section::raw-ref",
+                "doc",
+                "doc-2",
+                "references",
+                "forward",
+                "raw",
+                "navigational",
+                None,
+                None,
+                "content_links_resolved",
+                3,
+            ),
         ],
     )
     conn.commit()
@@ -142,7 +200,9 @@ class GraphEngineSqliteTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertEqual(proc.returncode, 0, msg=f"{script_name}\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}")
+        self.assertEqual(
+            proc.returncode, 0, msg=f"{script_name}\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
+        )
 
     def test_ddl_applies(self) -> None:
         conn = sqlite3.connect(str(self.db_path))
@@ -155,7 +215,14 @@ class GraphEngineSqliteTest(unittest.TestCase):
         tables = {row[0] for row in cur.fetchall()}
         self.assertEqual(
             tables,
-            {"nodes", "node_map_docs", "node_map_sections", "edges_manual", "edges_inferred", "influence"},
+            {
+                "nodes",
+                "node_map_docs",
+                "node_map_sections",
+                "edges_manual",
+                "edges_inferred",
+                "influence",
+            },
         )
         conn.close()
 
@@ -223,7 +290,15 @@ class GraphEngineSqliteTest(unittest.TestCase):
             INSERT INTO docs(doc_uid,title,title_norm,path,origin,created_at_utc,updated_at_utc)
             VALUES(?,?,?,?,?,?,?)
             """,
-            ("doc-x", "Doc X", "doc x", "x.md", "core", "2026-01-01T00:00:00Z", "2026-01-01T00:00:00Z"),
+            (
+                "doc-x",
+                "Doc X",
+                "doc x",
+                "x.md",
+                "core",
+                "2026-01-01T00:00:00Z",
+                "2026-01-01T00:00:00Z",
+            ),
         )
         cur.executemany(
             """
@@ -237,7 +312,20 @@ class GraphEngineSqliteTest(unittest.TestCase):
                 ("s-2", "doc-x", "A.1", "a.1", 3, "A > A.1", "a-1", 2, "ok", None, 11, 20),
                 ("s-3", "doc-x", "A.2", "a.2", 3, "A > A.2", "a-2", 3, "ok", None, 21, 30),
                 ("s-4", "doc-x", "B", "b", 2, "B", "b", 4, "ok", None, 31, 40),
-                ("s-5", "doc-x", "B.1.1", "b.1.1", 4, "B > B.1 > B.1.1", "b-1-1", 5, "ok", None, 41, 50),
+                (
+                    "s-5",
+                    "doc-x",
+                    "B.1.1",
+                    "b.1.1",
+                    4,
+                    "B > B.1 > B.1.1",
+                    "b-1-1",
+                    5,
+                    "ok",
+                    None,
+                    41,
+                    50,
+                ),
             ],
         )
         conn.commit()
@@ -247,7 +335,9 @@ class GraphEngineSqliteTest(unittest.TestCase):
 
         conn = sqlite3.connect(str(self.db_path))
         cur = conn.cursor()
-        cur.execute("SELECT node_uid,kind,parent_node_uid FROM nodes WHERE kind IN ('sec','subsec') ORDER BY ordinal")
+        cur.execute(
+            "SELECT node_uid,kind,parent_node_uid FROM nodes WHERE kind IN ('sec','subsec') ORDER BY ordinal"
+        )
         rows = cur.fetchall()
         expected = [
             ("s-1", "sec", "doc-x"),

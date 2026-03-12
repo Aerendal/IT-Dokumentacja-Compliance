@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from itdoc.cli import build_parser, cmd_find, cmd_validate, cmd_db_check, main
+from itdoc.cli import build_parser, cmd_db_check, cmd_find, cmd_validate, main
 
 _REPO_ROOT = Path(__file__).parent.parent
 _DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix.db"
@@ -121,6 +121,7 @@ class TestCmdValidate:
     def _make_args(self, path: str, db: str = None):
         class Args:
             pass
+
         a = Args()
         a.path = path
         a.db = db
@@ -166,6 +167,7 @@ class TestCmdDbCheck:
     def _make_args(self, db_path=None):
         class Args:
             pass
+
         a = Args()
         a.db = str(db_path) if db_path else None
         return a
@@ -173,6 +175,7 @@ class TestCmdDbCheck:
     def test_missing_db_exits_1(self, tmp_path):
         """Gdy DB nie istnieje, cmd_db_check powinno zwrócić kod 1 (przez main)."""
         from itdoc.cli import main as cli_main
+
         code = cli_main(["--db", str(tmp_path / "missing.db"), "db-check"])
         assert code == 1
 
@@ -191,9 +194,16 @@ class TestCmdFind:
     @pytest.mark.integration
     def test_find_standard_prints_results(self, capsys):
         _skip_if_no_db()
-        args = type("A", (), {
-            "db": None, "standard": "ISO/IEC 27001", "regulation": None, "limit": 5,
-        })()
+        args = type(
+            "A",
+            (),
+            {
+                "db": None,
+                "standard": "ISO/IEC 27001",
+                "regulation": None,
+                "limit": 5,
+            },
+        )()
         code = cmd_find(args)
         out = capsys.readouterr()
         assert code == 0
@@ -203,9 +213,16 @@ class TestCmdFind:
     @pytest.mark.integration
     def test_find_unknown_standard_clean_output(self, capsys):
         _skip_if_no_db()
-        args = type("A", (), {
-            "db": None, "standard": "NIEZNANY_XYZ_99999", "regulation": None, "limit": 5,
-        })()
+        args = type(
+            "A",
+            (),
+            {
+                "db": None,
+                "standard": "NIEZNANY_XYZ_99999",
+                "regulation": None,
+                "limit": 5,
+            },
+        )()
         code = cmd_find(args)
         out = capsys.readouterr()
         assert code == 0
@@ -220,7 +237,9 @@ class TestCliSubprocess:
     def test_module_runnable(self):
         result = subprocess.run(
             [sys.executable, "-m", "itdoc"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
             cwd=str(_REPO_ROOT),
         )
         assert result.returncode == 0
@@ -228,7 +247,9 @@ class TestCliSubprocess:
     def test_help_flag_runnable(self):
         result = subprocess.run(
             [sys.executable, "-m", "itdoc", "--help"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
             cwd=str(_REPO_ROOT),
         )
         assert result.returncode == 0
@@ -239,7 +260,9 @@ class TestCliSubprocess:
         _skip_if_no_db()
         result = subprocess.run(
             [sys.executable, "-m", "itdoc", "db-check"],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True,
+            text=True,
+            timeout=30,
             cwd=str(_REPO_ROOT),
         )
         assert result.returncode == 0

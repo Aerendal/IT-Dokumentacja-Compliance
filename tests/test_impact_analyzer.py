@@ -1,13 +1,18 @@
 """Tests for scripts/maintenance/impact_analyzer.py."""
-import pytest
+
 import sqlite3
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.maintenance.impact_analyzer import (
-    analyze_standard, analyze_regulation, analyze_section, analyze_doc
+    analyze_doc,
+    analyze_regulation,
+    analyze_section,
+    analyze_standard,
 )
 
 pytestmark = pytest.mark.unit
@@ -56,36 +61,57 @@ def mem_conn():
         );
     """)
 
-    conn.executemany("INSERT INTO standards VALUES (?,?)", [
-        ("ISO/IEC 27001", "Information Security Management"),
-        ("ISO 9001", "Quality Management Systems"),
-    ])
-    conn.executemany("INSERT INTO compliance_regulations VALUES (?,?)", [
-        ("RODO", "Rozporządzenie o Ochronie Danych Osobowych"),
-        ("KSC-PL", "Ustawa o Krajowym Systemie Cyberbezpieczeństwa"),
-    ])
-    conn.executemany("INSERT INTO docs VALUES (?,?,?)", [
-        ("uid-001", "Security Policy Document", "core/security_policy.md"),
-        ("uid-002", "Access Control Guide", "core/access_control.md"),
-        ("uid-003", "Data Privacy Policy", "compliance/data_privacy.md"),
-    ])
-    conn.executemany("INSERT INTO doc_standard_mapping VALUES (?,?,?)", [
-        ("core/security_policy.md", "ISO/IEC 27001", "title match"),
-        ("core/access_control.md", "ISO/IEC 27001", "keyword match"),
-    ])
-    conn.executemany("INSERT INTO doc_regulation_mapping VALUES (?,?,?)", [
-        ("compliance/data_privacy.md", "RODO", "direct reference"),
-        ("core/security_policy.md", "KSC-PL", "compliance section"),
-    ])
-    conn.executemany("INSERT INTO sections VALUES (?,?,?,?,?)", [
-        ("sec-001", "uid-001", "Standardy i compliance", "#standardy", 1),
-        ("sec-002", "uid-001", "Zakres stosowania", "#zakres", 2),
-        ("sec-003", "uid-002", "Standardy i compliance", "#standardy", 1),
-    ])
-    conn.executemany("INSERT INTO content_links VALUES (NULL,?,?)", [
-        ("uid-002", "document::Security Policy Document::section-1"),
-        ("uid-003", "document::Access Control Guide::section-1"),
-    ])
+    conn.executemany(
+        "INSERT INTO standards VALUES (?,?)",
+        [
+            ("ISO/IEC 27001", "Information Security Management"),
+            ("ISO 9001", "Quality Management Systems"),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO compliance_regulations VALUES (?,?)",
+        [
+            ("RODO", "Rozporządzenie o Ochronie Danych Osobowych"),
+            ("KSC-PL", "Ustawa o Krajowym Systemie Cyberbezpieczeństwa"),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO docs VALUES (?,?,?)",
+        [
+            ("uid-001", "Security Policy Document", "core/security_policy.md"),
+            ("uid-002", "Access Control Guide", "core/access_control.md"),
+            ("uid-003", "Data Privacy Policy", "compliance/data_privacy.md"),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO doc_standard_mapping VALUES (?,?,?)",
+        [
+            ("core/security_policy.md", "ISO/IEC 27001", "title match"),
+            ("core/access_control.md", "ISO/IEC 27001", "keyword match"),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO doc_regulation_mapping VALUES (?,?,?)",
+        [
+            ("compliance/data_privacy.md", "RODO", "direct reference"),
+            ("core/security_policy.md", "KSC-PL", "compliance section"),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO sections VALUES (?,?,?,?,?)",
+        [
+            ("sec-001", "uid-001", "Standardy i compliance", "#standardy", 1),
+            ("sec-002", "uid-001", "Zakres stosowania", "#zakres", 2),
+            ("sec-003", "uid-002", "Standardy i compliance", "#standardy", 1),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO content_links VALUES (NULL,?,?)",
+        [
+            ("uid-002", "document::Security Policy Document::section-1"),
+            ("uid-003", "document::Access Control Guide::section-1"),
+        ],
+    )
     conn.commit()
     return conn
 

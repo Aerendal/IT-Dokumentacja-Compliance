@@ -1,9 +1,11 @@
 """
 tests/test_standard_controls.py — Unit tests for seed_standard_controls and map_docs_to_controls.
 """
+
+import os
 import sqlite3
 import sys
-import os
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -11,17 +13,21 @@ pytestmark = pytest.mark.unit
 # Make scripts importable
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts", "maintenance"))
 
-from seed_standard_controls import (
-    CREATE_TABLE_SQL as SEED_TABLE_SQL,
-    ALL_CONTROLS,
-)
 from map_docs_to_controls import (
     CREATE_TABLE_SQL as MAP_TABLE_SQL,
+)
+from map_docs_to_controls import (
     map_docs_to_controls,
 )
-
+from seed_standard_controls import (
+    ALL_CONTROLS,
+)
+from seed_standard_controls import (
+    CREATE_TABLE_SQL as SEED_TABLE_SQL,
+)
 
 # ── helpers ──────────────────────────────────────────────────────────────────
+
 
 def make_seed_db():
     """In-memory DB with standard_controls table seeded."""
@@ -59,12 +65,27 @@ def make_mapping_db():
     )
     # insert a handful of test docs
     test_docs = [
-        ("uid1", "Access Control Policy",          "access control policy",          "core/access_control.md"),
-        ("uid2", "Incident Management Procedure",  "incident management procedure",  "core/incident_mgmt.md"),
-        ("uid3", "Data Backup and Recovery Plan",  "data backup and recovery plan",  "core/backup_recovery.md"),
-        ("uid4", "Supplier Risk Assessment",       "supplier risk assessment",       "core/supplier_risk.md"),
-        ("uid5", "Network Security Architecture",  "network security architecture",  "core/network_security.md"),
-        ("uid6", "Cryptography Standards",         "cryptography standards",         "core/cryptography.md"),
+        ("uid1", "Access Control Policy", "access control policy", "core/access_control.md"),
+        (
+            "uid2",
+            "Incident Management Procedure",
+            "incident management procedure",
+            "core/incident_mgmt.md",
+        ),
+        (
+            "uid3",
+            "Data Backup and Recovery Plan",
+            "data backup and recovery plan",
+            "core/backup_recovery.md",
+        ),
+        ("uid4", "Supplier Risk Assessment", "supplier risk assessment", "core/supplier_risk.md"),
+        (
+            "uid5",
+            "Network Security Architecture",
+            "network security architecture",
+            "core/network_security.md",
+        ),
+        ("uid6", "Cryptography Standards", "cryptography standards", "core/cryptography.md"),
     ]
     conn.executemany(
         "INSERT INTO docs (doc_uid, title, title_norm, path, created_at_utc, updated_at_utc) VALUES (?,?,?,?,?,?)",
@@ -82,6 +103,7 @@ def make_mapping_db():
 
 # ── tests ─────────────────────────────────────────────────────────────────────
 
+
 def test_seed_creates_table():
     conn = make_seed_db()
     cur = conn.execute(
@@ -92,17 +114,13 @@ def test_seed_creates_table():
 
 def test_seed_iso27001_count():
     conn = make_seed_db()
-    cur = conn.execute(
-        "SELECT COUNT(*) FROM standard_controls WHERE standard_code='ISO/IEC 27001'"
-    )
+    cur = conn.execute("SELECT COUNT(*) FROM standard_controls WHERE standard_code='ISO/IEC 27001'")
     assert cur.fetchone()[0] == 93
 
 
 def test_seed_nist_csf_count():
     conn = make_seed_db()
-    cur = conn.execute(
-        "SELECT COUNT(*) FROM standard_controls WHERE standard_code='NIST CSF 2.0'"
-    )
+    cur = conn.execute("SELECT COUNT(*) FROM standard_controls WHERE standard_code='NIST CSF 2.0'")
     assert cur.fetchone()[0] == 22
 
 
@@ -135,8 +153,9 @@ def test_doc_control_mapping_table_created():
 
 def test_map_assigns_top5_max():
     conn = make_mapping_db()
-    map_docs_to_controls(":memory:", apply=True, standard="ISO/IEC 27001",
-                         min_confidence=0.05, _conn=conn)
+    map_docs_to_controls(
+        ":memory:", apply=True, standard="ISO/IEC 27001", min_confidence=0.05, _conn=conn
+    )
     cur = conn.execute(
         "SELECT doc_path, COUNT(*) as cnt FROM doc_control_mapping "
         "WHERE standard_code='ISO/IEC 27001' GROUP BY doc_path HAVING cnt > 5"
@@ -147,16 +166,18 @@ def test_map_assigns_top5_max():
 
 def test_map_dry_run_no_changes():
     conn = make_mapping_db()
-    map_docs_to_controls(":memory:", dry_run=True, standard="ISO/IEC 27001",
-                         min_confidence=0.05, _conn=conn)
+    map_docs_to_controls(
+        ":memory:", dry_run=True, standard="ISO/IEC 27001", min_confidence=0.05, _conn=conn
+    )
     cur = conn.execute("SELECT COUNT(*) FROM doc_control_mapping")
     assert cur.fetchone()[0] == 0, "Dry-run should not write rows"
 
 
 def test_map_min_confidence_filter():
     conn = make_mapping_db()
-    map_docs_to_controls(":memory:", apply=True, standard="ISO/IEC 27001",
-                         min_confidence=0.9, _conn=conn)
+    map_docs_to_controls(
+        ":memory:", apply=True, standard="ISO/IEC 27001", min_confidence=0.9, _conn=conn
+    )
     cur = conn.execute("SELECT COUNT(*) FROM doc_control_mapping WHERE confidence < 0.9")
     below_threshold = cur.fetchone()[0]
     assert below_threshold == 0, f"{below_threshold} rows below min_confidence threshold"

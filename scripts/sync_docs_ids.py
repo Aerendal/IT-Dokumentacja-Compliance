@@ -2,8 +2,9 @@
 """Sync docs/docs_final_map using file_index (built from manifest).
 Deterministic, DB-first, ULID IDs.
 """
-from datetime import datetime, timezone
+
 import sqlite3
+from datetime import datetime, timezone
 from pathlib import Path
 
 from ulid import ulid

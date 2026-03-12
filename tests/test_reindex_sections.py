@@ -1,12 +1,14 @@
 """Tests for pure functions in scripts/reindex_sections.py."""
-import pytest
+
 import hashlib
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scripts.reindex_sections import to_anchor, make_section_uid
+from scripts.reindex_sections import make_section_uid, to_anchor
 
 pytestmark = pytest.mark.unit
 

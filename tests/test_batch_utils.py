@@ -11,15 +11,17 @@ zatrzymywać całego przebiegu. Ale ważne jest żeby:
   2. W trybie ITDOC_STRICT=1 był RE-RAISED (dla debugowania)
   3. Zachowanie było PRZETESTOWANE (nie "zgadywane")
 """
+
 import logging
+
 import pytest
 
 from itdoc._batch import batch_continue
 
-
 # ---------------------------------------------------------------------------
 # Testy trybu normalnego (bez ITDOC_STRICT)
 # ---------------------------------------------------------------------------
+
 
 class TestBatchContinueNormalMode:
     """batch_continue() w trybie normalnym (ITDOC_STRICT=0/brak)."""
@@ -50,10 +52,7 @@ class TestBatchContinueNormalMode:
                 raise ValueError("test error")
 
         # Powinien być wpis na DEBUG z kontekstem i typem wyjątku
-        assert any(
-            "my context" in r.message and "ValueError" in r.message
-            for r in caplog.records
-        )
+        assert any("my context" in r.message and "ValueError" in r.message for r in caplog.records)
 
     def test_log_contains_exception_message(self, caplog):
         """Log zawiera treść wyjątku — wiadomo dlaczego pominięto."""
@@ -97,6 +96,7 @@ class TestBatchContinueNormalMode:
 # ---------------------------------------------------------------------------
 # Testy trybu ITDOC_STRICT=1 (tryb debugowania)
 # ---------------------------------------------------------------------------
+
 
 class TestBatchContinueStrictMode:
     """batch_continue() w trybie ITDOC_STRICT=1 — wszystkie wyjątki re-raised."""
@@ -152,6 +152,7 @@ class TestBatchContinueStrictMode:
 # Testy parametru reraise
 # ---------------------------------------------------------------------------
 
+
 class TestBatchContinueReraise:
     """Typy wyjątków które zawsze są propagowane (niezależnie od ITDOC_STRICT)."""
 
@@ -178,6 +179,7 @@ class TestBatchContinueReraise:
 # Testy integracyjne: symulacja rzeczywistych użyć z codebase
 # ---------------------------------------------------------------------------
 
+
 class TestBatchContinueRealWorldPatterns:
     """Symulacja wzorców rzeczywiście używanych w scripts/."""
 
@@ -195,7 +197,7 @@ class TestBatchContinueRealWorldPatterns:
 
         for path in files:
             with batch_continue(f"read {path.name}"):
-                content = path.read_text(encoding="utf-8")  # bad.txt -> UnicodeDecodeError
+                path.read_text(encoding="utf-8")  # bad.txt -> UnicodeDecodeError
                 processed.append(path.name)
 
         # 4 dobre przetworzone, bad.txt pominięty

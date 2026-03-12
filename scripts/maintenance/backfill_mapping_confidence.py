@@ -22,107 +22,251 @@ DB_PATH = Path(__file__).parent.parent.parent / "reports" / "it_doc_matrix.db"
 GENERATED_TEMPLATES = Path(__file__).parent.parent.parent / "generated_templates"
 
 STOP = {
-    "i", "w", "z", "do", "na", "nie", "sie", "to", "jest", "dla", "oraz",
-    "lub", "przy", "po", "jak", "co", "by", "ale", "ze",
-    "the", "a", "an", "and", "or", "of", "in", "for", "to", "is", "with",
-    "on", "at", "by", "be", "as", "from", "that", "this", "it", "are",
-    "was", "will", "can", "has", "have",
-    "system", "zarzadzanie", "zarzadzania", "document", "dokumentu", "management",
+    "i",
+    "w",
+    "z",
+    "do",
+    "na",
+    "nie",
+    "sie",
+    "to",
+    "jest",
+    "dla",
+    "oraz",
+    "lub",
+    "przy",
+    "po",
+    "jak",
+    "co",
+    "by",
+    "ale",
+    "ze",
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "of",
+    "in",
+    "for",
+    "is",
+    "with",
+    "on",
+    "at",
+    "be",
+    "as",
+    "from",
+    "that",
+    "this",
+    "it",
+    "are",
+    "was",
+    "will",
+    "can",
+    "has",
+    "have",
+    "system",
+    "zarzadzanie",
+    "zarzadzania",
+    "document",
+    "dokumentu",
+    "management",
     # keep originals for backward compat (lookup happens post-normalize)
-    "zarządzanie", "zarządzania",
+    "zarządzanie",
+    "zarządzania",
 }
 
 # ---------------------------------------------------------------------------
 # Polish → English translation map
 # ---------------------------------------------------------------------------
 PL_EN_MAP = {
-    'bezpieczenstwo': 'security', 'bezpieczenstwie': 'security',
-    'bezpieczenstwem': 'security', 'bezpieczenstwa': 'security',
-    'ryzyko': 'risk', 'ryzyka': 'risk', 'ryzykiem': 'risk',
-    'zarzadzanie': 'management', 'zarzadzania': 'management',
-    'dostep': 'access', 'dostepu': 'access', 'dostepem': 'access',
-    'audyt': 'audit', 'audytu': 'audit', 'audytem': 'audit',
-    'incydent': 'incident', 'incydentu': 'incident',
-    'polityka': 'policy', 'polityki': 'policy',
-    'procedura': 'procedure', 'procedury': 'procedure',
-    'zgodnosc': 'compliance', 'zgodnosci': 'compliance',
-    'kontrola': 'control', 'kontroly': 'control', 'kontroli': 'control',
-    'dokumentacja': 'documentation', 'dokument': 'document',
-    'szkolenie': 'training', 'szkolenia': 'training',
-    'wdrozenie': 'implementation', 'wdrozenia': 'implementation',
-    'monitorowanie': 'monitoring',
-    'systemu': 'system', 'systemy': 'systems',
-    'siec': 'network', 'sieci': 'network',
-    'konfiguracja': 'configuration', 'konfiguracji': 'configuration',
-    'kopie': 'backup', 'kopia': 'backup', 'zapasowa': 'backup',
-    'ciaglosc': 'continuity', 'ciagloci': 'continuity',
-    'zmiany': 'change', 'zmiana': 'change', 'zmianie': 'change',
-    'wymagania': 'requirements', 'wymaganie': 'requirement',
-    'testy': 'testing', 'testow': 'testing',
-    'oprogramowanie': 'software', 'aplikacja': 'application',
-    'serwer': 'server', 'infrastruktura': 'infrastructure',
-    'uzytkownicy': 'users', 'uzytkownik': 'user',
-    'uprawnienia': 'permissions', 'uprawnienie': 'permission',
-    'haslo': 'password', 'hasla': 'passwords', 'uwierzytelnianie': 'authentication',
-    'szyfrowanie': 'encryption', 'szyfrowania': 'encryption',
-    'podatnosc': 'vulnerability', 'podatnosci': 'vulnerabilities',
-    'narusznie': 'breach', 'naruszenie': 'breach',
-    'dostawca': 'supplier', 'dostawcy': 'suppliers', 'zewnetrzny': 'external',
-    'prywatnosc': 'privacy', 'prywatnosci': 'privacy',
-    'dane': 'data', 'danych': 'data', 'danymi': 'data',
-    'ochrona': 'protection', 'ochrony': 'protection',
-    'zasob': 'asset', 'zasoby': 'assets', 'zasobow': 'assets',
-    'wlasciwy': 'appropriate', 'odpowiedzialnosc': 'responsibility',
-    'cel': 'objective', 'cele': 'objectives', 'celach': 'objectives',
-    'proces': 'process', 'procesy': 'processes', 'procesow': 'processes',
-    'wejscie': 'input', 'wyjscie': 'output', 'granice': 'scope',
-    'projekt': 'project', 'projektow': 'projects',
-    'analiza': 'analysis', 'analize': 'analysis',
-    'raport': 'report', 'raportu': 'report', 'raportowanie': 'reporting',
-    'komunikacja': 'communication', 'komunikacji': 'communication',
-    'przywodztwo': 'leadership', 'kierownictwo': 'management',
-    'strategia': 'strategy', 'strategii': 'strategy',
-    'architektura': 'architecture', 'architektury': 'architecture',
+    "bezpieczenstwo": "security",
+    "bezpieczenstwie": "security",
+    "bezpieczenstwem": "security",
+    "bezpieczenstwa": "security",
+    "ryzyko": "risk",
+    "ryzyka": "risk",
+    "ryzykiem": "risk",
+    "zarzadzanie": "management",
+    "zarzadzania": "management",
+    "dostep": "access",
+    "dostepu": "access",
+    "dostepem": "access",
+    "audyt": "audit",
+    "audytu": "audit",
+    "audytem": "audit",
+    "incydent": "incident",
+    "incydentu": "incident",
+    "polityka": "policy",
+    "polityki": "policy",
+    "procedura": "procedure",
+    "procedury": "procedure",
+    "zgodnosc": "compliance",
+    "zgodnosci": "compliance",
+    "kontrola": "control",
+    "kontroly": "control",
+    "kontroli": "control",
+    "dokumentacja": "documentation",
+    "dokument": "document",
+    "szkolenie": "training",
+    "szkolenia": "training",
+    "wdrozenie": "implementation",
+    "wdrozenia": "implementation",
+    "monitorowanie": "monitoring",
+    "systemu": "system",
+    "systemy": "systems",
+    "siec": "network",
+    "sieci": "network",
+    "konfiguracja": "configuration",
+    "konfiguracji": "configuration",
+    "kopie": "backup",
+    "kopia": "backup",
+    "zapasowa": "backup",
+    "ciaglosc": "continuity",
+    "ciagloci": "continuity",
+    "zmiany": "change",
+    "zmiana": "change",
+    "zmianie": "change",
+    "wymagania": "requirements",
+    "wymaganie": "requirement",
+    "testy": "testing",
+    "testow": "testing",
+    "oprogramowanie": "software",
+    "aplikacja": "application",
+    "serwer": "server",
+    "infrastruktura": "infrastructure",
+    "uzytkownicy": "users",
+    "uzytkownik": "user",
+    "uprawnienia": "permissions",
+    "uprawnienie": "permission",
+    "haslo": "password",
+    "hasla": "passwords",
+    "uwierzytelnianie": "authentication",
+    "szyfrowanie": "encryption",
+    "szyfrowania": "encryption",
+    "podatnosc": "vulnerability",
+    "podatnosci": "vulnerabilities",
+    "narusznie": "breach",
+    "naruszenie": "breach",
+    "dostawca": "supplier",
+    "dostawcy": "suppliers",
+    "zewnetrzny": "external",
+    "prywatnosc": "privacy",
+    "prywatnosci": "privacy",
+    "dane": "data",
+    "danych": "data",
+    "danymi": "data",
+    "ochrona": "protection",
+    "ochrony": "protection",
+    "zasob": "asset",
+    "zasoby": "assets",
+    "zasobow": "assets",
+    "wlasciwy": "appropriate",
+    "odpowiedzialnosc": "responsibility",
+    "cel": "objective",
+    "cele": "objectives",
+    "celach": "objectives",
+    "proces": "process",
+    "procesy": "processes",
+    "procesow": "processes",
+    "wejscie": "input",
+    "wyjscie": "output",
+    "granice": "scope",
+    "projekt": "project",
+    "projektow": "projects",
+    "analiza": "analysis",
+    "analize": "analysis",
+    "raport": "report",
+    "raportu": "report",
+    "raportowanie": "reporting",
+    "komunikacja": "communication",
+    "komunikacji": "communication",
+    "przywodztwo": "leadership",
+    "kierownictwo": "management",
+    "strategia": "strategy",
+    "strategii": "strategy",
+    "architektura": "architecture",
+    "architektury": "architecture",
     # ISO 9001 – quality management
-    'jakosc': 'quality', 'jakosci': 'quality', 'jakoscia': 'quality',
-    'wyrob': 'product', 'wyrobu': 'product', 'wyroby': 'products',
-    'usluga': 'service', 'uslugi': 'services', 'uslug': 'services',
-    'klient': 'customer', 'klienta': 'customer', 'klientow': 'customers',
-    'satysfakcja': 'satisfaction',
-    'doskonalenie': 'improvement', 'doskonalenia': 'improvement',
-    'certyfikacja': 'certification', 'certyfikat': 'certificate',
-    'norma': 'standard', 'normy': 'standard',
-    'niezgodnosc': 'nonconformity', 'niezgodnosci': 'nonconformities',
-    'korygowanie': 'corrective', 'korygujace': 'corrective',
-    'zapobiegawcze': 'preventive', 'zapobieganie': 'prevention',
-    'przeglad': 'review', 'przegladem': 'review',
-    'planowanie': 'planning', 'planowania': 'planning',
-    'produkt': 'product', 'produktu': 'product',
-    'specyfikacja': 'specification', 'specyfikacji': 'specification',
+    "jakosc": "quality",
+    "jakosci": "quality",
+    "jakoscia": "quality",
+    "wyrob": "product",
+    "wyrobu": "product",
+    "wyroby": "products",
+    "usluga": "service",
+    "uslugi": "services",
+    "uslug": "services",
+    "klient": "customer",
+    "klienta": "customer",
+    "klientow": "customers",
+    "satysfakcja": "satisfaction",
+    "doskonalenie": "improvement",
+    "doskonalenia": "improvement",
+    "certyfikacja": "certification",
+    "certyfikat": "certificate",
+    "norma": "standard",
+    "normy": "standard",
+    "niezgodnosc": "nonconformity",
+    "niezgodnosci": "nonconformities",
+    "korygowanie": "corrective",
+    "korygujace": "corrective",
+    "zapobiegawcze": "preventive",
+    "zapobieganie": "prevention",
+    "przeglad": "review",
+    "przegladem": "review",
+    "planowanie": "planning",
+    "planowania": "planning",
+    "produkt": "product",
+    "produktu": "product",
+    "specyfikacja": "specification",
+    "specyfikacji": "specification",
     # TOGAF ADM – enterprise architecture
-    'przedsiebiorstwo': 'enterprise', 'przedsiebiorstwa': 'enterprise',
-    'korporacyjna': 'enterprise', 'korporacyjnej': 'enterprise',
-    'warstwa': 'layer', 'warstwy': 'layers',
-    'faza': 'phase', 'fazy': 'phase', 'fazami': 'phase',
-    'transformacja': 'transformation', 'transformacji': 'transformation',
-    'zdolnosc': 'capability', 'zdolnosci': 'capabilities',
-    'migracja': 'migration', 'migracji': 'migration',
-    'integracja': 'integration', 'integracji': 'integration',
-    'platforma': 'platform', 'platformy': 'platform',
-    'interfejs': 'interface', 'interfejsy': 'interfaces',
-    'komponent': 'component', 'komponentow': 'components',
-    'metodologia': 'methodology', 'metodologii': 'methodology',
-    'wizja': 'vision', 'wizji': 'vision',
-    'repozytorium': 'repository',
+    "przedsiebiorstwo": "enterprise",
+    "przedsiebiorstwa": "enterprise",
+    "korporacyjna": "enterprise",
+    "korporacyjnej": "enterprise",
+    "warstwa": "layer",
+    "warstwy": "layers",
+    "faza": "phase",
+    "fazy": "phase",
+    "fazami": "phase",
+    "transformacja": "transformation",
+    "transformacji": "transformation",
+    "zdolnosc": "capability",
+    "zdolnosci": "capabilities",
+    "migracja": "migration",
+    "migracji": "migration",
+    "integracja": "integration",
+    "integracji": "integration",
+    "platforma": "platform",
+    "platformy": "platform",
+    "interfejs": "interface",
+    "interfejsy": "interfaces",
+    "komponent": "component",
+    "komponentow": "components",
+    "metodologia": "methodology",
+    "metodologii": "methodology",
+    "wizja": "vision",
+    "wizji": "vision",
+    "repozytorium": "repository",
     # COBIT 2019 – IT governance
-    'lad': 'governance', 'ladu': 'governance',
-    'wartosc': 'value', 'wartosci': 'value',
-    'interesariusze': 'stakeholders', 'interesariusz': 'stakeholder',
-    'inwestycja': 'investment', 'inwestycji': 'investment',
-    'wydajnosc': 'performance', 'wydajnosci': 'performance',
-    'dojrzalosc': 'maturity', 'dojrzalosci': 'maturity',
-    'wskaznik': 'indicator', 'wskazniki': 'indicators',
-    'biznesowy': 'business', 'biznesowych': 'business',
+    "lad": "governance",
+    "ladu": "governance",
+    "wartosc": "value",
+    "wartosci": "value",
+    "interesariusze": "stakeholders",
+    "interesariusz": "stakeholder",
+    "inwestycja": "investment",
+    "inwestycji": "investment",
+    "wydajnosc": "performance",
+    "wydajnosci": "performance",
+    "dojrzalosc": "maturity",
+    "dojrzalosci": "maturity",
+    "wskaznik": "indicator",
+    "wskazniki": "indicators",
+    "biznesowy": "business",
+    "biznesowych": "business",
 }
 
 _PL_NORM = str.maketrans("ąćęłńóśźżĄĆĘŁŃÓŚŹŻ", "acelnoszzACELNOSZZ")
@@ -157,7 +301,7 @@ def jaccard(set_a: set, set_b: set) -> float:
 
 
 def doc_title_from_path(doc_path: str) -> str:
-    stem = Path(doc_path).stem          # e.g. "wizja_platformy_zarz_dzania..."
+    stem = Path(doc_path).stem  # e.g. "wizja_platformy_zarz_dzania..."
     return stem.replace("_", " ")
 
 
@@ -181,12 +325,15 @@ def add_evidence_column(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE doc_standard_mapping ADD COLUMN evidence TEXT")
         conn.commit()
     except sqlite3.OperationalError as exc:
-        _log.debug("evidence column already exists or ALTER failed: %s", exc)  # column already exists
+        _log.debug(
+            "evidence column already exists or ALTER failed: %s", exc
+        )  # column already exists
 
 
 # ---------------------------------------------------------------------------
 # Content cache
 # ---------------------------------------------------------------------------
+
 
 def build_content_cache(base_dir: Path) -> dict:
     """Returns {doc_path: set_of_tokens} built from .md file headings + body."""
@@ -230,41 +377,55 @@ def build_content_cache(base_dir: Path) -> dict:
 
 # (code_keyword_in_standard, path_keywords, token_keywords)
 _DOMAIN_KEYWORDS: list[tuple[str, list[str], list[str]]] = [
-    ("27001", ["security", "bezpiecze", "isms", "audit", "incydent", "dostep"],
-              ["security", "audit", "controls", "information"]),
-    ("27002", ["security", "bezpiecze", "control", "audit"],
-              ["security", "controls", "audit"]),
-    ("27005", ["risk", "ryzyko", "analiza"],
-              ["risk", "vulnerability", "analysis"]),
-    ("NIST CSF", ["cybersecurity", "security", "bezpiecze", "framework"],
-                 ["security", "controls", "protection"]),
-    ("CIS Controls", ["control", "cis", "benchmark", "security", "bezpiecze"],
-                     ["controls", "security", "audit"]),
-    ("RODO", ["prywatnosc", "privacy", "dane", "data", "gdpr", "osobow"],
-             ["privacy", "data", "protection"]),
-    ("GDPR", ["privacy", "dane", "data", "personal", "osobow"],
-             ["privacy", "data", "protection"]),
-    ("PCI DSS", ["payment", "card", "pci", "platnosc"],
-                ["security", "data"]),
-    ("ISO 22301", ["continuity", "ciaglosc", "bcp", "bcm", "awaryjn"],
-                  ["continuity", "backup"]),
-    ("COBIT", ["governance", "audit", "control", "zarzadzanie", "lad"],
-              ["governance", "audit", "controls", "management", "maturity", "value"]),
-    ("ISO 9001", ["jakosc", "quality", "wyrob", "usluga", "klient", "doskonalen"],
-                 ["quality", "product", "service", "customer", "improvement"]),
-    ("TOGAF ADM", ["architektur", "enterprise", "faz", "transformacj", "migracj"],
-                  ["architecture", "enterprise", "phase", "framework", "layer"]),
+    (
+        "27001",
+        ["security", "bezpiecze", "isms", "audit", "incydent", "dostep"],
+        ["security", "audit", "controls", "information"],
+    ),
+    ("27002", ["security", "bezpiecze", "control", "audit"], ["security", "controls", "audit"]),
+    ("27005", ["risk", "ryzyko", "analiza"], ["risk", "vulnerability", "analysis"]),
+    (
+        "NIST CSF",
+        ["cybersecurity", "security", "bezpiecze", "framework"],
+        ["security", "controls", "protection"],
+    ),
+    (
+        "CIS Controls",
+        ["control", "cis", "benchmark", "security", "bezpiecze"],
+        ["controls", "security", "audit"],
+    ),
+    (
+        "RODO",
+        ["prywatnosc", "privacy", "dane", "data", "gdpr", "osobow"],
+        ["privacy", "data", "protection"],
+    ),
+    ("GDPR", ["privacy", "dane", "data", "personal", "osobow"], ["privacy", "data", "protection"]),
+    ("PCI DSS", ["payment", "card", "pci", "platnosc"], ["security", "data"]),
+    ("ISO 22301", ["continuity", "ciaglosc", "bcp", "bcm", "awaryjn"], ["continuity", "backup"]),
+    (
+        "COBIT",
+        ["governance", "audit", "control", "zarzadzanie", "lad"],
+        ["governance", "audit", "controls", "management", "maturity", "value"],
+    ),
+    (
+        "ISO 9001",
+        ["jakosc", "quality", "wyrob", "usluga", "klient", "doskonalen"],
+        ["quality", "product", "service", "customer", "improvement"],
+    ),
+    (
+        "TOGAF ADM",
+        ["architektur", "enterprise", "faz", "transformacj", "migracj"],
+        ["architecture", "enterprise", "phase", "framework", "layer"],
+    ),
 ]
 
 
-def _domain_bonus(standard_code: str, doc_path: str,
-                  doc_tokens: set | None = None) -> float:
+def _domain_bonus(standard_code: str, doc_path: str, doc_tokens: set | None = None) -> float:
     path_lower = doc_path.lower()
     tokens = doc_tokens or set()
     for code_kw, path_kws, token_kws in _DOMAIN_KEYWORDS:
         if code_kw in standard_code:
-            if (any(kw in path_lower for kw in path_kws)
-                    or any(kw in tokens for kw in token_kws)):
+            if any(kw in path_lower for kw in path_kws) or any(kw in tokens for kw in token_kws):
                 return 0.08
     return 0.0
 
@@ -272,6 +433,7 @@ def _domain_bonus(standard_code: str, doc_path: str,
 # ---------------------------------------------------------------------------
 # Scoring
 # ---------------------------------------------------------------------------
+
 
 def _coverage_score(std_tokens: set, doc_tokens: set) -> float:
     """Fraction of std_tokens covered by doc_tokens, scaled to [0, 0.35]."""
@@ -281,9 +443,13 @@ def _coverage_score(std_tokens: set, doc_tokens: set) -> float:
     return covered * 0.35
 
 
-def score_row(row, standards_cache: dict, guidance_cache: dict,
-              slug_to_title: dict | None = None,
-              content_cache: dict | None = None) -> tuple[float, str]:
+def score_row(
+    row,
+    standards_cache: dict,
+    guidance_cache: dict,
+    slug_to_title: dict | None = None,
+    content_cache: dict | None = None,
+) -> tuple[float, str]:
     doc_path, standard_code = row["doc_path"], row["standard_code"]
 
     description = standards_cache.get(standard_code, "")
@@ -402,7 +568,9 @@ def run(dry_run: bool, limit: int | None, reprocess: bool = False) -> None:
         confidence = min(1.0, base + guidance_bonus + bonus)
 
         matched = sorted(intersection)[:5]
-        evidence = f"tokens: {', '.join(matched)} | guidance_refs: {'yes' if has_guidance else 'no'}"
+        evidence = (
+            f"tokens: {', '.join(matched)} | guidance_refs: {'yes' if has_guidance else 'no'}"
+        )
 
         rows_processed += 1
         confidences.append(confidence)
@@ -438,7 +606,7 @@ def run(dry_run: bool, limit: int | None, reprocess: bool = False) -> None:
     print(f"  rows_processed : {rows_processed}")
     print(f"  rows_updated   : {rows_updated if not dry_run else '(dry-run, 0 written)'}")
     if confidences:
-        print(f"  avg_confidence : {sum(confidences)/len(confidences):.4f}")
+        print(f"  avg_confidence : {sum(confidences) / len(confidences):.4f}")
         print(f"  min_confidence : {min(confidences):.4f}")
         print(f"  max_confidence : {max(confidences):.4f}")
     print(f"  mode           : {'DRY RUN' if dry_run else 'APPLY'}")
@@ -459,24 +627,37 @@ def export_low_confidence(threshold: float) -> None:
     writer = csv.writer(sys.stdout)
     writer.writerow(["doc_path", "standard_code", "confidence", "match_reason", "evidence"])
     for r in rows:
-        writer.writerow([r["doc_path"], r["standard_code"], r["confidence"],
-                         r["match_reason"], r["evidence"]])
+        writer.writerow(
+            [r["doc_path"], r["standard_code"], r["confidence"], r["match_reason"], r["evidence"]]
+        )
     print(f"Exported {len(rows)} rows with confidence < {threshold}", file=sys.stderr)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Backfill confidence scores for keyword_match rows")
+    parser = argparse.ArgumentParser(
+        description="Backfill confidence scores for keyword_match rows"
+    )
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("--dry-run", action="store_true", default=True,
-                       help="Show stats but don't write (default)")
-    group.add_argument("--apply", action="store_true",
-                       help="Actually write confidence scores to DB")
-    parser.add_argument("--limit", type=int, default=None,
-                        help="Process only first N rows (for testing)")
-    parser.add_argument("--reprocess", action="store_true",
-                        help="Also reprocess rows already scored (match_reason='keyword_match_scored')")
-    parser.add_argument("--export-low-confidence", type=float, metavar="THRESHOLD",
-                        help="Export rows with confidence < THRESHOLD to CSV (stdout). Example: --export-low-confidence 0.4")
+    group.add_argument(
+        "--dry-run", action="store_true", default=True, help="Show stats but don't write (default)"
+    )
+    group.add_argument(
+        "--apply", action="store_true", help="Actually write confidence scores to DB"
+    )
+    parser.add_argument(
+        "--limit", type=int, default=None, help="Process only first N rows (for testing)"
+    )
+    parser.add_argument(
+        "--reprocess",
+        action="store_true",
+        help="Also reprocess rows already scored (match_reason='keyword_match_scored')",
+    )
+    parser.add_argument(
+        "--export-low-confidence",
+        type=float,
+        metavar="THRESHOLD",
+        help="Export rows with confidence < THRESHOLD to CSV (stdout). Example: --export-low-confidence 0.4",
+    )
     args = parser.parse_args()
 
     if args.export_low_confidence is not None:

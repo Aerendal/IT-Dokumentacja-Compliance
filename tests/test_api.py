@@ -1,6 +1,8 @@
 """Unit tests for the FastAPI compliance REST API."""
+
 import os
 import sqlite3
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -30,13 +32,15 @@ def client(tmp_path):
     conn.commit()
     conn.close()
 
-    os.environ['IT_DOC_API_TOKEN'] = 'test-token'
+    os.environ["IT_DOC_API_TOKEN"] = "test-token"
 
     import scripts.api.main as api_main
+
     api_main.DB_PATH = db_path
-    api_main.API_TOKEN = 'test-token'
+    api_main.API_TOKEN = "test-token"
 
     from scripts.api.main import app
+
     return TestClient(app)
 
 
@@ -163,8 +167,9 @@ def test_review_not_found(client):
 
 def test_violations_missing_table(tmp_path):
     """Covers lines 122-123: OperationalError when table is missing → returns []."""
-    import sqlite3
     import os
+    import sqlite3
+
     db_path = tmp_path / "empty.db"
     conn = sqlite3.connect(db_path)
     # Do NOT create template_violations table
@@ -176,14 +181,17 @@ def test_violations_missing_table(tmp_path):
     """)
     conn.close()
 
-    os.environ['IT_DOC_API_TOKEN'] = 'test-token'
+    os.environ["IT_DOC_API_TOKEN"] = "test-token"
 
     import scripts.api.main as api_main
+
     api_main.DB_PATH = db_path
-    api_main.API_TOKEN = 'test-token'
+    api_main.API_TOKEN = "test-token"
+
+    from fastapi.testclient import TestClient
 
     from scripts.api.main import app
-    from fastapi.testclient import TestClient
+
     c = TestClient(app)
     r = c.get("/violations")
     assert r.status_code == 200

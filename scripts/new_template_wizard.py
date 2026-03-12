@@ -21,22 +21,22 @@ Wizard:
   4. Uruchamia pipeline (opcjonalnie).
 """
 
-import sys
-import re
-import json
-import sqlite3
-import hashlib
 import argparse
+import hashlib
+import json
+import re
+import sqlite3
+import sys
 import unicodedata
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
 # ── Sciezki ──────────────────────────────────────────────────────────────────
-SCRIPT_DIR   = Path(__file__).parent
-DOC_DIR      = SCRIPT_DIR.parent
-DB_PATH      = DOC_DIR / "reports" / "it_doc_matrix.db"
-CORE_DIR     = DOC_DIR / "generated_templates" / "core"
-SAT_DIR      = DOC_DIR / "generated_templates" / "satellite"
+SCRIPT_DIR = Path(__file__).parent
+DOC_DIR = SCRIPT_DIR.parent
+DB_PATH = DOC_DIR / "reports" / "it_doc_matrix.db"
+CORE_DIR = DOC_DIR / "generated_templates" / "core"
+SAT_DIR = DOC_DIR / "generated_templates" / "satellite"
 
 # ── Stale ─────────────────────────────────────────────────────────────────────
 PHASES = [
@@ -66,44 +66,45 @@ PHASES = [
 ]
 
 STANDARD_GUIDANCE: dict[str, str] = {
-    "ISO/IEC 27001":  "System Zarządzania Bezpieczeństwem Informacji",
-    "ISO/IEC 27002":  "Katalog kontrolek bezpieczeństwa",
-    "ISO/IEC 27005":  "Zarządzanie ryzykiem bezpieczeństwa",
-    "ISO 22301":      "Ciągłość działania (BCMS)",
-    "ISO 20000-1":    "Zarządzanie usługami IT (ITSM)",
-    "ISO 9001":       "System Zarządzania Jakością",
-    "ISO/IEC 12207":  "Procesy cyklu życia oprogramowania",
-    "IEEE 829":       "Dokumentacja testów",
-    "IEEE 830":       "Specyfikacja wymagań oprogramowania",
-    "IEEE 1016":      "Dokumentacja projektu oprogramowania",
-    "IEEE 42010":     "Architektura systemów i oprogramowania",
-    "ITIL 4":         "Zarządzanie usługami IT",
-    "TOGAF ADM":      "Architektura korporacyjna",
-    "PMBOK 7":        "Zarządzanie projektami",
-    "PRINCE2 7":      "Metodologia projektów",
-    "COBIT 2019":     "Ład IT i zarządzanie",
-    "DORA":           "Cyfrowa odporność operacyjna (finanse)",
-    "NIS2":           "Bezpieczeństwo sieci i systemów informacyjnych",
-    "NIST CSF":       "Framework cyberbezpieczeństwa NIST",
-    "OWASP ASVS":     "Weryfikacja bezpieczeństwa aplikacji",
-    "CIS Controls v8":"Kontrole bezpieczeństwa CIS",
-    "PCI DSS":        "Bezpieczeństwo danych kart płatniczych",
-    "SAFe 6.0":       "Scaled Agile Framework",
-    "SCRUM Guide":    "Framework Scrum",
+    "ISO/IEC 27001": "System Zarządzania Bezpieczeństwem Informacji",
+    "ISO/IEC 27002": "Katalog kontrolek bezpieczeństwa",
+    "ISO/IEC 27005": "Zarządzanie ryzykiem bezpieczeństwa",
+    "ISO 22301": "Ciągłość działania (BCMS)",
+    "ISO 20000-1": "Zarządzanie usługami IT (ITSM)",
+    "ISO 9001": "System Zarządzania Jakością",
+    "ISO/IEC 12207": "Procesy cyklu życia oprogramowania",
+    "IEEE 829": "Dokumentacja testów",
+    "IEEE 830": "Specyfikacja wymagań oprogramowania",
+    "IEEE 1016": "Dokumentacja projektu oprogramowania",
+    "IEEE 42010": "Architektura systemów i oprogramowania",
+    "ITIL 4": "Zarządzanie usługami IT",
+    "TOGAF ADM": "Architektura korporacyjna",
+    "PMBOK 7": "Zarządzanie projektami",
+    "PRINCE2 7": "Metodologia projektów",
+    "COBIT 2019": "Ład IT i zarządzanie",
+    "DORA": "Cyfrowa odporność operacyjna (finanse)",
+    "NIS2": "Bezpieczeństwo sieci i systemów informacyjnych",
+    "NIST CSF": "Framework cyberbezpieczeństwa NIST",
+    "OWASP ASVS": "Weryfikacja bezpieczeństwa aplikacji",
+    "CIS Controls v8": "Kontrole bezpieczeństwa CIS",
+    "PCI DSS": "Bezpieczeństwo danych kart płatniczych",
+    "SAFe 6.0": "Scaled Agile Framework",
+    "SCRUM Guide": "Framework Scrum",
 }
 
 REGULATION_GUIDANCE: dict[str, str] = {
-    "KSC-PL":           "Ustawa o krajowym systemie cyberbezpieczeństwa",
-    "UODO-PL":          "Ustawa o ochronie danych osobowych / RODO-PL",
-    "PZP-PL":           "Prawo zamówień publicznych",
-    "UŚUDE-PL":         "Ustawa o świadczeniu usług drogą elektroniczną",
-    "PN-ISO/IEC-27001":  "Polska Norma — ISO/IEC 27001",
-    "CERT-PL-WYTYCZNE":  "Wytyczne CERT Polska",
-    "KNF-REKOM-IT":      "Rekomendacje KNF dla sektora finansowego",
+    "KSC-PL": "Ustawa o krajowym systemie cyberbezpieczeństwa",
+    "UODO-PL": "Ustawa o ochronie danych osobowych / RODO-PL",
+    "PZP-PL": "Prawo zamówień publicznych",
+    "UŚUDE-PL": "Ustawa o świadczeniu usług drogą elektroniczną",
+    "PN-ISO/IEC-27001": "Polska Norma — ISO/IEC 27001",
+    "CERT-PL-WYTYCZNE": "Wytyczne CERT Polska",
+    "KNF-REKOM-IT": "Rekomendacje KNF dla sektora finansowego",
 }
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def slugify(title: str) -> str:
     """Generuje slug nazwy pliku: lowercase, ASCII, podkreslniki."""
@@ -136,6 +137,7 @@ def choose(prompt: str, options: list[str], multi: bool = False) -> list[str]:
 
 # ── Generowanie pliku .md ─────────────────────────────────────────────────────
 
+
 def render_template(
     title: str,
     phases: list[str],
@@ -158,7 +160,8 @@ def render_template(
     if stds_block or regs_block:
         standards_section = (
             "\n## Mające zastosowanie standardy i normy\n"
-            + stds_block + regs_block
+            + stds_block
+            + regs_block
             + "\n\n> Sekcja generowana automatycznie. Zweryfikuj trafność i uzupełnij.\n"
         )
 
@@ -186,7 +189,7 @@ aligned_by: wizard
 - Status: draft
 
 ## Cel dokumentu
-{guidance_cel or 'Opisz cel i rolę tego dokumentu w procesie.'}
+{guidance_cel or "Opisz cel i rolę tego dokumentu w procesie."}
 
 ## Zakres i granice
 - Obejmuje: (do uzupełnienia)
@@ -238,6 +241,7 @@ aligned_by: wizard
 
 # ── Wstawianie do DB ──────────────────────────────────────────────────────────
 
+
 def ulid_simple(title: str) -> str:
     """Pseudo-ULID na podstawie hash tytulu (dla nowych dokumentow)."""
     h = hashlib.sha256(title.encode()).hexdigest()[:20].upper()
@@ -279,7 +283,10 @@ def insert_to_db(
     base_sections = [
         ("Cel dokumentu", "Krótko opisz cel i rolę dokumentu w procesie."),
         ("Zakres i granice", "Zdefiniuj zakres tematyczny i organizacyjny."),
-        ("Wejścia i wyjścia", "Wymień kluczowe wejścia (dane/dokumenty potrzebne) i wyjścia (rezultaty)."),
+        (
+            "Wejścia i wyjścia",
+            "Wymień kluczowe wejścia (dane/dokumenty potrzebne) i wyjścia (rezultaty).",
+        ),
         ("Zależności dokumentu", "Wskaż dokumenty zależne i nadrzędne."),
     ]
     stds_json = json.dumps(standards, ensure_ascii=False) if standards else None
@@ -298,36 +305,37 @@ def insert_to_db(
 
 # ── CLI args ──────────────────────────────────────────────────────────────────
 
+
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Wizard tworzenia nowego szablonu dokumentacji IT"
-    )
+    parser = argparse.ArgumentParser(description="Wizard tworzenia nowego szablonu dokumentacji IT")
     parser.add_argument("--title", help="Tytuł dokumentu")
     parser.add_argument(
-        "--type", dest="type",
-        help="Typ dokumentu (np. Procedura, Polityka, Instrukcja)"
+        "--type", dest="type", help="Typ dokumentu (np. Procedura, Polityka, Instrukcja)"
     )
     parser.add_argument(
-        "--standard", action="append",
-        help="Kod standardu (można powtarzać, np. --standard 'ISO/IEC 27001')"
+        "--standard",
+        action="append",
+        help="Kod standardu (można powtarzać, np. --standard 'ISO/IEC 27001')",
     )
     parser.add_argument(
-        "--regulation", action="append",
-        help="Kod regulacji (można powtarzać, np. --regulation 'RODO')"
+        "--regulation",
+        action="append",
+        help="Kod regulacji (można powtarzać, np. --regulation 'RODO')",
     )
     parser.add_argument("--goal", help="Krótki opis celu dokumentu")
     parser.add_argument(
-        "--dry-run", action="store_true",
-        help="Renderuj szablon i wyświetl na stdout bez zapisywania pliku ani wpisu do DB"
+        "--dry-run",
+        action="store_true",
+        help="Renderuj szablon i wyświetl na stdout bez zapisywania pliku ani wpisu do DB",
     )
     parser.add_argument(
-        "--no-pipeline", action="store_true",
-        help="Pomiń uruchomienie pipeline_run na końcu"
+        "--no-pipeline", action="store_true", help="Pomiń uruchomienie pipeline_run na końcu"
     )
     return parser.parse_args()
 
 
 # ── Interactive inputs ────────────────────────────────────────────────────────
+
 
 def get_interactive_inputs() -> dict:
     """Zbiera dane od użytkownika interaktywnie. Zwraca słownik wejść."""
@@ -338,7 +346,8 @@ def get_interactive_inputs() -> dict:
 
     title = ask("Tytuł dokumentu (PL)")
     if not title:
-        print("Tytul jest wymagany."); sys.exit(1)
+        print("Tytul jest wymagany.")
+        sys.exit(1)
 
     goal = ask("Krotki opis celu dokumentu (opcjonalny)")
 
@@ -374,6 +383,7 @@ def get_interactive_inputs() -> dict:
 
 # ── Core run logic ────────────────────────────────────────────────────────────
 
+
 def run(
     title: str,
     doc_type: str,
@@ -408,7 +418,8 @@ def run(
     if out_path.exists() and sys.stdin.isatty():
         overwrite = ask(f"Plik {out_path.name} juz istnieje. Nadpisac? (tak/nie)", default="nie")
         if overwrite.lower() not in ("tak", "t", "yes", "y"):
-            print("Anulowano."); sys.exit(0)
+            print("Anulowano.")
+            sys.exit(0)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(content, encoding="utf-8")
@@ -422,10 +433,12 @@ def run(
 
     if not no_pipeline:
         import subprocess
+
         pipe_result = subprocess.run(
             ["python3", "scripts/pipeline_run.py"],
             cwd=str(DOC_DIR),
-            capture_output=True, text=True,
+            capture_output=True,
+            text=True,
         )
         print(pipe_result.stdout[-500:] if pipe_result.stdout else "")
         if pipe_result.returncode != 0:
@@ -440,6 +453,7 @@ def run(
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
+
 
 def main() -> None:
     args = parse_args()

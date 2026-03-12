@@ -4,7 +4,6 @@ Wymagają połączenia z rzeczywistą DB (fixtures: real_db_conn z conftest).
 Testy są oznaczone @pytest.mark.integration i pomijane gdy DB nie istnieje.
 """
 
-
 import pytest
 
 pytestmark = pytest.mark.integration
@@ -33,11 +32,15 @@ class TestCriticalTablesNotEmpty:
 class TestLinkResolutionCoverage:
     def test_coverage_at_least_99_9_percent(self, real_db_conn):
         from itdoc.db import check_link_resolution_coverage
+
         cov = check_link_resolution_coverage(real_db_conn)
-        assert cov >= 0.999, f"Pokrycie resolucji linków zbyt niskie: {cov:.4f} (oczekiwano ≥ 0.999)"
+        assert cov >= 0.999, (
+            f"Pokrycie resolucji linków zbyt niskie: {cov:.4f} (oczekiwano ≥ 0.999)"
+        )
 
     def test_coverage_does_not_exceed_1(self, real_db_conn):
         from itdoc.db import check_link_resolution_coverage
+
         cov = check_link_resolution_coverage(real_db_conn)
         assert cov <= 1.0, f"Pokrycie > 100%: {cov}"
 
@@ -68,7 +71,9 @@ class TestSectionIntegrity:
               AND d.path != 'ORPHAN'
               AND NOT EXISTS (SELECT 1 FROM sections s WHERE s.doc_uid = d.doc_uid)
         """).fetchone()[0]
-        assert count == 0, f"{count} dokumentów (z path!=NULL i path!='ORPHAN') nie ma żadnej sekcji"
+        assert count == 0, (
+            f"{count} dokumentów (z path!=NULL i path!='ORPHAN') nie ma żadnej sekcji"
+        )
 
 
 class TestContractIntegrity:
@@ -127,5 +132,6 @@ class TestSchemaVersion:
 
     def test_validate_schema_no_errors(self, real_db_conn):
         from itdoc.db import validate_schema
+
         errors = validate_schema(real_db_conn)
         assert errors == [], f"validate_schema() zwróciło błędy: {errors}"

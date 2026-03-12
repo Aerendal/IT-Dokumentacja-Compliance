@@ -1,21 +1,22 @@
 """Tests for scripts/resolve_content_links_extended.py — pure utility functions."""
+
 import re
 import sqlite3
 
 from scripts.resolve_content_links_extended import (
-    to_anchor,
-    norm_title,
+    DOC_TITLE_SECTION_RE,
     build_doc_title_index,
     build_section_anchor_index,
+    norm_title,
     strength_from_required,
+    to_anchor,
     utc_now,
-    DOC_TITLE_SECTION_RE,
 )
-
 
 # ---------------------------------------------------------------------------
 # to_anchor
 # ---------------------------------------------------------------------------
+
 
 class TestToAnchor:
     def test_basic_lowercase(self):
@@ -68,6 +69,7 @@ class TestToAnchor:
 # norm_title
 # ---------------------------------------------------------------------------
 
+
 class TestNormTitle:
     def test_lowercase(self):
         assert norm_title("ISO 27001") == "iso 27001"
@@ -93,6 +95,7 @@ class TestNormTitle:
 # strength_from_required
 # ---------------------------------------------------------------------------
 
+
 class TestStrengthFromRequired:
     def test_required_1(self):
         assert strength_from_required(1) == "required"
@@ -114,10 +117,11 @@ class TestStrengthFromRequired:
 # utc_now
 # ---------------------------------------------------------------------------
 
+
 class TestUtcNow:
     def test_format(self):
         result = utc_now()
-        assert re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$', result)
+        assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$", result)
 
     def test_returns_string(self):
         assert isinstance(utc_now(), str)
@@ -129,6 +133,7 @@ class TestUtcNow:
 # ---------------------------------------------------------------------------
 # DOC_TITLE_SECTION_RE
 # ---------------------------------------------------------------------------
+
 
 class TestDocTitleSectionRe:
     def test_matches_valid_format(self):
@@ -156,15 +161,19 @@ class TestDocTitleSectionRe:
 # build_doc_title_index
 # ---------------------------------------------------------------------------
 
+
 def _make_docs_db():
     conn = sqlite3.connect(":memory:")
     conn.execute("CREATE TABLE docs (doc_uid TEXT, title TEXT)")
-    conn.executemany("INSERT INTO docs VALUES (?,?)", [
-        ("uid-1", "ISO 27001 Policy"),
-        ("uid-2", "GDPR Compliance"),
-        ("uid-3", None),           # null title — should be skipped
-        ("uid-4", "  Trimmed Title  "),
-    ])
+    conn.executemany(
+        "INSERT INTO docs VALUES (?,?)",
+        [
+            ("uid-1", "ISO 27001 Policy"),
+            ("uid-2", "GDPR Compliance"),
+            ("uid-3", None),  # null title — should be skipped
+            ("uid-4", "  Trimmed Title  "),
+        ],
+    )
     conn.commit()
     return conn
 
@@ -202,10 +211,13 @@ class TestBuildDocTitleIndex:
     def test_duplicate_titles_first_wins(self):
         conn = sqlite3.connect(":memory:")
         conn.execute("CREATE TABLE docs (doc_uid TEXT, title TEXT)")
-        conn.executemany("INSERT INTO docs VALUES (?,?)", [
-            ("uid-a", "Duplicate"),
-            ("uid-b", "Duplicate"),
-        ])
+        conn.executemany(
+            "INSERT INTO docs VALUES (?,?)",
+            [
+                ("uid-a", "Duplicate"),
+                ("uid-b", "Duplicate"),
+            ],
+        )
         conn.commit()
         idx = build_doc_title_index(conn.cursor())
         assert idx["duplicate"] == "uid-a"
@@ -215,15 +227,19 @@ class TestBuildDocTitleIndex:
 # build_section_anchor_index
 # ---------------------------------------------------------------------------
 
+
 def _make_sections_db():
     conn = sqlite3.connect(":memory:")
     conn.execute("CREATE TABLE sections (section_uid TEXT, doc_uid TEXT, anchor TEXT)")
-    conn.executemany("INSERT INTO sections VALUES (?,?,?)", [
-        ("sec-1", "doc-1", "introduction"),
-        ("sec-2", "doc-1", "phase-1"),
-        ("sec-3", "doc-2", "overview"),
-        ("sec-4", "doc-2", None),   # null anchor — should be skipped
-    ])
+    conn.executemany(
+        "INSERT INTO sections VALUES (?,?,?)",
+        [
+            ("sec-1", "doc-1", "introduction"),
+            ("sec-2", "doc-1", "phase-1"),
+            ("sec-3", "doc-2", "overview"),
+            ("sec-4", "doc-2", None),  # null anchor — should be skipped
+        ],
+    )
     conn.commit()
     return conn
 
@@ -238,7 +254,7 @@ class TestBuildSectionAnchorIndex:
     def test_null_anchors_excluded(self):
         conn = _make_sections_db()
         idx = build_section_anchor_index(conn.cursor())
-        for (du, anchor) in idx:
+        for _du, anchor in idx:
             assert anchor is not None
 
     def test_multiple_sections(self):

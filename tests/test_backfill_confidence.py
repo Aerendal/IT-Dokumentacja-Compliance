@@ -1,4 +1,5 @@
 """Tests for scripts/maintenance/backfill_mapping_confidence.py"""
+
 import sqlite3
 import sys
 from pathlib import Path
@@ -11,16 +12,18 @@ from backfill_mapping_confidence import (
     build_caches,
     doc_title_from_path,
     get_real_title,
-    jaccard as _jaccard,
     rough_slug,
     score_row,
     tokenize,
 )
-
+from backfill_mapping_confidence import (
+    jaccard as _jaccard,
+)
 
 # ---------------------------------------------------------------------------
 # Fixture
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def conn():
@@ -70,6 +73,7 @@ def conn():
 # tokenize
 # ---------------------------------------------------------------------------
 
+
 def test_tokenize_basic():
     result = tokenize("Security Management Systems")
     assert "security" in result
@@ -112,6 +116,7 @@ def test_tokenize_empty_string():
 # jaccard
 # ---------------------------------------------------------------------------
 
+
 def test_jaccard_identical():
     assert _jaccard({"a", "b"}, {"a", "b"}) == pytest.approx(1.0)
 
@@ -136,6 +141,7 @@ def test_jaccard_one_empty():
 # ---------------------------------------------------------------------------
 # Confidence / score_row
 # ---------------------------------------------------------------------------
+
 
 def test_confidence_capped_at_1(conn):
     # Insert a standard whose description fully overlaps a doc title
@@ -180,6 +186,7 @@ def test_related_title_gives_higher_confidence(conn):
 # add_evidence_column
 # ---------------------------------------------------------------------------
 
+
 def test_add_evidence_column_idempotent(conn):
     """Calling twice must not raise."""
     add_evidence_column(conn)
@@ -189,6 +196,7 @@ def test_add_evidence_column_idempotent(conn):
 # ---------------------------------------------------------------------------
 # build_caches
 # ---------------------------------------------------------------------------
+
 
 def test_build_caches_returns_standards(conn):
     standards_cache, _, __ = build_caches(conn)
@@ -209,6 +217,7 @@ def test_build_caches_guidance_populated(conn):
 # doc_title_from_path
 # ---------------------------------------------------------------------------
 
+
 def test_doc_title_from_path_replaces_underscores():
     assert doc_title_from_path("foo/bar_baz_qux.md") == "bar baz qux"
 
@@ -222,6 +231,7 @@ def test_doc_title_from_path_strips_extension():
 # ---------------------------------------------------------------------------
 # rough_slug / get_real_title
 # ---------------------------------------------------------------------------
+
 
 def test_rough_slug_polish():
     slug = rough_slug("Zarządzanie bezpieczeństwem")

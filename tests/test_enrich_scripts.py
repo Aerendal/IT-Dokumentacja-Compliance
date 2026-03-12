@@ -3,14 +3,16 @@ tests/test_enrich_scripts.py — unit tests for scripts/maintenance/enrich_niche
 and scripts/maintenance/enrich_placeholders.py.
 All tests use in-memory or tmp_path fixtures only.
 """
-import pytest
+
 from pathlib import Path
 
+import pytest
+
 from scripts.maintenance.enrich_niche_domains import (
+    PLACEHOLDER,
+    enrich_file,
     match_archetype,
     pattern_guidance,
-    enrich_file,
-    PLACEHOLDER,
 )
 from scripts.maintenance.enrich_placeholders import find_archetype
 

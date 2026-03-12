@@ -4,10 +4,12 @@
 - doc_section_links: doc -> section within same doc
 - content_links: stored as raw refs if section context is ambiguous
 """
-import sqlite3
+
 import re
+import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
+
 from ulid import ulid
 
 MASTER_DB = Path("../reports/it_doc_matrix.db")
@@ -68,7 +70,9 @@ def main():
     cur.execute("DELETE FROM edges")
 
     # doc_doc_links
-    cur.execute("SELECT id, doc_title, depends_on_title, dependency_type, rationale FROM doc_doc_links")
+    cur.execute(
+        "SELECT id, doc_title, depends_on_title, dependency_type, rationale FROM doc_doc_links"
+    )
     for row_id, doc_title, dep_title, dep_type, rationale in cur.fetchall():
         du = doc_map.get(norm(doc_title))
         tu = doc_map.get(norm(dep_title))
@@ -99,7 +103,9 @@ def main():
         )
 
     # doc_section_links
-    cur.execute("SELECT id, doc_title, section_title, link_type, direction, rationale FROM doc_section_links")
+    cur.execute(
+        "SELECT id, doc_title, section_title, link_type, direction, rationale FROM doc_section_links"
+    )
     for row_id, doc_title, section_title, link_type, direction, rationale in cur.fetchall():
         du = doc_map.get(norm(doc_title))
         if not du:
@@ -131,9 +137,22 @@ def main():
         )
 
     # content_links (raw refs retained; can be resolved later when doc context is available)
-    cur.execute("SELECT id, from_type, from_ref, to_type, to_ref, link_type, direction, rationale, required, source FROM content_links")
+    cur.execute(
+        "SELECT id, from_type, from_ref, to_type, to_ref, link_type, direction, rationale, required, source FROM content_links"
+    )
     for row in cur.fetchall():
-        row_id, from_type, from_ref, to_type, to_ref, link_type, direction, rationale, required, source = row
+        (
+            row_id,
+            from_type,
+            from_ref,
+            to_type,
+            to_ref,
+            link_type,
+            direction,
+            rationale,
+            required,
+            source,
+        ) = row
         strength = strength_from_required(required)
         ensure_link_type(link_type)
         cur.execute(

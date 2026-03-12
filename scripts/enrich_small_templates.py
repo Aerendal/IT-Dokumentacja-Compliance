@@ -66,32 +66,25 @@ SECTION_GUIDANCE = {
 Opisz co wchodzi w zakres tego dokumentu, a co jest poza nim.
 Przykład: „Obejmuje: [lista obszarów]. Nie obejmuje: [lista wyłączeń]."
 Podaj granice odpowiedzialności, systemy/procesy których dokument dotyczy oraz te, które są z niego wyłączone.""",
-
     "## Użytkownicy i interesariusze": """\
 - [Rola / interesariusz] — [potrzeby i odpowiedzialności]
 - [Rola / interesariusz] — [potrzeby i odpowiedzialności]""",
-
     "## Wejścia i wyjścia": """\
 - Wejścia: [dokumenty, dane, decyzje potrzebne przed rozpoczęciem pracy z tym dokumentem]
 - Wyjścia: [dokumenty, decyzje, artefakty produkowane na podstawie tego dokumentu]""",
-
     "## Założenia": """\
 - [Założenie 1 — co przyjmujemy za prawdziwe bez weryfikacji]
 - [Założenie 2 — warunki brzegowe, które muszą być spełnione]""",
-
     "## Otwarte pytania": """\
 - [Pytanie 1 — kwestia do rozstrzygnięcia, właściciel decyzji, termin]
 - [Pytanie 2 — kwestia do rozstrzygnięcia, właściciel decyzji, termin]""",
-
     "## Powiązania (meta)": """\
 - Wymaga odniesienia do: [dokument lub sekcja źródłowa]
 - Wymaga odniesienia do: [dokument lub sekcja źródłowa]
 - Dostarcza do: [dokument lub sekcja docelowa]""",
-
     "## Zależności dokumentu": """\
 - Konsumuje: [dokumenty wejściowe — co musi istnieć zanim ten dokument powstanie]
 - Dostarcza do: [dokumenty wyjściowe — co korzysta z tego dokumentu]""",
-
     "## Fazy cyklu życia": """\
 Dla każdej fazy określ, czy dokument w tej fazie: powstaje, jest aktualizowany, przeglądany czy archiwizowany.
 - Faza 1 – Koncepcja i Wizja: [akcja i odpowiedzialny]
@@ -103,79 +96,61 @@ Dla każdej fazy określ, czy dokument w tej fazie: powstaje, jest aktualizowany
 - Faza 7 – Bezpieczeństwo / Compliance: [akcja i odpowiedzialny]
 - Faza 8 – Wdrożenie / Deployment: [akcja i odpowiedzialny]
 - Faza 9 – Operacje / Maintenance: [akcja i odpowiedzialny]""",
-
     "## Definicje robocze": """\
 - [Termin 1] — [definicja robocza i źródło]
 - [Termin 2] — [definicja robocza i źródło]""",
-
     "## Przykłady użycia": """\
 - [Przykład 1 — krótki opis sytuacji i zastosowania tego dokumentu]
 - [Przykład 2 — krótki opis sytuacji i zastosowania tego dokumentu]""",
-
     "## Ryzyka i ograniczenia": """\
 - [Ryzyko 1 — prawdopodobieństwo, wpływ, sposób ograniczenia]
 - [Ryzyko 2 — prawdopodobieństwo, wpływ, sposób ograniczenia]""",
-
     "## Decyzje i uzasadnienia": """\
 - [Decyzja 1 — uzasadnienie, alternatywy odrzucone, data]
 - [Decyzja 2 — uzasadnienie, alternatywy odrzucone, data]""",
-
     "## Powiązania z innymi dokumentami": """\
 - [Dokument A] — [typ relacji: wymaga/uzupełnia/zastępuje/jest-częścią] — [uzasadnienie]
 - [Dokument B] — [typ relacji] — [uzasadnienie]""",
-
     "## Powiązania z sekcjami innych dokumentów": """\
 - [Dokument X → Sekcja Y] — [powód powiązania i kierunek przepływu informacji]
 - [Dokument Z → Sekcja W] — [powód powiązania i kierunek przepływu informacji]""",
-
     "## Słownik pojęć w dokumencie": """\
 - [Pojęcie 1] — [definicja i źródło normalizacyjne lub wewnętrzne]
 - [Pojęcie 2] — [definicja i źródło normalizacyjne lub wewnętrzne]""",
-
     "## Wymagane odwołania do standardów": """\
 - [Standard 1, np. ISO 27001 §A.5] — [sekcja lub wymaganie, którego dotyczy to odwołanie]
 - [Standard 2] — [sekcja lub wymaganie]""",
-
     "## Mapa relacji sekcja→sekcja": """\
 - [Sekcja A] -> [Sekcja B] : [typ relacji: rozszerza/streszcza/wymaga/wyklucza]
 - [Sekcja C] -> [Sekcja D] : [typ relacji]""",
-
     "## Mapa relacji dokument→dokument": """\
 - [Dokument A] -> [Dokument B] : [typ relacji]
 - [Dokument C] -> [Dokument D] : [typ relacji]""",
-
     "## Ścieżki informacji": """\
 - [Wejście] -> [Sekcja źródłowa] -> [Sekcja rozwinięcia] -> [Wyjście]
 - [Wejście] -> [Sekcja źródłowa] -> [Sekcja streszczenia] -> [Wyjście]""",
-
     "## Weryfikacja spójności": """\
 - [ ] Czy wszystkie ścieżki informacji są zamknięte (każde wejście ma wyjście)?
 - [ ] Czy istnieją pętle lub sprzeczne relacje między sekcjami?
 - [ ] Czy sekcje kluczowe mają wskazane źródła i odbiorców?
 - [ ] Czy terminologia jest spójna z sekcją "Słownik pojęć"?""",
-
     "## Lista kontrolna spójności relacji": """\
 - [ ] Czy każda sekcja z relacją ma wskazaną sekcję źródłową?
 - [ ] Czy relacje nie tworzą sprzecznych wymagań?
 - [ ] Czy wszystkie wymagane standardy mają odwołania?
 - [ ] Czy RACI jest kompletne dla kluczowych działań?""",
-
     "## Artefakty powiązane": """\
 - [Artefakt 1, np. diagram architektury] — [opis i relacja do tego dokumentu]
 - [Artefakt 2, np. schemat bazy danych] — [opis i relacja do tego dokumentu]""",
-
     "## Ścieżka decyzji": """\
 - [Decyzja] -> [Uzasadnienie] -> [Konsekwencje dla dokumentu i systemu]
 - [Decyzja] -> [Uzasadnienie] -> [Konsekwencje]""",
-
     "## Ścieżka akceptacji": """\
 - [Rola zatwierdząca] -> [kryteria akceptacji] -> [status: oczekuje/zatwierdzone/odrzucone]
 - [Rola zatwierdząca] -> [kryteria akceptacji] -> [status]""",
-
     "## Metryki jakości": """\
 - [Metryka 1, np. pokrycie testami] — [cel / próg minimalny]
 - [Metryka 2, np. czas przeglądu] — [cel / próg minimalny]""",
-
     "## Kryteria ukończenia": """\
 - [ ] Kryterium 1 — [opis stanu ukończenia tej sekcji lub dokumentu]
 - [ ] Kryterium 2 — [opis stanu ukończenia tej sekcji lub dokumentu]""",
@@ -195,13 +170,13 @@ def parse_file(text: str) -> tuple[str, dict[str, str], list[str]]:
     if text.startswith("---"):
         end = text.find("\n---", 3)
         if end != -1:
-            fm = text[:end + 4]
+            fm = text[: end + 4]
             body_start = end + 4
 
     body = text[body_start:]
 
     # Split into sections
-    parts = re.split(r'^(#{1,3} .+)$', body, flags=re.MULTILINE)
+    parts = re.split(r"^(#{1,3} .+)$", body, flags=re.MULTILINE)
     sections = {}
     order = []
 
@@ -271,7 +246,8 @@ def enrich_file(path: Path) -> bool:
     def bump_rev(fm_text: str) -> str:
         def inc(m):
             return f"aligned_rev: {int(m.group(1)) + 1}"
-        return re.sub(r'aligned_rev:\s*(\d+)', inc, fm_text)
+
+        return re.sub(r"aligned_rev:\s*(\d+)", inc, fm_text)
 
     new_fm = bump_rev(fm)
 
@@ -284,13 +260,12 @@ def main():
     dry_run = "--dry-run" in sys.argv
 
     # Find small files
-    small_files = [
-        f for f in TEMPLATES_DIR.glob("*.md")
-        if f.stat().st_size < MAX_SIZE_BYTES
-    ]
+    small_files = [f for f in TEMPLATES_DIR.glob("*.md") if f.stat().st_size < MAX_SIZE_BYTES]
     small_files.sort()
 
-    print(f"Faza 10 — Uzupelnianie malych szablonow ({len(small_files)} plikow <{MAX_SIZE_BYTES//1024}KB)")
+    print(
+        f"Faza 10 — Uzupelnianie malych szablonow ({len(small_files)} plikow <{MAX_SIZE_BYTES // 1024}KB)"
+    )
     if dry_run:
         print("  [DRY RUN — brak zapisu]")
 

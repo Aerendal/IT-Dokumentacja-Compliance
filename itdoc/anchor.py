@@ -32,19 +32,19 @@ def to_anchor(text: str) -> str:
     s = text.lower().strip()
 
     # Nagłówki faz — specjalny format zachowany z reindex_sections.py
-    m = re.match(r'^faza\s+(\d+)\s*:', s)
+    m = re.match(r"^faza\s+(\d+)\s*:", s)
     if m:
         n = int(m.group(1))
         return f"phase-{n:02d}"
 
     # Strip polskich diakrytyków (usunięcie, nie transliteracja — zgodne z DB)
-    s = s.encode('ascii', 'ignore').decode('ascii')
+    s = s.encode("ascii", "ignore").decode("ascii")
 
     # Tylko alfanumeryczne, spacje i myślniki
-    s = re.sub(r'[^a-z0-9\s\-]', '', s)
+    s = re.sub(r"[^a-z0-9\s\-]", "", s)
 
     # Spacje → myślnik, kolaps wielokrotnych
-    s = re.sub(r'\s+', '-', s.strip())
-    s = re.sub(r'-+', '-', s)
+    s = re.sub(r"\s+", "-", s.strip())
+    s = re.sub(r"-+", "-", s)
 
     return s

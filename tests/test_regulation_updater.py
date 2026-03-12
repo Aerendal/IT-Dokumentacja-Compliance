@@ -2,18 +2,20 @@
 tests/test_regulation_updater.py — unit tests for scripts/maintenance/regulation_updater.py
 All tests use in-memory SQLite fixtures.
 """
+
 import sqlite3
+
 import pytest
 
 from scripts.maintenance.regulation_updater import (
-    validate_match_reason,
-    validate_confidence,
+    VALID_CONFIDENCE,
+    VALID_MATCH_REASONS,
+    RegulationUpdater,
     build_list_query,
     format_row_csv,
     format_row_table,
-    RegulationUpdater,
-    VALID_MATCH_REASONS,
-    VALID_CONFIDENCE,
+    validate_confidence,
+    validate_match_reason,
 )
 
 pytestmark = pytest.mark.unit
@@ -22,6 +24,7 @@ pytestmark = pytest.mark.unit
 # ---------------------------------------------------------------------------
 # Helpers / Fixtures
 # ---------------------------------------------------------------------------
+
 
 def _make_schema(conn: sqlite3.Connection) -> None:
     conn.executescript("""
@@ -78,6 +81,7 @@ def updater(db_path):
 # Validation helpers
 # ---------------------------------------------------------------------------
 
+
 class TestValidateMatchReason:
     def test_valid_reasons_accepted(self):
         for reason in VALID_MATCH_REASONS:
@@ -104,6 +108,7 @@ class TestValidateConfidence:
 # ---------------------------------------------------------------------------
 # build_list_query
 # ---------------------------------------------------------------------------
+
 
 class TestBuildListQuery:
     def test_no_filters_returns_base_sql(self):
@@ -136,6 +141,7 @@ class TestBuildListQuery:
 # ---------------------------------------------------------------------------
 # format_row_csv / format_row_table
 # ---------------------------------------------------------------------------
+
 
 class TestFormatRowCsv:
     def test_returns_csv_line(self):
@@ -172,16 +178,24 @@ class TestFormatRowTable:
             "status": "ok",
         }
         widths = {
-            "doc_path": 20, "standard_code": 15,
-            "match_reason": 10, "confidence": 8, "status": 8,
+            "doc_path": 20,
+            "standard_code": 15,
+            "match_reason": 10,
+            "confidence": 8,
+            "status": 8,
         }
         line = format_row_table(row, widths)
         assert "ISO27001" in line
         assert "core/auth.md" in line
 
     def test_uses_default_widths_when_empty(self):
-        row = {"doc_path": "a.md", "standard_code": "S", "match_reason": "m",
-               "confidence": "high", "status": "ok"}
+        row = {
+            "doc_path": "a.md",
+            "standard_code": "S",
+            "match_reason": "m",
+            "confidence": "high",
+            "status": "ok",
+        }
         line = format_row_table(row, {})
         assert "a.md" in line
 
@@ -189,6 +203,7 @@ class TestFormatRowTable:
 # ---------------------------------------------------------------------------
 # RegulationUpdater — add_standard_mapping
 # ---------------------------------------------------------------------------
+
 
 class TestAddStandardMapping:
     def test_adds_mapping(self, updater):
@@ -216,6 +231,7 @@ class TestAddStandardMapping:
 # RegulationUpdater — remove_standard_mapping
 # ---------------------------------------------------------------------------
 
+
 class TestRemoveStandardMapping:
     def test_removes_existing_mapping(self, updater, capsys):
         updater.add_standard_mapping("core/doc.md", "ISO27001")
@@ -233,6 +249,7 @@ class TestRemoveStandardMapping:
 # ---------------------------------------------------------------------------
 # RegulationUpdater — list_mappings
 # ---------------------------------------------------------------------------
+
 
 class TestListMappings:
     def test_returns_all_when_no_filter(self, updater):
@@ -257,6 +274,7 @@ class TestListMappings:
 # ---------------------------------------------------------------------------
 # RegulationUpdater — add_regulation_mapping
 # ---------------------------------------------------------------------------
+
 
 class TestAddRegulationMapping:
     def test_adds_regulation_mapping(self, updater):

@@ -28,7 +28,6 @@ from itdoc.db import (
 )
 from itdoc.exceptions import SchemaError
 
-
 # ─── Fixtures ──────────────────────────────────────────────────────────────
 
 
@@ -180,9 +179,11 @@ class TestValidateSchema:
         conn = open_connection(db_path)
         errors = validate_schema(conn)
         conn.close()
-        assert any("pusta" in e.lower() or "empty" in e.lower() or t in e
-                   for e in errors for t in _REQUIRED_TABLES), \
-            f"Oczekiwano błędu o pustej tabeli, got: {errors}"
+        assert any(
+            "pusta" in e.lower() or "empty" in e.lower() or t in e
+            for e in errors
+            for t in _REQUIRED_TABLES
+        ), f"Oczekiwano błędu o pustej tabeli, got: {errors}"
 
     def test_validate_schema_idempotent(self, tmp_db):
         """Dwukrotne wywołanie zwraca ten sam wynik."""
@@ -235,7 +236,7 @@ class TestCheckLinkResolutionCoverage:
         conn = open_connection(db_path)
         cov = check_link_resolution_coverage(conn)
         conn.close()
-        assert abs(cov - 1/3) < 0.001
+        assert abs(cov - 1 / 3) < 0.001
 
     def test_zero_links_returns_zero(self, tmp_path):
         db_path = tmp_path / "zero.db"
@@ -273,6 +274,7 @@ class TestEPValidateSchemaOnError:
     def test_on_error_called_for_missing_table(self, tmp_db):
         """on_error jest wywoływany gdy tabela brakuje."""
         import sqlite3
+
         conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
         # Tylko jedna tabela — pozostałe brakują
@@ -289,6 +291,7 @@ class TestEPValidateSchemaOnError:
     def test_on_error_not_called_when_schema_ok(self, tmp_db):
         """on_error NIE jest wywoływany gdy schemat jest OK."""
         from itdoc.db import _open_connection
+
         conn = _open_connection(tmp_db)
         collected = []
         errors = validate_schema(conn, on_error=collected.append)
@@ -300,6 +303,7 @@ class TestEPValidateSchemaOnError:
     def test_on_error_none_still_returns_errors(self):
         """on_error=None (domyślny) — błędy są zwracane normalnie."""
         import sqlite3
+
         conn = sqlite3.connect(":memory:")
         conn.execute("CREATE TABLE docs (id INTEGER)")
         conn.execute("INSERT INTO docs VALUES (1)")
@@ -311,6 +315,7 @@ class TestEPValidateSchemaOnError:
     def test_on_error_receives_string_messages(self, tmp_db):
         """Każda wiadomość przekazana do on_error jest stringiem."""
         import sqlite3
+
         conn = sqlite3.connect(":memory:")
         conn.execute("CREATE TABLE docs (id INTEGER)")
         conn.execute("INSERT INTO docs VALUES (1)")

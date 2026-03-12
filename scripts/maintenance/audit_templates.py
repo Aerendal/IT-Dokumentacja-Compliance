@@ -18,13 +18,13 @@ import argparse
 import hashlib
 import json
 import logging
+import os
 import sqlite3
 import sys
-import os
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from collections import defaultdict
-from typing import List, Dict, Any, Set
+from typing import Any
 
 _log = logging.getLogger(__name__)
 
@@ -38,21 +38,22 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 DEFAULT_DB = PROJECT_ROOT / "reports" / "it_doc_matrix.db"
 DEFAULT_TEMPLATES_DIR = PROJECT_ROOT / "generated_templates" / "core"
 
-ANSI_RESET  = "\033[0m"
-ANSI_RED    = "\033[91m"
-ANSI_GREEN  = "\033[92m"
+ANSI_RESET = "\033[0m"
+ANSI_RED = "\033[91m"
+ANSI_GREEN = "\033[92m"
 ANSI_YELLOW = "\033[93m"
-ANSI_BOLD   = "\033[1m"
-ANSI_DIM    = "\033[2m"
+ANSI_BOLD = "\033[1m"
+ANSI_DIM = "\033[2m"
 
-EXIT_OK    = 0
-EXIT_WARN  = 2
+EXIT_OK = 0
+EXIT_WARN = 2
 EXIT_ERROR = 1
 
 
 # ---------------------------------------------------------------------------
 # Narzedzia pomocnicze
 # ---------------------------------------------------------------------------
+
 
 def colored(text: str, color: str) -> str:
     if not sys.stdout.isatty():
@@ -80,6 +81,7 @@ def log_err(msg: str) -> None:
 # Funkcje top-level (exportowane do testow)
 # ---------------------------------------------------------------------------
 
+
 def normalize_path(path: str) -> str:
     """Normalizuje sciezke: backslash -> forward slash, lowercase."""
     return path.replace("\\", "/").strip().lower()
@@ -90,13 +92,13 @@ def compute_hash(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
 
 
-def find_ghosts(conn: sqlite3.Connection, templates_dir: Path) -> List[str]:
+def find_ghosts(conn: sqlite3.Connection, templates_dir: Path) -> list[str]:
     """
     Zwraca liste sciezek ktore sa w bazie (docs.path i gap_analysis.matched_doc_path)
     ale nie istnieja jako pliki na dysku w templates_dir.
     Sciezki w formacie np. 'core/nazwa.md'.
     """
-    db_paths: Set[str] = set()
+    db_paths: set[str] = set()
 
     # docs.path
     try:
@@ -129,14 +131,14 @@ def find_ghosts(conn: sqlite3.Connection, templates_dir: Path) -> List[str]:
     return ghosts
 
 
-def find_orphans(conn: sqlite3.Connection, templates_dir: Path) -> List[str]:
+def find_orphans(conn: sqlite3.Connection, templates_dir: Path) -> list[str]:
     """
     Zwraca liste sciezek plikow ktore istnieja na dysku w templates_dir
     ale nie maja wpisu w docs.path.
     Sciezki w formacie np. 'core/nazwa.md'.
     """
     # Pobierz sciezki z DB
-    db_paths: Set[str] = set()
+    db_paths: set[str] = set()
     try:
         cur = conn.execute("SELECT path FROM docs WHERE path IS NOT NULL AND path != 'ORPHAN'")
         for row in cur.fetchall():
@@ -155,14 +157,14 @@ def find_orphans(conn: sqlite3.Connection, templates_dir: Path) -> List[str]:
     return orphans
 
 
-def find_duplicates(templates_dir: Path) -> Dict[str, List[str]]:
+def find_duplicates(templates_dir: Path) -> dict[str, list[str]]:
     """
     Wykrywa pliki o identycznej tresci (SHA256).
     Zwraca slownik: sha256_hex -> [sciezki_relatywne].
     Uwzglednia tylko grupy z >= 2 plikami.
     """
     templates_base = templates_dir.parent
-    hash_map: Dict[str, List[str]] = defaultdict(list)
+    hash_map: dict[str, list[str]] = defaultdict(list)
 
     for md_file in sorted(templates_dir.rglob("*.md")):
         try:
@@ -176,7 +178,7 @@ def find_duplicates(templates_dir: Path) -> Dict[str, List[str]]:
     return {h: paths for h, paths in hash_map.items() if len(paths) > 1}
 
 
-def find_unmapped(conn: sqlite3.Connection) -> List[str]:
+def find_unmapped(conn: sqlite3.Connection) -> list[str]:
     """
     Zwraca liste docs.path ktore nie maja zadnego wpisu w doc_standard_mapping.
     Pomija rekordy ORPHAN i NULL.
@@ -202,6 +204,7 @@ def find_unmapped(conn: sqlite3.Connection) -> List[str]:
 # ---------------------------------------------------------------------------
 # Baza danych — inicjalizacja
 # ---------------------------------------------------------------------------
+
 
 def open_db(db_path: str) -> sqlite3.Connection:
     if not os.path.exists(db_path):
@@ -234,16 +237,22 @@ def save_audit_run(
     ghost_count: int,
     duplicate_count: int,
     unmapped_count: int,
-    report: Dict[str, Any],
+    report: dict[str, Any],
 ) -> None:
-    conn.execute("""
+    conn.execute(
+        """
         INSERT INTO audit_integrity_log
             (run_at, orphan_count, ghost_count, duplicate_count, unmapped_count, report_json)
         VALUES (datetime('now'), ?, ?, ?, ?, ?)
-    """, (
-        orphan_count, ghost_count, duplicate_count, unmapped_count,
-        json.dumps(report, ensure_ascii=False),
-    ))
+    """,
+        (
+            orphan_count,
+            ghost_count,
+            duplicate_count,
+            unmapped_count,
+            json.dumps(report, ensure_ascii=False),
+        ),
+    )
     conn.commit()
 
 
@@ -251,9 +260,10 @@ def save_audit_run(
 # Archiwizacja duchow
 # ---------------------------------------------------------------------------
 
+
 def archive_ghosts(
     conn: sqlite3.Connection,
-    ghosts: List[str],
+    ghosts: list[str],
     templates_dir: Path,
     dry_run: bool,
 ) -> int:
@@ -287,11 +297,14 @@ def archive_ghosts(
             (ghost_path,),
         ).fetchall()
         for row in rows:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO gap_analysis_archive
                     (archived_at, original_id, matched_doc_path, standard_code, confidence)
                 VALUES (datetime('now'), ?, ?, ?, ?)
-            """, (row[0], ghost_path, row["standard_code"], row["confidence"]))
+            """,
+                (row[0], ghost_path, row["standard_code"], row["confidence"]),
+            )
             archived += 1
     conn.commit()
     return archived
@@ -301,12 +314,13 @@ def archive_ghosts(
 # Raport
 # ---------------------------------------------------------------------------
 
+
 def build_report(
-    orphans: List[str],
-    ghosts: List[str],
-    duplicates: Dict[str, List[str]],
-    unmapped: List[str],
-) -> Dict[str, Any]:
+    orphans: list[str],
+    ghosts: list[str],
+    duplicates: dict[str, list[str]],
+    unmapped: list[str],
+) -> dict[str, Any]:
     return {
         "generated_at": datetime.now().isoformat(),
         "orphan_count": len(orphans),
@@ -320,30 +334,47 @@ def build_report(
     }
 
 
-def print_report(report: Dict[str, Any]) -> None:
+def print_report(report: dict[str, Any]) -> None:
     print(colored("=" * 62, ANSI_BOLD))
     print(colored("  RAPORT INTEGRALNOSCI BIBLIOTEKI SZABLONOW", ANSI_BOLD))
     print(colored("=" * 62, ANSI_BOLD))
     print(f"  Wygenerowano:    {report['generated_at'][:19]}")
-    print(f"  Sieroty (orphans):    "
-          f"{colored(str(report['orphan_count']), ANSI_YELLOW if report['orphan_count'] else ANSI_GREEN)}")
-    print(f"  Duchy (ghosts):       "
-          f"{colored(str(report['ghost_count']), ANSI_RED if report['ghost_count'] else ANSI_GREEN)}")
-    print(f"  Duplikaty tresci:     "
-          f"{colored(str(report['duplicate_count']), ANSI_YELLOW if report['duplicate_count'] else ANSI_GREEN)}")
-    print(f"  Bez mapowania std.:   "
-          f"{colored(str(report['unmapped_count']), ANSI_YELLOW if report['unmapped_count'] else ANSI_GREEN)}")
+    print(
+        f"  Sieroty (orphans):    "
+        f"{colored(str(report['orphan_count']), ANSI_YELLOW if report['orphan_count'] else ANSI_GREEN)}"
+    )
+    print(
+        f"  Duchy (ghosts):       "
+        f"{colored(str(report['ghost_count']), ANSI_RED if report['ghost_count'] else ANSI_GREEN)}"
+    )
+    print(
+        f"  Duplikaty tresci:     "
+        f"{colored(str(report['duplicate_count']), ANSI_YELLOW if report['duplicate_count'] else ANSI_GREEN)}"
+    )
+    print(
+        f"  Bez mapowania std.:   "
+        f"{colored(str(report['unmapped_count']), ANSI_YELLOW if report['unmapped_count'] else ANSI_GREEN)}"
+    )
     print(colored("-" * 62, ANSI_DIM))
 
     if report["orphans"]:
-        print(colored(f"\nSieroty ({report['orphan_count']}) — pliki na dysku bez wpisu w docs:", ANSI_BOLD))
+        print(
+            colored(
+                f"\nSieroty ({report['orphan_count']}) — pliki na dysku bez wpisu w docs:",
+                ANSI_BOLD,
+            )
+        )
         for p in report["orphans"][:20]:
             print(f"  {colored('-', ANSI_YELLOW)} {p}")
         if report["orphan_count"] > 20:
             print(colored(f"  ... ({report['orphan_count'] - 20} wiecej)", ANSI_DIM))
 
     if report["ghosts"]:
-        print(colored(f"\nDuchy ({report['ghost_count']}) — wpisy w DB bez pliku na dysku:", ANSI_BOLD))
+        print(
+            colored(
+                f"\nDuchy ({report['ghost_count']}) — wpisy w DB bez pliku na dysku:", ANSI_BOLD
+            )
+        )
         for p in report["ghosts"][:20]:
             print(f"  {colored('-', ANSI_RED)} {p}")
         if report["ghost_count"] > 20:
@@ -370,6 +401,7 @@ def print_report(report: Dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 # Glowna logika
 # ---------------------------------------------------------------------------
+
 
 def run_audit(
     db_path: str,
@@ -423,6 +455,7 @@ def run_audit(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(

@@ -47,12 +47,13 @@ Konfiguracja przez zmienną środowiskową::
     ITDOC_STRICT=1    — re-raise wszystkich wyjątków batch_continue
     ITDOC_STRICT=0    — (domyślnie) tryb normalny, loguj DEBUG i kontynuuj
 """
+
 from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator, Tuple, Type
 
 _DEFAULT_LOGGER = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ def batch_continue(
     context: str,
     *,
     logger: logging.Logger | None = None,
-    reraise: Tuple[Type[BaseException], ...] = (),
+    reraise: tuple[type[BaseException], ...] = (),
 ) -> Generator[None, None, None]:
     """Context manager for batch processing: log-and-continue on exception.
 
@@ -114,8 +115,7 @@ def batch_continue(
     except Exception as exc:
         if _strict_mode():
             raise RuntimeError(
-                f"batch_continue: exception in [{context}] "
-                f"(re-raised because ITDOC_STRICT=1)"
+                f"batch_continue: exception in [{context}] (re-raised because ITDOC_STRICT=1)"
             ) from exc
         _log.debug(
             "batch_continue: skipped [%s] — %s: %s",

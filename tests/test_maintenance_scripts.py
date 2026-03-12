@@ -14,77 +14,81 @@ from pathlib import Path
 
 import pytest
 
-# ---------------------------------------------------------------------------
-# Importy testowanych modułów
-# ---------------------------------------------------------------------------
-
-from scripts.maintenance.interactive_audit import (
-    format_preview,
-    build_filter_query,
-    parse_keypress,
-)
-from scripts.maintenance.patch_section import (
-    strip_frontmatter,
-    find_section,
-    apply_operation,
-    build_diff,
-    atomic_write,
-    _apply_action_raw,
-    _build_section_pattern,
-    count_diff_lines,
-    similarity_ratio,
-)
-from scripts.maintenance.regulation_updater import (
-    validate_match_reason,
-    validate_confidence,
-    build_list_query,
-    format_row_csv,
-)
 from scripts.maintenance.audit_templates import (
-    normalize_path,
     compute_hash,
     find_ghosts,
     find_orphans,
     find_unmapped,
-)
-from scripts.maintenance.changelog_generator import (
-    parse_git_log,
-    group_into_sessions,
-    render_markdown,
-    render_json,
-    format_date_range,
+    normalize_path,
 )
 from scripts.maintenance.bulk_section_patcher import (
+    apply_add_section,
+    apply_append_to_section,
+    apply_replace_in_section,
     ensure_changelog_table,
     log_change,
-    apply_add_section,
-    apply_replace_in_section,
-    apply_append_to_section,
 )
-from scripts.maintenance.impact_analyzer import (
-    analyze_standard,
-    analyze_regulation,
-    analyze_section,
-    analyze_doc,
+from scripts.maintenance.changelog_generator import (
+    format_date_range,
+    group_into_sessions,
+    parse_git_log,
+    render_json,
+    render_markdown,
+)
+from scripts.maintenance.changelog_tracker import (
+    cmd_export,
+    cmd_stats,
 )
 from scripts.maintenance.changelog_tracker import (
     ensure_table as ct_ensure_table,
-    cmd_stats,
-    cmd_export,
 )
-from scripts.maintenance.template_auditor import (
-    audit_file,
+from scripts.maintenance.impact_analyzer import (
+    analyze_doc,
+    analyze_regulation,
+    analyze_section,
+    analyze_standard,
+)
+
+# ---------------------------------------------------------------------------
+# Importy testowanych modułów
+# ---------------------------------------------------------------------------
+from scripts.maintenance.interactive_audit import (
+    build_filter_query,
+    format_preview,
+    parse_keypress,
+)
+from scripts.maintenance.patch_section import (
+    _apply_action_raw,
+    _build_section_pattern,
+    apply_operation,
+    atomic_write,
+    build_diff,
+    count_diff_lines,
+    find_section,
+    similarity_ratio,
+    strip_frontmatter,
+)
+from scripts.maintenance.regulation_updater import (
+    build_list_query,
+    format_row_csv,
+    validate_confidence,
+    validate_match_reason,
 )
 from scripts.maintenance.satellite_linker import (
     ensure_table as sat_ensure_table,
-    similarity_score,
-    get_unmapped_docs,
+)
+from scripts.maintenance.satellite_linker import (
     get_approved_docs,
-    suggest_satellites,
+    get_unmapped_docs,
     link_satellite,
-    unlink_satellite,
     list_satellites,
     satellite_report,
+    similarity_score,
+    suggest_satellites,
+    unlink_satellite,
+)
+from scripts.maintenance.template_auditor import (
+    audit_file,
 )
 
 # ---------------------------------------------------------------------------
@@ -98,11 +102,12 @@ pytestmark = []  # markery ustawiane per-klasa poniżej
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def mem_db():
-    conn = sqlite3.connect(':memory:')
+    conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
-    conn.executescript('''
+    conn.executescript("""
         CREATE TABLE doc_standard_mapping (
             id INTEGER PRIMARY KEY,
             doc_path TEXT NOT NULL,
@@ -178,7 +183,7 @@ def mem_db():
         INSERT INTO sections VALUES (1, "UID001", "Cel dokumentu", "cel-dokumentu", 1);
         INSERT INTO sections VALUES (2, "UID001", "Zakres", "zakres", 2);
         INSERT INTO content_links VALUES (1, "UID002", "document::Project Charter::cel-dokumentu");
-    ''')
+    """)
     yield conn
     conn.close()
 
@@ -190,12 +195,11 @@ def tmp_templates(tmp_path):
     # szablon z frontmatter
     (d / "test_template.md").write_text(
         "---\ntitle: Test\nstatus: draft\n---\n# Test Template\n\n## Cel dokumentu\nOpis celu.\n\n## Zakres\nOpis zakresu.\n",
-        encoding='utf-8'
+        encoding="utf-8",
     )
     # szablon bez frontmatter
     (d / "no_frontmatter.md").write_text(
-        "# No Frontmatter\n\n## Sekcja A\nTreść A.\n",
-        encoding='utf-8'
+        "# No Frontmatter\n\n## Sekcja A\nTreść A.\n", encoding="utf-8"
     )
     return d
 
@@ -205,8 +209,7 @@ def tmp_templates(tmp_path):
 # ---------------------------------------------------------------------------
 
 _SAMPLE_GIT_LOG = (
-    "COMMIT|abc123def456|2024-03-15|Add project charter|Jan Kowalski\n"
-    "M\tcore/project_charter.md\n"
+    "COMMIT|abc123def456|2024-03-15|Add project charter|Jan Kowalski\nM\tcore/project_charter.md\n"
 )
 
 _SAMPLE_GIT_LOG_TWO_DAYS = (
@@ -221,9 +224,9 @@ _SAMPLE_GIT_LOG_TWO_DAYS = (
 # TestInteractiveAuditUnit
 # ===========================================================================
 
+
 @pytest.mark.unit
 class TestInteractiveAuditUnit:
-
     def test_format_preview_returns_string(self):
         result = format_preview("core/test.md", "ISO 27001", "keyword_match", "Test Doc")
         assert isinstance(result, str)
@@ -283,19 +286,16 @@ class TestInteractiveAuditUnit:
 # TestPatchSectionUnit
 # ===========================================================================
 
+
 @pytest.mark.unit
 class TestPatchSectionUnit:
-
     _CONTENT_WITH_FM = (
         "---\ntitle: Test\nstatus: draft\n---\n"
         "# Test Template\n\n"
         "## Cel dokumentu\nOpis celu.\n\n"
         "## Zakres\nOpis zakresu.\n"
     )
-    _CONTENT_NO_FM = (
-        "# No Frontmatter\n\n"
-        "## Sekcja A\nTreść A.\n"
-    )
+    _CONTENT_NO_FM = "# No Frontmatter\n\n## Sekcja A\nTreść A.\n"
 
     def test_strip_frontmatter_basic(self):
         fm, body = strip_frontmatter(self._CONTENT_WITH_FM)
@@ -304,7 +304,7 @@ class TestPatchSectionUnit:
 
     def test_strip_frontmatter_no_frontmatter(self):
         fm, body = strip_frontmatter(self._CONTENT_NO_FM)
-        assert fm == ''
+        assert fm == ""
 
     def test_strip_frontmatter_preserves_body(self):
         fm, body = strip_frontmatter(self._CONTENT_WITH_FM)
@@ -334,7 +334,7 @@ class TestPatchSectionUnit:
         # Implementacja używa re.escape bez IGNORECASE — uppercase nie pasuje
         _, body = strip_frontmatter(self._CONTENT_WITH_FM)
         result_lower = find_section(body, "Cel dokumentu")
-        result_upper = find_section(body, "CEL DOKUMENTU")
+        find_section(body, "CEL DOKUMENTU")
         # Sprawdzamy spójność zachowania (nie zakładamy case-insensitive)
         assert result_lower is not None  # lowercase powinno działać
         # uppercase może zwrócić None — to jest dozwolone zachowanie
@@ -388,16 +388,16 @@ class TestPatchSectionUnit:
         target = tmp_path / "output.md"
         atomic_write(target, "# Hello\n")
         assert target.exists()
-        assert target.read_text(encoding='utf-8') == "# Hello\n"
+        assert target.read_text(encoding="utf-8") == "# Hello\n"
 
 
 # ===========================================================================
 # TestRegulationUpdaterUnit
 # ===========================================================================
 
+
 @pytest.mark.unit
 class TestRegulationUpdaterUnit:
-
     def test_validate_match_reason_valid(self):
         # Wartości zdefiniowane w VALID_MATCH_REASONS regulation_updater.py
         assert validate_match_reason("keyword_match") is True
@@ -477,9 +477,9 @@ class TestRegulationUpdaterUnit:
 # TestAuditTemplatesUnit
 # ===========================================================================
 
+
 @pytest.mark.unit
 class TestAuditTemplatesUnit:
-
     def test_normalize_path_backslash(self):
         result = normalize_path("core\\test\\file.md")
         assert "\\" not in result
@@ -535,9 +535,9 @@ class TestAuditTemplatesUnit:
 # TestChangelogGeneratorUnit
 # ===========================================================================
 
+
 @pytest.mark.unit
 class TestChangelogGeneratorUnit:
-
     def test_parse_git_log_empty_string(self):
         result = parse_git_log("")
         assert result == []
@@ -598,9 +598,9 @@ class TestChangelogGeneratorUnit:
 # TestIntegrationDB
 # ===========================================================================
 
+
 @pytest.mark.integration
 class TestIntegrationDB:
-
     def test_build_filter_query_standard_filters_correctly(self, mem_db):
         sql, params = build_filter_query("PMBOK", None, 100)
         rows = mem_db.execute(sql, params).fetchall()
@@ -616,20 +616,17 @@ class TestIntegrationDB:
             assert row["standard_code"] == "PMBOK 7"
 
     def test_validate_match_reason_matches_db_values(self, mem_db):
-        rows = mem_db.execute(
-            "SELECT DISTINCT match_reason FROM doc_standard_mapping"
-        ).fetchall()
+        rows = mem_db.execute("SELECT DISTINCT match_reason FROM doc_standard_mapping").fetchall()
         for row in rows:
             reason = row[0]
             # Wartości z DB powinny być walidowane przez interactive_audit.VALID_REASONS
             from scripts.maintenance.interactive_audit import VALID_REASONS
+
             assert reason in VALID_REASONS, f"Nieznany reason w DB: {reason}"
 
     def test_find_unmapped_detects_all_unmapped(self, mem_db):
         # Dodaj doc bez mappingu
-        mem_db.execute(
-            "INSERT INTO docs VALUES ('core/unmapped_doc.md', 'Unmapped Doc', 'UID999')"
-        )
+        mem_db.execute("INSERT INTO docs VALUES ('core/unmapped_doc.md', 'Unmapped Doc', 'UID999')")
         mem_db.commit()
         result = find_unmapped(mem_db)
         assert "core/unmapped_doc.md" in result
@@ -638,11 +635,11 @@ class TestIntegrationDB:
         # Utwórz DB z ścieżkami odpowiadającymi plikom na dysku
         d = tmp_path / "core"
         d.mkdir()
-        (d / "existing.md").write_text("# Existing\n", encoding='utf-8')
+        (d / "existing.md").write_text("# Existing\n", encoding="utf-8")
 
-        conn = sqlite3.connect(':memory:')
+        conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
-        conn.executescript('''
+        conn.executescript("""
             CREATE TABLE docs (path TEXT PRIMARY KEY, title TEXT, uid TEXT);
             CREATE TABLE gap_analysis (
                 id INTEGER PRIMARY KEY,
@@ -650,7 +647,7 @@ class TestIntegrationDB:
                 matched_doc_path TEXT
             );
             INSERT INTO docs VALUES ("core/existing.md", "Existing", "UID001");
-        ''')
+        """)
 
         ghosts = find_ghosts(conn, d)
         assert ghosts == []
@@ -660,32 +657,30 @@ class TestIntegrationDB:
         # Utwórz plik i DB z pasującą ścieżką
         d = tmp_path / "core"
         d.mkdir()
-        (d / "mapped.md").write_text("# Mapped\n", encoding='utf-8')
+        (d / "mapped.md").write_text("# Mapped\n", encoding="utf-8")
 
-        conn = sqlite3.connect(':memory:')
+        conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
-        conn.executescript('''
+        conn.executescript("""
             CREATE TABLE docs (path TEXT PRIMARY KEY, title TEXT, uid TEXT);
             INSERT INTO docs VALUES ("core/mapped.md", "Mapped", "UID001");
-        ''')
+        """)
 
         orphans = find_orphans(conn, d)
         assert orphans == []
         conn.close()
 
     def test_strip_frontmatter_real_template(self, tmp_templates):
-        content = (tmp_templates / "test_template.md").read_text(encoding='utf-8')
+        content = (tmp_templates / "test_template.md").read_text(encoding="utf-8")
         fm, body = strip_frontmatter(content)
         assert fm.startswith("---")
         assert "title: Test" in fm
         assert "# Test Template" in body
 
     def test_apply_replace_modifies_section(self, tmp_templates):
-        content = (tmp_templates / "test_template.md").read_text(encoding='utf-8')
+        content = (tmp_templates / "test_template.md").read_text(encoding="utf-8")
         _, body = strip_frontmatter(content)
-        result = apply_operation(
-            body, "Cel dokumentu", "replace", content="Nowy opis po zmianie."
-        )
+        result = apply_operation(body, "Cel dokumentu", "replace", content="Nowy opis po zmianie.")
         assert "Nowy opis po zmianie." in result
         assert "Opis celu." not in result
 
@@ -694,7 +689,7 @@ class TestIntegrationDB:
         content = "# Readable\n\nTreść testowa.\n"
         atomic_write(target, content)
         assert target.exists()
-        read_back = target.read_text(encoding='utf-8')
+        read_back = target.read_text(encoding="utf-8")
         assert read_back == content
 
     def test_render_markdown_with_empty_data(self):
@@ -709,13 +704,16 @@ class TestIntegrationDB:
 # TestBulkSectionPatcherUnit
 # ===========================================================================
 
+
 @pytest.mark.unit
 class TestBulkSectionPatcherUnit:
     """Testy jednostkowe dla bulk_section_patcher.py."""
 
     def test_ensure_changelog_table_creates_table(self, mem_db):
         ensure_changelog_table(mem_db)
-        cur = mem_db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='template_changelog'")
+        cur = mem_db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='template_changelog'"
+        )
         assert cur.fetchone() is not None
 
     def test_ensure_changelog_table_idempotent(self, mem_db):
@@ -726,7 +724,9 @@ class TestBulkSectionPatcherUnit:
         ensure_changelog_table(mem_db)
         log_change(mem_db, "core/test.md", "bulk_patch", "Powód", "Zmiana", "{}")
         mem_db.commit()
-        row = mem_db.execute("SELECT * FROM template_changelog WHERE template_path='core/test.md'").fetchone()
+        row = mem_db.execute(
+            "SELECT * FROM template_changelog WHERE template_path='core/test.md'"
+        ).fetchone()
         assert row is not None
         assert row["change_type"] == "bulk_patch"
 
@@ -734,7 +734,9 @@ class TestBulkSectionPatcherUnit:
         ensure_changelog_table(mem_db)
         log_change(mem_db, "core/a.md", "test_op", "mój powód", "diff", "{}")
         mem_db.commit()
-        row = mem_db.execute("SELECT change_reason FROM template_changelog WHERE template_path='core/a.md'").fetchone()
+        row = mem_db.execute(
+            "SELECT change_reason FROM template_changelog WHERE template_path='core/a.md'"
+        ).fetchone()
         assert row["change_reason"] == "mój powód"
 
     def test_apply_add_section_appends_when_no_insert_before(self):
@@ -752,7 +754,9 @@ class TestBulkSectionPatcherUnit:
 
     def test_apply_replace_in_section_replaces_text(self):
         content = "# Dok\n\n## Cel dokumentu\nStary tekst.\n\n## Zakres\nOpis.\n"
-        new_content, msg = apply_replace_in_section(content, "## Cel dokumentu", "Stary tekst.", "Nowy tekst.")
+        new_content, msg = apply_replace_in_section(
+            content, "## Cel dokumentu", "Stary tekst.", "Nowy tekst."
+        )
         assert "Nowy tekst." in new_content
         assert "Stary tekst." not in new_content
         assert msg
@@ -765,7 +769,9 @@ class TestBulkSectionPatcherUnit:
 
     def test_apply_append_to_section_adds_text(self):
         content = "# Dok\n\n## Standardy i compliance\n- ISO 9001\n\n## Zakres\nOpis.\n"
-        new_content, msg = apply_append_to_section(content, "## Standardy i compliance", "- ISO/IEC 27001")
+        new_content, msg = apply_append_to_section(
+            content, "## Standardy i compliance", "- ISO/IEC 27001"
+        )
         assert "- ISO/IEC 27001" in new_content
         assert msg
 
@@ -779,6 +785,7 @@ class TestBulkSectionPatcherUnit:
 # ===========================================================================
 # TestImpactAnalyzerUnit
 # ===========================================================================
+
 
 @pytest.mark.unit
 class TestImpactAnalyzerUnit:
@@ -833,6 +840,7 @@ class TestImpactAnalyzerUnit:
 # TestChangelogTrackerUnit
 # ===========================================================================
 
+
 @pytest.mark.unit
 class TestChangelogTrackerUnit:
     """Testy jednostkowe dla changelog_tracker.py."""
@@ -842,7 +850,9 @@ class TestChangelogTrackerUnit:
         mem_db.execute("DROP TABLE IF EXISTS template_changelog")
         mem_db.commit()
         ct_ensure_table(mem_db)
-        cur = mem_db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='template_changelog'")
+        cur = mem_db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='template_changelog'"
+        )
         assert cur.fetchone() is not None
 
     def test_ensure_table_idempotent(self, mem_db):
@@ -852,6 +862,7 @@ class TestChangelogTrackerUnit:
     def test_cmd_stats_runs_without_error(self, mem_db, capsys):
         class FakeArgs:
             pass
+
         ct_ensure_table(mem_db)
         cmd_stats(mem_db, FakeArgs())  # nie rzuca wyjątku
         captured = capsys.readouterr()
@@ -863,12 +874,13 @@ class TestChangelogTrackerUnit:
         for i in range(3):
             mem_db.execute(
                 "INSERT INTO template_changelog (template_path, changed_at, change_type) VALUES (?,?,?)",
-                (f"core/doc{i}.md", "2026-03-10T10:00:00", "test_type")
+                (f"core/doc{i}.md", "2026-03-10T10:00:00", "test_type"),
             )
         mem_db.commit()
 
         class FakeArgs:
             pass
+
         cmd_stats(mem_db, FakeArgs())
         captured = capsys.readouterr()
         assert "3" in captured.out
@@ -877,12 +889,13 @@ class TestChangelogTrackerUnit:
         ct_ensure_table(mem_db)
         mem_db.execute(
             "INSERT INTO template_changelog (template_path, changed_at, change_type) VALUES (?,?,?)",
-            ("core/export_test.md", "2026-03-10T12:00:00", "bulk_patch")
+            ("core/export_test.md", "2026-03-10T12:00:00", "bulk_patch"),
         )
         mem_db.commit()
 
         class FakeArgs:
             save = None
+
         cmd_export(mem_db, FakeArgs())
         captured = capsys.readouterr()
         data = json.loads(captured.out)
@@ -895,6 +908,7 @@ class TestChangelogTrackerUnit:
 
         class FakeArgs:
             save = str(out_file)
+
         cmd_export(mem_db, FakeArgs())
         assert out_file.exists()
         data = json.loads(out_file.read_text(encoding="utf-8"))
@@ -913,6 +927,7 @@ class TestChangelogTrackerUnit:
 
         class FakeArgs:
             pass
+
         ct_ensure_table(mem_db)
         cmd_stats(mem_db, FakeArgs())  # nie rzuca nawet przy pustej tabeli
         captured = capsys.readouterr()
@@ -925,6 +940,7 @@ class TestChangelogTrackerUnit:
 
         class FakeArgs:
             save = None
+
         cmd_export(mem_db, FakeArgs())
         captured = capsys.readouterr()
         data = json.loads(captured.out)
@@ -934,7 +950,7 @@ class TestChangelogTrackerUnit:
         ct_ensure_table(mem_db)
         mem_db.execute(
             "INSERT INTO template_changelog (template_path, changed_at, change_type, change_reason) VALUES (?,?,?,?)",
-            ("core/r.md", "2026-03-10", "manual", "Korekta po przeglądzie")
+            ("core/r.md", "2026-03-10", "manual", "Korekta po przeglądzie"),
         )
         mem_db.commit()
         row = mem_db.execute(
@@ -946,6 +962,7 @@ class TestChangelogTrackerUnit:
 # ===========================================================================
 # TestTemplateAuditorUnit
 # ===========================================================================
+
 
 @pytest.mark.unit
 class TestTemplateAuditorUnit:
@@ -1039,6 +1056,7 @@ class TestTemplateAuditorUnit:
 # TestPatchSectionPrivateFunctions  (podwyższenie mutation score)
 # ===========================================================================
 
+
 @pytest.mark.unit
 class TestPatchSectionPrivateFunctions:
     """Testy dla prywatnych funkcji patch_section poprawiające mutation score."""
@@ -1076,9 +1094,7 @@ class TestPatchSectionPrivateFunctions:
 
     def test_apply_action_raw_returns_none_when_no_match(self):
         pattern = _build_section_pattern("Nie ma takiej sekcji", None, None)
-        result, msg = _apply_action_raw(
-            self._BODY_WITH_SECTIONS, pattern, "replace", "cokolwiek"
-        )
+        result, msg = _apply_action_raw(self._BODY_WITH_SECTIONS, pattern, "replace", "cokolwiek")
         assert result is None
         assert msg is None
 
@@ -1187,14 +1203,14 @@ class TestPatchSectionPrivateFunctions:
 
     def test_apply_operation_replace_old_new(self):
         body = "## Cel\nStary tekst dokładny.\n\n## Zakres\nZakres.\n"
-        result = apply_operation(body, "Cel", "replace",
-                                 old="Stary tekst dokładny.", new="Zamieniony.")
+        result = apply_operation(
+            body, "Cel", "replace", old="Stary tekst dokładny.", new="Zamieniony."
+        )
         assert "Zamieniony." in result
 
     def test_apply_operation_replace_old_not_found_returns_body(self):
         body = "## Cel\nInna treść.\n\n## Zakres\nZakres.\n"
-        result = apply_operation(body, "Cel", "replace",
-                                 old="Coś czego tu nie ma.", new="Nowe.")
+        result = apply_operation(body, "Cel", "replace", old="Coś czego tu nie ma.", new="Nowe.")
         assert result == body
 
     def test_apply_operation_append_content(self):
@@ -1241,8 +1257,8 @@ class TestPatchSectionPrivateFunctions:
 
     def test_similarity_ratio_almost_same(self):
         # więcej wspólnych linii = wyższy score
-        r1 = similarity_ratio("a\nb\nc\n", "a\nb\nx\n")   # 2/4 wspólne
-        r2 = similarity_ratio("a\nb\nc\n", "x\ny\nz\n")   # 0/6 wspólne
+        r1 = similarity_ratio("a\nb\nc\n", "a\nb\nx\n")  # 2/4 wspólne
+        r2 = similarity_ratio("a\nb\nc\n", "x\ny\nz\n")  # 0/6 wspólne
         assert r1 > r2
 
     # -----------------------------------------------------------------------
@@ -1316,29 +1332,49 @@ class TestRegulationUpdaterMutationKillers:
         assert "\n" not in result
 
     def test_format_row_csv_empty_fields(self):
-        row = {"doc_path": None, "standard_code": None,
-               "match_reason": None, "confidence": None, "status": None}
+        row = {
+            "doc_path": None,
+            "standard_code": None,
+            "match_reason": None,
+            "confidence": None,
+            "status": None,
+        }
         result = format_row_csv(row)
         assert isinstance(result, str)
 
     def test_format_row_table_contains_doc_path(self):
-        widths = {"doc_path": 30, "standard_code": 15, "match_reason": 15,
-                  "confidence": 8, "status": 8}
+        widths = {
+            "doc_path": 30,
+            "standard_code": 15,
+            "match_reason": 15,
+            "confidence": 8,
+            "status": 8,
+        }
         result = format_row_table(self._SAMPLE_ROW, widths)
         assert "core/api.md" in result
         assert "ISO27001" in result
 
     def test_format_row_table_truncates_long_path(self):
         row = {**self._SAMPLE_ROW, "doc_path": "a" * 100}
-        widths = {"doc_path": 20, "standard_code": 15, "match_reason": 15,
-                  "confidence": 8, "status": 8}
+        widths = {
+            "doc_path": 20,
+            "standard_code": 15,
+            "match_reason": 15,
+            "confidence": 8,
+            "status": 8,
+        }
         result = format_row_table(row, widths)
         assert "a" * 21 not in result
 
     def test_format_row_table_handles_none_confidence(self):
         row = {**self._SAMPLE_ROW, "confidence": None, "status": None}
-        widths = {"doc_path": 30, "standard_code": 15, "match_reason": 15,
-                  "confidence": 8, "status": 8}
+        widths = {
+            "doc_path": 30,
+            "standard_code": 15,
+            "match_reason": 15,
+            "confidence": 8,
+            "status": 8,
+        }
         result = format_row_table(row, widths)
         assert "-" in result
 
@@ -1377,6 +1413,7 @@ class TestRegulationUpdaterMutationKillers:
 # ===========================================================================
 # TestImpactAnalyzerMutationKillers — zabijamy survived mutanty w analyze_*
 # ===========================================================================
+
 
 @pytest.mark.unit
 class TestImpactAnalyzerMutationKillers:
@@ -1470,6 +1507,7 @@ class TestImpactAnalyzerMutationKillers:
 # ===========================================================================
 # TestTemplateAuditorMutationKillers — graniczne wartości score
 # ===========================================================================
+
 
 @pytest.mark.unit
 class TestTemplateAuditorMutationKillers:
@@ -1567,8 +1605,7 @@ class TestTemplateAuditorMutationKillers:
 # ===========================================================================
 
 _GIT_LOG_RENAME = (
-    "COMMIT|ren111|2024-05-01|Rename file|Admin\n"
-    "R100\tcore/old_name.md\tcore/new_name.md\n"
+    "COMMIT|ren111|2024-05-01|Rename file|Admin\nR100\tcore/old_name.md\tcore/new_name.md\n"
 )
 
 _GIT_LOG_MULTI_FILES = (
@@ -1579,16 +1616,12 @@ _GIT_LOG_MULTI_FILES = (
 )
 
 _GIT_LOG_TWO_SAME_DAY = (
-    "COMMIT|c1|2024-07-01|First|Dev\n"
-    "M\tcore/a.md\n"
-    "COMMIT|c2|2024-07-01|Second|Dev\n"
-    "M\tcore/b.md\n"
+    "COMMIT|c1|2024-07-01|First|Dev\nM\tcore/a.md\nCOMMIT|c2|2024-07-01|Second|Dev\nM\tcore/b.md\n"
 )
 
 
 @pytest.mark.unit
 class TestChangelogGeneratorMutationKillers:
-
     # parse_git_log: subject i author
     def test_parse_git_log_subject_correct(self):
         result = parse_git_log(_SAMPLE_GIT_LOG)
@@ -1700,8 +1733,14 @@ class TestChangelogGeneratorMutationKillers:
 
     def test_render_markdown_shows_changelog_rows(self):
         sessions = []
-        rows = [{"changed_at": "2024-03-15T10:00:00", "template_path": "core/t.md",
-                 "change_type": "bulk_patch", "change_reason": "Test reason"}]
+        rows = [
+            {
+                "changed_at": "2024-03-15T10:00:00",
+                "template_path": "core/t.md",
+                "change_type": "bulk_patch",
+                "change_reason": "Test reason",
+            }
+        ]
         result = render_markdown(sessions, rows)
         assert "core/t.md" in result
         assert "bulk_patch" in result
@@ -1746,12 +1785,13 @@ class TestChangelogGeneratorMutationKillers:
 # TestSatelliteLinker
 # ===========================================================================
 
+
 @pytest.fixture
 def sat_db():
     """In-memory DB z tabelami docs + doc_standard_mapping + doc_satellites."""
-    conn = sqlite3.connect(':memory:')
+    conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
-    conn.executescript('''
+    conn.executescript("""
         CREATE TABLE docs (
             path TEXT PRIMARY KEY,
             title TEXT,
@@ -1775,7 +1815,7 @@ def sat_db():
         INSERT INTO doc_standard_mapping VALUES (1, 'core/project_charter.md', 'PMBOK 7', 'keyword_match');
         INSERT INTO doc_standard_mapping VALUES (2, 'core/isms_policy.md', 'ISO/IEC 27001', 'keyword_match');
         INSERT INTO doc_standard_mapping VALUES (3, 'core/risk_register.md', 'ISO 31000', 'manual');
-    ''')
+    """)
     sat_ensure_table(conn)
     yield conn
     conn.close()
@@ -1783,7 +1823,6 @@ def sat_db():
 
 @pytest.mark.unit
 class TestSatelliteLinker:
-
     # similarity_score
     def test_similarity_score_identical(self):
         assert similarity_score("Project Charter", "Project Charter") == 1.0
@@ -1814,9 +1853,10 @@ class TestSatelliteLinker:
     # ensure_table
     def test_ensure_table_creates_table(self, sat_db):
         sat_ensure_table(sat_db)
-        tables = [r[0] for r in sat_db.execute(
-            "SELECT name FROM sqlite_master WHERE type='table'"
-        ).fetchall()]
+        tables = [
+            r[0]
+            for r in sat_db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+        ]
         assert "doc_satellites" in tables
 
     def test_ensure_table_idempotent(self, sat_db):
@@ -1867,7 +1907,9 @@ class TestSatelliteLinker:
 
     def test_suggest_charter_template_to_charter(self, sat_db):
         result = suggest_satellites(sat_db, top=20, min_score=0.01)
-        charter_suggestions = [r for r in result if r["satellite_path"] == "core/charter_template.md"]
+        charter_suggestions = [
+            r for r in result if r["satellite_path"] == "core/charter_template.md"
+        ]
         assert len(charter_suggestions) >= 1
         assert charter_suggestions[0]["parent_path"] == "core/project_charter.md"
 
@@ -1892,9 +1934,14 @@ class TestSatelliteLinker:
 
     def test_suggest_empty_when_no_unmapped(self, sat_db):
         # Dodaj mapowania dla wszystkich niezmapowanych
-        for path in ["core/charter_template.md", "core/security_checklist.md", "core/random_doc.md"]:
+        for path in [
+            "core/charter_template.md",
+            "core/security_checklist.md",
+            "core/random_doc.md",
+        ]:
             sat_db.execute(
-                "INSERT INTO doc_standard_mapping VALUES (NULL, ?, 'TEST', 'keyword_match')", (path,)
+                "INSERT INTO doc_standard_mapping VALUES (NULL, ?, 'TEST', 'keyword_match')",
+                (path,),
             )
         sat_db.commit()
         result = suggest_satellites(sat_db, min_score=0.01)
@@ -1918,12 +1965,16 @@ class TestSatelliteLinker:
         assert rows[0]["parent_path"] == "core/project_charter.md"
 
     def test_link_satellite_stores_note(self, sat_db):
-        link_satellite(sat_db, "core/charter_template.md", "core/project_charter.md", note="test note")
+        link_satellite(
+            sat_db, "core/charter_template.md", "core/project_charter.md", note="test note"
+        )
         row = sat_db.execute("SELECT note FROM doc_satellites").fetchone()
         assert row["note"] == "test note"
 
     def test_link_satellite_stores_linked_by(self, sat_db):
-        link_satellite(sat_db, "core/charter_template.md", "core/project_charter.md", linked_by="ci_auto")
+        link_satellite(
+            sat_db, "core/charter_template.md", "core/project_charter.md", linked_by="ci_auto"
+        )
         row = sat_db.execute("SELECT linked_by FROM doc_satellites").fetchone()
         assert row["linked_by"] == "ci_auto"
 

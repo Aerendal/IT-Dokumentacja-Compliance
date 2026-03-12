@@ -45,8 +45,8 @@ def main():
 
     # Get phases table to map phase_number → phase_id
     cur.execute("SELECT phase_number, id FROM phases WHERE id IS NOT NULL LIMIT 1")
-    sample = cur.fetchone()
-    has_phase_id = sample is not None
+    # Check if id column exists (not just rowid)
+    cur.fetchone()  # discard sample — just validates the query runs
 
     cur.execute("SELECT phase_number, rowid FROM phases")
     phase_num_to_rowid = {r[0]: r[1] for r in cur.fetchall()}
@@ -61,24 +61,29 @@ def main():
 
         try:
             if "doc_id" in dpm_cols and "phase_id" in dpm_cols:
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT OR IGNORE INTO document_phase_mapping (doc_id, phase_id, action)
                     VALUES (?, ?, ?)
-                """, (doc_uid, phase_rowid, "used"))
+                """,
+                    (doc_uid, phase_rowid, "used"),
+                )
                 if cur.rowcount:
                     inserted_dpm += 1
         except Exception as exc:
-            _log.debug("document_phase_mapping insert skipped for %s: %s", doc_uid, exc)────────────────────────────────────────────────
+            _log.debug("document_phase_mapping insert skipped for %s: %s", doc_uid, exc)
+
+    # ── document_lifecycle ────────────────────────────────────────────────────
     cur.execute("PRAGMA table_info(document_lifecycle)")
     dlc_cols = {r[1] for r in cur.fetchall()}
 
     # Lifecycle states for each doc: create → review → approve → active → archive
     lifecycle_states = [
-        ("draft",    "Tworzenie",   "Dokument jest tworzony po raz pierwszy"),
-        ("review",   "Przegląd",    "Dokument jest przeglądany przez interesariuszy"),
-        ("approved", "Zatwierdzone","Dokument zatwierdzony do użycia"),
-        ("active",   "Aktywne",     "Dokument jest aktywnie używany"),
-        ("archived", "Archiwum",    "Dokument wycofany, przechowywany jako referencja"),
+        ("draft", "Tworzenie", "Dokument jest tworzony po raz pierwszy"),
+        ("review", "Przegląd", "Dokument jest przeglądany przez interesariuszy"),
+        ("approved", "Zatwierdzone", "Dokument zatwierdzony do użycia"),
+        ("active", "Aktywne", "Dokument jest aktywnie używany"),
+        ("archived", "Archiwum", "Dokument wycofany, przechowywany jako referencja"),
     ]
 
     inserted_dlc = 0
@@ -90,14 +95,19 @@ def main():
         for doc_uid in sample_docs:
             for state, label, desc in lifecycle_states:
                 try:
-                    cur.execute("""
+                    cur.execute(
+                        """
                         INSERT OR IGNORE INTO document_lifecycle (doc_id, lifecycle_state, description)
                         VALUES (?, ?, ?)
-                    """, (doc_uid, state, desc))
+                    """,
+                        (doc_uid, state, desc),
+                    )
                     if cur.rowcount:
                         inserted_dlc += 1
                 except Exception as exc:
-                    _log.debug("document_lifecycle insert skipped for %s/%s: %s", doc_uid, state, exc)
+                    _log.debug(
+                        "document_lifecycle insert skipped for %s/%s: %s", doc_uid, state, exc
+                    )
                     break  # if schema doesn't match, skip all
 
     conn.commit()

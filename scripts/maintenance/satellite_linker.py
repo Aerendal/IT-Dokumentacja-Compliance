@@ -24,7 +24,7 @@ Schema w DB:
 import argparse
 import sqlite3
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 # ---------------------------------------------------------------------------
 # Konfiguracja
@@ -49,9 +49,11 @@ CREATE TABLE IF NOT EXISTS doc_satellites (
 # Pomocnicze
 # ---------------------------------------------------------------------------
 
+
 def _words(text: str) -> set:
     """Zwraca zbiór słów z tekstu (lowercase, min 3 znaki)."""
     import re
+
     tokens = re.findall(r"[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+", text.lower())
     return {t for t in tokens if len(t) >= 3}
 
@@ -74,7 +76,8 @@ def ensure_table(conn: sqlite3.Connection) -> None:
 # Core operations
 # ---------------------------------------------------------------------------
 
-def get_unmapped_docs(conn: sqlite3.Connection) -> List[dict]:
+
+def get_unmapped_docs(conn: sqlite3.Connection) -> list[dict]:
     """Zwraca dokumenty bez żadnego mapowania standardu."""
     rows = conn.execute("""
         SELECT d.path, d.title
@@ -90,7 +93,7 @@ def get_unmapped_docs(conn: sqlite3.Connection) -> List[dict]:
     return [{"path": r["path"], "title": r["title"] or ""} for r in rows]
 
 
-def get_approved_docs(conn: sqlite3.Connection) -> List[dict]:
+def get_approved_docs(conn: sqlite3.Connection) -> list[dict]:
     """Zwraca dokumenty z zatwierdzonymi mapowaniami (keyword_match lub manual)."""
     rows = conn.execute("""
         SELECT DISTINCT d.path, d.title, GROUP_CONCAT(m.standard_code, ', ') AS standards
@@ -100,14 +103,17 @@ def get_approved_docs(conn: sqlite3.Connection) -> List[dict]:
         GROUP BY d.path
         ORDER BY d.path
     """).fetchall()
-    return [{"path": r["path"], "title": r["title"] or "", "standards": r["standards"] or ""} for r in rows]
+    return [
+        {"path": r["path"], "title": r["title"] or "", "standards": r["standards"] or ""}
+        for r in rows
+    ]
 
 
 def suggest_satellites(
     conn: sqlite3.Connection,
     top: int = 20,
     min_score: float = 0.25,
-) -> List[dict]:
+) -> list[dict]:
     """
     Dla każdego niezmapowanego dokumentu szuka najbardziej podobnego
     zatwierdzonego dokumentu (Jaccard similarity tytułów).
@@ -129,14 +135,16 @@ def suggest_satellites(
                 best_score = score
                 best_parent = par
         if best_score >= min_score and best_parent:
-            results.append({
-                "satellite_path": sat["path"],
-                "satellite_title": sat["title"],
-                "parent_path": best_parent["path"],
-                "parent_title": best_parent["title"],
-                "parent_standards": best_parent["standards"],
-                "score": best_score,
-            })
+            results.append(
+                {
+                    "satellite_path": sat["path"],
+                    "satellite_title": sat["title"],
+                    "parent_path": best_parent["path"],
+                    "parent_title": best_parent["title"],
+                    "parent_standards": best_parent["standards"],
+                    "score": best_score,
+                }
+            )
 
     results.sort(key=lambda x: x["score"], reverse=True)
     return results[:top]
@@ -185,7 +193,7 @@ def unlink_satellite(
 def list_satellites(
     conn: sqlite3.Connection,
     parent_path: Optional[str] = None,
-) -> List[dict]:
+) -> list[dict]:
     """Zwraca listę powiązań satelitarnych (opcjonalnie filtruje po rodzicu)."""
     ensure_table(conn)
     if parent_path:
@@ -255,6 +263,7 @@ def satellite_report(conn: sqlite3.Connection) -> str:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="Zarządzanie szablonami satelitarnymi w bibliotece IT.",
@@ -291,7 +300,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--suggest", action="store_true", help=argparse.SUPPRESS)
     p.add_argument("--top", type=int, default=20)
     p.add_argument("--min-score", type=float, default=0.25)
-    p.add_argument("--link", nargs=2, metavar=("SATELLITE", "PARENT"), help="--link satellite_path parent_path")
+    p.add_argument(
+        "--link", nargs=2, metavar=("SATELLITE", "PARENT"), help="--link satellite_path parent_path"
+    )
     p.add_argument("--note", default=None)
     p.add_argument("--unlink", nargs=2, metavar=("SATELLITE", "PARENT"))
     p.add_argument("--list", action="store_true")

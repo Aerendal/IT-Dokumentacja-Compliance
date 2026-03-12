@@ -52,14 +52,12 @@ TARGET_SECTIONS = {
     "## Metryki jakości",
     "## Kryteria ukończenia",
     "## Cel dokumentu",
-    "## Fazy cyklu życia",
     "## Struktura sekcji (szkielet)",
     "## Jak używać dokumentu",
 }
 
 PLACEHOLDER_RE = re.compile(
-    r'^\s*-\s*\[.+?\]|^\s*\[.+?\]|Uzupelnij zgodnie|Opisz co wchodzi',
-    re.MULTILINE
+    r"^\s*-\s*\[.+?\]|^\s*\[.+?\]|Uzupelnij zgodnie|Opisz co wchodzi", re.MULTILINE
 )
 
 
@@ -71,7 +69,7 @@ def is_placeholder_body(body: str) -> bool:
     lines = [l.strip() for l in stripped.splitlines() if l.strip()]
     if not lines:
         return True
-    placeholder_lines = sum(1 for l in lines if re.match(r'^\[.+\]$|^-\s*\[.+\]$', l))
+    placeholder_lines = sum(1 for l in lines if re.match(r"^\[.+\]$|^-\s*\[.+\]$", l))
     # Also check for the generic guidance text we inserted
     generic_markers = [
         "Uzupełnij zgodnie z kontekstem",
@@ -114,7 +112,7 @@ def is_placeholder_body(body: str) -> bool:
 
 def extract_title_from_file(text: str, filename: str) -> str:
     """Extract document title from H1 heading or filename."""
-    m = re.search(r'^# (.+)$', text, re.MULTILINE)
+    m = re.search(r"^# (.+)$", text, re.MULTILINE)
     if m:
         return m.group(1).strip()
     return filename.replace("_", " ").replace(".md", "")
@@ -122,16 +120,41 @@ def extract_title_from_file(text: str, filename: str) -> str:
 
 def title_keywords(title: str) -> set:
     """Extract meaningful keywords from title."""
-    stop = {"and", "or", "the", "a", "an", "of", "in", "for", "to", "with",
-            "plan", "document", "dokumentu", "i", "w", "z", "do", "na", "dla",
-            "oraz", "lub", "jak", "jest", "nie", "co", "sie"}
-    words = re.findall(r'[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+', title.lower())
+    stop = {
+        "and",
+        "or",
+        "the",
+        "a",
+        "an",
+        "of",
+        "in",
+        "for",
+        "to",
+        "with",
+        "plan",
+        "document",
+        "dokumentu",
+        "i",
+        "w",
+        "z",
+        "do",
+        "na",
+        "dla",
+        "oraz",
+        "lub",
+        "jak",
+        "jest",
+        "nie",
+        "co",
+        "sie",
+    }
+    words = re.findall(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+", title.lower())
     return {w for w in words if len(w) > 2 and w not in stop}
 
 
 def parse_sections(text: str) -> dict:
     """Parse H2 sections from markdown text."""
-    parts = re.split(r'^(## .+)$', text, flags=re.MULTILINE)
+    parts = re.split(r"^(## .+)$", text, flags=re.MULTILINE)
     sections = {}
     for i in range(1, len(parts) - 1, 2):
         heading = parts[i].rstrip()
@@ -156,8 +179,11 @@ def build_large_template_index() -> list[tuple[set, dict, str]]:
             kw = title_keywords(title)
             sections = parse_sections(text)
             # Only include templates with rich section content
-            rich_sections = {k: v for k, v in sections.items()
-                             if k in TARGET_SECTIONS and not is_placeholder_body(v)}
+            rich_sections = {
+                k: v
+                for k, v in sections.items()
+                if k in TARGET_SECTIONS and not is_placeholder_body(v)
+            }
             if len(rich_sections) >= 5:
                 index.append((kw, rich_sections, f.name))
     return index
@@ -187,10 +213,9 @@ def rebuild_file_with_new_sections(text: str, updated_sections: dict) -> str:
     for heading, new_body in updated_sections.items():
         # Find and replace just this section's body
         pattern = re.compile(
-            r'(^' + re.escape(heading) + r'\n)(.*?)(?=^## |\Z)',
-            re.MULTILINE | re.DOTALL
+            r"(^" + re.escape(heading) + r"\n)(.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL
         )
-        replacement = r'\g<1>' + new_body.lstrip("\n")
+        replacement = r"\g<1>" + new_body.lstrip("\n")
         result = pattern.sub(replacement, result)
     return result
 
@@ -198,7 +223,8 @@ def rebuild_file_with_new_sections(text: str, updated_sections: dict) -> str:
 def bump_rev(text: str) -> str:
     def inc(m):
         return f"aligned_rev: {int(m.group(1)) + 1}"
-    return re.sub(r'aligned_rev:\s*(\d+)', inc, text)
+
+    return re.sub(r"aligned_rev:\s*(\d+)", inc, text)
 
 
 def main():
@@ -215,8 +241,9 @@ def main():
         with batch_continue(f"scan {f.name}", logger=_log):
             text = f.read_text(encoding="utf-8")
             sections = parse_sections(text)
-            needs_fill = {k for k, v in sections.items()
-                          if k in TARGET_SECTIONS and is_placeholder_body(v)}
+            needs_fill = {
+                k for k, v in sections.items() if k in TARGET_SECTIONS and is_placeholder_body(v)
+            }
             if needs_fill:
                 candidates.append((f, text, sections, needs_fill))
 
@@ -228,7 +255,7 @@ def main():
             kw = title_keywords(title)
             match = find_best_match(kw, index)
             matched_name = "BRAK"
-            for kw2, secs, fname in index:
+            for _kw2, secs, fname in index:
                 if secs is match:
                     matched_name = fname
                     break

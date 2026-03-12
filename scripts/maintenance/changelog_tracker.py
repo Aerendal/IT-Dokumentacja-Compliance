@@ -85,10 +85,12 @@ def cmd_list(conn: sqlite3.Connection, args):
     print(f"\n{'ID':>6}  {'Data':>24}  {'Typ':>20}  {'Szablon'}")
     print("-" * 100)
     for r in rows:
-        print(f"{r['id']:>6}  {r['changed_at'][:19]:>19}  {r['change_type']:>20}  {r['template_path']}")
-        if r['change_reason']:
+        print(
+            f"{r['id']:>6}  {r['changed_at'][:19]:>19}  {r['change_type']:>20}  {r['template_path']}"
+        )
+        if r["change_reason"]:
             print(f"{'':>6}  Powód: {r['change_reason']}")
-        if r['diff_summary']:
+        if r["diff_summary"]:
             print(f"{'':>6}  Zmiana: {r['diff_summary']}")
     print(f"\nŁącznie: {len(rows)} wpisów")
 
@@ -118,18 +120,18 @@ def cmd_stats(conn: sqlite3.Connection, args):
     """)
     most_changed = cur.fetchall()
 
-    print(f"\n=== Statystyki changelog ===")
+    print("\n=== Statystyki changelog ===")
     print(f"Łącznie wpisów: {total}")
 
-    print(f"\nPo typie zmiany:")
+    print("\nPo typie zmiany:")
     for r in by_type:
         print(f"  {r['cnt']:6d}  {r['change_type']}")
 
-    print(f"\nPo dniu (ostatnie 10):")
+    print("\nPo dniu (ostatnie 10):")
     for r in by_day:
         print(f"  {r['day']}  {r['cnt']:5d} zmian")
 
-    print(f"\nNajczęściej zmieniane szablony (top 10):")
+    print("\nNajczęściej zmieniane szablony (top 10):")
     for r in most_changed:
         print(f"  {r['cnt']:4d}x  {r['template_path']}")
 

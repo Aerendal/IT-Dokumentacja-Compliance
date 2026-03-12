@@ -7,15 +7,16 @@ Uruchomienie:
 
 Dokumentacja: http://localhost:8000/docs
 """
-import sqlite3
+
 import os
+import sqlite3
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Depends, Security, Query
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, FastAPI, HTTPException, Query, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from .models import TemplateOut, CoverageOut, ViolationOut, ReviewIn, ReviewOut
+from .models import CoverageOut, ReviewIn, ReviewOut, TemplateOut, ViolationOut
 
 app = FastAPI(
     title="IT Dokumentacja Compliance API",
@@ -24,8 +25,11 @@ app = FastAPI(
 )
 
 # DB path — can be overridden via env var IT_DOC_DB
-DB_PATH = Path(os.getenv("IT_DOC_DB",
-    str(Path(__file__).parent.parent.parent / "reports" / "it_doc_matrix.db")))
+DB_PATH = Path(
+    os.getenv(
+        "IT_DOC_DB", str(Path(__file__).parent.parent.parent / "reports" / "it_doc_matrix.db")
+    )
+)
 
 # Auth token — set via IT_DOC_API_TOKEN env var (required for write endpoints)
 API_TOKEN = os.getenv("IT_DOC_API_TOKEN", "change-me-before-production")
@@ -73,7 +77,8 @@ def list_templates(
 @app.get("/coverage/{standard_code:path}", response_model=CoverageOut, tags=["Coverage"])
 def get_coverage(standard_code: str, conn: sqlite3.Connection = Depends(get_db)):
     """Get compliance coverage metrics for a specific standard."""
-    row = conn.execute("""
+    row = conn.execute(
+        """
         SELECT standard_code,
                COUNT(*) as total_mappings,
                SUM(CASE WHEN confidence >= 0.5 THEN 1 ELSE 0 END) as high_conf_50,
@@ -81,12 +86,14 @@ def get_coverage(standard_code: str, conn: sqlite3.Connection = Depends(get_db))
         FROM doc_standard_mapping
         WHERE standard_code = ?
         GROUP BY standard_code
-    """, [standard_code]).fetchone()
+    """,
+        [standard_code],
+    ).fetchone()
     if not row:
         raise HTTPException(status_code=404, detail=f"Standard '{standard_code}' not found")
     d = dict(row)
-    total = d['total_mappings'] or 1
-    d['coverage_pct_50'] = round((d['high_conf_50'] / total) * 100, 1)
+    total = d["total_mappings"] or 1
+    d["coverage_pct_50"] = round((d["high_conf_50"] / total) * 100, 1)
     return d
 
 
@@ -96,7 +103,7 @@ def get_mappings_for_doc(doc_path: str, conn: sqlite3.Connection = Depends(get_d
     """Get all standard mappings for a specific template."""
     rows = conn.execute(
         "SELECT doc_path, standard_code, confidence, match_reason, evidence FROM doc_standard_mapping WHERE doc_path = ? ORDER BY confidence DESC",
-        [doc_path]
+        [doc_path],
     ).fetchall()
     if not rows:
         raise HTTPException(status_code=404, detail=f"No mappings found for '{doc_path}'")
@@ -132,8 +139,7 @@ def review_mapping(
 ):
     """Approve or reject a mapping (requires API token)."""
     row = conn.execute(
-        "SELECT id, confidence FROM doc_standard_mapping WHERE id = ?",
-        [payload.mapping_id]
+        "SELECT id, confidence FROM doc_standard_mapping WHERE id = ?", [payload.mapping_id]
     ).fetchone()
     if not row:
         raise HTTPException(status_code=404, detail=f"Mapping {payload.mapping_id} not found")
@@ -141,17 +147,31 @@ def review_mapping(
     evidence_note = f"expert approved: {payload.notes}" if payload.notes else "expert approved"
 
     if payload.approved:
-        new_conf = payload.confidence_override if payload.confidence_override is not None else max(row['confidence'] or 0.0, 0.8)
+        new_conf = (
+            payload.confidence_override
+            if payload.confidence_override is not None
+            else max(row["confidence"] or 0.0, 0.8)
+        )
         conn.execute(
             "UPDATE doc_standard_mapping SET match_reason='expert_reviewed', confidence=?, evidence=? WHERE id=?",
-            [new_conf, evidence_note, payload.mapping_id]
+            [new_conf, evidence_note, payload.mapping_id],
         )
         conn.commit()
-        return ReviewOut(mapping_id=payload.mapping_id, action='approved', new_confidence=new_conf, new_match_reason='expert_reviewed')
+        return ReviewOut(
+            mapping_id=payload.mapping_id,
+            action="approved",
+            new_confidence=new_conf,
+            new_match_reason="expert_reviewed",
+        )
     else:
         conn.execute("DELETE FROM doc_standard_mapping WHERE id=?", [payload.mapping_id])
         conn.commit()
-        return ReviewOut(mapping_id=payload.mapping_id, action='rejected', new_confidence=None, new_match_reason=None)
+        return ReviewOut(
+            mapping_id=payload.mapping_id,
+            action="rejected",
+            new_confidence=None,
+            new_match_reason=None,
+        )
 
 
 # --- GET /health ---
@@ -159,5 +179,7 @@ def review_mapping(
 def health(conn: sqlite3.Connection = Depends(get_db)):
     """Health check — returns DB stats."""
     total = conn.execute("SELECT COUNT(*) FROM doc_standard_mapping").fetchone()[0]
-    null_c = conn.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence IS NULL").fetchone()[0]
+    null_c = conn.execute(
+        "SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence IS NULL"
+    ).fetchone()[0]
     return {"status": "ok", "total_mappings": total, "null_confidence": null_c}

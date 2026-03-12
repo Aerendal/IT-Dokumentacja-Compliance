@@ -24,7 +24,7 @@ Funkcje:
 
 import re
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
 from itdoc.exceptions import TemplateError
 
@@ -94,8 +94,7 @@ def get_required_sections(section_set: Optional[str] = None) -> list:
         return list(_ALL_REQUIRED_SECTIONS)
     if section_set not in _SECTION_SETS:
         raise ValueError(
-            f"Nieznany section_set: '{section_set}'. "
-            f"Dostępne: {list(_SECTION_SETS.keys())}"
+            f"Nieznany section_set: '{section_set}'. Dostępne: {list(_SECTION_SETS.keys())}"
         )
     return list(_SECTION_SETS[section_set])
 
@@ -130,7 +129,7 @@ def load_template(path: Path) -> dict:
     }
 
 
-def validate_template(tmpl: dict, validators: Optional[List[Callable]] = None) -> list:
+def validate_template(tmpl: dict, validators: Optional[list[Callable]] = None) -> list:
     """Waliduje załadowany szablon.
 
     Args:
@@ -174,7 +173,9 @@ def validate_template(tmpl: dict, validators: Optional[List[Callable]] = None) -
                 if extra:
                     errors.extend(extra)
             except Exception as exc:
-                errors.append(f"{path}: błąd validatora {getattr(validator, '__name__', '?')}: {exc}")
+                errors.append(
+                    f"{path}: błąd validatora {getattr(validator, '__name__', '?')}: {exc}"
+                )
 
     return errors
 
@@ -208,5 +209,5 @@ def _parse_frontmatter(raw: str, path: Optional[Path] = None) -> tuple:
             key, _, val = line.partition(":")
             fm[key.strip()] = val.strip()
 
-    body = "\n".join(lines[end_idx + 1:])
+    body = "\n".join(lines[end_idx + 1 :])
     return fm, body

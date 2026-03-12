@@ -64,12 +64,28 @@ def ensure_changelog_table(conn: sqlite3.Connection):
     conn.commit()
 
 
-def log_change(conn: sqlite3.Connection, path: str, change_type: str,
-               reason: str, diff_summary: str, patch_args: str):
-    conn.execute("""
+def log_change(
+    conn: sqlite3.Connection,
+    path: str,
+    change_type: str,
+    reason: str,
+    diff_summary: str,
+    patch_args: str,
+):
+    conn.execute(
+        """
         INSERT INTO template_changelog (template_path, changed_at, change_type, change_reason, diff_summary, patch_args)
         VALUES (?, ?, ?, ?, ?, ?)
-    """, (path, datetime.now(timezone.utc).isoformat(), change_type, reason, diff_summary, patch_args))
+    """,
+        (
+            path,
+            datetime.now(timezone.utc).isoformat(),
+            change_type,
+            reason,
+            diff_summary,
+            patch_args,
+        ),
+    )
 
 
 def collect_targets(conn: sqlite3.Connection, args) -> list[str]:
@@ -77,16 +93,22 @@ def collect_targets(conn: sqlite3.Connection, args) -> list[str]:
     cur = conn.cursor()
 
     if args.filter_standard:
-        cur.execute("""
+        cur.execute(
+            """
             SELECT DISTINCT doc_path FROM doc_standard_mapping
             WHERE standard_code LIKE ?
-        """, (f"%{args.filter_standard}%",))
+        """,
+            (f"%{args.filter_standard}%",),
+        )
         paths = {r[0] for r in cur.fetchall()}
     elif args.filter_regulation:
-        cur.execute("""
+        cur.execute(
+            """
             SELECT DISTINCT doc_path FROM doc_regulation_mapping
             WHERE regulation_code LIKE ?
-        """, (f"%{args.filter_regulation}%",))
+        """,
+            (f"%{args.filter_regulation}%",),
+        )
         paths = {r[0] for r in cur.fetchall()}
     elif args.filter_isic:
         # docs table doesn't have isic directly; look at docs that contain isic keyword in path
@@ -99,7 +121,11 @@ def collect_targets(conn: sqlite3.Connection, args) -> list[str]:
     # Apply glob filter if given
     if args.filter_glob:
         pattern = args.filter_glob
-        paths = {p for p in paths if fnmatch.fnmatch(p, pattern) or fnmatch.fnmatch(Path(p).name, pattern)}
+        paths = {
+            p
+            for p in paths
+            if fnmatch.fnmatch(p, pattern) or fnmatch.fnmatch(Path(p).name, pattern)
+        }
 
     # Apply title-contains filter
     if args.filter_title:
@@ -110,18 +136,19 @@ def collect_targets(conn: sqlite3.Connection, args) -> list[str]:
     return sorted(paths)
 
 
-def apply_add_section(content: str, heading: str, section_content: str,
-                      insert_before: str | None) -> tuple[str, str]:
+def apply_add_section(
+    content: str, heading: str, section_content: str, insert_before: str | None
+) -> tuple[str, str]:
     """Add a new section if not already present."""
     # Check if section already exists
-    heading_clean = heading.lstrip('#').strip()
-    if re.search(rf'^{re.escape(heading)}\b', content, re.MULTILINE):
+    heading.lstrip("#").strip()
+    if re.search(rf"^{re.escape(heading)}\b", content, re.MULTILINE):
         return content, ""  # already exists
 
     new_block = f"\n{heading}\n\n{section_content.strip()}\n"
 
     if insert_before:
-        m = re.search(rf'^{re.escape(insert_before)}\b', content, re.MULTILINE)
+        m = re.search(rf"^{re.escape(insert_before)}\b", content, re.MULTILINE)
         if m:
             pos = m.start()
             content = content[:pos] + new_block + "\n" + content[pos:]
@@ -131,17 +158,18 @@ def apply_add_section(content: str, heading: str, section_content: str,
     return content, f"Dodano sekcję '{heading}' na końcu pliku"
 
 
-def apply_replace_in_section(content: str, section_heading: str,
-                              old_text: str, new_text: str) -> tuple[str, str]:
+def apply_replace_in_section(
+    content: str, section_heading: str, old_text: str, new_text: str
+) -> tuple[str, str]:
     """Replace old_text with new_text within a given section."""
     # Find the section bounds
-    m_start = re.search(rf'^{re.escape(section_heading)}\b', content, re.MULTILINE)
+    m_start = re.search(rf"^{re.escape(section_heading)}\b", content, re.MULTILINE)
     if not m_start:
         return content, ""
 
     section_start = m_start.start()
     # Find next ## heading
-    m_end = re.search(r'^#{1,3} ', content[m_start.end():], re.MULTILINE)
+    m_end = re.search(r"^#{1,3} ", content[m_start.end() :], re.MULTILINE)
     section_end = m_start.end() + m_end.start() if m_end else len(content)
 
     section_body = content[section_start:section_end]
@@ -149,23 +177,25 @@ def apply_replace_in_section(content: str, section_heading: str,
         return content, ""
 
     new_body = section_body.replace(old_text, new_text, 1)
-    return content[:section_start] + new_body + content[section_end:], \
-           f"Zamieniono tekst w sekcji '{section_heading}'"
+    return content[:section_start] + new_body + content[
+        section_end:
+    ], f"Zamieniono tekst w sekcji '{section_heading}'"
 
 
-def apply_append_to_section(content: str, section_heading: str,
-                             append_text: str) -> tuple[str, str]:
+def apply_append_to_section(
+    content: str, section_heading: str, append_text: str
+) -> tuple[str, str]:
     """Append text at the end of the named section (before next heading)."""
-    m_start = re.search(rf'^{re.escape(section_heading)}\b', content, re.MULTILINE)
+    m_start = re.search(rf"^{re.escape(section_heading)}\b", content, re.MULTILINE)
     if not m_start:
         return content, ""
 
-    m_end = re.search(r'^#{1,3} ', content[m_start.end():], re.MULTILINE)
+    m_end = re.search(r"^#{1,3} ", content[m_start.end() :], re.MULTILINE)
     section_end = m_start.end() + m_end.start() if m_end else len(content)
 
     insert_pos = section_end
     # Back up to last non-blank line in section
-    section_body = content[m_start.start():section_end]
+    section_body = content[m_start.start() : section_end]
     stripped = section_body.rstrip()
     insert_pos = m_start.start() + len(stripped)
 
@@ -175,20 +205,20 @@ def apply_append_to_section(content: str, section_heading: str,
 
 def list_headings(content: str) -> list[str]:
     """Return all ## headings found in content."""
-    return re.findall(r'^#{1,3} .+', content, re.MULTILINE)
+    return re.findall(r"^#{1,3} .+", content, re.MULTILINE)
 
 
 def preview_section(content: str, heading: str) -> str:
     """Return the content of a named section, or an error message with available headings."""
-    m_start = re.search(rf'^{re.escape(heading)}\b', content, re.MULTILINE)
+    m_start = re.search(rf"^{re.escape(heading)}\b", content, re.MULTILINE)
     if not m_start:
         headings = list_headings(content)
         available = ", ".join(headings) if headings else "(brak naglowkow)"
-        return f'Sekcja nie znaleziona. Dostepne sekcje:\n  {available}'
+        return f"Sekcja nie znaleziona. Dostepne sekcje:\n  {available}"
 
-    m_end = re.search(r'^#{1,3} ', content[m_start.end():], re.MULTILINE)
+    m_end = re.search(r"^#{1,3} ", content[m_start.end() :], re.MULTILINE)
     section_end = m_start.end() + m_end.start() if m_end else len(content)
-    return content[m_start.start():section_end].rstrip()
+    return content[m_start.start() : section_end].rstrip()
 
 
 def patch_file(filepath: Path, args) -> tuple[bool, str]:
@@ -203,9 +233,7 @@ def patch_file(filepath: Path, args) -> tuple[bool, str]:
 
     if args.add_section:
         content, msg = apply_add_section(
-            content, args.add_section,
-            args.section_content or "",
-            args.insert_before
+            content, args.add_section, args.section_content or "", args.insert_before
         )
         if msg:
             summary_parts.append(msg)
@@ -216,16 +244,14 @@ def patch_file(filepath: Path, args) -> tuple[bool, str]:
         )
         if msg:
             summary_parts.append(msg)
-        elif not re.search(rf'^{re.escape(args.replace_in_section)}\b', content, re.MULTILINE):
+        elif not re.search(rf"^{re.escape(args.replace_in_section)}\b", content, re.MULTILINE):
             _warn_section_not_found(content, args.replace_in_section, filepath)
 
     if args.append_to_section and args.append_text:
-        content, msg = apply_append_to_section(
-            content, args.append_to_section, args.append_text
-        )
+        content, msg = apply_append_to_section(content, args.append_to_section, args.append_text)
         if msg:
             summary_parts.append(msg)
-        elif not re.search(rf'^{re.escape(args.append_to_section)}\b', content, re.MULTILINE):
+        elif not re.search(rf"^{re.escape(args.append_to_section)}\b", content, re.MULTILINE):
             _warn_section_not_found(content, args.append_to_section, filepath)
 
     if content == original or not summary_parts:
@@ -241,7 +267,7 @@ def _warn_section_not_found(content: str, heading: str, filepath: Path):
     available = ", ".join(headings) if headings else "(brak naglowkow)"
     print(
         f'OSTRZEZENIE: Sekcja "{heading}" nie znaleziona w {filepath}\n'
-        f'  Dostepne sekcje: {available}',
+        f"  Dostepne sekcje: {available}",
         file=sys.stderr,
     )
 
@@ -262,61 +288,98 @@ def main():
     )
 
     # Single-file target
-    parser.add_argument("--file", metavar="PATH",
-                        help="Przetwórz pojedynczy plik zamiast kolekcji z DB")
+    parser.add_argument(
+        "--file", metavar="PATH", help="Przetwórz pojedynczy plik zamiast kolekcji z DB"
+    )
 
     # Filters
     filt = parser.add_argument_group("Filtry szablonów")
-    filt.add_argument("--filter-standard", metavar="CODE",
-                      help="Filtruj po kodzie standardu (np. 'ISO/IEC 27001')")
-    filt.add_argument("--filter-regulation", metavar="CODE",
-                      help="Filtruj po kodzie regulacji (np. 'KSC-PL')")
-    filt.add_argument("--filter-glob", metavar="PATTERN",
-                      help="Filtruj po wzorcu ścieżki (np. 'core/security_*.md')")
-    filt.add_argument("--filter-title", metavar="TEXT",
-                      help="Filtruj po fragmencie tytułu dokumentu")
-    filt.add_argument("--filter-isic", metavar="CODE",
-                      help="Filtruj po kodzie ISIC (TODO: wymaga kolumny isic w docs)")
+    filt.add_argument(
+        "--filter-standard",
+        metavar="CODE",
+        help="Filtruj po kodzie standardu (np. 'ISO/IEC 27001')",
+    )
+    filt.add_argument(
+        "--filter-regulation", metavar="CODE", help="Filtruj po kodzie regulacji (np. 'KSC-PL')"
+    )
+    filt.add_argument(
+        "--filter-glob",
+        metavar="PATTERN",
+        help="Filtruj po wzorcu ścieżki (np. 'core/security_*.md')",
+    )
+    filt.add_argument(
+        "--filter-title", metavar="TEXT", help="Filtruj po fragmencie tytułu dokumentu"
+    )
+    filt.add_argument(
+        "--filter-isic",
+        metavar="CODE",
+        help="Filtruj po kodzie ISIC (TODO: wymaga kolumny isic w docs)",
+    )
 
     # Patch operations (mutually exclusive with --preview-section)
     ops = parser.add_argument_group("Operacje patch")
-    ops.add_argument("--add-section", metavar="HEADING",
-                     help="Dodaj nową sekcję (np. '## Nowa sekcja')")
-    ops.add_argument("--section-content", metavar="TEXT",
-                     help="Treść nowej sekcji (używaj z --add-section)")
-    ops.add_argument("--insert-before", metavar="HEADING",
-                     help="Wstaw przed tym nagłówkiem (opcjonalne)")
-    ops.add_argument("--replace-in-section", metavar="HEADING",
-                     help="Zamień tekst w tej sekcji (wymaga --old-text i --new-text)")
+    ops.add_argument(
+        "--add-section", metavar="HEADING", help="Dodaj nową sekcję (np. '## Nowa sekcja')"
+    )
+    ops.add_argument(
+        "--section-content", metavar="TEXT", help="Treść nowej sekcji (używaj z --add-section)"
+    )
+    ops.add_argument(
+        "--insert-before", metavar="HEADING", help="Wstaw przed tym nagłówkiem (opcjonalne)"
+    )
+    ops.add_argument(
+        "--replace-in-section",
+        metavar="HEADING",
+        help="Zamień tekst w tej sekcji (wymaga --old-text i --new-text)",
+    )
     ops.add_argument("--old-text", metavar="TEXT", help="Tekst do zamiany")
     ops.add_argument("--new-text", metavar="TEXT", help="Nowy tekst")
-    ops.add_argument("--append-to-section", metavar="HEADING",
-                     help="Dołącz tekst na końcu tej sekcji (wymaga --append-text)")
+    ops.add_argument(
+        "--append-to-section",
+        metavar="HEADING",
+        help="Dołącz tekst na końcu tej sekcji (wymaga --append-text)",
+    )
     ops.add_argument("--append-text", metavar="TEXT", help="Tekst do dołączenia")
 
     # Preview mode
-    ops.add_argument("--preview-section", metavar="HEADING",
-                     help="Pokaż zawartość sekcji bez modyfikacji (wyklucza operacje patch)")
+    ops.add_argument(
+        "--preview-section",
+        metavar="HEADING",
+        help="Pokaż zawartość sekcji bez modyfikacji (wyklucza operacje patch)",
+    )
 
     # Run options
-    parser.add_argument("--reason", metavar="TEXT", default="",
-                        help="Powód zmiany (zapisywany w template_changelog)")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Pokaż co by się zmieniło bez faktycznej modyfikacji")
-    parser.add_argument("--limit", type=int, default=0,
-                        help="Ogranicz do N plików (do testowania)")
-    parser.add_argument("--confirm", action="store_true",
-                        help="Zapytaj o potwierdzenie przed masową operacją (bez --file)")
+    parser.add_argument(
+        "--reason",
+        metavar="TEXT",
+        default="",
+        help="Powód zmiany (zapisywany w template_changelog)",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Pokaż co by się zmieniło bez faktycznej modyfikacji"
+    )
+    parser.add_argument("--limit", type=int, default=0, help="Ogranicz do N plików (do testowania)")
+    parser.add_argument(
+        "--confirm",
+        action="store_true",
+        help="Zapytaj o potwierdzenie przed masową operacją (bez --file)",
+    )
 
     args = parser.parse_args()
 
     # --preview-section is mutually exclusive with patch operations
-    if args.preview_section and any([args.add_section, args.replace_in_section, args.append_to_section]):
+    if args.preview_section and any(
+        [args.add_section, args.replace_in_section, args.append_to_section]
+    ):
         parser.error("--preview-section nie może być użyty razem z operacjami patch")
 
     # Validate: at least one operation or preview
-    if not args.preview_section and not any([args.add_section, args.replace_in_section, args.append_to_section]):
-        parser.error("Podaj co najmniej jedną operację: --add-section, --replace-in-section, --append-to-section lub --preview-section")
+    if not args.preview_section and not any(
+        [args.add_section, args.replace_in_section, args.append_to_section]
+    ):
+        parser.error(
+            "Podaj co najmniej jedną operację: --add-section, --replace-in-section, --append-to-section lub --preview-section"
+        )
 
     # ------------------------------------------------------------------ #
     # --file mode: operate on a single file directly                       #
@@ -345,14 +408,17 @@ def main():
                 return 1
             original = content
             if args.add_section:
-                content, _ = apply_add_section(content, args.add_section,
-                                               args.section_content or "", args.insert_before)
+                content, _ = apply_add_section(
+                    content, args.add_section, args.section_content or "", args.insert_before
+                )
             if args.replace_in_section and args.old_text:
-                content, _ = apply_replace_in_section(content, args.replace_in_section,
-                                                       args.old_text, args.new_text or "")
+                content, _ = apply_replace_in_section(
+                    content, args.replace_in_section, args.old_text, args.new_text or ""
+                )
             if args.append_to_section and args.append_text:
-                content, _ = apply_append_to_section(content, args.append_to_section,
-                                                      args.append_text)
+                content, _ = apply_append_to_section(
+                    content, args.append_to_section, args.append_text
+                )
             if content != original:
                 print(f"  [ZMIANA] {filepath}")
             else:
@@ -367,7 +433,9 @@ def main():
                 try:
                     ensure_changelog_table(conn)
                     patch_args_json = json.dumps(vars(args), ensure_ascii=False)
-                    log_change(conn, str(filepath), "bulk_patch", args.reason, summary, patch_args_json)
+                    log_change(
+                        conn, str(filepath), "bulk_patch", args.reason, summary, patch_args_json
+                    )
                     conn.commit()
                 finally:
                     conn.close()
@@ -408,7 +476,7 @@ def main():
         return 1
 
     if args.limit:
-        targets = targets[:args.limit]
+        targets = targets[: args.limit]
 
     # --confirm: ask user before applying bulk changes
     if args.confirm and not args.dry_run:
@@ -443,14 +511,17 @@ def main():
                 continue
             original = content
             if args.add_section:
-                content, msg = apply_add_section(content, args.add_section,
-                                                  args.section_content or "", args.insert_before)
+                content, msg = apply_add_section(
+                    content, args.add_section, args.section_content or "", args.insert_before
+                )
             if args.replace_in_section and args.old_text:
-                content, msg = apply_replace_in_section(content, args.replace_in_section,
-                                                         args.old_text, args.new_text or "")
+                content, msg = apply_replace_in_section(
+                    content, args.replace_in_section, args.old_text, args.new_text or ""
+                )
             if args.append_to_section and args.append_text:
-                content, msg = apply_append_to_section(content, args.append_to_section,
-                                                        args.append_text)
+                content, msg = apply_append_to_section(
+                    content, args.append_to_section, args.append_text
+                )
             if content != original:
                 changed += 1
                 print(f"  [ZMIANA] {rel_path}")
@@ -471,7 +542,7 @@ def main():
         conn.commit()
     conn.close()
 
-    print(f"\nPodsumowanie:")
+    print("\nPodsumowanie:")
     print(f"  Zmienione: {changed}")
     print(f"  Bez zmian: {unchanged}")
     print(f"  Błędy:     {errors}")

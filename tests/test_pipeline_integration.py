@@ -52,6 +52,5 @@ class TestPipelinePass:
         )
         combined = result.stdout + result.stderr
         assert "PASS" in combined, (
-            f"Brak 'PASS' w wyjściu pipeline\n"
-            f"Output (ostatnie 2000 znaków):\n{combined[-2000:]}"
+            f"Brak 'PASS' w wyjściu pipeline\nOutput (ostatnie 2000 znaków):\n{combined[-2000:]}"
         )

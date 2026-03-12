@@ -2,6 +2,7 @@
 Covers: audit_templates log/colored/find_duplicates/find_unmapped,
         template_auditor collect_targets, slugify utility.
 """
+
 import sqlite3
 import sys
 from pathlib import Path
@@ -16,15 +17,15 @@ pytestmark = pytest.mark.unit
 # ── audit_templates: colored / log functions ──────────────────────────────────
 
 from scripts.maintenance.audit_templates import (
+    ANSI_GREEN,
+    ANSI_RESET,
     colored,
+    find_duplicates,
+    find_unmapped,
+    log_err,
     log_info,
     log_ok,
     log_warn,
-    log_err,
-    find_duplicates,
-    find_unmapped,
-    ANSI_GREEN,
-    ANSI_RESET,
 )
 
 
@@ -69,6 +70,7 @@ def test_log_err_prints_to_stderr(capsys):
 
 # ── audit_templates: find_duplicates ──────────────────────────────────────────
 
+
 def test_find_duplicates_empty_dir(tmp_path):
     core = tmp_path / "core"
     core.mkdir()
@@ -110,6 +112,7 @@ def test_find_duplicates_three_identical(tmp_path):
 
 
 # ── audit_templates: find_unmapped ────────────────────────────────────────────
+
 
 @pytest.fixture
 def unmapped_conn():
@@ -174,10 +177,10 @@ import unicodedata
 
 def _slugify(s: str) -> str:
     """Same implementation as scripts/update_linkage_with_branch.slugify."""
-    s = ''.join(c for c in unicodedata.normalize('NFKD', s) if not unicodedata.combining(c))
+    s = "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
     s = s.lower()
-    s = re.sub(r'[^a-z0-9]+', '-', s)
-    s = re.sub(r'-+', '-', s).strip('-')
+    s = re.sub(r"[^a-z0-9]+", "-", s)
+    s = re.sub(r"-+", "-", s).strip("-")
     return s
 
 

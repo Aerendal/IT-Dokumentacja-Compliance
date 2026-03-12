@@ -32,7 +32,7 @@ def main():
 
     # Check content_links_resolved columns
     cur.execute("PRAGMA table_info(content_links_resolved)")
-    clr_cols = {r[1] for r in cur.fetchall()}
+    {r[1] for r in cur.fetchall()}
 
     # Build the SELECT from content_links (uses to_type, from_ref, to_ref)
     # from_ref / to_ref format: "document::Title"
@@ -62,9 +62,9 @@ def main():
 
     # Deduplicate (from_uid, to_uid) → strongest dep_type
     seen: dict[tuple, str] = {}
-    for from_ref, to_ref, link_type, required, ctx_uid in raw_links:
+    for from_ref, to_ref, _link_type, required, ctx_uid in raw_links:
         from_uid = ref_to_uid(from_ref) or ctx_uid
-        to_uid   = ref_to_uid(to_ref)
+        to_uid = ref_to_uid(to_ref)
         if not from_uid or not to_uid or from_uid == to_uid:
             continue
         dep_type = "requires" if required else "relates_to"
@@ -83,23 +83,32 @@ def main():
         try:
             # Try to match actual column names
             if "source_doc_id" in dep_cols and "target_doc_id" in dep_cols:
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT OR IGNORE INTO document_dependencies
                       (source_doc_id, target_doc_id, dep_type)
                     VALUES (?, ?, ?)
-                """, (from_uid, to_uid, dep_type))
+                """,
+                    (from_uid, to_uid, dep_type),
+                )
             elif "doc_id" in dep_cols and "depends_on_doc_id" in dep_cols:
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT OR IGNORE INTO document_dependencies
                       (doc_id, depends_on_doc_id, dep_type)
                     VALUES (?, ?, ?)
-                """, (from_uid, to_uid, dep_type))
+                """,
+                    (from_uid, to_uid, dep_type),
+                )
             elif "doc_id" in dep_cols and "related_doc_id" in dep_cols:
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT OR IGNORE INTO document_dependencies
                       (doc_id, related_doc_id, relationship_type)
                     VALUES (?, ?, ?)
-                """, (from_uid, to_uid, dep_type))
+                """,
+                    (from_uid, to_uid, dep_type),
+                )
             else:
                 # Fallback: use positional insert with first 3 text columns
                 print(f"  Nieznany schemat document_dependencies: {dep_cols}")
