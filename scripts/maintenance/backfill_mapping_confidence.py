@@ -6,12 +6,17 @@ match_reason='keyword_match' AND confidence IS NULL.
 
 import argparse
 import csv
+import logging
 import re
 import shutil
 import sqlite3
 import sys
 import unicodedata
 from pathlib import Path
+
+from itdoc._batch import batch_continue
+
+_log = logging.getLogger(__name__)
 
 DB_PATH = Path(__file__).parent.parent.parent / "reports" / "it_doc_matrix.db"
 GENERATED_TEMPLATES = Path(__file__).parent.parent.parent / "generated_templates"
@@ -189,9 +194,8 @@ def build_content_cache(base_dir: Path) -> dict:
     if not base_dir.exists():
         return cache
     for md_file in base_dir.rglob("*.md"):
-        try:
-            relative = md_file.relative_to(base_dir)
-            doc_path = str(relative)
+        doc_path = str(md_file.relative_to(base_dir))
+        with batch_continue(f"tokenize {doc_path}", logger=_log):
             raw = md_file.read_text(encoding="utf-8", errors="ignore")
 
             tokens: set = set()
@@ -212,13 +216,11 @@ def build_content_cache(base_dir: Path) -> dict:
             tokens |= tokenize(" ".join(body_words))
 
             # Path components (skip 'generated_templates')
-            for part in relative.parts:
+            for part in md_file.relative_to(base_dir).parts:
                 clean = re.sub(r"\.md$", "", part).replace("_", " ").replace("-", " ")
                 tokens |= tokenize(clean)
 
             cache[doc_path] = tokens
-        except Exception:
-            pass
     return cache
 
 

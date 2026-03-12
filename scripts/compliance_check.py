@@ -15,10 +15,15 @@ Użycie:
   python3 compliance_check.py full-audit [--apply] [--db PATH] [--ci]
 """
 import argparse
+import logging
 import subprocess
 import sys
 import sqlite3
 from pathlib import Path
+
+from itdoc._batch import batch_continue
+
+_log = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).parent.parent
 DB_DEFAULT = BASE_DIR / "reports" / "it_doc_matrix.db"
@@ -48,13 +53,13 @@ def get_db_stats(db_path: Path) -> dict:
             cur.execute("SELECT COUNT(*) FROM doc_standard_mapping")
             stats["total_mappings"] = cur.fetchone()[0]
         except sqlite3.OperationalError:
-            pass
+            pass  # tabela może nie istnieć w pustej DB
 
         try:
             cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence IS NULL")
             stats["null_confidence"] = cur.fetchone()[0]
         except sqlite3.OperationalError:
-            pass
+            pass  # tabela może nie istnieć w pustej DB
 
         try:
             cur.execute("SELECT COUNT(*) FROM template_violations WHERE severity='ERROR'")
@@ -62,7 +67,7 @@ def get_db_stats(db_path: Path) -> dict:
             cur.execute("SELECT COUNT(*) FROM template_violations WHERE severity='WARNING'")
             stats["warning_violations"] = cur.fetchone()[0]
         except sqlite3.OperationalError:
-            pass
+            pass  # tabela template_violations opcjonalna
     finally:
         conn.close()
     return stats
@@ -175,7 +180,7 @@ def run_full_audit(db_path: Path, apply_backfill: bool = False, ci_mode: bool = 
     # Compute ISO/IEC 27001 coverage if available
     coverage_pct = 0.0
     coverage_retrieved = False
-    try:
+    with batch_continue("iso27001 coverage query", logger=_log):
         conn = sqlite3.connect(db_path)
         cur = conn.cursor()
         cur.execute("""
@@ -192,8 +197,6 @@ def run_full_audit(db_path: Path, apply_backfill: bool = False, ci_mode: bool = 
             coverage_pct = covered / total_controls * 100
         coverage_retrieved = True
         conn.close()
-    except Exception:
-        pass
 
     err_icon = "✅" if err == 0 else "❌"
     warn_icon = "✅" if warn == 0 else "⚠️"

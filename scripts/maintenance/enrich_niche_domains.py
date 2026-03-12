@@ -7,8 +7,13 @@ Użycie:
     python3 enrich_niche_domains.py --apply
     python3 enrich_niche_domains.py --apply --path-filter quantum
 """
+import logging
 import re, argparse, sys
 from pathlib import Path
+
+from itdoc._batch import batch_continue
+
+_log = logging.getLogger(__name__)
 
 TDIR        = Path(__file__).parent.parent.parent / "generated_templates"
 PLACEHOLDER = "Opisuje cel, zakres i zastosowanie tego dokumentu"
@@ -437,12 +442,10 @@ def enrich_file(fpath: Path, dry_run: bool) -> bool:
     m = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
     title = ""
     if m:
-        try:
+        with batch_continue(f"yaml frontmatter {fpath.name}", logger=_log):
             import yaml
             fm = yaml.safe_load(m.group(1))
             title = fm.get("title", "")
-        except Exception:
-            pass
     if not title:
         title = fpath.stem.replace("_", " ").replace("-", " ").title()
 

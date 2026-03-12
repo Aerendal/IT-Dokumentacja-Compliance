@@ -11,8 +11,11 @@ Faza 9A: Zasilenie słowników bazowych w it_doc_matrix.db:
   - quality_dimensions (~8 wymiarów jakości)
 """
 
+import logging
 import sqlite3
 from pathlib import Path
+
+_log = logging.getLogger(__name__)
 
 DB_PATH = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
 
@@ -351,8 +354,8 @@ def main():
                 try:
                     cur.execute("INSERT OR IGNORE INTO quality_dimensions (dimension, name, description) VALUES (?,?,?)",
                                 (r[0], r[1], r[3]))
-                except Exception:
-                    pass
+                except Exception as exc:
+                    _log.debug("quality_dimensions fallback insert failed: %s: %s", type(exc).__name__, exc)
     results["quality_dimensions"] = len(QUALITY_DIMS)
 
     conn.commit()

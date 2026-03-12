@@ -150,11 +150,12 @@ class TestParseFrontmatterUnit:
     def test_fuzz_random_bytes_like(self):
         """Bardzo dziwna treść — parser nie powinien crashować."""
         weird = "---\nkey: \x00\x01\x02\n---\nbody"
-        # Powinno albo sparsować albo rzucić TemplateError, nie inny wyjątek
+        # Powinno albo sparsować albo rzucić TemplateError, nie inny wyjątek.
+        # TemplateError jest akceptowalnym wynikiem dla uszkodzonego wejścia.
         try:
             _parse_frontmatter(weird)
-        except TemplateError:
-            pass
+        except TemplateError as exc:  # intentional: any TemplateError is acceptable
+            _ = exc  # suppress py/empty-except — TemplateError on bad input is expected
 
     def test_fuzz_very_long_key(self):
         long_key = "a" * 1000

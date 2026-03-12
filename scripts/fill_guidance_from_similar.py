@@ -12,10 +12,15 @@ Dla kazdego szablonu z generycznymi placeholderami (tekst w nawiasach [...]):
 Nie zmienia sekcji ktore juz maja specyficzna tresc (nie sa samo-placeholderami).
 """
 
+import logging
 import re
 import sys
 from pathlib import Path
 from collections import defaultdict
+
+from itdoc._batch import batch_continue
+
+_log = logging.getLogger(__name__)
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "generated_templates" / "core"
 
@@ -146,7 +151,7 @@ def build_large_template_index() -> list[tuple[set, dict, str]]:
     for f in TEMPLATES_DIR.glob("*.md"):
         if f.stat().st_size < 8000:
             continue
-        try:
+        with batch_continue(f"index {f.name}", logger=_log):
             text = f.read_text(encoding="utf-8")
             title = extract_title_from_file(text, f.name)
             kw = title_keywords(title)
@@ -156,8 +161,6 @@ def build_large_template_index() -> list[tuple[set, dict, str]]:
                              if k in TARGET_SECTIONS and not is_placeholder_body(v)}
             if len(rich_sections) >= 5:
                 index.append((kw, rich_sections, f.name))
-        except Exception:
-            pass
     return index
 
 
@@ -210,15 +213,13 @@ def main():
     # Find files that still have placeholder sections
     candidates = []
     for f in sorted(TEMPLATES_DIR.glob("*.md")):
-        try:
+        with batch_continue(f"scan {f.name}", logger=_log):
             text = f.read_text(encoding="utf-8")
             sections = parse_sections(text)
             needs_fill = {k for k, v in sections.items()
                           if k in TARGET_SECTIONS and is_placeholder_body(v)}
             if needs_fill:
                 candidates.append((f, text, sections, needs_fill))
-        except Exception:
-            pass
 
     print(f"  {len(candidates)} szablonow z placeholderami do wypelnienia.")
 

@@ -19,6 +19,7 @@ Tryb domyślny to dry-run. Dodaj --apply aby zapisać zmiany.
 """
 
 import argparse
+import logging
 import os
 import re
 import shutil
@@ -54,6 +55,8 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 VERSION = "2.1.0"
+
+_log = logging.getLogger(__name__)
 
 _SCRIPT_DIR   = Path(__file__).parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent.parent          # dokumentacja/
@@ -448,8 +451,9 @@ def _filter_by_git_date(files: List[Path], days: int, base_dir: str) -> List[Pat
         )
         changed = set(result.stdout.strip().splitlines())
         return [f for f in files if str(f.relative_to(base_dir)) in changed or f.name in changed]
-    except Exception:
+    except Exception as exc:
         safe_print(colored('[WARN] Nie można filtrować przez Git.', ANSI_YELLOW))
+        _log.debug("git log filter failed: %s", exc)
         return files
 
 
@@ -459,8 +463,8 @@ def _filter_by_contains(files: List[Path], substring: str) -> List[Path]:
         try:
             if substring in f.read_text(encoding='utf-8', errors='replace'):
                 result.append(f)
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.debug("Cannot read %s for substring filter: %s", f, exc)
     return result
 
 
@@ -472,8 +476,8 @@ def _filter_by_section_empty(files: List[Path], pattern: re.Pattern) -> List[Pat
             match = pattern.search(body)
             if match and not match.group(2).strip():
                 result.append(f)
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.debug("Cannot read %s for section_empty filter: %s", f, exc)
     return result
 
 
@@ -484,8 +488,8 @@ def _filter_by_section_missing(files: List[Path], pattern: re.Pattern) -> List[P
             _, body = strip_frontmatter(f.read_text(encoding='utf-8', errors='replace'))
             if not pattern.search(body):
                 result.append(f)
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.debug("Cannot read %s for section_missing filter: %s", f, exc)
     return result
 
 
@@ -509,8 +513,8 @@ def _filter_by_section_length(
                 result.append(f)
             elif min_length is None and max_length is None:
                 result.append(f)
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.debug("Cannot read %s for section_length filter: %s", f, exc)
     return result
 
 
@@ -527,8 +531,8 @@ def _filter_by_if_section(
             match = cond_pattern.search(body)
             if match and condition_contains in match.group(2):
                 result.append(f)
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.debug("Cannot read %s for if_section filter: %s", f, exc)
     return result
 
 
@@ -839,9 +843,8 @@ def patch_section(
                         'file': str(f), 'section': display_name, 'action': action,
                         'body_preview': match.group(2)[:100].strip(),
                     })
-            except Exception:
-                pass
-        with open(simulate_jsonl, 'w', encoding='utf-8') as jf:
+            except Exception as exc:
+                _log.debug("Cannot read %s during simulation: %s", f, exc)
             for op in ops:
                 jf.write(json.dumps(op, ensure_ascii=False) + '\n')
         safe_print(colored(f'[OK] Symulacja zapisana do: {simulate_jsonl} ({len(ops)} operacji)', ANSI_GREEN))
@@ -959,10 +962,8 @@ def report_matrix(
             file_sections[str(f)] = sections
             for s in sections:
                 all_sections[s].add(str(f))
-        except Exception:
-            pass
-
-    all_headers = sorted(all_sections.keys())
+        except Exception as exc:
+            _log.debug("Cannot read %s for section matrix: %s", f, exc)
     safe_print(f'\n[MACIERZ SEKCJI] {len(files)} plików, {len(all_headers)} unikalnych sekcji\n')
 
     common = [(h, len(v)) for h, v in all_sections.items() if len(v) > 1]
@@ -987,8 +988,8 @@ def report_matrix(
             _, body = strip_frontmatter(Path(f).read_text(encoding='utf-8', errors='replace'))
             for m in level_re.finditer(body):
                 level_map[m.group(2).strip()].add(len(m.group(1)))
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.debug("Cannot read %s for heading level analysis: %s", f, exc)
     inconsistent = [(name, levels) for name, levels in level_map.items() if len(levels) > 1]
     if inconsistent:
         for name, levels in inconsistent[:10]:

@@ -14,12 +14,17 @@ Podejscie:
 
 Nie nadpisuje istniejacych resolved wpisow.
 """
+import logging
 import re
 import sqlite3
 import sys
 import unicodedata
 from pathlib import Path
 from datetime import datetime, timezone
+
+from itdoc._batch import batch_continue
+
+_log = logging.getLogger(__name__)
 
 DB_PATH = Path(__file__).parent.parent / 'reports' / 'it_doc_matrix.db'
 DOC_TITLE_SECTION_RE = re.compile(r'^document::(.+?)::section::(.+)$', re.IGNORECASE)
@@ -189,7 +194,7 @@ def main():
         print(f"  content_links_resolved razem: {total_resolved} / {total_links}")
 
         # Zapisz do sync_runs
-        try:
+        with batch_continue("sync_run telemetry insert", logger=_log):
             from ulid import ulid
             cur.execute(
                 "INSERT INTO sync_runs(sync_id,ran_at_utc,kind,status,notes) VALUES(?,?,?,?,?)",
@@ -197,8 +202,6 @@ def main():
                  'OK', f"resolved={resolved}, missing_doc={missing_doc}, missing_section={missing_section}")
             )
             conn.commit()
-        except Exception:
-            pass
     elif dry_run:
         print("\nDRY-RUN — brak zmian w DB.")
 

@@ -3,11 +3,16 @@
 - No content is written back to DB; only counts and statuses.
 - Designed to run after: build_file_index -> sync_docs_ids -> extract_sections -> materialize_edges -> resolve_content_links.
 """
+import logging
 import re
 import sqlite3
 from pathlib import Path
 from datetime import datetime, timezone
 from ulid import ulid
+
+from itdoc._batch import batch_continue
+
+_log = logging.getLogger(__name__)
 
 MASTER_DB = Path(__file__).resolve().parent.parent / "reports" / "it_doc_matrix.db"
 TEMPLATES_ROOT = Path(__file__).resolve().parent.parent / "generated_templates"
@@ -220,13 +225,11 @@ def main():
         )
         doc_rows += 1
 
-    try:
+    with batch_continue("sync_run telemetry", logger=_log):
         cur.execute(
             "INSERT INTO sync_runs(sync_id, ran_at_utc, kind, status, notes) VALUES(?,?,?,?,?)",
             (ulid(), now, "quality", "OK", f"docs={doc_rows}, sections={section_rows}"),
         )
-    except Exception:
-        pass
 
     conn.commit()
     conn.close()

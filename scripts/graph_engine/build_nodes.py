@@ -5,12 +5,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import re
 import sqlite3
 import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+
+_log = logging.getLogger(__name__)
 
 DEFAULT_DB_ARG = "reports/it_doc_matrix.db"
 PROJECT_DB = Path(__file__).resolve().parents[2] / "reports" / "it_doc_matrix.db"
@@ -562,7 +565,8 @@ def main() -> None:
                 )
                 cur.execute("UPDATE sync_runs SET notes=? WHERE sync_id=?", (final_notes, sync_id))
                 conn.commit()
-            except Exception:
+            except Exception as exc:
+                _log.debug("sync_runs notes update failed: %s: %s", type(exc).__name__, exc)
                 conn.rollback()
     except Exception as exc:
         conn.rollback()
@@ -571,18 +575,19 @@ def main() -> None:
             if table_exists(cur, "sync_runs"):
                 insert_sync_run(cur, status="FAIL", notes=str(exc)[:500], now=now)
                 conn.commit()
-        except Exception:
+        except Exception as exc:
+            _log.debug("sync_runs FAIL insert failed: %s: %s", type(exc).__name__, exc)
             conn.rollback()
         raise
     finally:
         try:
             conn.execute("PRAGMA synchronous = NORMAL")
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.debug("PRAGMA synchronous reset failed: %s: %s", type(exc).__name__, exc)
         try:
             conn.execute("PRAGMA foreign_keys = ON")
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.debug("PRAGMA foreign_keys reset failed: %s: %s", type(exc).__name__, exc)
         conn.close()
 
 

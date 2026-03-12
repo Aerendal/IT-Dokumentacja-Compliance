@@ -17,6 +17,7 @@ Uzycie:
 import argparse
 import hashlib
 import json
+import logging
 import shutil
 import sqlite3
 import sys
@@ -25,6 +26,8 @@ from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
 from typing import Optional, List, Dict, Any, Set
+
+_log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Stale
@@ -102,8 +105,8 @@ def find_ghosts(conn: sqlite3.Connection, templates_dir: Path) -> List[str]:
         for row in cur.fetchall():
             if row[0]:
                 db_paths.add(normalize_path(row[0]))
-    except sqlite3.Error:
-        pass
+    except sqlite3.Error as exc:
+        _log.debug("docs.path table unavailable (DB may lack table): %s", exc)
 
     # gap_analysis.matched_doc_path
     try:
@@ -113,8 +116,8 @@ def find_ghosts(conn: sqlite3.Connection, templates_dir: Path) -> List[str]:
         for row in cur.fetchall():
             if row[0]:
                 db_paths.add(normalize_path(row[0]))
-    except sqlite3.Error:
-        pass
+    except sqlite3.Error as exc:
+        _log.debug("gap_analysis table unavailable: %s", exc)
 
     ghosts = []
     templates_base = templates_dir.parent  # generated_templates/
@@ -140,10 +143,8 @@ def find_orphans(conn: sqlite3.Connection, templates_dir: Path) -> List[str]:
         for row in cur.fetchall():
             if row[0]:
                 db_paths.add(normalize_path(row[0]))
-    except sqlite3.Error:
-        pass
-
-    # Ustal prefiks relatywny (np. "core")
+    except sqlite3.Error as exc:
+        _log.debug("docs.path table unavailable in find_orphans: %s", exc)
     templates_base = templates_dir.parent  # generated_templates/
 
     orphans = []
@@ -170,8 +171,8 @@ def find_duplicates(templates_dir: Path) -> Dict[str, List[str]]:
             h = compute_hash(content)
             rel = normalize_path(str(md_file.relative_to(templates_base)))
             hash_map[h].append(rel)
-        except OSError:
-            pass
+        except OSError as exc:
+            _log.debug("Cannot read %s for duplicate detection: %s", md_file, exc)
 
     return {h: paths for h, paths in hash_map.items() if len(paths) > 1}
 
