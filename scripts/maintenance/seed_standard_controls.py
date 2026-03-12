@@ -7,7 +7,6 @@ Użycie:
 """
 import argparse
 import sqlite3
-import sys
 
 DB_DEFAULT = "reports/it_doc_matrix.db"
 

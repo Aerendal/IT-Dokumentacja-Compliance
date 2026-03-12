@@ -53,7 +53,7 @@ class TestMatchCatalogEntry:
         assert result[2] in (CONFIDENCE_HIGH, CONFIDENCE_EXACT, "medium")
 
     def test_mapping_boost_lowers_threshold(self):
-        from scripts.gap_analysis import match_catalog_entry, CONFIDENCE_HIGH
+        from scripts.gap_analysis import match_catalog_entry
         docs = [("core/mapped.md", "Incident Response Procedure")]
         # With mapping boost, threshold is effectively lower
         result = match_catalog_entry(

@@ -18,14 +18,13 @@ import argparse
 import hashlib
 import json
 import logging
-import shutil
 import sqlite3
 import sys
 import os
 from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
-from typing import Optional, List, Dict, Any, Set
+from typing import List, Dict, Any, Set
 
 _log = logging.getLogger(__name__)
 

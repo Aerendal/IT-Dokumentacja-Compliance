@@ -1,0 +1,70 @@
+# .pre-commit-config.yaml — IT Dokumentacja Compliance
+#
+# Instalacja (jednorazowo):
+#   pip install pre-commit
+#   pre-commit install
+#
+# Ręczne uruchomienie na wszystkich plikach:
+#   pre-commit run --all-files
+#
+# Pomijanie hooków przy wyjątkowym commicie:
+#   git commit --no-verify -m "..."
+
+repos:
+  # --------------------------------------------------------------------------
+  # Podstawowe sanity-checks (bez zależności zewnętrznych)
+  # --------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+        exclude: "generated_templates/"
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+        exclude: "generated_templates/"
+      - id: check-merge-conflict
+      - id: debug-statements        # wykrywa pdb/breakpoint() zostawione w kodzie
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+
+  # --------------------------------------------------------------------------
+  # Autoflake — usuwa nieużywane importy i zmienne
+  # --------------------------------------------------------------------------
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args:
+          - --remove-all-unused-imports
+          - --remove-unused-variables
+          - --in-place
+        exclude: "generated_templates/"
+
+  # --------------------------------------------------------------------------
+  # Ruff — linter (pyflakes + pycodestyle + isort + bugbear + pyupgrade)
+  # --------------------------------------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        exclude: "generated_templates/"
+      - id: ruff-format
+        exclude: "generated_templates/"
+
+  # --------------------------------------------------------------------------
+  # Bandit — podstawowy SAST (blokuje tylko HIGH severity)
+  # --------------------------------------------------------------------------
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.3
+    hooks:
+      - id: bandit
+        args: ["-ll", "--quiet"]   # -ll = tylko HIGH severity
+        exclude: "tests/"
+
+# Ustawienia globalne
+default_stages: [pre-commit]
+fail_fast: false

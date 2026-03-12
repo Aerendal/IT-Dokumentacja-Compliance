@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import sqlite3
-import time
 from collections import defaultdict
 from pathlib import Path
 

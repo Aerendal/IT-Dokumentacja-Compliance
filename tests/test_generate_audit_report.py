@@ -1,6 +1,5 @@
 """Tests for scripts/generate_audit_report.py — run() function with in-memory DB."""
 import sqlite3
-import pytest
 
 from scripts.generate_audit_report import run
 

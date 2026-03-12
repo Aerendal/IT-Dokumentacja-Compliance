@@ -23,7 +23,6 @@ import subprocess
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from collections import defaultdict
 from typing import Optional, List, Dict, Any
 
 # ---------------------------------------------------------------------------

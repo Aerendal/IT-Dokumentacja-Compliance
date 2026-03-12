@@ -57,7 +57,6 @@ from scripts.maintenance.changelog_generator import (
 from scripts.maintenance.bulk_section_patcher import (
     ensure_changelog_table,
     log_change,
-    collect_targets as bsp_collect_targets,
     apply_add_section,
     apply_replace_in_section,
     apply_append_to_section,
@@ -75,7 +74,6 @@ from scripts.maintenance.changelog_tracker import (
 )
 from scripts.maintenance.template_auditor import (
     audit_file,
-    collect_targets as ta_collect_targets,
 )
 from scripts.maintenance.satellite_linker import (
     ensure_table as sat_ensure_table,

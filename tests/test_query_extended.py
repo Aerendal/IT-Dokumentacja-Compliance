@@ -16,7 +16,6 @@ rozszerzenia (extension points), wykrywanie potencjalnych wycieków logicznych.
 """
 
 import sqlite3
-from pathlib import Path
 
 import pytest
 

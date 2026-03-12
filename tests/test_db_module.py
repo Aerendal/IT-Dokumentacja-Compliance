@@ -14,7 +14,6 @@ Poniższe testy używają in-memory DB lub tmpfile — bez dostępu do real DB.
 """
 
 import sqlite3
-import tempfile
 from pathlib import Path
 
 import pytest

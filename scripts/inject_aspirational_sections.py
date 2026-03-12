@@ -9,10 +9,8 @@ have them as actual ## headings.
 This boosts content_links_resolved from ~19% to ~35%.
 """
 
-import os
 import re
 import sqlite3
-import hashlib
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent.parent

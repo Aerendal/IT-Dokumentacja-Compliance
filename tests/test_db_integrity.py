@@ -4,7 +4,6 @@ Wymagają połączenia z rzeczywistą DB (fixtures: real_db_conn z conftest).
 Testy są oznaczone @pytest.mark.integration i pomijane gdy DB nie istnieje.
 """
 
-import json
 
 import pytest
 

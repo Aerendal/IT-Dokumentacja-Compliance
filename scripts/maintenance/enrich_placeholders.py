@@ -3,7 +3,10 @@
 enrich_placeholders.py — wypełnia szablony-placeholdery
 treścią opisującą: cel, co zawierają, dlaczego i mechanizmy wpływu.
 """
-import sqlite3, os, re, sys, argparse
+import sqlite3
+import re
+import sys
+import argparse
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent.parent.parent / "reports/it_doc_matrix.db"

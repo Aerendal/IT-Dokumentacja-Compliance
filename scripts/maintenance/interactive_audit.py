@@ -23,7 +23,7 @@ import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Dict, Tuple
 
 
 # ---------------------------------------------------------------------------

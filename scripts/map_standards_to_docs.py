@@ -13,7 +13,6 @@ jesli jeszcze jej nie ma.
 """
 import sqlite3
 import sys
-import re
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent.parent / 'reports' / 'it_doc_matrix.db'

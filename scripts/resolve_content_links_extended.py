@@ -18,7 +18,6 @@ import logging
 import re
 import sqlite3
 import sys
-import unicodedata
 from pathlib import Path
 from datetime import datetime, timezone
 

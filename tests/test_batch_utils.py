@@ -12,10 +12,9 @@ zatrzymywać całego przebiegu. Ale ważne jest żeby:
   3. Zachowanie było PRZETESTOWANE (nie "zgadywane")
 """
 import logging
-import os
 import pytest
 
-from itdoc._batch import batch_continue, _strict_mode
+from itdoc._batch import batch_continue
 
 
 # ---------------------------------------------------------------------------

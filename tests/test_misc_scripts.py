@@ -8,10 +8,8 @@ Covers:
   - scripts/gap_analysis.py (utility functions)
   - scripts/fill_guidance_from_similar.py (utility functions)
 """
-import re
 import sqlite3
 import pytest
-from pathlib import Path
 
 pytestmark = pytest.mark.unit
 

@@ -9,9 +9,7 @@ Filozofia: "wykrycie przecieków i miejsc do rozwinięć" z TESTING_METHODOLOGY 
 """
 
 import gc
-import os
 import sqlite3
-import tempfile
 from pathlib import Path
 
 import pytest

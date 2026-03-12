@@ -13,11 +13,14 @@ Wymagania: requests (pip install requests)
 """
 
 import argparse
+import logging
 import re
 import sqlite3
 import sys
 import time
 from pathlib import Path
+
+_log = logging.getLogger(__name__)
 
 try:
     import requests
@@ -172,10 +175,8 @@ def check_mapping_quality(conn, sample: int = 50) -> list[dict]:
             try:
                 content = fpath.read_text(encoding="utf-8", errors="replace").lower()
                 found_keywords = [kw for kw in keywords if kw.lower() in content]
-            except Exception:
-                pass
-
-        quality = "OK" if found_keywords else ("NO_KEYWORDS" if keywords else "NO_RULES")
+            except Exception as exc:
+                _log.debug("Cannot read %s for keyword check: %s", fpath, exc) else ("NO_KEYWORDS" if keywords else "NO_RULES")
         results.append({
             "doc_path": doc_path,
             "standard_code": code,

@@ -4,7 +4,6 @@ Sprawdzają że pipeline_run.py zwraca status PASS.
 Oznaczone @pytest.mark.slow — pomijane w szybkim CI (pytest -m "not slow").
 """
 
-import re
 import subprocess
 import sys
 from pathlib import Path

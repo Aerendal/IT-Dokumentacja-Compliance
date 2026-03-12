@@ -5,8 +5,6 @@ All tests use in-memory SQLite and no real Git calls.
 import json
 import sqlite3
 import pytest
-from pathlib import Path
-from datetime import datetime
 
 from scripts.maintenance.changelog_generator import (
     parse_git_log,
@@ -16,7 +14,6 @@ from scripts.maintenance.changelog_generator import (
     render_json,
     render_csv,
     fetch_changelog_rows,
-    STATUS_LABELS,
 )
 
 pytestmark = pytest.mark.unit

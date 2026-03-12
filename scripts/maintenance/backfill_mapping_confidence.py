@@ -180,8 +180,8 @@ def add_evidence_column(conn: sqlite3.Connection) -> None:
     try:
         conn.execute("ALTER TABLE doc_standard_mapping ADD COLUMN evidence TEXT")
         conn.commit()
-    except sqlite3.OperationalError:
-        pass  # column already exists
+    except sqlite3.OperationalError as exc:
+        _log.debug("evidence column already exists or ALTER failed: %s", exc)  # column already exists
 
 
 # ---------------------------------------------------------------------------

@@ -27,7 +27,6 @@ import json
 import re
 import sqlite3
 import sys
-import unicodedata
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent.parent.parent

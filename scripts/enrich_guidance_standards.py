@@ -10,7 +10,6 @@ Logika:
 
 import sqlite3
 import json
-import re
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"

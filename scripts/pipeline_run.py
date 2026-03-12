@@ -6,7 +6,6 @@ Assumes CURRENT is already built (documents_current up to date, alignment_log.cs
 import csv
 import hashlib
 import json
-import os
 import shutil
 import sqlite3
 import sys

@@ -12,9 +12,12 @@ Dla każdego szablonu który ma sekcję 'RACI i role':
 Dla szablonów bez tabeli RACI lub z samym guidance — użyj domyślnego RACI wg kategorii.
 """
 
+import logging
 import re
 import sqlite3
 from pathlib import Path
+
+_log = logging.getLogger(__name__)
 
 DB_PATH = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
 TEMPLATES_DIR = Path(__file__).parent.parent / "generated_templates" / "core"
@@ -138,10 +141,8 @@ def main():
                 )
                 if raci_match:
                     rows = parse_raci_table(raci_match.group(1))
-            except Exception:
-                pass
-
-        if not rows:
+            except Exception as exc:
+                _log.debug("RACI parse failed for doc %s: %s", doc_uid, exc)
             # Use one default RACI row per document
             r, a, c, i = default_raci_for_title(title or "")
             rows = [("Ogólna odpowiedzialność", r, a, c, i)]

@@ -1,7 +1,6 @@
 """Tests for pure helper functions in scripts/maintenance/interactive_audit.py."""
 import sqlite3
 import sys
-import pytest
 
 from scripts.maintenance.interactive_audit import (
     format_preview,
@@ -12,10 +11,7 @@ from scripts.maintenance.interactive_audit import (
     VALID_CONFIDENCE,
     VALID_REASONS,
     ANSI_GREEN,
-    ANSI_YELLOW,
-    ANSI_CYAN,
     ANSI_RESET,
-    ANSI_BOLD,
     ANSI_RED,
 )
 

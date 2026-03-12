@@ -1,7 +1,6 @@
 """Tests for scripts/resolve_content_links_extended.py — pure utility functions."""
 import re
 import sqlite3
-import pytest
 
 from scripts.resolve_content_links_extended import (
     to_anchor,

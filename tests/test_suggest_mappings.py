@@ -8,9 +8,7 @@ Uruchom:
     python3 -m pytest tests/test_suggest_mappings.py -v --tb=short
 """
 
-import math
 import sqlite3
-from pathlib import Path
 
 import pytest
 
@@ -20,7 +18,6 @@ from scripts.maintenance.suggest_mappings import (
     overlap_coefficient,
     build_idf_profiles,
     get_unmapped_docs,
-    score_doc_against_profiles,
     generate_suggestions,
     apply_suggestions,
     render_report,

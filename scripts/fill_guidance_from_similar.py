@@ -16,7 +16,6 @@ import logging
 import re
 import sys
 from pathlib import Path
-from collections import defaultdict
 
 from itdoc._batch import batch_continue
 

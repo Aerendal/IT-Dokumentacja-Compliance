@@ -52,22 +52,22 @@ def get_db_stats(db_path: Path) -> dict:
         try:
             cur.execute("SELECT COUNT(*) FROM doc_standard_mapping")
             stats["total_mappings"] = cur.fetchone()[0]
-        except sqlite3.OperationalError:
-            pass  # tabela może nie istnieć w pustej DB
+        except sqlite3.OperationalError as exc:
+            _log.debug("doc_standard_mapping table unavailable: %s", exc)  # table may not exist
 
         try:
             cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence IS NULL")
             stats["null_confidence"] = cur.fetchone()[0]
-        except sqlite3.OperationalError:
-            pass  # tabela może nie istnieć w pustej DB
+        except sqlite3.OperationalError as exc:
+            _log.debug("doc_standard_mapping.confidence column unavailable: %s", exc)  # table may not exist
 
         try:
             cur.execute("SELECT COUNT(*) FROM template_violations WHERE severity='ERROR'")
             stats["error_violations"] = cur.fetchone()[0]
             cur.execute("SELECT COUNT(*) FROM template_violations WHERE severity='WARNING'")
             stats["warning_violations"] = cur.fetchone()[0]
-        except sqlite3.OperationalError:
-            pass  # tabela template_violations opcjonalna
+        except sqlite3.OperationalError as exc:
+            _log.debug("template_violations table unavailable: %s", exc)  # optional table
     finally:
         conn.close()
     return stats

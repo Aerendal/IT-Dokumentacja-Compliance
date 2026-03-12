@@ -14,11 +14,16 @@ mg = "metagraph.cli.main:cli"
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "pytest-xdist>=3.0",
     "fastapi>=0.100",
     "httpx>=0.24",
     "uvicorn>=0.22",
     "pydantic>=2.0",
     "requests>=2.28",
+    "ruff>=0.4",
+    "autoflake>=2.3",
+    "pre-commit>=3.7",
+    "mypy>=1.10",
 ]
 
 [tool.pytest.ini_options]
@@ -48,3 +53,50 @@ paths_to_mutate = ["scripts/maintenance/"]
 tests_dir = ["tests/test_maintenance_scripts.py"]
 pytest_add_cli_args = ["-x", "-q", "--tb=no"]
 also_copy = ["scripts/__init__.py", "scripts/maintenance/__init__.py"]
+
+# ---------------------------------------------------------------------------
+# Ruff — linter + formatter (zastępuje flake8, isort, black)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+exclude = [
+    ".git", "__pycache__", ".pytest_cache",
+    "generated_templates", "dokumentacja",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (unused imports, undefined names)
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+]
+ignore = [
+    "E501",  # line too long (ruff format handles it)
+    "B008",  # do not perform function calls in default args
+    "UP007", # use X | Y instead of Optional[X] (requires py3.10+)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F811"]  # redefined-while-unused (fixtures)
+
+[tool.ruff.lint.isort]
+known-first-party = ["itdoc", "scripts", "metagraph"]
+
+# ---------------------------------------------------------------------------
+# Mypy — opcjonalne sprawdzanie typów (stopniowe wdrożenie)
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.9"
+warn_unused_ignores = true
+warn_return_any = false
+ignore_missing_imports = true
+exclude = [
+    "generated_templates/",
+    "dokumentacja/",
+    "tests/",
+]

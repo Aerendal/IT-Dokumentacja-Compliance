@@ -580,8 +580,8 @@ def undo_session(audit_path: str, session_id: str) -> None:
                 rec = json.loads(line.strip())
                 if rec.get('session_id') == session_id and not rec.get('dry_run'):
                     records.append(rec)
-            except json.JSONDecodeError:
-                pass
+            except json.JSONDecodeError as exc:
+                _log.debug("Skipping malformed JSON line in history: %s", exc)
     if not records:
         safe_print(colored(f"[WARN] Brak zapisanych operacji dla sesji '{session_id}'.", ANSI_YELLOW))
         return

@@ -1,6 +1,5 @@
 """Unit tests for new_template_wizard.py pure/testable functions."""
 
-import json
 import sqlite3
 import subprocess
 import sys

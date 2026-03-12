@@ -11,8 +11,11 @@ document_lifecycle: stany cyklu życia per dokument.
 Generuje domyślny lifecycle: create (phase 1-2) → review (phase 3-4) → approve → active → archive.
 """
 
+import logging
 import sqlite3
 from pathlib import Path
+
+_log = logging.getLogger(__name__)
 
 DB_PATH = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
 
@@ -64,10 +67,8 @@ def main():
                 """, (doc_uid, phase_rowid, "used"))
                 if cur.rowcount:
                     inserted_dpm += 1
-        except Exception:
-            pass
-
-    # ── document_lifecycle ────────────────────────────────────────────────────
+        except Exception as exc:
+            _log.debug("document_phase_mapping insert skipped for %s: %s", doc_uid, exc)────────────────────────────────────────────────
     cur.execute("PRAGMA table_info(document_lifecycle)")
     dlc_cols = {r[1] for r in cur.fetchall()}
 
@@ -95,7 +96,8 @@ def main():
                     """, (doc_uid, state, desc))
                     if cur.rowcount:
                         inserted_dlc += 1
-                except Exception:
+                except Exception as exc:
+                    _log.debug("document_lifecycle insert skipped for %s/%s: %s", doc_uid, state, exc)
                     break  # if schema doesn't match, skip all
 
     conn.commit()

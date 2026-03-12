@@ -12,7 +12,7 @@ Sekcje:
 from __future__ import annotations
 import argparse
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 DB_DEFAULT = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
@@ -21,7 +21,7 @@ REPORT_DIR = Path(__file__).parent.parent / "reports"
 
 def run(conn: sqlite3.Connection) -> str:
     lines: list[str] = []
-    ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     # ── Nagłówek ──────────────────────────────────────────────────────────
     lines += [

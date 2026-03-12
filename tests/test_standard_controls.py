@@ -13,15 +13,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts", "mai
 
 from seed_standard_controls import (
     CREATE_TABLE_SQL as SEED_TABLE_SQL,
-    ISO27001_CONTROLS,
-    NIST_CSF_CONTROLS,
     ALL_CONTROLS,
-    seed,
 )
 from map_docs_to_controls import (
     CREATE_TABLE_SQL as MAP_TABLE_SQL,
-    tokenize,
-    jaccard,
     map_docs_to_controls,
 )
 

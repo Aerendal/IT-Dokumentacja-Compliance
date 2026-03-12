@@ -4,7 +4,6 @@ Covers: audit_templates log/colored/find_duplicates/find_unmapped,
 """
 import sqlite3
 import sys
-from io import StringIO
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -25,8 +24,6 @@ from scripts.maintenance.audit_templates import (
     find_duplicates,
     find_unmapped,
     ANSI_GREEN,
-    ANSI_YELLOW,
-    ANSI_RED,
     ANSI_RESET,
 )
 
