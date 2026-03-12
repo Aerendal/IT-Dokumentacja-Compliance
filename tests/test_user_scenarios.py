@@ -70,9 +70,9 @@ class TestGroupAOnboarding:
         high_conf = _high_exact(results)
         assert len(high_conf) >= 5, f"Za mało wysokiej jakości szablonów ASVS: {len(high_conf)}"
         paths = _paths(high_conf)
-        assert (
-            "owasp_asvs_cryptography_policy.md" in paths
-        ), "Brak owasp_asvs_cryptography_policy.md w wynikach wysokiej pewności"
+        assert "owasp_asvs_cryptography_policy.md" in paths, (
+            "Brak owasp_asvs_cryptography_policy.md w wynikach wysokiej pewności"
+        )
 
 
 # ===========================================================================
@@ -114,9 +114,9 @@ class TestGroupBAudit:
         results = find_by_standard(real_db_conn, "NIS2")
         assert len(results) >= 4, f"Za mało szablonów NIS2: {len(results)}"
         paths = _paths(results)
-        assert (
-            "incident_transparency_report.md" in paths
-        ), "Brak szablonu raportowania incydentów NIS2"
+        assert "incident_transparency_report.md" in paths, (
+            "Brak szablonu raportowania incydentów NIS2"
+        )
         assert "risk_assessment.md" in paths, "Brak szablonu oceny ryzyka NIS2"
 
     def test_b4_dora_eba_artifacts(self, real_db_conn):
@@ -293,9 +293,9 @@ class TestGroupFBCM:
         test_templates = [
             p for p in paths if "test" in p or "exercise" in p or "compliance_test" in p
         ]
-        assert (
-            len(test_templates) >= 1
-        ), f"Brak szablonu testowania/ćwiczenia DRP w ISO 22301. Dostępne: {sorted(paths)[:10]}"
+        assert len(test_templates) >= 1, (
+            f"Brak szablonu testowania/ćwiczenia DRP w ISO 22301. Dostępne: {sorted(paths)[:10]}"
+        )
 
     def test_f4_major_incident_report_bcm(self, real_db_conn):
         """F4: Raport po incydencie ciągłości (ISO 22301 + ITIL 4)."""
@@ -370,21 +370,21 @@ class TestGroupHCloud:
         iso20000 = find_by_standard(real_db_conn, "ISO 20000-1")
         itil_paths = _paths(itil4)
         iso20000_paths = _paths(iso20000)
-        assert (
-            "configuration_management_document.md" in itil_paths
-        ), "Brak Configuration Management Document w ITIL 4"
-        assert (
-            "iso20000_availability_plan.md" in iso20000_paths
-        ), "Brak Availability Plan ISO 20000-1"
+        assert "configuration_management_document.md" in itil_paths, (
+            "Brak Configuration Management Document w ITIL 4"
+        )
+        assert "iso20000_availability_plan.md" in iso20000_paths, (
+            "Brak Availability Plan ISO 20000-1"
+        )
 
     def test_h3_pci_dss_compliance_package(self, real_db_conn):
         """H3: PCI DSS — komplet dokumentów dla środowiska CDE."""
         results = find_by_standard(real_db_conn, "PCI DSS")
         assert len(results) >= 7, f"Za mało szablonów PCI DSS: {len(results)}"
         paths = _paths(results)
-        assert (
-            "payment_card_security_pci_dss.md" in paths or "pci_dss_compliance.md" in paths
-        ), "Brak podstawowego szablonu PCI DSS compliance"
+        assert "payment_card_security_pci_dss.md" in paths or "pci_dss_compliance.md" in paths, (
+            "Brak podstawowego szablonu PCI DSS compliance"
+        )
         assert "access_control.md" in paths, "Brak szablonu kontroli dostępu"
         assert "data_flow_diagram.md" in paths, "Brak Data Flow Diagram (wymagany PCI DSS req. 1)"
 

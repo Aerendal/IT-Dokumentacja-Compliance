@@ -275,9 +275,9 @@ class TestFindCuratedByStandard:
         """Wyniki curated są istotnie mniejsze niż pełne (bez boilerplate FP)."""
         full = find_by_standard(real_db_conn, "PMBOK 7")
         curated = find_curated_by_standard(real_db_conn, "PMBOK 7")
-        assert len(curated) < len(
-            full
-        ), f"Curated ({len(curated)}) powinno być mniejsze niż full ({len(full)})"
+        assert len(curated) < len(full), (
+            f"Curated ({len(curated)}) powinno być mniejsze niż full ({len(full)})"
+        )
         assert len(curated) >= 5, f"Za mało curated wyników PMBOK 7: {len(curated)}"
 
     def test_gap_analysis_results_come_first(self, real_db_conn):

@@ -29,16 +29,14 @@ class TestConfigFiles:
     """Weryfikuje że pliki konfiguracyjne QoL istnieją i mają wymagane sekcje."""
 
     def test_pre_commit_config_exists(self):
-        assert (
-            PROJECT_ROOT / ".pre-commit-config.yaml"
-        ).exists(), (
+        assert (PROJECT_ROOT / ".pre-commit-config.yaml").exists(), (
             ".pre-commit-config.yaml nie istnieje — uruchom: cp .pre-commit-config.yaml.example ..."
         )
 
     def test_env_example_exists(self):
-        assert (
-            PROJECT_ROOT / ".env.example"
-        ).exists(), ".env.example nie istnieje — dokumentuje zmienne środowiskowe"
+        assert (PROJECT_ROOT / ".env.example").exists(), (
+            ".env.example nie istnieje — dokumentuje zmienne środowiskowe"
+        )
 
     def test_env_example_documents_itdoc_strict(self):
         content = (PROJECT_ROOT / ".env.example").read_text()
@@ -70,9 +68,9 @@ class TestConfigFiles:
 
     def test_pyproject_dev_deps_include_pytest_xdist(self):
         content = (PROJECT_ROOT / "pyproject.toml").read_text()
-        assert (
-            "pytest-xdist" in content
-        ), "pyproject.toml dev deps powinny zawierać pytest-xdist (równoległe testy)"
+        assert "pytest-xdist" in content, (
+            "pyproject.toml dev deps powinny zawierać pytest-xdist (równoległe testy)"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -94,15 +92,15 @@ class TestCIWorkflows:
 
     def test_ci_has_strict_test_job(self):
         content = self._read_workflow("ci.yml")
-        assert (
-            "ITDOC_STRICT" in content
-        ), "ci.yml powinien zawierać job strict-test z ITDOC_STRICT=1"
+        assert "ITDOC_STRICT" in content, (
+            "ci.yml powinien zawierać job strict-test z ITDOC_STRICT=1"
+        )
 
     def test_ci_has_pytest_xdist(self):
         content = self._read_workflow("ci.yml")
-        assert (
-            "-n auto" in content or "xdist" in content
-        ), "ci.yml powinien uruchamiać pytest z -n auto (pytest-xdist)"
+        assert "-n auto" in content or "xdist" in content, (
+            "ci.yml powinien uruchamiać pytest z -n auto (pytest-xdist)"
+        )
 
     def test_ci_has_coverage_xml(self):
         content = self._read_workflow("ci.yml")
@@ -137,9 +135,9 @@ class TestMakefile:
         return (PROJECT_ROOT / "Makefile").read_text()
 
     def test_makefile_has_strict_test(self):
-        assert (
-            "strict-test" in self._makefile_content()
-        ), "Makefile powinien zawierać cel strict-test"
+        assert "strict-test" in self._makefile_content(), (
+            "Makefile powinien zawierać cel strict-test"
+        )
 
     def test_makefile_has_lint_ruff(self):
         content = self._makefile_content()
@@ -149,23 +147,23 @@ class TestMakefile:
         assert "format" in self._makefile_content(), "Makefile powinien zawierać cel format"
 
     def test_makefile_has_type_check(self):
-        assert (
-            "type-check" in self._makefile_content()
-        ), "Makefile powinien zawierać cel type-check (mypy)"
+        assert "type-check" in self._makefile_content(), (
+            "Makefile powinien zawierać cel type-check (mypy)"
+        )
 
     def test_makefile_has_test_par(self):
-        assert (
-            "test-par" in self._makefile_content()
-        ), "Makefile powinien zawierać cel test-par (równoległe testy)"
+        assert "test-par" in self._makefile_content(), (
+            "Makefile powinien zawierać cel test-par (równoległe testy)"
+        )
 
     def test_makefile_strict_test_uses_itdoc_strict(self):
         content = self._makefile_content()
         assert "ITDOC_STRICT=1" in content, "Makefile strict-test powinien ustawiać ITDOC_STRICT=1"
 
     def test_makefile_has_mutate(self):
-        assert (
-            "mutate" in self._makefile_content()
-        ), "Makefile powinien zawierać cel mutate (mutation testing)"
+        assert "mutate" in self._makefile_content(), (
+            "Makefile powinien zawierać cel mutate (mutation testing)"
+        )
 
 
 # ---------------------------------------------------------------------------

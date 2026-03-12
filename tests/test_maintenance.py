@@ -44,9 +44,9 @@ class TestTemplateAuditor:
         if not script.exists():
             pytest.skip(f"Skrypt nie istnieje: {script}")
         result = _run_script(script, ["--glob", "core/21_cfr_part_11_compliance.md"])
-        assert (
-            result.returncode == 0
-        ), f"template_auditor.py zakończył się kodem {result.returncode}\n{result.stderr}"
+        assert result.returncode == 0, (
+            f"template_auditor.py zakończył się kodem {result.returncode}\n{result.stderr}"
+        )
 
     def test_produces_output(self):
         _skip_if_no_db()
@@ -77,9 +77,9 @@ class TestBulkSectionPatcher:
                 "--dry-run",
             ],
         )
-        assert (
-            result.returncode == 0
-        ), f"bulk_section_patcher.py (dry-run) zakończył się kodem {result.returncode}\n{result.stderr}"
+        assert result.returncode == 0, (
+            f"bulk_section_patcher.py (dry-run) zakończył się kodem {result.returncode}\n{result.stderr}"
+        )
 
     def test_dry_run_does_not_modify_files(self):
         _skip_if_no_db()
@@ -114,9 +114,9 @@ class TestImpactAnalyzer:
         if not script.exists():
             pytest.skip(f"Skrypt nie istnieje: {script}")
         result = _run_script(script, ["--standard", "ISO/IEC 27001"])
-        assert (
-            result.returncode == 0
-        ), f"impact_analyzer.py zakończył się kodem {result.returncode}\n{result.stderr}"
+        assert result.returncode == 0, (
+            f"impact_analyzer.py zakończył się kodem {result.returncode}\n{result.stderr}"
+        )
 
     def test_produces_nonempty_output(self):
         _skip_if_no_db()

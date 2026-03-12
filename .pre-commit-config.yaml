@@ -47,7 +47,7 @@ repos:
   # Ruff — linter (pyflakes + pycodestyle + isort + bugbear + pyupgrade)
   # --------------------------------------------------------------------------
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+    rev: v0.15.4
     hooks:
       - id: ruff
         args: [--fix]
