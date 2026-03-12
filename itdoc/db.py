@@ -92,8 +92,8 @@ def validate_schema(
             if on_error:
                 on_error(msg)
             continue
-        count = conn.execute(  # nosec B608 -- table from hardcoded _REQUIRED_TABLES whitelist, not user input
-            f"SELECT COUNT(*) FROM [{table}]"
+        count = conn.execute(
+            f"SELECT COUNT(*) FROM [{table}]"  # nosec B608 -- table from hardcoded _REQUIRED_TABLES whitelist, not user input
         ).fetchone()[0]
         if count == 0:
             msg = f"Pusta tabela: {table}"
