@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS nodes (
     layer TEXT NOT NULL CHECK (layer IN ('pm', 'scrum', 'docs', 'system')),
     source_file TEXT,
     source_section TEXT,
+    tags TEXT,  -- spacja-rozdzielone stemmy (pl_stems dla FTS + filtrów)
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
