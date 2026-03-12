@@ -281,7 +281,8 @@ def rhythm_upstream(
         if edge_type:
             edge_filter = " AND re.rhythm_type = ?"
             params.append(edge_type)
-        rows = conn.execute(f"""  # nosec B608 -- f-string used only for safe IN-placeholders and hardcoded edge_filter clause; user data bound via params
+        # nosec B608 -- f-string builds ?-placeholders ("?,?,?") and hardcoded edge_filter only; all user data bound via params list
+        rows = conn.execute(f"""
             SELECT re.from_node AS from_uid, re.to_node AS to_uid,
                    re.rhythm_type AS edge_type, re.weight
             FROM rhythm_edges re
@@ -336,7 +337,8 @@ def rhythm_downstream(
         if edge_type:
             edge_filter = " AND re.rhythm_type = ?"
             params.append(edge_type)
-        rows = conn.execute(f"""  # nosec B608 -- f-string used only for safe IN-placeholders and hardcoded edge_filter clause; user data bound via params
+        # nosec B608 -- f-string builds ?-placeholders ("?,?,?") and hardcoded edge_filter only; all user data bound via params list
+        rows = conn.execute(f"""
             SELECT re.from_node AS from_uid, re.to_node AS to_uid,
                    re.rhythm_type AS edge_type, re.weight
             FROM rhythm_edges re
