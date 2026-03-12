@@ -1,0 +1,1816 @@
+openapi: "3.1.0"
+
+info:
+  title: AI Documentation Workshop API
+  version: "1.0.0"
+  x-api-version-strategy: "URL prefix /v1/ planned for v2. Current endpoints are v1 implicitly. Breaking changes will be introduced with /v2/ prefix."
+  description: |
+    REST API dla czterech modułów "drugiego warsztatu" dokumentacyjnego.
+    Biblioteka itdoc (it_doc_matrix.db) jest używana wyłącznie read-only.
+
+    ## Moduły
+    - **Side 1 — Ingestion** (`/ingestion`): Ingestia nowych szablonów ze specyfikacji
+    - **Side 2 — Brief Mapper** (`/brief`): Mapowanie briefu klienta na szablony
+    - **Side 3 — Reports** (`/reports`): Generowanie kosztorysów
+    - **Side 4 — Planning** (`/planning`): Planowanie pracy dla AI-agentów
+
+servers:
+  - url: http://localhost:8000
+    description: Lokalny serwer developerski (Docker Compose)
+
+tags:
+  - name: health
+    description: Health check endpoints
+  - name: ingestion
+    description: Side 1 — Ingestia nowych szablonów
+  - name: brief
+    description: Side 2 — Mapowanie briefów klientów
+  - name: reports
+    description: Side 3 — Raporty kosztorysowe
+  - name: planning
+    description: Side 4 — Planowanie pracy dla AI-agentów
+  - name: projects
+    description: Zarządzanie projektami klientów
+
+# ──────────────────────────────────────────────
+# COMPONENTS
+# ──────────────────────────────────────────────
+components:
+  securitySchemes:
+    ApiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+
+    # ── Shared ──
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:       { type: string, example: "NOT_FOUND" }
+            message:    { type: string, example: "Brief xyz nie istnieje" }
+            detail:     { type: string, nullable: true }
+            request_id: { type: string, example: "req_abc123" }
+
+    UUID:
+      type: string
+      format: uuid
+      example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+
+    # ── Projects ──
+    Project:
+      type: object
+      required: [id, name, status, created_at]
+      properties:
+        id:          { $ref: '#/components/schemas/UUID' }
+        name:        { type: string, example: "Projekt Fintech ABC S.A." }
+        client_name: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [active, archived, cancelled]
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    ProjectCreate:
+      type: object
+      required: [name]
+      properties:
+        name:        { type: string }
+        client_name: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+
+    # ── Ingestion ──
+    IngestionJob:
+      type: object
+      required: [id, status, created_at]
+      properties:
+        id:         { $ref: '#/components/schemas/UUID' }
+        status:
+          type: string
+          enum: [pending, generating, review, approved, rejected]
+        standard_code:       { type: string, nullable: true }
+        created_at:          { type: string, format: date-time }
+        updated_at:          { type: string, format: date-time }
+
+    IngestionJobDetail:
+      allOf:
+        - $ref: '#/components/schemas/IngestionJob'
+        - type: object
+          properties:
+            generated_template:   { type: string, nullable: true }
+            template_frontmatter: { type: object, nullable: true }
+            rejection_reason:     { type: string, nullable: true }
+            approved_path:        { type: string, nullable: true }
+
+    ApproveRequest:
+      type: object
+      required: [save_path]
+      properties:
+        save_path: { type: string, nullable: true, description: "Ścieżka docelowa (opcjonalna, default: auto)" }
+        index_for_mapping:
+          type: boolean
+          default: true
+          description: Czy dodać zatwierdzony szablon do local_templates_index dla SemanticMapper
+
+    RejectRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          nullable: true
+          description: Opcjonalny powód odrzucenia
+
+    # ── Brief ──
+    BriefFormat:
+      type: string
+      enum: [txt, md, pdf, docx, unknown]
+
+    BriefUploadResult:
+      type: object
+      required: [brief_id, filename, format, parse_status]
+      properties:
+        brief_id:     { $ref: '#/components/schemas/UUID' }
+        filename:     { type: string }
+        format:       { $ref: '#/components/schemas/BriefFormat' }
+        word_count:   { type: integer }
+        parse_status:
+          type: string
+          enum: [parsed, failed]
+        parse_error: { type: string, nullable: true }
+
+    ExtractedEntities:
+      type: object
+      properties:
+        domains:      { type: array, items: { type: string }, example: ["fintech", "cloud"] }
+        standards:    { type: array, items: { type: string }, example: ["PCI DSS", "ISO/IEC 27001"] }
+        regulations:  { type: array, items: { type: string }, example: ["RODO", "KSC"] }
+        phases:       { type: array, items: { type: integer }, example: [3, 5, 6, 13] }
+        keywords:     { type: array, items: { type: string } }
+        project_type: { type: string, nullable: true, example: "greenfield_saas" }
+
+    MappingItem:
+      type: object
+      required: [id, doc_uid, doc_title, phase_id, confidence]
+      properties:
+        id:               { $ref: '#/components/schemas/UUID' }
+        doc_uid:          { type: string, example: "core_fintech_0042" }
+        doc_title:        { type: string }
+        doc_path:         { type: string, nullable: true }
+        phase_id:         { type: integer, minimum: 1, maximum: 23 }
+        phase_name:       { type: string }
+        confidence:       { type: number, format: float, minimum: 0.0, maximum: 1.0 }
+        match_reason:     { type: string }
+        match_sources:    { type: array, items: { type: string }, example: ["standard:PCI_DSS", "keyword:payment"] }
+        is_required:      { type: boolean }
+        manually_reviewed:{ type: boolean }
+
+    MappingResult:
+      type: object
+      required: [id, brief_id, status, items]
+      properties:
+        id:                 { $ref: '#/components/schemas/UUID' }
+        brief_id:           { $ref: '#/components/schemas/UUID' }
+        llm_model:          { type: string, nullable: true }
+        extracted_entities: { $ref: '#/components/schemas/ExtractedEntities' }
+        items:              { type: array, items: { $ref: '#/components/schemas/MappingItem' } }
+        total_items:        { type: integer }
+        avg_confidence:     { type: number, format: float, nullable: true }
+        status:
+          type: string
+          enum: [pending, running, done, failed]
+        error:      { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        completed_at: { type: string, format: date-time, nullable: true }
+
+    MapRequest:
+      type: object
+      properties:
+        confidence_threshold: { type: number, format: float, default: 0.6, minimum: 0.0, maximum: 1.0 }
+        max_results:          { type: integer, default: 200, minimum: 1, maximum: 500 }
+        force_rerun:          { type: boolean, default: false }
+
+    MappingItemUpdate:
+      type: object
+      properties:
+        confidence:        { type: number, format: float, minimum: 0.0, maximum: 1.0, nullable: true }
+        is_required:       { type: boolean, nullable: true }
+        manually_reviewed: { type: boolean, default: true }
+
+    # ── Reports ──
+    DeductionPoint:
+      type: object
+      required: [type, description, weight]
+      properties:
+        type:        { type: string, example: "standard_coverage" }
+        description: { type: string, example: "PCI DSS wymaga 12 obszarów → 47 szablonów" }
+        weight:      { type: number, format: float, minimum: 0.0, maximum: 1.0 }
+
+    PhaseEstimate:
+      type: object
+      required: [phase_id, phase_name, doc_count, h_min, h_likely, h_max]
+      properties:
+        phase_id:         { type: integer }
+        phase_name:       { type: string }
+        doc_count:        { type: integer }
+        h_min:            { type: number, format: float }
+        h_likely:         { type: number, format: float }
+        h_max:            { type: number, format: float }
+        is_critical_path: { type: boolean }
+        notes:            { type: string, nullable: true }
+        documents:
+          type: array
+          items:
+            type: object
+            properties:
+              doc_uid:    { type: string }
+              doc_title:  { type: string }
+              h_estimate: { type: number, format: float }
+              confidence: { type: number, format: float }
+
+    EstimationReport:
+      type: object
+      required: [id, project_id, total_docs, total_h_min, total_h_likely, total_h_max, status]
+      properties:
+        id:               { $ref: '#/components/schemas/UUID' }
+        mapping_id:       { $ref: '#/components/schemas/UUID' }
+        project_id:       { $ref: '#/components/schemas/UUID' }
+        total_docs:       { type: integer }
+        total_h_min:      { type: number, format: float }
+        total_h_likely:   { type: number, format: float }
+        total_h_max:      { type: number, format: float }
+        complexity_level:
+          type: string
+          enum: [low, medium, high, critical]
+          nullable: true
+        by_phase:         { type: array, items: { $ref: '#/components/schemas/PhaseEstimate' } }
+        deduction_basis:  { type: array, items: { $ref: '#/components/schemas/DeductionPoint' } }
+        status:
+          type: string
+          enum: [draft, accepted, rejected]
+        accepted_at: { type: string, format: date-time, nullable: true }
+        created_at:  { type: string, format: date-time }
+
+    EstimateRequest:
+      type: object
+      properties:
+        confidence_threshold: { type: number, format: float, default: 0.6 }
+        include_phases:       { type: array, items: { type: integer }, nullable: true }
+
+    # ── Planning ──
+    WorkPackage:
+      type: object
+      required: [id, plan_id, doc_uid, doc_title, phase_id, sequence_order, status]
+      properties:
+        id:             { $ref: '#/components/schemas/UUID' }
+        plan_id:        { $ref: '#/components/schemas/UUID' }
+        doc_uid:        { type: string }
+        doc_title:      { type: string }
+        phase_id:       { type: integer }
+        phase_name:     { type: string }
+        sequence_order: { type: integer }
+        inputs_json:    { type: array, items: { type: string } }
+        outputs_json:   { type: array, items: { type: string } }
+        gates_json:     { type: array, items: { type: string } }
+        assignee_type:
+          type: string
+          enum: [ai_agent_writer, ai_agent_reviewer, human]
+          nullable: true
+        h_estimate:  { type: number, format: float, nullable: true }
+        status:
+          type: string
+          enum: [pending, in_progress, done, blocked]
+        depends_on:  { type: array, items: { $ref: '#/components/schemas/UUID' } }
+        created_at:  { type: string, format: date-time }
+        updated_at:  { type: string, format: date-time }
+
+    WorkPlan:
+      type: object
+      required: [id, report_id, project_id, total_packages, status]
+      properties:
+        id:              { $ref: '#/components/schemas/UUID' }
+        report_id:       { $ref: '#/components/schemas/UUID' }
+        project_id:      { $ref: '#/components/schemas/UUID' }
+        total_packages:  { type: integer }
+        status:
+          type: string
+          enum: [draft, active, completed, cancelled]
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    UnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthorized
+        message:
+          type: string
+          example: "Missing or invalid API key"
+
+    ForbiddenError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: "Resource belongs to a different project"
+        request_id:
+          type: string
+          format: uuid
+
+    InternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: internal_server_error
+        message:
+          type: string
+        request_id:
+          type: string
+          format: uuid
+
+# ──────────────────────────────────────────────
+# PATHS
+# ──────────────────────────────────────────────
+security:
+  - ApiKeyHeader: []
+
+paths:
+
+  # ── HEALTH ──────────────────────────────────
+  /health:
+    get:
+      tags: [health]
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:  { type: string, example: "ok" }
+                  version: { type: string, example: "1.0.0" }
+                  db:      { type: string, enum: [ok, error] }
+                  itdoc:   { type: string, enum: [ok, error] }
+
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  # ── PROJECTS ────────────────────────────────
+  /projects:
+    post:
+      tags: [projects]
+      summary: Utwórz projekt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProjectCreate' }
+      responses:
+        "201":
+          description: Projekt utworzony
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    get:
+      tags: [projects]
+      summary: Lista projektów
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [active, archived, cancelled] }
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista projektów
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Project' }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /projects/{project_id}:
+    get:
+      tags: [projects]
+      summary: Pobierz projekt
+      parameters:
+        - in: path
+          name: project_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        "200":
+          description: Projekt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+        "404":
+          description: Nie znaleziono
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    patch:
+      tags: [projects]
+      summary: Aktualizuj projekt
+      parameters:
+        - in: path
+          name: project_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:        { type: string }
+                status:      { type: string, enum: [active, on_hold, cancelled, completed] }
+                description: { type: string, nullable: true }
+      responses:
+        "200":
+          description: Zaktualizowany projekt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+        "404": { description: Nie znaleziono, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        "422": { description: Błąd walidacji, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags: [projects]
+      summary: Usuń projekt (cascade)
+      parameters:
+        - in: path
+          name: project_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        "204": { description: Usunięto }
+        "404": { description: Nie znaleziono, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        "409": { description: Projekt ma aktywne przetwarzanie, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /projects/{project_id}/briefs:
+    get:
+      tags: [Side 2 — Mapping]
+      summary: Lista briefów projektu
+      parameters:
+        - { name: project_id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [uploaded, parsing, parsed, failed] } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: per_page, in: query, schema: { type: integer, default: 20, maximum: 100 } }
+      responses:
+        "200":
+          description: Lista briefów
+          headers:
+            X-Total-Count: { schema: { type: integer } }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/BriefStatus' } }
+                  total: { type: integer }
+        "404": { description: Projekt nie znaleziony, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /projects/{project_id}/reports:
+    get:
+      tags: [Side 3 — Reports]
+      summary: Lista raportów projektu
+      parameters:
+        - { name: project_id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [draft, accepted, rejected] } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: per_page, in: query, schema: { type: integer, default: 20, maximum: 100 } }
+      responses:
+        "200":
+          description: Lista raportów
+          headers:
+            X-Total-Count: { schema: { type: integer } }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/EstimationReport' } }
+                  total: { type: integer }
+        "404": { description: Projekt nie znaleziony, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /projects/{project_id}/plans:
+    get:
+      tags: [Side 4 — Planning]
+      summary: Lista planów projektu
+      parameters:
+        - { name: project_id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [draft, active, completed, cancelled] } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: per_page, in: query, schema: { type: integer, default: 20, maximum: 100 } }
+      responses:
+        "200":
+          description: Lista planów
+          headers:
+            X-Total-Count: { schema: { type: integer } }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/WorkPlan' } }
+                  total: { type: integer }
+        "404": { description: Projekt nie znaleziony, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /projects/{project_id}/webhooks:
+    post:
+      tags: [Core]
+      summary: Utwórz subskrypcję webhook
+      parameters:
+        - { name: project_id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_url, events]
+              properties:
+                target_url: { type: string, format: uri }
+                events:
+                  type: array
+                  items:
+                    type: string
+                    enum: [mapping.done, mapping.failed, report.ready, report.accepted, plan.ready, ingestion.review]
+                secret: { type: string, nullable: true, description: "Sekret HMAC (opcjonalny)" }
+      responses:
+        "201":
+          description: Subskrypcja utworzona
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:         { type: string, format: uuid }
+                  target_url: { type: string, format: uri }
+                  events:     { type: array, items: { type: string } }
+                  is_active:  { type: boolean }
+                  created_at: { type: string, format: date-time }
+        "404": { description: Projekt nie znaleziony, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    get:
+      tags: [Core]
+      summary: Lista subskrypcji webhook projektu
+      parameters:
+        - { name: project_id, in: path, required: true, schema: { type: string, format: uuid } }
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista subskrypcji
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:         { type: string, format: uuid }
+                    target_url: { type: string, format: uri }
+                    events:     { type: array, items: { type: string } }
+                    is_active:  { type: boolean }
+                    created_at: { type: string, format: date-time }
+        "404": { description: Projekt nie znaleziony, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /projects/{project_id}/webhooks/{webhook_id}:
+    delete:
+      tags: [Core]
+      summary: Usuń subskrypcję webhook
+      parameters:
+        - { name: project_id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: webhook_id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "204": { description: Usunięto }
+        "404": { description: Nie znaleziono, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /webhooks/{id}:
+    get:
+      summary: Get webhook subscription
+      operationId: getWebhook
+      tags: [Webhooks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Webhook subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscription'
+        '404':
+          description: Not found
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  # ── INGESTION (Side 1) ───────────────────────
+  /ingestion/spec:
+    post:
+      tags: [ingestion]
+      summary: Prześlij specyfikację do wygenerowania szablonu
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                source_type:   { type: string, enum: [text, url, file] }
+                content:       { type: string, nullable: true }
+                url:           { type: string, format: uri, nullable: true }
+                file:          { type: string, format: binary, nullable: true }
+                standard_code: { type: string, nullable: true }
+                hint_title:    { type: string, nullable: true }
+      responses:
+        "202":
+          description: Job zakolejkowany
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IngestionJob' }
+        "400": { description: Nieprawidłowe wejście, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        "503": { description: LLM niedostępny, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /ingestion/jobs:
+    get:
+      tags: [ingestion]
+      summary: Lista jobów ingestii
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [pending, generating, review, approved, rejected] }
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista jobów
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/IngestionJob' }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /ingestion/{job_id}:
+    get:
+      tags: [ingestion]
+      summary: Pobierz szczegóły joba ingestii
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        "200":
+          description: Szczegóły joba
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IngestionJobDetail' }
+        "404": { description: Nie znaleziono, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /ingestion/{job_id}/approve:
+    post:
+      tags: [ingestion]
+      summary: Zatwierdź wygenerowany szablon
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApproveRequest' }
+      responses:
+        "200":
+          description: Szablon zatwierdzony i zapisany
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IngestionJobDetail' }
+        "409": { description: Konflikt stanu, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        "404": { description: Nie znaleziono, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /ingestion/{job_id}/reject:
+    post:
+      tags: [ingestion]
+      summary: Odrzuć wygenerowany szablon
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RejectRequest' }
+      responses:
+        "200":
+          description: Job odrzucony
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IngestionJobDetail' }
+        "409": { description: Konflikt stanu, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  # ── BRIEF (Side 2) ───────────────────────────
+  /briefs/upload:
+    post:
+      tags: [brief]
+      summary: Wgraj plik briefu klienta
+      parameters:
+        - in: query
+          name: project_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        "201":
+          description: Brief wgrany i sparsowany
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BriefUploadResult' }
+        "404": { description: Projekt nie znaleziony }
+        "413": { description: Plik zbyt duży }
+        "415": { description: Format nieobsługiwany }
+        "422": { description: Nie można sparsować }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /briefs/{brief_id}/map:
+    post:
+      tags: [brief]
+      summary: Uruchom mapowanie semantyczne briefu na szablony
+      parameters:
+        - in: path
+          name: brief_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MapRequest' }
+      responses:
+        "202":
+          description: Mapowanie uruchomione (async)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MappingResult' }
+        "404": { description: Brief nie znaleziony }
+        "409": { description: Brief nie sparsowany lub mapowanie w toku }
+        "503": { description: LLM niedostępny }
+        "429": { description: Rate limit LLM }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /briefs/{brief_id}/mapping:
+    get:
+      tags: [brief]
+      summary: Pobierz wynik mapowania
+      parameters:
+        - in: path
+          name: brief_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - in: query
+          name: min_confidence
+          schema: { type: number, format: float, default: 0.0 }
+        - in: query
+          name: phase_id
+          schema: { type: integer, nullable: true }
+      responses:
+        "200":
+          description: Wynik mapowania
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MappingResult' }
+        "404": { description: Brak mapowania dla tego briefu }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      summary: Cancel active mapping
+      operationId: cancelMapping
+      tags: [Briefs]
+      description: Cancels a mapping that is in 'pending' or 'running' status
+      responses:
+        '204':
+          description: Mapping cancelled
+        '409':
+          description: Cannot cancel — mapping already completed or failed
+        '404':
+          description: No active mapping found
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /briefs/{brief_id}/mapping/{item_id}:
+    put:
+      tags: [brief]
+      summary: Ręczna korekta elementu mapowania
+      parameters:
+        - in: path
+          name: brief_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - in: path
+          name: item_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MappingItemUpdate' }
+      responses:
+        "200":
+          description: Element zaktualizowany
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MappingItem' }
+        "404": { description: Element nie znaleziony }
+        "422": { description: Błąd walidacji }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  # ── REPORTS (Side 3) ─────────────────────────
+  /reports/estimate/{brief_id}:
+    post:
+      tags: [reports]
+      summary: Wygeneruj raport kosztorysowy
+      parameters:
+        - in: path
+          name: brief_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EstimateRequest' }
+      responses:
+        "201":
+          description: Raport wygenerowany (status=draft)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EstimationReport' }
+        "404": { description: Brief nie znaleziony }
+        "409": { description: Brak zakończonego mapowania }
+        "422": { description: Za mało zmapowanych szablonów }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /reports/{report_id}:
+    get:
+      tags: [reports]
+      summary: Pobierz raport kosztorysowy
+      parameters:
+        - in: path
+          name: report_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - in: query
+          name: format
+          schema: { type: string, enum: [json, markdown], default: json }
+      responses:
+        "200":
+          description: Raport (JSON lub Markdown)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EstimationReport' }
+            text/markdown:
+              schema: { type: string }
+        "404": { description: Raport nie znaleziony }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /reports/{report_id}/summary:
+    get:
+      tags: [reports]
+      summary: Skrócony widok raportu (dla klienta)
+      parameters:
+        - in: path
+          name: report_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        "200":
+          description: Skrót raportu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_docs:       { type: integer }
+                  total_h_likely:   { type: number }
+                  complexity_level: { type: string }
+                  phases_count:     { type: integer }
+                  top_standards:    { type: array, items: { type: string } }
+            text/markdown:
+              schema: { type: string }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /reports/{report_id}/accept:
+    post:
+      tags: [reports]
+      summary: Zaakceptuj raport (odblokuje Side 4)
+      parameters:
+        - in: path
+          name: report_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        "200":
+          description: Raport zaakceptowany
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EstimationReport' }
+        "404": { description: Raport nie znaleziony }
+        "409": { description: Raport już zaakceptowany lub odrzucony }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /reports/{report_id}/reject:
+    post:
+      tags: [reports]
+      summary: Odrzuć raport
+      parameters:
+        - in: path
+          name: report_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectRequest'
+      responses:
+        "200":
+          description: Raport odrzucony
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EstimationReport' }
+        "409": { description: Raport już zaakceptowany lub odrzucony }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  # ── PLANNING (Side 4) ────────────────────────
+  /plans/create/{report_id}:  # TODO S-01: v2 → POST /plans/ with report_id in request body
+    post:
+      tags: [planning]
+      summary: Utwórz plan pracy na podstawie zaakceptowanego raportu
+      parameters:
+        - in: path
+          name: report_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        "201":
+          description: Plan pracy utworzony
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkPlan' }
+        "404": { description: Raport nie znaleziony }
+        "409": { description: Raport nie zaakceptowany lub plan już istnieje }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /plans/{plan_id}:
+    get:
+      tags: [planning]
+      summary: Pobierz plan pracy
+      parameters:
+        - in: path
+          name: plan_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        "200":
+          description: Plan pracy
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkPlan' }
+        "404": { description: Plan nie znaleziony }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /plans/{plan_id}/packages:
+    get:
+      tags: [planning]
+      summary: Pobierz task-units dla AI-agentów
+      parameters:
+        - in: path
+          name: plan_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - in: query
+          name: status
+          schema: { type: string, enum: [pending, in_progress, done, blocked], nullable: true }
+        - in: query
+          name: phase_id
+          schema: { type: integer, nullable: true }
+        - in: query
+          name: assignee_type
+          schema: { type: string, enum: [ai_agent_writer, ai_agent_reviewer, human], nullable: true }
+      responses:
+        "200":
+          description: Lista work packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/WorkPackage' }
+        "404": { description: Plan nie znaleziony }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /plans/{plan_id}/packages/{package_id}/status:
+    patch:
+      tags: [planning]
+      summary: Zaktualizuj status work package
+      parameters:
+        - in: path
+          name: plan_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - in: path
+          name: package_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [pending, in_progress, done, blocked] }
+                note:   { type: string, nullable: true }
+      responses:
+        "200":
+          description: Status zaktualizowany
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkPackage' }
+        "404": { description: Pakiet nie znaleziony }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /plans/{plan_id}/gantt:
+    get:
+      tags: [planning]
+      summary: Widok sekwencji wykonania (Gantt-like)
+      parameters:
+        - in: path
+          name: plan_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - in: query
+          name: format
+          schema: { type: string, enum: [json, markdown], default: markdown }
+      responses:
+        "200":
+          description: Widok sekwencji
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    phase_id:    { type: integer }
+                    phase_name:  { type: string }
+                    packages:    { type: array, items: { $ref: '#/components/schemas/WorkPackage' } }
+            text/markdown:
+              schema: { type: string }
+        "404": { description: Plan nie znaleziony }
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  # Export/Import projektu
+  /projects/{project_id}/export:
+    get:
+      tags: [Core]
+      summary: Eksportuj projekt do archiwum ZIP
+      description: Zwraca ZIP z JSON project.json + briefs/ + mappings/ + reports/ + plans/
+      parameters:
+        - {name: project_id, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: Archiwum ZIP
+          content:
+            application/zip:
+              schema: {type: string, format: binary}
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /projects/import:
+    post:
+      tags: [Core]
+      summary: Importuj projekt z archiwum ZIP
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: {type: string, format: binary}
+                new_name: {type: string}
+      responses:
+        '201': {description: Zaimportowany projekt}
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  # Porównanie raportów
+  /reports/compare:
+    get:
+      tags: [Side 3 — Reports]
+      summary: Porównaj dwa raporty kosztorysowe
+      parameters:
+        - {name: report_id_a, in: query, required: true, schema: {type: string, format: uuid}}
+        - {name: report_id_b, in: query, required: true, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: Diff między raportami
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  added_docs: {type: array, items: {$ref: '#/components/schemas/DocumentEstimate'}}
+                  removed_docs: {type: array, items: {$ref: '#/components/schemas/DocumentEstimate'}}
+                  changed_estimates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        doc_uid: {type: string}
+                        h_before: {type: number}
+                        h_after: {type: number}
+                  total_h_delta:
+                    type: object
+                    properties:
+                      min: {type: number}
+                      likely: {type: number}
+                      max: {type: number}
+
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
