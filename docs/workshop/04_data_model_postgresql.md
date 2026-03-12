@@ -475,7 +475,12 @@ migrations/versions/
 ├── 0003_project_settings.py        # project_settings table (A07)
 ├── 0004_audit_log.py               # audit_log table (A08)
 ├── 0005_webhooks.py                # webhook_subscriptions table (A02)
-└── ...
+├── 0006_content_hash.py            # briefs.content_hash UNIQUE (B05)
+├── 0007_retention_policy.py        # mapping_results.expires_at, retencja (B06)
+├── 0008_ingestion_events.py        # ingestion_events table (C02)
+├── 0009_llm_response_content.py    # llm_calls_log.response_content TEXT (D01)
+├── 0010_audit_log_extended.py      # audit_log.request_id, indexes (D04)
+└── 0011_custom_templates.py        # custom_templates table (V-03)
 ```
 
 Uruchomienie:
