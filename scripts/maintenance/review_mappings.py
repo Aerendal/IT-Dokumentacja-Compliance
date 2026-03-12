@@ -59,7 +59,7 @@ def export_pending(
         List of dicts with keys matching CSV_FIELDNAMES.
     """
     placeholders_reason = ",".join("?" for _ in AUDITED_REASONS)
-    query = (
+    query = (  # nosec B608 -- f-string builds IN-placeholders ("?,?,?") only; all values bound via params
         f"SELECT id, doc_path, standard_code, confidence, match_reason, evidence "
         f"FROM doc_standard_mapping "
         f"WHERE confidence < ? "
@@ -74,7 +74,7 @@ def export_pending(
     query += " ORDER BY standard_code ASC, confidence DESC"
 
     if limit is not None:
-        query += f" LIMIT {int(limit)}"
+        query += f" LIMIT {int(limit)}"  # nosec B608 -- int() cast ensures numeric value
 
     rows = conn.execute(query, params).fetchall()
 
@@ -192,7 +192,7 @@ def stats(conn: sqlite3.Connection) -> Dict:
         by_confidence_tier[label] = conn.execute(query).fetchone()[0]
 
     audited_placeholders = ",".join("?" for _ in AUDITED_REASONS)
-    pending_review = conn.execute(
+    pending_review = conn.execute(  # nosec B608 -- f-string builds IN-placeholders only; values bound via params
         f"SELECT COUNT(*) FROM doc_standard_mapping "
         f"WHERE confidence < 0.4 AND match_reason NOT IN ({audited_placeholders})",
         list(AUDITED_REASONS),

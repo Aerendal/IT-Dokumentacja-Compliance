@@ -10,6 +10,21 @@ from pathlib import Path
 
 DB_PATH = Path(__file__).parent.parent / 'reports' / 'it_doc_matrix.db'
 
+# Whitelist of allowed table/column/pk identifiers to prevent SQL injection
+# if this function is ever called with dynamic arguments.
+_ALLOWED_TABLES = frozenset({
+    'doc_section_guidance', 'documents_final', 'documents_expected', 'link_type_guidance'
+})
+_ALLOWED_COLUMNS = frozenset({
+    'doc_title', 'section_title', 'guidance', 'title', 'link_type'
+})
+_ALLOWED_PKS = frozenset({'id'})
+
+
+def _validate_identifier(value: str, allowed: frozenset, kind: str) -> None:
+    if value not in allowed:
+        raise ValueError(f"Niedozwolony identyfikator {kind}: {value!r} (dozwolone: {allowed})")
+
 
 def try_fix(value: str) -> tuple[str, bool]:
     """Próbuje naprawić mojibake (cp1252 błędnie zdekodowane jako unicode)."""
@@ -21,8 +36,11 @@ def try_fix(value: str) -> tuple[str, bool]:
 
 
 def fix_column(conn: sqlite3.Connection, table: str, column: str, pk: str = 'id', dry_run: bool = False):
+    _validate_identifier(table, _ALLOWED_TABLES, 'table')
+    _validate_identifier(column, _ALLOWED_COLUMNS, 'column')
+    _validate_identifier(pk, _ALLOWED_PKS, 'pk')
     cur = conn.cursor()
-    cur.execute(f'SELECT {pk}, {column} FROM {table}')
+    cur.execute(f'SELECT {pk}, {column} FROM {table}')  # nosec B608 -- identifiers validated against whitelist above
     rows = cur.fetchall()
     fixed_count = 0
     updates = []
@@ -35,7 +53,7 @@ def fix_column(conn: sqlite3.Connection, table: str, column: str, pk: str = 'id'
             fixed_count += 1
     print(f'  [{table}.{column}] Znaleziono do naprawy: {fixed_count} / {len(rows)}')
     if not dry_run and updates:
-        cur.executemany(f'UPDATE {table} SET {column} = ? WHERE {pk} = ?', updates)
+        cur.executemany(f'UPDATE {table} SET {column} = ? WHERE {pk} = ?', updates)  # nosec B608 -- identifiers validated
         conn.commit()
         print(f'  [{table}.{column}] Naprawiono: {fixed_count} wierszy.')
     elif dry_run:

@@ -271,7 +271,7 @@ def recreate_nodes_objects(cur: sqlite3.Cursor) -> None:
 
 
 def flush_nodes(cur: sqlite3.Cursor, rows: list[tuple], table: str = "nodes") -> None:
-    cur.executemany(
+    cur.executemany(  # nosec B608 -- table is a hardcoded default ("nodes"); callers pass only known table names
         f"""
         INSERT INTO {table}(
           node_uid,kind,node_kind,doc_uid,parent_node_uid,title,key_norm,title_norm,anchor,ordinal,start_line,end_line,
@@ -283,7 +283,7 @@ def flush_nodes(cur: sqlite3.Cursor, rows: list[tuple], table: str = "nodes") ->
 
 
 def flush_doc_map(cur: sqlite3.Cursor, rows: list[tuple], table: str = "node_map_docs") -> None:
-    cur.executemany(
+    cur.executemany(  # nosec B608 -- table is hardcoded default; no user-controlled input reaches this parameter
         f"""
         INSERT INTO {table}(doc_uid,node_uid,created_at_utc,updated_at_utc)
         VALUES(?,?,?,?)
@@ -293,7 +293,7 @@ def flush_doc_map(cur: sqlite3.Cursor, rows: list[tuple], table: str = "node_map
 
 
 def flush_section_map(cur: sqlite3.Cursor, rows: list[tuple], table: str = "node_map_sections") -> None:
-    cur.executemany(
+    cur.executemany(  # nosec B608 -- table is hardcoded default; no user-controlled input reaches this parameter
         f"""
         INSERT INTO {table}(section_uid,node_uid,created_at_utc,updated_at_utc)
         VALUES(?,?,?,?)

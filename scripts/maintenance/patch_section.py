@@ -43,7 +43,7 @@ except ImportError:
     YAML_AVAILABLE = False
 
 try:
-    from jinja2 import Template as JinjaTemplate
+    from jinja2 import Environment, BaseLoader
     JINJA_AVAILABLE = True
 except ImportError:
     JINJA_AVAILABLE = False
@@ -342,7 +342,10 @@ def _apply_action_raw(
 
     if template_vars and JINJA_AVAILABLE and new_content:
         try:
-            new_content = JinjaTemplate(new_content).render(**template_vars)
+            # autoescape=False is intentional: we render Markdown, not HTML.
+            # User-supplied template_vars come from CLI args (trusted operator input).
+            _jinja_env = Environment(loader=BaseLoader(), autoescape=False)  # nosec B701
+            new_content = _jinja_env.from_string(new_content).render(**template_vars)
         except Exception as exc:
             safe_print(colored(f'  [WARN] Błąd szablonu Jinja2: {exc}', ANSI_YELLOW))
 

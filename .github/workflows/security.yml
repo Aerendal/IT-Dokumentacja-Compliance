@@ -47,7 +47,7 @@ jobs:
           bandit -r scripts/ itdoc/ \
             --severity-level high \
             --confidence-level high \
-            -f text \
+            -f txt \
             || true
 
   pip-audit:
