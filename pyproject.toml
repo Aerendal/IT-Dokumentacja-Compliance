@@ -5,7 +5,7 @@ description = "Biblioteka Python dla IT Dokumentacja — 7966 szablonów IT"
 requires-python = ">=3.9"
 
 [tool.setuptools.packages.find]
-include = ["itdoc*", "metagraph*"]
+include = ["itdoc*", "metagraph*", "scripts*"]
 
 [project.scripts]
 mg = "metagraph.cli.main:cli"
@@ -14,6 +14,11 @@ mg = "metagraph.cli.main:cli"
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "fastapi>=0.100",
+    "httpx>=0.24",
+    "uvicorn>=0.22",
+    "pydantic>=2.0",
+    "requests>=2.28",
 ]
 
 [tool.pytest.ini_options]
@@ -27,6 +32,7 @@ markers = [
 # Użyj:  pytest -m "not slow"  dla szybkiego CI
 # Użyj:  pytest                dla pełnego zestawu (z --ignore=... jeśli brak DB)
 addopts = "--tb=short -q"
+pythonpath = ["."]
 filterwarnings = ["ignore::urllib3.exceptions.NotOpenSSLWarning", "ignore::UserWarning"]
 
 [tool.coverage.run]
