@@ -840,7 +840,6 @@ def patch_section(
     simulate_jsonl: Optional[str] = None,
     db_path: Optional[Path] = None,
 ) -> dict[str, Any]:
-
     base_path = Path(directory)
     if not base_path.exists():
         safe_print(colored(f"[BŁĄD] Katalog {directory} nie istnieje.", ANSI_RED))

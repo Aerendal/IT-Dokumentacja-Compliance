@@ -247,7 +247,7 @@ class GraphEngineSqliteTest(unittest.TestCase):
         self.assertEqual(cur.fetchone()[0], 1)
 
         cur.execute("SELECT kind, status FROM sync_runs")
-        kinds = {(k, s) for k, s in cur.fetchall()}
+        kinds = set(cur.fetchall())
         self.assertIn(("build_nodes", "OK"), kinds)
         self.assertIn(("migrate_edges_manual", "WARN"), kinds)
 
