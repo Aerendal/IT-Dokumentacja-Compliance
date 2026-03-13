@@ -13,6 +13,7 @@ import sqlite3
 
 import pytest
 
+import itdoc.analytics as analytics
 from itdoc.analytics import (
     coverage_by_standard,
     library_health_report,
@@ -317,3 +318,52 @@ class TestSuggestForDoc:
         result = suggest_for_doc(analytics_db, "core/orphan_a.md")
         for row in result:
             assert "standard_code" in row
+
+
+# ---------------------------------------------------------------------------
+# analytics.main() CLI
+# ---------------------------------------------------------------------------
+
+
+class TestAnalyticsMain:
+    """Testy dla analytics.main() — CLI entry point."""
+
+    def test_missing_db_returns_1(self, tmp_path):
+        rc = analytics.main(["--db", str(tmp_path / "nonexistent.db")])
+        assert rc == 1
+
+    def test_coverage_flag(self, tmp_path, analytics_db):
+        db_path = tmp_path / "test.db"
+        import sqlite3 as _sq3
+        file_conn = _sq3.connect(str(db_path))
+        analytics_db.backup(file_conn)
+        file_conn.close()
+        rc = analytics.main(["--db", str(db_path), "--coverage"])
+        assert rc == 0
+
+    def test_gaps_flag(self, tmp_path, analytics_db):
+        db_path = tmp_path / "test.db"
+        import sqlite3 as _sq3
+        file_conn = _sq3.connect(str(db_path))
+        analytics_db.backup(file_conn)
+        file_conn.close()
+        rc = analytics.main(["--db", str(db_path), "--gaps"])
+        assert rc == 0
+
+    def test_gaps_flag_custom_min_coverage(self, tmp_path, analytics_db):
+        db_path = tmp_path / "test.db"
+        import sqlite3 as _sq3
+        file_conn = _sq3.connect(str(db_path))
+        analytics_db.backup(file_conn)
+        file_conn.close()
+        rc = analytics.main(["--db", str(db_path), "--gaps", "--min-coverage", "1"])
+        assert rc == 0
+
+    def test_default_report(self, tmp_path, analytics_db):
+        db_path = tmp_path / "test.db"
+        import sqlite3 as _sq3
+        file_conn = _sq3.connect(str(db_path))
+        analytics_db.backup(file_conn)
+        file_conn.close()
+        rc = analytics.main(["--db", str(db_path)])
+        assert rc == 0
