@@ -949,53 +949,6 @@ def diagnostics_report(db_path: Path, run_dir: Path) -> dict:
     return rep
 
 
-# CSV coverage (FS vs alignment_log paths)
-def _detect_delimiter(sample: str) -> str:
-    semi = sample.count(";")
-    comma = sample.count(",")
-    tab = sample.count("\\t")
-    if tab > semi and tab > comma:
-        return "\\t"
-    return ";" if semi > comma else ","
-
-
-def _sanitize_csv_bom_copy(src: Path, dst: Path) -> dict:
-    raw = src.read_bytes()
-    bom = b"\\xef\\xbb\\xbf"
-    had_bom = raw.startswith(bom)
-    dst.write_bytes(raw[len(bom) :] if had_bom else raw)
-    return {"had_bom": had_bom, "sanitized_path": str(dst)}
-
-
-def _open_dictreader(csv_path: Path):
-    f = open(csv_path, encoding="utf-8-sig", newline="")
-    pos = f.tell()
-    sample = f.read(8192)
-    f.seek(pos)
-    delim = _detect_delimiter(sample)
-    rdr = csv.DictReader(f, delimiter=delim)
-    raw_fn = rdr.fieldnames[:] if rdr.fieldnames else None
-    if rdr.fieldnames:
-        rdr.fieldnames = [fn.replace("\\ufeff", "").strip() for fn in rdr.fieldnames]
-    norm_fn = rdr.fieldnames[:] if rdr.fieldnames else None
-    header_diag = {"raw": raw_fn, "normalized": norm_fn}
-    return rdr, f, delim, header_diag
-
-
-def _detect_path_column(fieldnames):
-    if not fieldnames:
-        return None
-    candidates = ["path", "Path", "relative_path", "template_path", "file_path", "rel_path"]
-    fset = set(fieldnames)
-    for c in candidates:
-        if c in fset:
-            return c
-    for fn in fieldnames:
-        if fn.strip().lower() == "path":
-            return fn
-    return None
-
-
 # Manifest and hashes
 def build_manifest_v2(run_dir: Path) -> tuple[str, Path]:
     out = run_dir / "templates_manifest_v2.csv"
@@ -1197,47 +1150,38 @@ def sync_latest(run_dir: Path):
     shutil.copytree(run_dir, LATEST_ROOT)
 
 
-# Main
+# ---------------------------------------------------------------------------
+# Main pipeline — sub-functions
+# ---------------------------------------------------------------------------
 
 
-def main():
-    started_at_utc = utc_now_iso()
-    run_id = utc_now_iso() + "__run"
-    run_dir = RUNS_ROOT / run_id
-    ensure_dirs(run_dir)
-
-    # hard gate: no emoji allowed in tracked text files
+def _setup_run(run_dir: Path) -> tuple[str, Path, str]:
+    """Emoji gate + manifest v2. Zwraca (manifest_hash_v2, manifest_path, log_hash)."""
     emoji_report = emoji_check(Path("."), run_dir)
     if emoji_report["status"] != "PASS":
         print("FAIL: emoji check failed")
         sys.exit(1)
-
-    # compute manifest v2
     manifest_hash_v2, manifest_path = build_manifest_v2(run_dir)
     log_hash = sha256_bytes(ALIGNMENT_LOG.read_bytes())
+    return manifest_hash_v2, manifest_path, log_hash
 
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("PRAGMA journal_mode=DELETE;")
-    conn.execute("PRAGMA foreign_keys=ON;")
-    conn.execute("PRAGMA busy_timeout=5000;")
-    cur = conn.cursor()
 
-    ensure_schema(conn)
-
-    # update hash_v2 in current using manifest_v2.csv (path relative to templates_root)
+def _run_pipeline_phases(
+    conn: sqlite3.Connection,
+    cur: sqlite3.Cursor,
+    run_dir: Path,
+    manifest_path: Path,
+    manifest_hash_v2: str,
+    log_hash: str,
+) -> dict:
+    """Coverage → validate → tag → snapshot → prune. Zwraca słownik wyników faz."""
     rows_update = []
     with manifest_path.open("r", encoding="utf-8", newline="") as mf:
-        import csv
-
         reader = csv.DictReader(mf)
         for row in reader:
-            rel = row["path"]
-            h = row["hash_sha256_v2"]
-            rows_update.append((h, f"generated_templates/{rel}"))
-
+            rows_update.append((row["hash_sha256_v2"], f"generated_templates/{row['path']}"))
     cur.executemany("UPDATE documents_current SET hash_sha256_v2=? WHERE path=?", rows_update)
 
-    # coverage checks
     cov_db = build_coverage(cur)
     cov_fs_csv = coverage_report(run_dir)
     if cov_db.aligned_not_ok or cov_db.empty_path:
@@ -1247,23 +1191,22 @@ def main():
         print("FAIL: csv coverage fail")
         sys.exit(1)
 
-    # counts and validate
     files_count, anomalies_total, collisions, null_v2 = load_counts(cur)
     if null_v2 != 0:
         print("FAIL: hash_v2 NULL in documents_current")
         sys.exit(1)
     cur.execute(
-        "SELECT hash_sha256_v2, COUNT(*) c FROM documents_current WHERE hash_sha256_v2 IS NOT NULL GROUP BY hash_sha256_v2 HAVING c>1"
+        "SELECT hash_sha256_v2, COUNT(*) c FROM documents_current WHERE hash_sha256_v2 IS NOT NULL"
+        " GROUP BY hash_sha256_v2 HAVING c>1"
     )
     duphash = len(cur.fetchall())
-    conn.commit()  # zwolnij locka przed otwarciem nowego polaczenia w diagnostics_report
+    conn.commit()
+
     diag = diagnostics_report(DB_PATH, run_dir)
-    # tagging (Tor 2) - używamy istniejącego połączenia/locka
     tagging = apply_tag_rules(cur, TAG_RULES_PATH, run_dir)
 
-    # simple validation: WARN tylko, jeśli są nieoczekiwane duplikaty, FAIL jeśli tagging=FAIL
     val_status = "PASS"
-    val_reasons = []
+    val_reasons: list[str] = []
     unexpected_clusters = diag.get("dup_content_hashes_unexpected_clusters", 0)
     if unexpected_clusters > 0:
         val_status = "WARN"
@@ -1287,73 +1230,59 @@ def main():
         },
     }
 
-    # snapshot if changed
     action = create_snapshot_if_changed(
         cur, manifest_hash_v2, log_hash, files_count, anomalies_total, collisions
     )
-    # transitions N-1 -> N (idempotent)
-    transitions = {"status": "SKIP", "reason": "snapshot_noop"}
-    diff_report = {"status": "SKIP", "reason": "snapshot_noop"}
+    transitions: dict = {"status": "SKIP", "reason": "snapshot_noop"}
+    diff_report: dict = {"status": "SKIP", "reason": "snapshot_noop"}
     if action.action == "CREATED":
         prev_id = previous_snapshot_id(cur, action.snapshot_id)
         if prev_id:
             transitions = compute_transitions(cur, prev_id, action.snapshot_id, run_dir)
             diff_report = compute_snapshot_diff(cur, prev_id, action.snapshot_id, run_dir)
         else:
-            transitions = {
-                "status": "SKIP",
-                "reason": "no_previous_snapshot",
-                "to_snapshot_id": action.snapshot_id,
-            }
-            (run_dir / "transitions_report.json").write_text(
-                json.dumps(transitions, indent=2), encoding="utf-8"
-            )
-            diff_report = {
-                "status": "SKIP",
-                "reason": "no_previous_snapshot",
-                "to_snapshot_id": action.snapshot_id,
-            }
-            (run_dir / "snapshot_diff_report.json").write_text(
-                json.dumps(diff_report, indent=2), encoding="utf-8"
-            )
-    else:
-        (run_dir / "transitions_report.json").write_text(
-            json.dumps(transitions, indent=2), encoding="utf-8"
-        )
-        (run_dir / "snapshot_diff_report.json").write_text(
-            json.dumps(diff_report, indent=2), encoding="utf-8"
-        )
+            transitions = {"status": "SKIP", "reason": "no_previous_snapshot", "to_snapshot_id": action.snapshot_id}
+            diff_report = {"status": "SKIP", "reason": "no_previous_snapshot", "to_snapshot_id": action.snapshot_id}
+    (run_dir / "transitions_report.json").write_text(json.dumps(transitions, indent=2), encoding="utf-8")
+    (run_dir / "snapshot_diff_report.json").write_text(json.dumps(diff_report, indent=2), encoding="utf-8")
 
-    # pruning
     prune = prune_snapshots(cur)
 
-    conn.commit()
-    conn.close()
+    return {
+        "cov_db": cov_db, "cov_fs_csv": cov_fs_csv,
+        "files_count": files_count, "anomalies_total": anomalies_total,
+        "collisions": collisions, "duphash": duphash,
+        "diag": diag, "tagging": tagging, "validate_report": validate_report,
+        "action": action, "transitions": transitions, "diff_report": diff_report,
+        "prune": prune,
+    }
 
-    # write reports
-    with (run_dir / "build_report.json").open("w") as f:
-        json.dump(
-            {
-                "run_id": run_id,
-                "coverage": asdict(cov_db),
-                "manifest_hash_v2": manifest_hash_v2,
-                "alignment_log_hash": log_hash,
-                "anomalies": anomalies_total,
-                "collisions_title_norm": collisions,
-                "dup_content_hashes": duphash,
-                "validate": validate_report["status"],
-            },
-            f,
-            indent=2,
-        )
-    with (run_dir / "validate_report.json").open("w") as f:
-        json.dump(validate_report, f, indent=2)
-    with (run_dir / "snapshot_action.json").open("w") as f:
-        json.dump(asdict(action), f, indent=2)
-    with (run_dir / "prune_report.json").open("w") as f:
-        json.dump(asdict(prune), f, indent=2)
 
-    manual_meta_sla = {}
+def _write_reports_and_log(
+    run_id: str,
+    run_dir: Path,
+    started_at_utc: str,
+    manifest_hash_v2: str,
+    log_hash: str,
+    phases: dict,
+) -> None:
+    """Zapisuje raporty JSON, agreguje pipeline_result, loguje do DB, sync_latest."""
+    cov_db = phases["cov_db"]
+    validate_report = phases["validate_report"]
+    action = phases["action"]
+    prune = phases["prune"]
+
+    (run_dir / "build_report.json").write_text(json.dumps({
+        "run_id": run_id, "coverage": asdict(cov_db),
+        "manifest_hash_v2": manifest_hash_v2, "alignment_log_hash": log_hash,
+        "anomalies": phases["anomalies_total"], "collisions_title_norm": phases["collisions"],
+        "dup_content_hashes": phases["duphash"], "validate": validate_report["status"],
+    }, indent=2), encoding="utf-8")
+    (run_dir / "validate_report.json").write_text(json.dumps(validate_report, indent=2), encoding="utf-8")
+    (run_dir / "snapshot_action.json").write_text(json.dumps(asdict(action), indent=2), encoding="utf-8")
+    (run_dir / "prune_report.json").write_text(json.dumps(asdict(prune), indent=2), encoding="utf-8")
+
+    manual_meta_sla: dict = {}
     sla_path = LATEST_ROOT / "manual_meta_sla.json"
     if sla_path.exists():
         try:
@@ -1361,57 +1290,62 @@ def main():
         except Exception:
             manual_meta_sla = {"status": "unreadable"}
 
-    # aggregate pipeline result
     pipeline_result = {
-        "run_id": run_id,
-        "status": validate_report["status"],
-        "manifest_hash_v2": manifest_hash_v2,
-        "alignment_log_hash": log_hash,
-        "coverage_db": asdict(cov_db),
-        "coverage_csv": cov_fs_csv,
-        "diagnostics": diag,
-        "emoji_check": emoji_report,
-        "validate": validate_report,
+        "run_id": run_id, "status": validate_report["status"],
+        "manifest_hash_v2": manifest_hash_v2, "alignment_log_hash": log_hash,
+        "coverage_db": asdict(cov_db), "coverage_csv": phases["cov_fs_csv"],
+        "diagnostics": phases["diag"], "validate": validate_report,
         "dup_content_policy": {
-            "policy_version": 1,
-            "hashing_rule_version": HASHING_RULE_VERSION,
+            "policy_version": 1, "hashing_rule_version": HASHING_RULE_VERSION,
             "exemptions_path": str(EXEMPTIONS_PATH),
-            "dup_hash_clusters_total": diag.get("dup_content_hashes", 0),
-            "dup_hash_clusters_exempt_only": diag.get("dup_content_hashes_exempt_only", 0),
-            "dup_hash_clusters_unexpected": diag.get("dup_content_hashes_unexpected_clusters", 0),
-            # przykłady są generowane tylko gdy unexpected > 0; tu zostawiamy puste dla PASS
+            "dup_hash_clusters_total": phases["diag"].get("dup_content_hashes", 0),
+            "dup_hash_clusters_exempt_only": phases["diag"].get("dup_content_hashes_exempt_only", 0),
+            "dup_hash_clusters_unexpected": phases["diag"].get("dup_content_hashes_unexpected_clusters", 0),
             "unexpected_examples": [],
         },
-        "tagging": tagging,
+        "tagging": phases["tagging"],
         "tagging_policy": {"rules_path": str(TAG_RULES_PATH), "conflict_policy": "allow_multi"},
-        "snapshot": asdict(action),
-        "transitions": transitions,
-        "snapshot_diff": diff_report,
-        "prune": asdict(prune),
+        "snapshot": asdict(action), "transitions": phases["transitions"],
+        "snapshot_diff": phases["diff_report"], "prune": asdict(prune),
         "manual_meta_sla": manual_meta_sla,
-        "run_dir": str(run_dir),
-        "latest_dir": str(LATEST_ROOT),
+        "run_dir": str(run_dir), "latest_dir": str(LATEST_ROOT),
     }
     pipeline_result_json = json.dumps(pipeline_result, ensure_ascii=False, indent=2)
     pipeline_result_sha = sha256_bytes(pipeline_result_json.encode("utf-8"))
     finished_at_utc = utc_now_iso()
-    with (run_dir / "pipeline_result.json").open("w", encoding="utf-8") as f:
-        f.write(pipeline_result_json)
 
-    # runs log (DB)
-    record_run_metrics(
-        DB_PATH, run_id, started_at_utc, finished_at_utc, pipeline_result, pipeline_result_sha
-    )
-
+    (run_dir / "pipeline_result.json").write_text(pipeline_result_json, encoding="utf-8")
+    record_run_metrics(DB_PATH, run_id, started_at_utc, finished_at_utc, pipeline_result, pipeline_result_sha)
     sync_latest(run_dir)
-    print(
-        {
-            "status": validate_report["status"],
-            "run_id": run_id,
-            "snapshot": action.action,
-            "pruned": prune.deleted,
-        }
-    )
+    print({"status": validate_report["status"], "run_id": run_id,
+           "snapshot": action.action, "pruned": prune.deleted})
+
+
+# Main
+
+
+
+def main() -> None:
+    """Orkiestrator pipeline — init, setup, fazy, raporty."""
+    started_at_utc = utc_now_iso()
+    run_id = utc_now_iso() + "__run"
+    run_dir = RUNS_ROOT / run_id
+    ensure_dirs(run_dir)
+
+    manifest_hash_v2, manifest_path, log_hash = _setup_run(run_dir)
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=DELETE;")
+    conn.execute("PRAGMA foreign_keys=ON;")
+    conn.execute("PRAGMA busy_timeout=5000;")
+    cur = conn.cursor()
+    ensure_schema(conn)
+
+    phases = _run_pipeline_phases(conn, cur, run_dir, manifest_path, manifest_hash_v2, log_hash)
+    conn.commit()
+    conn.close()
+
+    _write_reports_and_log(run_id, run_dir, started_at_utc, manifest_hash_v2, log_hash, phases)
 
 
 if __name__ == "__main__":
