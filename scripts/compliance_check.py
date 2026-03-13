@@ -18,6 +18,8 @@ Użycie:
 import argparse
 import logging
 import sqlite3
+
+from itdoc.db import get_connection
 import subprocess
 import sys
 from pathlib import Path
@@ -47,23 +49,18 @@ def get_db_stats(db_path: Path) -> dict:
         "error_violations": 0,
         "warning_violations": 0,
     }
-    conn = sqlite3.connect(db_path)
-    try:
+    with get_connection(db_path) as conn:
         cur = conn.cursor()
         try:
             cur.execute("SELECT COUNT(*) FROM doc_standard_mapping")
             stats["total_mappings"] = cur.fetchone()[0]
         except sqlite3.OperationalError as exc:
             _log.debug("doc_standard_mapping table unavailable: %s", exc)  # table may not exist
-
         try:
             cur.execute("SELECT COUNT(*) FROM doc_standard_mapping WHERE confidence IS NULL")
             stats["null_confidence"] = cur.fetchone()[0]
         except sqlite3.OperationalError as exc:
-            _log.debug(
-                "doc_standard_mapping.confidence column unavailable: %s", exc
-            )  # table may not exist
-
+            _log.debug("doc_standard_mapping.confidence column unavailable: %s", exc)  # table may not exist
         try:
             cur.execute("SELECT COUNT(*) FROM template_violations WHERE severity='ERROR'")
             stats["error_violations"] = cur.fetchone()[0]
@@ -71,8 +68,6 @@ def get_db_stats(db_path: Path) -> dict:
             stats["warning_violations"] = cur.fetchone()[0]
         except sqlite3.OperationalError as exc:
             _log.debug("template_violations table unavailable: %s", exc)  # optional table
-    finally:
-        conn.close()
     return stats
 
 
@@ -209,22 +204,21 @@ def run_full_audit(db_path: Path, apply_backfill: bool = False, ci_mode: bool = 
     coverage_pct = 0.0
     coverage_retrieved = False
     with batch_continue("iso27001 coverage query", logger=_log):
-        conn = sqlite3.connect(db_path)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT COUNT(*) FROM doc_standard_mapping m
-            JOIN standards s ON m.standard_id = s.id
-            WHERE s.code LIKE '%27001%' AND m.confidence >= 0.5
-        """)
-        covered = cur.fetchone()[0]
-        cur.execute("""
-            SELECT COUNT(*) FROM standards WHERE code LIKE '%27001%'
-        """)
-        total_controls = cur.fetchone()[0]
-        if total_controls > 0:
-            coverage_pct = covered / total_controls * 100
-        coverage_retrieved = True
-        conn.close()
+        with get_connection(db_path) as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT COUNT(*) FROM doc_standard_mapping m
+                JOIN standards s ON m.standard_id = s.id
+                WHERE s.code LIKE '%27001%' AND m.confidence >= 0.5
+            """)
+            covered = cur.fetchone()[0]
+            cur.execute("""
+                SELECT COUNT(*) FROM standards WHERE code LIKE '%27001%'
+            """)
+            total_controls = cur.fetchone()[0]
+            if total_controls > 0:
+                coverage_pct = covered / total_controls * 100
+            coverage_retrieved = True
 
     err_icon = "✅" if err == 0 else "❌"
     warn_icon = "✅" if warn == 0 else "⚠️"

@@ -21,6 +21,8 @@ import sqlite3
 import unicodedata
 from pathlib import Path
 
+from itdoc.db import get_connection
+
 DB_DEFAULT = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
 
 
@@ -356,29 +358,27 @@ def print_standard_summary(conn: sqlite3.Connection) -> None:
         print(f"  {code:<43} {present:>8} {missing:>8} {low_med:>8}{flag}")
 
 
+def run(db_path: Path, verbose: bool = False, report: bool = False, summary: bool = False) -> None:
+    """Uruchamia analizę luk bez parsowania CLI. Testowalne niezależnie."""
+    with get_connection(db_path) as conn:
+        create_tables(conn)
+        run_gap_analysis(conn, verbose=verbose)
+        if report:
+            print_missing_report(conn)
+        if summary:
+            print_standard_summary(conn)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument(
-        "--db",
-        default=DB_DEFAULT,
-        help="Ścieżka do pliku .db (domyślnie: reports/it_doc_matrix.db)",
-    )
+    ap.add_argument("--db", default=DB_DEFAULT, help="Ścieżka do pliku .db (domyślnie: reports/it_doc_matrix.db)")
     ap.add_argument("--verbose", "-v", action="store_true", help="Print each match/miss")
     ap.add_argument("--report", action="store_true", help="Print missing + extra report")
     ap.add_argument("--summary", action="store_true", help="Print per-standard summary table")
     ap.add_argument("--all", action="store_true", help="Run + print all reports")
     args = ap.parse_args()
 
-    conn = sqlite3.connect(args.db)
-    create_tables(conn)
-    run_gap_analysis(conn, verbose=args.verbose)
-
-    if args.report or args.all:
-        print_missing_report(conn)
-    if args.summary or args.all:
-        print_standard_summary(conn)
-
-    conn.close()
+    run(Path(args.db), verbose=args.verbose, report=args.report or args.all, summary=args.summary or args.all)
     print("✓ Analiza luk zakończona.")
 
 

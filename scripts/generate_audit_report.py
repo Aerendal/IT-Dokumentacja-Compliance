@@ -15,6 +15,8 @@ from __future__ import annotations
 import argparse
 import sqlite3
 from datetime import datetime, timezone
+
+from itdoc.db import get_connection
 from pathlib import Path
 
 DB_DEFAULT = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
@@ -247,23 +249,15 @@ def main() -> None:
     )
     args = ap.parse_args()
 
-    conn = sqlite3.connect(args.db)
-
-    # Sprawdź czy tabele istnieją
-    tables = [
-        r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-    ]
-    if "gap_analysis" not in tables:
-        print("ERROR: Tabela gap_analysis nie istnieje. Uruchom najpierw gap_analysis.py")
-        return
-    if "standards_catalog" not in tables:
-        print(
-            "ERROR: Tabela standards_catalog nie istnieje. Uruchom najpierw build_standards_catalog.py"
-        )
-        return
-
-    report_md = run(conn)
-    conn.close()
+    with get_connection(args.db) as conn:
+        tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+        if "gap_analysis" not in tables:
+            print("ERROR: Tabela gap_analysis nie istnieje. Uruchom najpierw gap_analysis.py")
+            return
+        if "standards_catalog" not in tables:
+            print("ERROR: Tabela standards_catalog nie istnieje. Uruchom najpierw build_standards_catalog.py")
+            return
+        report_md = run(conn)
 
     out_path = Path(args.output) if args.output else (REPORT_DIR / "standards_audit_report.md")
     out_path.parent.mkdir(parents=True, exist_ok=True)
