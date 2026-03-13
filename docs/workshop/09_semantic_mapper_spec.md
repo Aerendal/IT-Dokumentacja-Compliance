@@ -50,6 +50,25 @@ if len(parsed_brief.chunks) > 1:
     entities = deduplicate_entities(all_entities)
 ```
 
+**Definicja `merge_entities()`:**
+
+```python
+def merge_entities(a: ExtractedEntities, b: ExtractedEntities) -> ExtractedEntities:
+    """Union dwóch ExtractedEntities. Deduplication po wartości (case-insensitive dla str)."""
+    def merge_lists(x: list, y: list) -> list:
+        seen = {str(v).lower() for v in x}
+        return x + [v for v in y if str(v).lower() not in seen]
+
+    return ExtractedEntities(
+        domains=merge_lists(a.domains, b.domains),
+        standards=merge_lists(a.standards, b.standards),
+        regulations=merge_lists(a.regulations, b.regulations),
+        phases=sorted(set(a.phases) | set(b.phases)),  # int — set dedup, posortowane
+        keywords=merge_lists(a.keywords, b.keywords),
+        project_type=a.project_type or b.project_type,
+    )
+```
+
 **Wzbogacanie encji (normalizacja):**
 
 Po ekstrakcji przez LLM, encje są normalizowane do kodów znanych bibliotece itdoc:
@@ -255,9 +274,9 @@ if len(scored_candidates) > 100 and settings.llm_reranking_enabled:
     )
     
     # Scalaj score: 0.6 × Jaccard + 0.4 × LLM
-    # item.score pochodzi z LLMAdapter.ScoredCandidate (dok.07, pole "score")
+    # item.score pochodzi z LLMAdapter.LLMScoredCandidate (dok.07, pole "score")
     # original.confidence pochodzi z SemanticMapper.ScoredCandidate (ten plik, pole "confidence")
-    # To dwie różne klasy o podobnej nazwie — por. dok.07 §2 gdzie wyjaśniono rozróżnienie.
+    # Dwie różne klasy z różnymi nazwami — LLMScoredCandidate (dok.07) vs ScoredCandidate (ten plik).
     for item in reranked:
         original = next(c for c in top_100 if c.doc_uid == item.doc_uid)
         original.confidence = round(0.6 * original.confidence + 0.4 * item.score, 3)
@@ -438,4 +457,152 @@ async def _get_scoring_config(self, project_id: UUID) -> ScoringConfig:
         keyword_weight=settings.get("scoring.keyword_weight", KEYWORD_WEIGHT),
         phase_weight=settings.get("scoring.phase_weight", PHASE_WEIGHT),
     )
+```
+
+---
+
+## 11. Query Fallback Strategy — algorytm przejść
+
+Poniższy algorytm definiuje kiedy `_query_itdoc()` przechodzi do następnego poziomu.
+
+### 11.1 Poziomy fallbacku
+
+| Poziom | Metoda | Warunek wejścia | Warunek zatrzymania |
+|--------|--------|----------------|---------------------|
+| 1 | `find_by_standard(s)` per standard | zawsze | candidates >= MIN_CANDIDATES |
+| 2 | `find_by_regulation(r)` per regulacja | zawsze | candidates >= MIN_CANDIDATES |
+| 3 | `rhythm_downstream(uid, depth=1)` dla top-20 | po L1+L2 | candidates >= MIN_CANDIDATES |
+| 4 | `find_by_keyword(keywords[:30])` | candidates < MIN_CANDIDATES | candidates >= MIN_CANDIDATES |
+| 5 | `get_documents_by_phase(db_phase_id)` per faza | candidates < MIN_CANDIDATES | zawsze (max fallback) |
+
+`MIN_CANDIDATES = 10` — poniżej tej wartości pipeline jest nienasycony.
+
+### 11.2 Obsługa pustych tabel (graceful degradation)
+
+```python
+async def _query_level(self, method, *args) -> list[DocRef]:
+    """Wrapper odporny na OperationalError (brakujące tabele w DB)."""
+    try:
+        return await method(*args)
+    except OperationalError:
+        return []  # Tabela nie istnieje → pusty wynik, kontynuuj fallback
+```
+
+Wywołanie:
+```python
+docs = await self._query_level(connector.find_by_standard, standard)
+```
+
+### 11.3 Obsługa pustych `ExtractedEntities`
+
+Gdy brief był zbyt krótki lub LLM nie wyekstrahował nic:
+
+```python
+if entities.is_empty():
+    # Pomiń L1–L3, przejdź od razu do keyword fallback (L4)
+    # Jeśli też puste → phase fallback (L5) z entities.phases=[] → pomiń
+    # Wynik: candidates mogą być puste → MappingResult.items=[], status="insufficient"
+    logger.warning("Empty ExtractedEntities — fallback to keyword+phase only")
+```
+
+```python
+@dataclass
+class ExtractedEntities:
+    # ...
+    def is_empty(self) -> bool:
+        return (not self.standards and not self.regulations
+                and not self.keywords and not self.phases)
+```
+
+### 11.4 Obsługa `LLMTimeoutError` w ekstrakcji
+
+```python
+try:
+    entities = await llm_adapter.extract_entities(chunk)
+except LLMTimeoutError:
+    logger.warning("LLM timeout in extract_entities — using keyword-only fallback")
+    # Zbuduj ExtractedEntities tylko ze słów kluczowych (bez LLM)
+    entities = _extract_keywords_without_llm(chunk)
+    # _extract_keywords_without_llm: simple tokenizer, stopword removal, top-30 terms
+```
+
+---
+
+## 12. MappingResult Contract — gwarantowana struktura
+
+Wywołujący (EstimationEngine, WorkPlanner, API) mogą polegać na następujących gwarancjach:
+
+### 12.1 JSON Schema
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MappingResult",
+  "type": "object",
+  "required": ["id", "brief_id", "items", "total_items", "status"],
+  "properties": {
+    "id":           { "type": "string", "format": "uuid" },
+    "brief_id":     { "type": "string", "format": "uuid" },
+    "llm_model":    { "type": "string" },
+    "items": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 200,
+      "description": "Posortowane malejąco wg confidence. Max 200 (konfig MAX_MAPPING_RESULTS).",
+      "items": {
+        "type": "object",
+        "required": ["doc_uid", "doc_title", "phase_id", "confidence", "match_sources"],
+        "properties": {
+          "doc_uid":       { "type": "string" },
+          "doc_title":     { "type": "string" },
+          "phase_id":      { "type": "integer", "minimum": 1, "maximum": 24 },
+          "phase_name":    { "type": ["string", "null"] },
+          "confidence":    { "type": "number", "minimum": 0, "maximum": 1,
+                             "description": "Zaokrąglone do 4 miejsc po przecinku" },
+          "match_reason":  { "type": ["string", "null"] },
+          "match_sources": { "type": "array", "items": {"type": "string"},
+                             "description": "Bez duplikatów (set semantics)" },
+          "is_required":   { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "total_items":    { "type": "integer", "minimum": 0 },
+    "avg_confidence": { "type": ["number", "null"] },
+    "status": {
+      "type": "string",
+      "enum": ["done", "insufficient", "error"],
+      "description": "'insufficient' gdy items=[] lub brak danych; 'error' gdy wyjątek LLM"
+    }
+  }
+}
+```
+
+### 12.2 Gwarancje implementacyjne
+
+```python
+def _build_mapping_result(self, candidates: list[MappingItem], ...) -> MappingResult:
+    # 1. Sortowanie malejące po confidence
+    candidates.sort(key=lambda x: x.confidence, reverse=True)
+
+    # 2. Zaokrąglenie confidence do 4dp
+    for item in candidates:
+        item.confidence = round(item.confidence, 4)
+
+    # 3. Deduplikacja match_sources (set semantics, zachowana kolejność)
+    for item in candidates:
+        seen: set[str] = set()
+        deduped = []
+        for src in item.match_sources:
+            if src not in seen:
+                seen.add(src)
+                deduped.append(src)
+        item.match_sources = deduped
+
+    # 4. Limit do MAX_MAPPING_RESULTS (domyślnie 200)
+    items = candidates[:MAX_MAPPING_RESULTS]
+
+    status = "done" if items else "insufficient"
+    avg = round(sum(i.confidence for i in items) / len(items), 4) if items else None
+    return MappingResult(items=items, total_items=len(items),
+                         avg_confidence=avg, status=status)
 ```

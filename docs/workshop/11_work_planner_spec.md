@@ -34,8 +34,43 @@ class WorkPackage:
     gates_json:     list[str]      # warunki wejścia (checklist)
     assignee_type:  str            # "ai_agent_writer" | "ai_agent_reviewer" | "human"
     h_estimate:     float | None   # z EstimationEngine
-    status:         str            # "pending" | "in_progress" | "done" | "blocked"
-    depends_on:     list[UUID]     # IDs poprzednich WorkPackage
+    status:         str            # Canonical enum — patrz §2.1 poniżej
+    depends_on:     list[UUID]     # IDs poprzednich WorkPackage (UUID, nie doc_uid — patrz §2.2)
+```
+
+### 2.1 WorkPackageStatus — canonical enum
+
+```python
+class WorkPackageStatus(str, Enum):
+    PENDING      = "pending"       # oczekuje na poprzedniki
+    IN_PROGRESS  = "in_progress"   # w trakcie realizacji
+    NEEDS_REVIEW = "needs_review"  # gotowe, czeka na akceptację (assumption_flag=True lub warning gate)
+    BLOCKED      = "blocked"       # zatrzymane przez ClarificationRequest[required=True]
+    DONE         = "done"          # zaakceptowane, quality gates przeszły
+```
+
+> Przejścia stanów i warunki: `17_ai_agent_context_spec.md` §4.
+
+### 2.2 Konwersja `doc_uid` → `UUID` w `depends_on`
+
+Wewnętrznie `_build_dependency_graph()` operuje na `doc_uid` (string), ale
+`WorkPackage.depends_on` przechowuje `UUID` pakietów. Konwersja przez
+`uid_to_package_id: dict[str, UUID]` budowany przy tworzeniu pakietów:
+
+```python
+# Budowany sekwencyjnie podczas pętli tworzenia pakietów:
+uid_to_package_id: dict[str, UUID] = {}
+
+# Po utworzeniu pakietu dla doc_uid:
+uid_to_package_id[doc_uid] = pkg.id
+
+# Konwersja podczas tworzenia:
+depends_on_uids = deps.get(doc_uid, [])          # list[str] — doc_uids poprzedników
+depends_on_ids  = [uid_to_package_id[u]           # list[UUID] — UUIDs pakietów
+                   for u in depends_on_uids
+                   if u in uid_to_package_id]     # guard: poprzednik już przetworzony
+# Uwaga: "if u in uid_to_package_id" jest bezpieczne bo topologiczne sortowanie
+# gwarantuje że poprzednik zawsze pojawia się wcześniej w ordered_pairs.
 ```
 
 ---
@@ -439,3 +474,136 @@ RHYTHM_DEPTH_PLANNING=2        # głębokość ekspansji rhythm_upstream przy bu
 ENABLE_PHASE_ORDERING=true     # wymuszaj kolejność faz SDLC jako tiebreaker
 HUMAN_ASSIGNEE_PATTERNS=audit,approval,strategy,architecture,sign_off,interview
 ```
+
+---
+
+## 8. Sequencing Algorithm — szczegółowy opis
+
+### 8.1 `_insert_sorted_by_phase(queue, uid, get_phase_fn)`
+
+Stabilne wstawianie do kolejki z zachowaniem rosnącego `phase_id`:
+
+```python
+def _insert_sorted_by_phase(
+    queue: list[str],
+    uid: str,
+    get_phase_fn: Callable[[str], int]
+) -> None:
+    """Wstaw uid do queue w miejscu gdzie phase_id jest >= phase_id(uid)."""
+    target_phase = get_phase_fn(uid)
+    for i, existing in enumerate(queue):
+        if get_phase_fn(existing) > target_phase:
+            queue.insert(i, uid)
+            return
+    queue.append(uid)  # największy phase_id → na końcu
+```
+
+### 8.2 Cycle Detection i Break Strategy
+
+`rhythm_edges` mogą zawierać cykle. Algorytm Kahna naturalnie je wykrywa
+przez `remaining = [uid for uid in doc_uids if uid not in result]`.
+
+Gdy `remaining` niepuste po BFS → cykl istnieje. Strategia przerwania:
+
+```python
+def _break_cycles(
+    self,
+    remaining: list[str],
+    deps: dict[str, list[str]],
+    edge_weights: dict[tuple[str,str], float]  # (from_uid, to_uid) → weight
+) -> dict[str, list[str]]:
+    """
+    Usuwa krawędź o najniższym weight z każdego cyklu.
+    Fallback gdy weight nieznany: leksykograficznie (from_uid < to_uid).
+    Zwraca zmodyfikowany deps bez krawędzi tworzących cykl.
+    """
+    modified_deps = {uid: list(prereqs) for uid, prereqs in deps.items()}
+
+    for uid in remaining:
+        cycle_edges = [
+            (uid, prereq) for prereq in modified_deps[uid]
+            if prereq in remaining
+        ]
+        if cycle_edges:
+            # Wybierz krawędź do usunięcia: najniższy weight lub leksykograficznie
+            weakest = min(
+                cycle_edges,
+                key=lambda e: (edge_weights.get(e, 1.0), e[1])
+            )
+            modified_deps[weakest[0]].remove(weakest[1])
+            logger.warning(
+                f"Cycle broken: removed edge {weakest[0]} → {weakest[1]} "
+                f"(weight={edge_weights.get(weakest, 'unknown')})"
+            )
+
+    return modified_deps
+```
+
+Po `_break_cycles()` uruchom `_topological_sort()` ponownie — wynik będzie acykliczny.
+
+### 8.3 Walidacja wyniku sortowania
+
+```python
+def _validate_sequence(
+    self,
+    ordered: list[str],
+    deps: dict[str, list[str]]
+) -> list[str]:
+    """
+    Weryfikuje że każdy prerequisite pojawia się przed swoim dependentem.
+    Zwraca listę naruszeń (pary [prereq, dependent]) lub [] jeśli OK.
+    """
+    position = {uid: i for i, uid in enumerate(ordered)}
+    violations = []
+    for uid, prereqs in deps.items():
+        for prereq in prereqs:
+            if prereq in position and position[prereq] > position[uid]:
+                violations.append(f"{prereq} powinien być przed {uid}")
+    return violations
+```
+
+---
+
+## 9. Edge Cases
+
+### 9.1 Cycle w `WorkPackage.depends_on` (różne od cykli w rhythm_edges)
+
+`rhythm_edges` definiuje zależności na poziomie dokumentów (itdoc). Ale `WorkPackage.depends_on`
+jest budowane na podstawie `rhythm_upstream` — jeśli dane w `rhythm_edges` zawierają cykl A→B→A,
+`_build_dependency_graph()` może go przejąć. `_break_cycles()` łamie najsłabszą krawędź i
+loguje ostrzeżenie. **Implementacja `create_plan()` musi zawsze uruchamiać cycle detection
+przed topological sort**, nawet gdy rhythm_edges jest pozornie acykliczne (dane mogą być
+niespójne przy ręcznym wypełnieniu bazy).
+
+```python
+# Wymagany guard w create_plan() — PRZED topological sort:
+deps = await self._build_dependency_graph(doc_uids)
+deps = self._break_cycles(deps)          # zawsze, bez warunków
+ordered = self._topological_sort(deps)
+violations = self._validate_sequence(ordered, deps)
+if violations:
+    logger.error(f"Topological sort violations: {violations}")  # nie rzucaj — kontynuuj
+```
+
+### 9.2 Ostrzeżenie przy truncacji planu
+
+Kiedy `SemanticMapper` zwraca mniej dopasowań niż żądano (np. limit 100 ale LLM przyciął output),
+`WorkPlanner` tworzy plan z ograniczoną liczbą pakietów. Należy to zalogować wyraźnie:
+
+```python
+requested = len(report.all_documents_requested)   # ile klient chciał
+received  = len(all_docs)                          # ile dotarło do WorkPlanner
+
+if received < requested:
+    logger.warning(
+        f"WorkPlan truncated: klient oczekiwał {requested} dokumentów, "
+        f"plan zawiera tylko {received}. "
+        f"Sprawdź MappingResult i LLMResponse.finish_reason."
+    )
+    # Pole w WorkPlan: total_packages_requested = requested
+    # Pozwala front-endowi pokazać ostrzeżenie użytkownikowi
+```
+
+Pole `WorkPlan.total_packages_requested: int | None` — `None` gdy nie znamy limitu,
+`int` gdy znamy. Jeśli `total_packages_requested > total_packages` → truncation warning
+dla front-endu.

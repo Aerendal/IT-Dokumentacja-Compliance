@@ -535,3 +535,43 @@ async def test_get_contract_returns_none_for_stub(connector):
     result = await connector.get_contract("some_uid_with_empty_contract")
     assert result is None  # Nie rzuca wyjątku
 ```
+
+---
+
+## 8. Modele danych — canonical TypedDicts
+
+```python
+from typing import TypedDict
+
+class DocRef(TypedDict):
+    doc_uid:    str          # str(doc_id) z bazy itdoc
+    title:      str
+    path:       None         # kolumna path nie istnieje w documents — zawsze None
+    phase_id:   int          # 1-based (1–24); DB przechowuje 0-based, konwersja: phase_id+1
+    phase_name: str
+    source:     str | None   # "standard:...", "keyword_fallback", "phase_fallback:N" — audit trail
+
+class DocContract(TypedDict, total=False):
+    inputs:   list[str]      # wymagania wejściowe do stworzenia dokumentu
+    outputs:  list[str]      # co dokument dostarcza
+    gates:    list[str]      # quality checkpoints
+
+class Phase(TypedDict):
+    phase_id:   int          # 1-based (1–24) w interfejsie Warsztatu
+    phase_name: str
+    ordinal:    int          # dla sortowania (nie zawsze = phase_id)
+```
+
+### 8.1 Konwencja phase_id: 1-based w interfejsie, 0-based w DB
+
+| Kontekst | Base | Uwagi |
+|----------|------|-------|
+| `it_doc_matrix.db.phases.rowid` | 0-based | SQLite rowid zaczyna od 0 |
+| `DocRef.phase_id` (interfejs Warsztatu) | 1-based | +1 przy odczycie z DB |
+| `ExtractedEntities.phases` | 1-based | LLM outputuje 1-based (dok.07) |
+| `SemanticMapper` query do DB | 0-based | -1 przy przekazaniu do connector |
+
+Konwersja przy odczycie z `find_by_keyword()`:
+```python
+phase_id=row["phase_id"] + 1,  # 0-based DB → 1-based interfejs
+```

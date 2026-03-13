@@ -319,9 +319,16 @@ def _domain_multiplier(industries: list[str]) -> float:
     )
 ```
 
-### 5.3 `_estimate_base_hours(doc_type, complexity) -> tuple[float, float, float]`
+### 5.3 `_estimate_base_hours` — źródło prawdy: `spec10`
+
+> **Ważne:** Kanoniczny algorytm szacowania godzin zdefiniowany jest w
+> `10_estimation_engine_spec.md` §2.2 (`points_to_hours()` + `H_PER_POINT = 0.5`).  
+> Poniższa tabela `BASE_HOURS_TABLE` służy wyłącznie do **wstępnego szacunku**
+> w `WorkPackageContext.template_preview.estimated_pages` — przed uruchomieniem
+> pełnego `EstimationEngine`. Nie zastępuje obliczeń z spec10.
 
 ```python
+# Tylko do wstępnego podglądu w WorkPackageContext — nie do kosztorysu
 BASE_HOURS_TABLE = {
     # doc_type: (min_h, likely_h, max_h) przy complexity=1.0
     'specification': (4.0,  8.0,  16.0),
@@ -396,6 +403,125 @@ PROJECT_FACTS_LOOKBACK_PACKAGES: int = 10  # ile poprzednich pakietów do kontek
 | `BriefParser` | Wykrywa `MISSING_CRITICAL` → tworzy `ClarificationRequest` | V1.1 |
 | `WebhookService` | Emituje zdarzenia przy zmianie stanu work_package | V1.1 |
 | `ItdocConnector` | Dostarcza `template_sections[]` dla `TemplatePreview` | MVP |
+
+---
+
+## 9. QualityGate Checker — implementacje
+
+Sekcja definiuje konkretne klasy checkerów dla `automated=True` quality gates.
+
+### 9.1 Base interface
+
+```python
+from abc import ABC, abstractmethod
+
+class QualityGateChecker(ABC):
+    @abstractmethod
+    def check(self, content: dict[str, str]) -> tuple[bool, str | None]:
+        """
+        Args:
+            content: dict sekcja→tekst (np. {"Zakres audytu": "Lorem ipsum..."})
+        Returns:
+            (passed: bool, error_message: str | None)
+        """
+```
+
+### 9.2 Implementacje per `check_type`
+
+```python
+class MinLengthChecker(QualityGateChecker):
+    """check_type = 'min_length'"""
+    def __init__(self, section: str, min_chars: int = 0, min_paragraphs: int = 0):
+        self.section = section
+        self.min_chars = min_chars
+        self.min_paragraphs = min_paragraphs
+
+    def check(self, content: dict[str, str]) -> tuple[bool, str | None]:
+        text = content.get(self.section, "")
+        if self.min_chars and len(text) < self.min_chars:
+            return False, f"Sekcja '{self.section}': {len(text)} znaków, wymagane {self.min_chars}"
+        if self.min_paragraphs:
+            count = len([p for p in text.split('\n\n') if p.strip()])
+            if count < self.min_paragraphs:
+                return False, f"Sekcja '{self.section}': {count} paragrafów, wymagane {self.min_paragraphs}"
+        return True, None
+
+
+class RequiredFieldChecker(QualityGateChecker):
+    """check_type = 'required_field'"""
+    def __init__(self, field: str):
+        self.field = field
+
+    def check(self, content: dict[str, str]) -> tuple[bool, str | None]:
+        value = content.get(self.field, "").strip()
+        if not value:
+            return False, f"Pole '{self.field}' jest wymagane i nie może być puste"
+        return True, None
+
+
+class FormatMatchChecker(QualityGateChecker):
+    """check_type = 'format_match'"""
+    def __init__(self, field: str, pattern: str, description: str):
+        import re
+        self.field = field
+        self.regex = re.compile(pattern)
+        self.description = description
+
+    def check(self, content: dict[str, str]) -> tuple[bool, str | None]:
+        import re
+        value = content.get(self.field, "")
+        if not self.regex.search(value):
+            return False, f"Pole '{self.field}' nie pasuje do formatu: {self.description}"
+        return True, None
+
+
+class CrossReferenceChecker(QualityGateChecker):
+    """check_type = 'cross_reference'"""
+    def __init__(self, required_references: list[str]):
+        self.required = required_references
+
+    def check(self, content: dict[str, str]) -> tuple[bool, str | None]:
+        full_text = " ".join(content.values()).lower()
+        missing = [ref for ref in self.required if ref.lower() not in full_text]
+        if missing:
+            return False, f"Brakujące odniesienia: {', '.join(missing)}"
+        return True, None
+```
+
+### 9.3 Dispatcher
+
+```python
+CHECKER_REGISTRY: dict[str, type[QualityGateChecker]] = {
+    "min_length":      MinLengthChecker,
+    "required_field":  RequiredFieldChecker,
+    "format_match":    FormatMatchChecker,
+    "cross_reference": CrossReferenceChecker,
+    # "human_review" — brak automatu; zawsze needs_review
+}
+
+def run_quality_checks(
+    gates: list[QualityGate],
+    content: dict[str, str]
+) -> dict[str, list[str]]:
+    """
+    Uruchamia wszystkie automated quality gates.
+    Returns: {"passed": [...criteria], "failed": [...criteria], "warnings": [...criteria]}
+    """
+    result = {"passed": [], "failed": [], "warnings": []}
+    for gate in gates:
+        if not gate.automated:
+            result["warnings"].append(f"[human_review] {gate.criterion}")
+            continue
+        checker_cls = CHECKER_REGISTRY.get(gate.check_type)
+        if not checker_cls:
+            continue
+        passed, msg = checker_cls(**gate.checker_params).check(content)
+        key = "passed" if passed else ("failed" if gate.severity == "blocking" else "warnings")
+        result[key].append(gate.criterion if passed else f"{gate.criterion} — {msg}")
+    return result
+```
+
+> `gate.checker_params` to opcjonalne pole do dodania w `QualityGate` (dict z kwargs dla checkera).
 
 ---
 

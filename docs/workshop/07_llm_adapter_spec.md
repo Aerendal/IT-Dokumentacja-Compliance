@@ -32,7 +32,7 @@ class ExtractedEntities:
     domains:      list[str]
     standards:    list[str]
     regulations:  list[str]
-    phases:       list[int]
+    phases:       list[int]  # 1-based (1–24); konwersja na 0-based dla DB w SemanticMapper
     keywords:     list[str]
     project_type: str | None = None
 
@@ -46,13 +46,11 @@ class MappingCandidate:
 
 
 @dataclass
-class ScoredCandidate:
+class LLMScoredCandidate:
     """
     Wynik rerankingu zwracany przez LLM Adapter (rerank_mapping).
-    Uwaga: SemanticMapper używa własnej, bogatszej klasy ScoredCandidate 
-    (dok.09) z polami confidence, phase_id, match_sources itp.
-    Ta klasa jest używana WYŁĄCZNIE wewnątrz metody `_llm_rerank` w SemanticMapper
-    jako tymczasowy wynik parsowania odpowiedzi LLM przed blendingiem.
+    Nazwa różna od SemanticMapper.ScoredCandidate (dok.09) celowo —
+    ta klasa to tymczasowy wynik parsowania odpowiedzi LLM przed blendingiem.
     """
     doc_uid:    str
     score:      float        # 0.0–1.0 (zwracane przez LLM)
@@ -66,7 +64,9 @@ class LLMResponse:
     input_tokens:  int
     output_tokens: int
     latency_ms:    int
-    cached:        bool = False
+    cached:        bool  = False
+    finish_reason: str   = "stop"  # "stop" | "length" | "content_filter"
+    # Uwaga: finish_reason == "length" oznacza ucięty output — wywołujący MUSI obsłużyć
 
 
 class BaseLLMAdapter(ABC):
@@ -327,8 +327,17 @@ async def _save_to_cache(self, prompt_hash: str, response: str, ...) -> None:
 
 **Polityka cache:**
 - Ważność: 24 godziny (konfigurowalne przez `LLM_CACHE_TTL_HOURS`)
-- Klucz: SHA256(prompt_template + parametry) — nie SHA256 całego tekstu
+- Klucz: `SHA256(prompt_text + provider_name + model_name)` — **NIE** samo SHA256(prompt)
+  - Zmiana modelu z `gpt-4o` na `gpt-4o-mini` → inny hash → brak false cache hit
 - `force_rerun=True` pomija cache
+
+```python
+def _make_cache_key(self, prompt: str) -> str:
+    """Cache key uwzględnia provider i model aby unikać kolizji przy zmianie modelu."""
+    import hashlib
+    payload = f"{prompt}|{self.provider_name}|{self.model_name}"
+    return hashlib.sha256(payload.encode()).hexdigest()
+```
 
 ---
 
@@ -353,6 +362,32 @@ async def _call_with_retry(self, ...):
 | `LLMTimeoutError` | 2x, czekaj 5s | Re-raise po 2 próbach |
 | `LLMProviderError` (5xx) | 1x, czekaj 2s | Re-raise po 1 próbie |
 | `LLMProviderError` (4xx poza 429) | 0x | Natychmiast re-raise |
+
+**Obsługa `json.loads` — nigdy bez try/except:**
+
+```python
+def _parse_llm_json(self, content: str, operation: str) -> dict:
+    """Parsuj JSON z odpowiedzi LLM. Rzuca LLMParseError zamiast ValueError."""
+    try:
+        return json.loads(content)
+    except (json.JSONDecodeError, ValueError) as e:
+        raise LLMParseError(
+            f"LLM ({operation}) zwróciło nie-JSON: {content[:200]}..."
+        ) from e
+```
+
+**Obsługa uciętego outputu (`finish_reason == "length"`):**
+
+```python
+if response.finish_reason == "length":
+    logger.warning(
+        f"LLM output ucięty (finish_reason=length) dla operacji '{operation}'. "
+        f"Tokens użyte: {response.output_tokens}. "
+        f"Rozważ zwiększenie max_tokens lub skrócenie promptu."
+    )
+    # NIE rzucaj wyjątku — spróbuj parsować co się dało
+    # Wywołujący powinien sprawdzić finish_reason w LLMResponse
+```
 
 ---
 

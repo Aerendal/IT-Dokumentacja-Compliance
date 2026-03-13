@@ -378,3 +378,101 @@ Logowane w `briefs.metadata`:
 - `word_count < 50` — brief bardzo krótki, wyniki mapowania mogą być niepewne
 - `detected_language = "unknown"` — nieznany język
 - `empty_pages > 0` — PDF ze skanami (brak OCR)
+
+---
+
+## 9. Text Normalization Pipeline — szczegółowy opis
+
+`_normalize()` wykonuje 5 etapów **sekwencyjnie**. Kolejność jest ważna.
+
+### 9.1 Etapy pipeline
+
+| Etap | Cel | Implementacja | Uwagi |
+|------|-----|--------------|-------|
+| 1. Null bytes | Usuń `\x00` i inne bajty NUL | `text.replace('\x00', '')` | PDF-y eksportowane z niektórych narzędzi |
+| 2. Control chars | Usuń `Cc` Unicode poza `\n\t\r` | `unicodedata.category(c) != 'Cc'` | Zachowaj formatowanie akapitów |
+| 3. Mojibake | Napraw znaki polskie zdekodowane przez latin-2 | `mojibake_fixes` dict (9 par) | Tylko heurystyka; nieznane encodingi pomiń |
+| 4. Unicode form | NFC normalizacja | `unicodedata.normalize('NFC', text)` | Przed mojibakem żeby nie zniszczyć detekcji |
+| 5. Whitespace | Spłaszcz wielokrotne spacje i puste linie | `re.sub(r'\n{3,}', '\n\n', ...)` | NIE używaj na ASCII-art ani tabelach |
+
+> **Uwaga:** Etap 4 (NFC) powinien być wykonany PRZED etapem 3 (mojibake),
+> inaczej composited characters mogą nie pasować do wzorców w `mojibake_fixes`.
+> Obecna kolejność w kodzie (NFC po mojibake) jest suboptymalna — zalecana korekta przy refactorze.
+
+### 9.2 Encoding Exhaustion Handler
+
+Gdy wszystkie encodingi zawodzą:
+
+```python
+FALLBACK_ENCODINGS = ("utf-8", "utf-8-sig", "cp1250", "iso-8859-2", "latin-1")
+
+def _decode_bytes(self, raw: bytes, filename: str) -> str:
+    last_exc = None
+    for encoding in FALLBACK_ENCODINGS:
+        try:
+            return raw.decode(encoding)
+        except (UnicodeDecodeError, LookupError) as e:
+            last_exc = e
+    raise UnicodeParseError(
+        f"Nie udało się zdekodować '{filename}' "
+        f"używając: {FALLBACK_ENCODINGS}. "
+        f"Ostatni błąd: {last_exc}"
+    )
+```
+
+### 9.3 Mixed-language Detection
+
+Gdy brief zawiera mieszaninę języków:
+
+```python
+def _detect_language(self, text: str) -> str:
+    """
+    Wykrywa język dominujący.
+    Zwraca: "pl" | "en" | "mixed" | "unknown"
+    """
+    pl_chars = set('ąćęłńóśźżĄĆĘŁŃÓŚŹŻ')
+    en_only  = set('wqxvQWXV')  # litery rzadkie w PL, częste w EN
+
+    text_lower = text.lower()
+    total = max(len([c for c in text_lower if c.isalpha()]), 1)
+
+    pl_ratio = len([c for c in text if c in pl_chars]) / total
+    en_ratio = len([c for c in text_lower if c in en_only]) / total
+
+    if pl_ratio >= 0.02 and en_ratio >= 0.01:
+        return "mixed"    # Znaczące sygnały obu języków
+    elif pl_ratio >= 0.005:
+        return "pl"
+    elif en_ratio >= 0.005:
+        return "en"
+    else:
+        return "unknown"
+```
+
+`"mixed"` nie jest błędem — SemanticMapper obsługuje go jak `"pl"` (polish tokenization).
+
+---
+
+## 10. ParsedBriefMetadata — TypedDict
+
+```python
+from typing import TypedDict
+
+class ParsedBriefMetadata(TypedDict, total=False):
+    # Zawsze obecne
+    word_count:        int
+    char_count:        int
+    detected_language: str         # "pl" | "en" | "mixed" | "unknown"
+    parse_duration_ms: int
+    encoding:          str         # np. "utf-8", "cp1250"
+
+    # Zależne od formatu
+    author:            str | None  # DOCX, PDF metadata
+    title:             str | None  # DOCX, PDF metadata
+    pages:             int         # PDF
+    empty_pages:       int         # PDF — strony bez wyekstrahowanego tekstu
+    paragraph_count:   int         # DOCX, TXT
+    sheet_count:       int         # (future) Excel/ODS
+    has_tables:        bool        # DOCX — czy zawiera tabele
+    has_images:        bool        # DOCX/PDF — ostrzeżenie gdy True
+```
