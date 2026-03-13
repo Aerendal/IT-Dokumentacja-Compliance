@@ -1,0 +1,123 @@
+# Branże (kod ISIC, nazwy PL/EN, kategoria)
+
+industries:
+- category: Technologia
+  code: '62'
+  name_en: IT and Software
+  name_pl: IT i oprogramowanie
+- category: Technologia
+  code: '63'
+  name_en: Information Services
+  name_pl: Usługi informacyjne
+- category: Technologia
+  code: '61'
+  name_en: Telecommunications
+  name_pl: Telekomunikacja
+- category: Finanse
+  code: '64'
+  name_en: Banking and Finance
+  name_pl: Bankowość i finanse
+- category: Finanse
+  code: '65'
+  name_en: Insurance
+  name_pl: Ubezpieczenia
+- category: Finanse
+  code: '66'
+  name_en: Auxiliary Financial
+  name_pl: Działalność finansowa pomocnicza
+- category: Zdrowie
+  code: '86'
+  name_en: Healthcare
+  name_pl: Ochrona zdrowia
+- category: Zdrowie
+  code: '87'
+  name_en: Residential Care
+  name_pl: Opieka stacjonarna
+- category: Usługi publiczne
+  code: '85'
+  name_en: Education
+  name_pl: Edukacja
+- category: Usługi publiczne
+  code: '84'
+  name_en: Public Administration
+  name_pl: Administracja publiczna
+- category: Handel
+  code: '47'
+  name_en: Retail
+  name_pl: Handel detaliczny
+- category: Handel
+  code: '46'
+  name_en: Wholesale
+  name_pl: Handel hurtowy
+- category: Hospitality
+  code: '56'
+  name_en: Food and Beverage
+  name_pl: Gastronomia
+- category: Hospitality
+  code: '55'
+  name_en: Hotels and Accommodation
+  name_pl: Hotele i zakwaterowanie
+- category: Transport
+  code: '49'
+  name_en: Land Transport
+  name_pl: Transport lądowy
+- category: Transport
+  code: '50'
+  name_en: Water Transport
+  name_pl: Transport wodny
+- category: Transport
+  code: '51'
+  name_en: Air Transport
+  name_pl: Transport lotniczy
+- category: Transport
+  code: '52'
+  name_en: Warehousing and Logistics
+  name_pl: Magazynowanie i logistyka
+- category: Przemysł
+  code: '35'
+  name_en: Energy
+  name_pl: Energetyka
+- category: Przemysł
+  code: '19'
+  name_en: Oil Refining
+  name_pl: Rafinerie / paliwa
+- category: Przemysł
+  code: '20'
+  name_en: Chemical Industry
+  name_pl: Przemysł chemiczny
+- category: Przemysł
+  code: '26'
+  name_en: Electronics
+  name_pl: Elektronika
+- category: Nieruchomości
+  code: '41'
+  name_en: Construction
+  name_pl: Budownictwo
+- category: Nieruchomości
+  code: '68'
+  name_en: Real Estate
+  name_pl: Nieruchomości
+- category: Media
+  code: '73'
+  name_en: Advertising and Marketing
+  name_pl: Reklama i marketing
+- category: Media
+  code: '59'
+  name_en: Film and Media
+  name_pl: Film i media
+- category: Media
+  code: '60'
+  name_en: Broadcasting
+  name_pl: Nadawanie
+- category: Usługi
+  code: '79'
+  name_en: Tourism
+  name_pl: Turystyka
+- category: Pierwotne
+  code: '01'
+  name_en: Agriculture
+  name_pl: Rolnictwo
+- category: Usługi
+  code: '75'
+  name_en: Veterinary
+  name_pl: Usługi weterynaryjne

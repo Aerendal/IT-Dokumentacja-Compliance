@@ -1,0 +1,163 @@
+# Role IT (kod, nazwa PL, nazwa EN, opis)
+
+roles:
+- code: PO
+  description: Właściciel produktu; odpowiada za backlog i priorytety
+  name_en: Product Owner
+  name_pl: Product Owner
+- code: PM
+  description: Kierownik projektu; planowanie, harmonogram, budżet
+  name_en: Project Manager
+  name_pl: Project Manager
+- code: BA
+  description: Analityk biznesowy; wymagania, procesy, luki
+  name_en: Business Analyst
+  name_pl: Business Analyst
+- code: ARCH
+  description: Projektuje architekturę systemów IT
+  name_en: Architect
+  name_pl: Architekt
+- code: SA
+  description: Projektuje rozwiązanie w kontekście biznesowym
+  name_en: Solution Architect
+  name_pl: Architekt rozwiązań
+- code: EA
+  description: Architektura całej organizacji (TOGAF)
+  name_en: Enterprise Architect
+  name_pl: Architekt korporacyjny
+- code: DEV
+  description: Tworzy kod aplikacji i mikroserwisów
+  name_en: Developer
+  name_pl: Deweloper
+- code: SDEV
+  description: Prowadzi techniczne aspekty rozwoju
+  name_en: Senior Developer
+  name_pl: Senior Deweloper
+- code: DEVLEAD
+  description: Lider techniczny zespołu deweloperskiego
+  name_en: Tech Lead
+  name_pl: Tech Lead
+- code: QA
+  description: 'Zapewnienie jakości: testy manualne i automatyczne'
+  name_en: QA Engineer
+  name_pl: Inżynier QA
+- code: QALEAD
+  description: Prowadzi strategię testowania i zespół QA
+  name_en: QA Lead
+  name_pl: QA Lead
+- code: DEVOPS
+  description: CI/CD, infrastruktura, automatyzacja wdrożeń
+  name_en: DevOps Engineer
+  name_pl: Inżynier DevOps
+- code: SRE
+  description: Niezawodność systemów produkcyjnych, SLO/SLA
+  name_en: Site Reliability Engineer
+  name_pl: SRE
+- code: OPS
+  description: Administracja serwerami, sieciami, systemami
+  name_en: Systems Administrator
+  name_pl: Administrator systemów
+- code: DBA
+  description: Zarządzanie bazami danych, performance, backup
+  name_en: Database Administrator
+  name_pl: Administrator baz danych
+- code: SEC
+  description: Implementacja i utrzymanie zabezpieczeń
+  name_en: Security Engineer
+  name_pl: Inżynier bezpieczeństwa
+- code: CISO
+  description: Strategia i zarządzanie bezpieczeństwem IT
+  name_en: Chief Information Security Officer
+  name_pl: CISO
+- code: DPO
+  description: Zgodność z RODO/GDPR, ochrona danych osobowych
+  name_en: Data Protection Officer
+  name_pl: Inspektor Ochrony Danych
+- code: DE
+  description: Pipelines danych, ETL/ELT, hurtownie danych
+  name_en: Data Engineer
+  name_pl: Inżynier danych
+- code: DS
+  description: Modele ML, analiza statystyczna, eksperymentowanie
+  name_en: Data Scientist
+  name_pl: Data Scientist
+- code: MLOPS
+  description: Wdrożenie i monitorowanie modeli ML na produkcji
+  name_en: MLOps Engineer
+  name_pl: MLOps Engineer
+- code: UX
+  description: Badania użyteczności, prototypy, testy użytkowników
+  name_en: UX Designer
+  name_pl: Projektant UX
+- code: UI
+  description: Interfejsy graficzne, system designu
+  name_en: UI Designer
+  name_pl: Projektant UI
+- code: SCRUM
+  description: Facylitacja Scruma, usuwanie przeszkód
+  name_en: Scrum Master
+  name_pl: Scrum Master
+- code: CPO
+  description: Strategia produktowa całej organizacji
+  name_en: Chief Product Officer
+  name_pl: Chief Product Officer
+- code: CTO
+  description: Strategia technologiczna organizacji
+  name_en: Chief Technology Officer
+  name_pl: CTO
+- code: MGR
+  description: Zarządzanie zespołem i zasobami IT
+  name_en: IT Manager
+  name_pl: Menedżer IT
+- code: LEGAL
+  description: Aspekty prawne, regulacyjne, umowy
+  name_en: Legal / Compliance
+  name_pl: Prawnik / Compliance
+- code: AUDIT
+  description: Audyt wewnętrzny i zewnętrzny IT
+  name_en: Auditor
+  name_pl: Audytor
+- code: VENDOR
+  description: Zewnętrzny dostawca usług lub oprogramowania
+  name_en: Vendor
+  name_pl: Dostawca
+- code: STAKE
+  description: Osoba zainteresowana wynikiem projektu
+  name_en: Stakeholder
+  name_pl: Interesariusz
+- code: END
+  description: Bezpośredni użytkownik systemu lub dokumentu
+  name_en: End User
+  name_pl: Użytkownik końcowy
+- code: CLOUD
+  description: Projektowanie i optymalizacja infrastruktury chmurowej
+  name_en: Cloud Architect
+  name_pl: Architekt chmury
+- code: NETW
+  description: Infrastruktura sieciowa, LAN/WAN, firewall
+  name_en: Network Engineer
+  name_pl: Inżynier sieci
+- code: ITSM
+  description: Zarządzanie usługami IT (ITIL)
+  name_en: ITSM Manager
+  name_pl: Menadżer ITSM
+- code: CHANGE
+  description: Zarządzanie zmianami organizacyjnymi i IT
+  name_en: Change Manager
+  name_pl: Menedżer zmian
+- code: RISK
+  description: Identyfikacja, ocena i mitygacja ryzyk IT
+  name_en: Risk Manager
+  name_pl: Menedżer ryzyka
+- code: CONT
+  description: Zarządzanie treścią dokumentacji i wiedzy
+  name_en: Content Manager
+  name_pl: Content Manager
+- code: TRAIN
+  description: Szkolenia z systemów i procesów IT
+  name_en: IT Trainer
+  name_pl: Trener IT
+- code: PART
+  description: Łącznik między IT a jednostkami biznesowymi
+  name_en: IT Business Partner
+  name_pl: Partner biznesowy IT

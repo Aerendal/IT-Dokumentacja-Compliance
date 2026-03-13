@@ -1,0 +1,75 @@
+# Wymiary jakości dokumentacji IT
+
+quality_dims:
+- description: Wszystkie wymagane sekcje i pola są wypełnione
+  dimension: COMPLETENESS
+  example_checks: Sprawdź listę wymaganych sekcji; szukaj pustych nagłówków
+  good_threshold: 70%
+  measurement_method: Odsetek wypełnionych sekcji do wymaganych
+  name_en: Completeness
+  name_pl: Kompletność
+  target_threshold: 90%
+  tools: template_auditor.py, checklist_atomic.jsonl
+- description: Informacje są poprawne merytorycznie i aktualne
+  dimension: ACCURACY
+  example_checks: Porównaj z aktualnymi standardami i regulacjami
+  good_threshold: Przegląd co 6 mies.
+  measurement_method: Przegląd ekspercki; data ostatniej aktualizacji
+  name_en: Accuracy
+  name_pl: Dokładność
+  target_threshold: Przegląd co 3 mies.
+  tools: regulation_updater.py
+- description: Terminologia i struktura są spójne w całej bibliotece
+  dimension: CONSISTENCY
+  example_checks: Porównaj z szablonem wzorcowym; sprawdź słownik terminów
+  good_threshold: Brak krytycznych
+  measurement_method: Liczba niespójności terminologicznych i strukturalnych
+  name_en: Consistency
+  name_pl: Spójność
+  target_threshold: 0 niespójności
+  tools: bulk_section_patcher.py
+- description: Każda sekcja ma źródło (standard, regulacja, decyzja)
+  dimension: TRACEABILITY
+  example_checks: Sprawdź doc_section_guidance.standards_refs
+  good_threshold: 50%
+  measurement_method: Odsetek sekcji z wypełnionymi standards_refs
+  name_en: Traceability
+  name_pl: Śledzalność
+  target_threshold: 80%
+  tools: impact_analyzer.py
+- description: Dokument jest aktualny względem obowiązujących regulacji
+  dimension: TIMELINESS
+  example_checks: 'Sprawdź datę w ## Metadane; porównaj z datą nowelizacji regulacji'
+  good_threshold: < 12 mies.
+  measurement_method: Czas od ostatniej aktualizacji vs. częstotliwość przeglądów
+  name_en: Timeliness
+  name_pl: Aktualność
+  target_threshold: < 6 mies.
+  tools: changelog_tracker.py
+- description: Użytkownik końcowy może efektywnie wypełnić dokument na podstawie guidance
+  dimension: USABILITY
+  example_checks: Uruchom template_auditor.py; sprawdź score >= 60
+  good_threshold: Score >= 40
+  measurement_method: Ocena guidance (score z template_auditor); feedback użytkowników
+  name_en: Usability
+  name_pl: Użyteczność
+  target_threshold: Score >= 70
+  tools: template_auditor.py
+- description: Powiązania między dokumentami są poprawne i rozwiązane
+  dimension: LINKAGE
+  example_checks: Sprawdź content_links_resolved; uruchom resolve_content_links_extended.py
+  good_threshold: 20%
+  measurement_method: Odsetek content_links_resolved do content_links
+  name_en: Linkage
+  name_pl: Powiązania
+  target_threshold: 50%
+  tools: resolve_content_links_extended.py
+- description: Dokument spełnia wymogi formalne (brak emoji, struktura, metadane)
+  dimension: COMPLIANCE
+  example_checks: Uruchom pipeline_run.py; sprawdź emoji_report.json
+  good_threshold: 0 emoji, metadane
+  measurement_method: 'Wynik emoji_check; obecność ## Metadane; brak TODO'
+  name_en: Formal Compliance
+  name_pl: Zgodność formalna
+  target_threshold: 0 emoji, 0 TODO, metadane
+  tools: pipeline_run.py

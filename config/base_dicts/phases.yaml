@@ -1,0 +1,141 @@
+# Fazy cyklu życia projektu IT
+
+phases:
+- category: strategy
+  description: Wizja, cele, wstępny zakres, studium wykonalności
+  is_iterative: false
+  name_en: Initiation / Discovery
+  name_pl: Inicjacja / Odkrycie
+  number: 1
+- category: analysis
+  description: Wymagania funkcjonalne i niefunkcjonalne, user stories
+  is_iterative: false
+  name_en: Requirements Analysis
+  name_pl: Analiza Wymagań
+  number: 2
+- category: design
+  description: Architektura, projekt systemu, prototypy
+  is_iterative: false
+  name_en: Design
+  name_pl: Projekt / Design
+  number: 3
+- category: planning
+  description: Harmonogram, zasoby, budżet, plan projektu
+  is_iterative: false
+  name_en: Planning
+  name_pl: Planowanie
+  number: 4
+- category: build
+  description: Kodowanie, budowanie komponentów
+  is_iterative: true
+  name_en: Implementation
+  name_pl: Implementacja
+  number: 5
+- category: quality
+  description: Testy jednostkowe, integracyjne, systemowe, UAT
+  is_iterative: true
+  name_en: Testing / QA
+  name_pl: Testowanie / QA
+  number: 6
+- category: security
+  description: Testy bezpieczeństwa, audyt zgodności, certyfikacja
+  is_iterative: false
+  name_en: Security / Compliance
+  name_pl: Bezpieczeństwo / Compliance
+  number: 7
+- category: delivery
+  description: Wdrożenie na produkcję, migracja danych
+  is_iterative: false
+  name_en: Deployment
+  name_pl: Wdrożenie / Deployment
+  number: 8
+- category: operations
+  description: Eksploatacja, wsparcie, monitorowanie
+  is_iterative: true
+  name_en: Operations / Maintenance
+  name_pl: Operacje / Maintenance
+  number: 9
+- category: operations
+  description: Obsługa incydentów, eskalacje, SLA
+  is_iterative: true
+  name_en: Incident Management
+  name_pl: Incydenty i eskalacje
+  number: 10
+- category: operations
+  description: Metryki, logi, alerty, dashboardy
+  is_iterative: true
+  name_en: Monitoring / Observability
+  name_pl: Monitoring / Observability
+  number: 11
+- category: operations
+  description: Tuning, skalowanie, capacity planning
+  is_iterative: true
+  name_en: Performance Optimization
+  name_pl: Optymalizacja wydajności
+  number: 12
+- category: operations
+  description: CMDB, IaC, zarządzanie konfiguracją
+  is_iterative: true
+  name_en: Configuration Management
+  name_pl: Zarządzanie konfiguracją
+  number: 13
+- category: governance
+  description: Raporty statusowe, spotkania przeglądowe
+  is_iterative: true
+  name_en: Stakeholder Communication
+  name_pl: Komunikacja stakeholders
+  number: 14
+- category: governance
+  description: Dokumentacja, baza wiedzy, onboarding
+  is_iterative: true
+  name_en: Knowledge Management
+  name_pl: Knowledge Management
+  number: 15
+- category: governance
+  description: Analiza incydentów, wyciąganie wniosków
+  is_iterative: true
+  name_en: Postmortem / Retrospective
+  name_pl: Postmortem / Retrospektywa
+  number: 16
+- category: governance
+  description: Planowanie budżetu, rozliczenia, FinOps
+  is_iterative: false
+  name_en: Budgeting / Cost Management
+  name_pl: Budżetowanie / Cost Mgmt
+  number: 17
+- category: governance
+  description: Zarządzanie dostawcami, kontrakty, SLA
+  is_iterative: true
+  name_en: Vendor Management
+  name_pl: Vendor Management
+  number: 18
+- category: governance
+  description: Zarządzanie ładem IT, audyty, regulacje
+  is_iterative: true
+  name_en: Governance / Compliance
+  name_pl: Governance / Compliance
+  number: 19
+- category: closure
+  description: Wycofanie systemu, archiwizacja, migracja
+  is_iterative: false
+  name_en: Decommission / Sunset
+  name_pl: Decommission / Sunset
+  number: 20
+- category: resilience
+  description: Plan ciągłości działania, odtwarzanie po awarii
+  is_iterative: false
+  name_en: DR / BCP
+  name_pl: DR / BCP
+  number: 21
+- category: governance
+  description: Zarządzanie zmianami (ITIL Change Mgmt)
+  is_iterative: true
+  name_en: Change Management
+  name_pl: Change Management
+  number: 22
+- category: operations
+  description: Planowanie pojemności, prognozowanie wzrostu
+  is_iterative: true
+  name_en: Capacity Planning
+  name_pl: Capacity Planning
+  number: 23

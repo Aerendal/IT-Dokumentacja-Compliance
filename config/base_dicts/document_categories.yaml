@@ -1,0 +1,78 @@
+# Kategorie dokumentów IT
+
+document_categories:
+- code: GOVERNANCE
+  color_hex: '#2C3E50'
+  description: Dokumenty zarządcze i strategiczne IT
+  name_en: Governance
+  name_pl: Governance
+- code: SECURITY
+  color_hex: '#E74C3C'
+  description: Polityki, procedury i standardy bezpieczeństwa
+  name_en: Security
+  name_pl: Bezpieczeństwo
+- code: ARCHITECTURE
+  color_hex: '#3498DB'
+  description: Decyzje, diagramy i dokumenty architektoniczne
+  name_en: Architecture
+  name_pl: Architektura
+- code: DEVELOPMENT
+  color_hex: '#27AE60'
+  description: Wymagania, specyfikacje, dokumenty deweloperskie
+  name_en: Software Development
+  name_pl: Rozwój oprogramowania
+- code: QUALITY
+  color_hex: '#F39C12'
+  description: Plany testów, raporty jakości, strategie QA
+  name_en: Quality and Testing
+  name_pl: Jakość i testowanie
+- code: OPERATIONS
+  color_hex: '#8E44AD'
+  description: Runbooki, procedury operacyjne, monitoring
+  name_en: IT Operations
+  name_pl: Operacje IT
+- code: DATA
+  color_hex: '#16A085'
+  description: Modele danych, katalogi, pipeline'y
+  name_en: Data Management
+  name_pl: Zarządzanie danymi
+- code: COMPLIANCE
+  color_hex: '#D35400'
+  description: Dokumenty audytowe, zgodności, regulacyjne
+  name_en: Compliance and Regulations
+  name_pl: Zgodność i regulacje
+- code: PROJECT
+  color_hex: '#2980B9'
+  description: Plany, harmonogramy, raporty statusowe
+  name_en: Project Management
+  name_pl: Zarządzanie projektem
+- code: INCIDENT
+  color_hex: '#C0392B'
+  description: Playbooki, runbooki incydentowe, postmortem
+  name_en: Incident Management
+  name_pl: Incydenty i eskalacje
+- code: CONTINUITY
+  color_hex: '#1ABC9C'
+  description: BCP, DRP, plany odtwarzania po awarii
+  name_en: Business Continuity
+  name_pl: Ciągłość działania
+- code: VENDOR
+  color_hex: '#7F8C8D'
+  description: Kontrakty, SLA, ocena dostawców
+  name_en: Vendor Management
+  name_pl: Zarządzanie dostawcami
+- code: KNOWLEDGE
+  color_hex: '#BDC3C7'
+  description: Bazy wiedzy, onboarding, dokumentacja procesów
+  name_en: Knowledge Management
+  name_pl: Zarządzanie wiedzą
+- code: INFRASTRUCTURE
+  color_hex: '#34495E'
+  description: Dokumenty infrastruktury, sieci, chmury
+  name_en: Infrastructure
+  name_pl: Infrastruktura
+- code: PRODUCT
+  color_hex: '#9B59B6'
+  description: Dokumenty produktowe, user research, roadmapy
+  name_en: Product and UX
+  name_pl: Produkt i UX

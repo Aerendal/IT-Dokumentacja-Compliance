@@ -1,0 +1,53 @@
+# Typy relacji między dokumentami
+
+rel_types:
+- code: REQUIRES
+  description: Dokument A nie może istnieć bez dokumentu B
+  is_bidirectional: true
+  name_en: Requires
+  name_pl: Wymaga
+- code: RELATES_TO
+  description: Luźne powiązanie tematyczne lub informacyjne
+  is_bidirectional: true
+  name_en: Relates to
+  name_pl: Powiązany z
+- code: EXTENDS
+  description: Dokument A jest rozwinięciem/specjalizacją B
+  is_bidirectional: false
+  name_en: Extends
+  name_pl: Rozszerza
+- code: SUPERSEDES
+  description: Dokument A zastępuje dokument B (nowa wersja)
+  is_bidirectional: false
+  name_en: Supersedes
+  name_pl: Zastępuje
+- code: IMPLEMENTS
+  description: Dokument A implementuje wymagania z dokumentu B
+  is_bidirectional: false
+  name_en: Implements
+  name_pl: Implementuje
+- code: REFERENCES
+  description: Dokument A cytuje lub odwołuje się do B
+  is_bidirectional: false
+  name_en: References
+  name_pl: Odwołuje się do
+- code: DERIVED_FROM
+  description: Dokument A jest wyprowadzony z dokumentu B
+  is_bidirectional: false
+  name_en: Derived from
+  name_pl: Pochodzi z
+- code: PRECEDES
+  description: Dokument A jest tworzony przed dokumentem B (fazowo)
+  is_bidirectional: false
+  name_en: Precedes
+  name_pl: Poprzedza
+- code: VALIDATES
+  description: Dokument A weryfikuje poprawność dokumentu B
+  is_bidirectional: false
+  name_en: Validates
+  name_pl: Weryfikuje
+- code: TRIGGERS
+  description: Istnienie/zmiana dokumentu A inicjuje pracę nad B
+  is_bidirectional: false
+  name_en: Triggers
+  name_pl: Inicjuje
