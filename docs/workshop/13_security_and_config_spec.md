@@ -319,6 +319,7 @@ class BaseLLMAdapter(ABC):
 ```ini
 # .env
 LLM_MAX_CONCURRENT_CALLS=3      # Max 3 równoległe wywołania LLM
+LLM_QUEUE_TIMEOUT=60            # sek — czas oczekiwania na wolny slot (LLMQueueFullError po przekroczeniu)
 ```
 
 ---
@@ -369,6 +370,7 @@ Wszystkie zmienne env używane przez warsztat — w tym zmienne zdefiniowane w i
 | `LLM_CACHE_TTL_HOURS` | `24` | LLMAdapter | TTL wpisów cache (godziny) |
 | `LLM_RERANKING_ENABLED` | `false` | LLMAdapter | Reranking wyników (kosztowniejsze) |
 | `LLM_MAX_CONCURRENT_CALLS` | `3` | LLMAdapter | Max równoległych wywołań LLM (semaphore) |
+| `LLM_QUEUE_TIMEOUT` | `60` | LLMAdapter | Sek. oczekiwania na slot; po przekroczeniu → `LLMQueueFullError` |
 | `CONFIDENCE_THRESHOLD_DEFAULT` | `0.4` | SemanticMapper | Domyślny próg confidence |
 | `MAX_MAPPING_RESULTS` | `200` | SemanticMapper | Max wyników mapowania |
 | `RHYTHM_DEPTH` | `1` | SemanticMapper | Głębokość ekspansji rhythm |

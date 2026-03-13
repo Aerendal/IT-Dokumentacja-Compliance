@@ -229,8 +229,13 @@ CREATE TABLE work_plans (
     report_id       UUID NOT NULL REFERENCES estimation_reports(id),
     project_id      UUID NOT NULL REFERENCES projects(id),
     total_packages  INTEGER DEFAULT 0,
+    total_packages_requested INTEGER,               -- oryginalna liczba z MappingResult (null = nieznana)
     status          TEXT NOT NULL DEFAULT 'draft'
-                        CHECK (status IN ('draft','active','completed','cancelled')),
+                        CHECK (status IN ('draft','active','stale','archived')),
+                        -- 'stale': zastąpiony po zmianie mappingu (patrz spec11 §10)
+                        -- 'archived': manualnie przez PM
+                        -- 'completed'/'cancelled' usunięte — zastąpione przez 'stale'/'archived'
+    stale_reason    TEXT,                           -- powód unieważnienia (gdy status='stale')
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );

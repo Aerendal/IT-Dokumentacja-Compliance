@@ -923,3 +923,35 @@ async def export_project(project_id: UUID, exclude_raw: bool = False):
 **Performance:**
 - Cache diff (Redis lub in-memory LRU) przez 5 minut: klucz = `compare:{min(a,b)}:{max(a,b)}`
 - Limit: max 500 items w diff (HTTP 413 jeśli przekroczony z `detail_truncated: true`)
+
+---
+
+### Kontrakt QualityGateChecker (spec17 §9)
+
+```python
+class QualityGateChecker(ABC):
+    def check(self, content: dict[str, str]) -> tuple[bool, str | None]:
+        """
+        Args:
+            content: dict {sekcja_nazwa: tekst_sekcji}
+        Returns:
+            (passed, error_message_or_None)
+        Gwarancje:
+            - Nigdy nie rzuca wyjątku (łapie wewnętrznie, zwraca False + opis błędu)
+            - Idempotentna: ten sam input → ten sam output
+            - Nie modyfikuje content
+        """
+```
+
+| Implementacja | `check_type` | Kluczowe parametry |
+|--------------|--------------|-------------------|
+| `MinLengthChecker` | `min_length` | `section, min_chars, min_paragraphs` |
+| `RequiredFieldChecker` | `required_field` | `field` |
+| `FormatMatchChecker` | `format_match` | `field, pattern, description` |
+| `CrossReferenceChecker` | `cross_reference` | `required_references: list[str]` |
+
+Dispatcher `run_quality_checks(gates, content) → dict[str, list[str]]` zwraca
+`{"passed": [...], "failed": [...], "warnings": [...]}` — nigdy nie rzuca wyjątku.
+
+**Integracja z WorkPlanner:** `gates_json` w `WorkPackage` przechowuje listę `QualityGate`
+obiektów. `run_quality_checks()` wywoływany przez AI agenta przed oznaczeniem pakietu `done`.

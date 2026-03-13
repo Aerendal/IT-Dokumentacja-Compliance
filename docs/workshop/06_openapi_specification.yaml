@@ -195,6 +195,7 @@ components:
         confidence_threshold: { type: number, format: float, default: 0.6, minimum: 0.0, maximum: 1.0 }
         max_results:          { type: integer, default: 200, minimum: 1, maximum: 500 }
         force_rerun:          { type: boolean, default: false }
+        llm_enabled:          { type: boolean, default: true, description: "false → keyword-only fallback (spec01 §6.2); MappingResult.status='llm_free'" }
 
     MappingItemUpdate:
       type: object
@@ -298,9 +299,12 @@ components:
         report_id:       { $ref: '#/components/schemas/UUID' }
         project_id:      { $ref: '#/components/schemas/UUID' }
         total_packages:  { type: integer }
+        total_packages_requested: { type: integer, nullable: true, description: "Oryginalna liczba z MappingResult; null = nieznana" }
         status:
           type: string
-          enum: [draft, active, completed, cancelled]
+          enum: [draft, active, stale, archived]
+          description: "stale = zastąpiony po zmianie mappingu (spec11 §10); archived = manualnie przez PM"
+        stale_reason: { type: string, nullable: true }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
 
@@ -1520,6 +1524,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
+  /plans/rebuild/{report_id}:
+    post:
+      tags: [planning]
+      summary: Przebuduj plan po zmianie mappingu lub raportu
+      description: |
+        Ustawia istniejący WorkPlan na status='stale', tworzy nowy plan na podstawie
+        aktualnego EstimationReport. Używane gdy PM zmienił mapping po akceptacji (spec11 §10).
+      parameters:
+        - in: path
+          name: report_id
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, description: "Powód przebudowy (audit trail)" }
+      responses:
+        "201":
+          description: Nowy plan utworzony; stary plan ma status='stale'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkPlan' }
+        "404": { description: Raport nie znaleziony }
+        "422": { description: Brak aktywnego planu do zastąpienia }
   /plans/{plan_id}:
     get:
       tags: [planning]
