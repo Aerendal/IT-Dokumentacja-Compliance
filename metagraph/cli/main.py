@@ -432,6 +432,91 @@ def export_cmd(ctx, export_type, filter_val, output):
         console.print(md)
 
 
+@cli.command("log")
+@click.option("--since", "-s", default=None, help="SHA commita lub 'HEAD~N'")
+@click.option("--limit", "-n", default=10, help="Ile commitów sprawdzić")
+@click.pass_context
+def log_cmd(ctx, since, limit):
+    """Changelog grafu — co się zmieniło między commitami."""
+    import subprocess, json
+
+    def git(*args):
+        r = subprocess.run(["git", "--no-pager"] + list(args), capture_output=True, text=True,
+                           cwd=Path(__file__).parent.parent.parent)
+        return r.stdout.strip()
+
+    # Get recent commits touching metagraph.db
+    log_fmt = "%H|%s|%ai"
+    log_out = git("log", f"-{limit}", "--format=" + log_fmt, "--", "metagraph/metagraph.db")
+    if not log_out:
+        console.print("[yellow]Brak commitów zmieniających metagraph.db[/yellow]")
+        return
+
+    commits = []
+    for line in log_out.splitlines():
+        parts = line.split("|", 2)
+        if len(parts) == 3:
+            commits.append({"sha": parts[0][:8], "msg": parts[1], "date": parts[2][:10]})
+
+    if not commits:
+        console.print("[yellow]Brak danych[/yellow]")
+        return
+
+    table = Table(title=f"Changelog metagraph.db (ostatnie {len(commits)} commitów)",
+                  show_header=True, box=box.SIMPLE)
+    table.add_column("SHA", style="dim", width=9)
+    table.add_column("Data", width=11)
+    table.add_column("Opis", max_width=70)
+
+    for cm in commits:
+        table.add_row(cm["sha"], cm["date"], cm["msg"])
+
+    console.print(table)
+
+    # If --since provided, show what changed in the graph
+    if since:
+        diff_out = git("diff", since, "HEAD", "--", "metagraph/metagraph.db")
+        if diff_out:
+            console.print(f"\n[dim]Plik binarny — diff nieczytelny dla .db[/dim]")
+            console.print(f"[dim]Użyj 'mg check' i 'mg graph stats' żeby zobaczyć aktualny stan grafu[/dim]")
+        else:
+            console.print("[green]Brak zmian w metagraph.db od podanego commita[/green]")
+
+
+@cli.command("find")
+@click.argument("pattern")
+@click.option("--type", "-t", "type_id", default=None)
+@click.option("--severity", default=None, help="critical|high|medium|low (dla findings)")
+@click.option("--limit", "-n", default=20)
+@click.pass_context
+def find_cmd(ctx, pattern, type_id, severity, limit):
+    """Szukaj węzłów z filtrem severity (przydatne dla findings)."""
+    with get_conn(ctx.obj["db"]) as conn:
+        results = search_nodes(conn, pattern, limit=limit * 3)
+        if type_id:
+            results = [r for r in results if r["type_id"] == type_id]
+        if severity:
+            results = [r for r in results if severity in (r["tags"] or "")]
+        results = results[:limit]
+
+        # Show severity column for findings
+        if type_id == "docs:finding" or severity:
+            table = Table(title=f"Findings: '{pattern}'" + (f" [{severity}]" if severity else ""),
+                          show_header=True)
+            table.add_column("ID", style="dim", max_width=28)
+            table.add_column("Severity", max_width=10)
+            table.add_column("Tytuł", max_width=60)
+            sev_colors = {"critical": "red", "high": "yellow", "medium": "cyan", "low": "dim"}
+            for r in results:
+                tags = r["tags"] or ""
+                sev = next((s for s in ["critical","high","medium","low"] if s in tags), "?")
+                sc = sev_colors.get(sev, "white")
+                table.add_row(str(r["id"])[:26], f"[{sc}]{sev}[/{sc}]", str(r["title"])[:58])
+            console.print(table)
+        else:
+            _print_nodes_table(results, f"Wyniki: '{pattern}'")
+
+
 @cli.group("db")
 def db_group():
     """Zarządzanie bazą danych."""
