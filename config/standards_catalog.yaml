@@ -1,0 +1,1818 @@
+# Katalog wymaganych dokumentów dla standardów IT
+# Generowany z: scripts/build_standards_catalog.py
+# Format: standard_code -> list of doc entries
+
+AsyncAPI 3.x:
+- category: api
+  doc_type_id: asyncapi_spec
+  notes: Specyfikacja asynchronicznego API w formacie AsyncAPI 3.x
+  required: true
+  title: AsyncAPI Specification Document
+  url: https://www.asyncapi.com/docs/reference/specification/v3.0.0
+- category: api
+  doc_type_id: asyncapi_event_catalog
+  notes: Katalog zdarzeń/wiadomości (event types, schemas)
+  required: true
+  title: Event Catalog
+  url: https://www.asyncapi.com/docs/reference/specification/v3.0.0
+- category: api
+  doc_type_id: asyncapi_channel_design
+  notes: Projekt kanałów/tematów asynchronicznych
+  required: false
+  title: Channel / Topic Design Document
+  url: https://www.asyncapi.com/docs/reference/specification/v3.0.0
+CIS Controls v8:
+- category: security
+  doc_type_id: cis_asset_inventory_hw
+  notes: 'Inwentaryzacja sprzętu (CIS #1)'
+  required: true
+  title: Hardware Asset Inventory
+  url: https://www.cisecurity.org/controls/v8
+- category: security
+  doc_type_id: cis_asset_inventory_sw
+  notes: 'Inwentaryzacja oprogramowania (CIS #2)'
+  required: true
+  title: Software Asset Inventory
+  url: https://www.cisecurity.org/controls/v8
+- category: security
+  doc_type_id: cis_data_mgmt_policy
+  notes: 'Polityka zarządzania danymi (CIS #3)'
+  required: true
+  title: Data Management Policy
+  url: https://www.cisecurity.org/controls/v8
+- category: security
+  doc_type_id: cis_vulnerability_mgmt
+  notes: 'Program zarządzania podatnościami (CIS #7)'
+  required: true
+  title: Vulnerability Management Program
+  url: https://www.cisecurity.org/controls/v8
+- category: security
+  doc_type_id: cis_audit_log_mgmt
+  notes: 'Polityka zarządzania dziennikami audytu (CIS #8)'
+  required: true
+  title: Audit Log Management Policy
+  url: https://www.cisecurity.org/controls/v8
+- category: security
+  doc_type_id: cis_ir_plan
+  notes: 'Plan reagowania na incydenty (CIS #17)'
+  required: true
+  title: Incident Response Plan (CIS)
+  url: https://www.cisecurity.org/controls/v8
+- category: security
+  doc_type_id: cis_pentest_plan
+  notes: 'Plan testów penetracyjnych (CIS #18)'
+  required: true
+  title: Penetration Testing Plan
+  url: https://www.cisecurity.org/controls/v8
+- category: security
+  doc_type_id: cis_security_awareness
+  notes: 'Program szkoleń bezpieczeństwa (CIS #14)'
+  required: true
+  title: Security Awareness Training Program
+  url: https://www.cisecurity.org/controls/v8
+COBIT 2019:
+- category: governance
+  doc_type_id: cobit_it_strategy
+  notes: Strategia IT wg. COBIT 2019
+  required: true
+  title: IT Strategy Document (COBIT)
+  url: https://www.isaca.org/resources/cobit
+- category: governance
+  doc_type_id: cobit_governance_framework
+  notes: Opis frameworku ładu IT
+  required: true
+  title: IT Governance Framework Description
+  url: https://www.isaca.org/resources/cobit
+- category: governance
+  doc_type_id: cobit_process_desc
+  notes: Opisy procesów zarządczych i menedżerskich
+  required: true
+  title: Governance/Management Process Descriptions
+  url: https://www.isaca.org/resources/cobit
+- category: governance
+  doc_type_id: cobit_maturity_assessment
+  notes: Ocena dojrzałości procesów IT
+  required: false
+  title: Process Capability/Maturity Assessment
+  url: https://www.isaca.org/resources/cobit
+- category: governance
+  doc_type_id: cobit_audit_report
+  notes: Raport audytu IT wg. COBIT
+  required: false
+  title: IT Audit Report (COBIT)
+  url: https://www.isaca.org/resources/cobit
+- category: governance
+  doc_type_id: cobit_risk_profile
+  notes: Profil ryzyka IT
+  required: true
+  title: IT Risk Profile
+  url: https://www.isaca.org/resources/cobit
+DORA:
+- category: compliance
+  doc_type_id: dora_ict_risk_framework
+  notes: Framework zarządzania ryzykiem ICT (Art. 6)
+  required: true
+  title: ICT Risk Management Framework
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R2554
+- category: compliance
+  doc_type_id: dora_incident_classification
+  notes: Polityka klasyfikacji incydentów ICT (Art. 17)
+  required: true
+  title: ICT Incident Classification Policy
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R2554
+- category: compliance
+  doc_type_id: dora_major_incident_report
+  notes: Raport poważnego incydentu ICT dla regulatora (Art. 19)
+  required: true
+  title: Major ICT Incident Report
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R2554
+- category: compliance
+  doc_type_id: dora_drt_plan
+  notes: Plan testowania odporności cyfrowej (Art. 24)
+  required: true
+  title: Digital Operational Resilience Testing Plan
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R2554
+- category: compliance
+  doc_type_id: dora_tlpt_report
+  notes: Raport TLPT — zaawansowane testy penetracyjne (Art. 26)
+  required: false
+  title: Threat-Led Penetration Testing (TLPT) Report
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R2554
+- category: compliance
+  doc_type_id: dora_third_party_register
+  notes: Rejestr dostawców usług ICT (Art. 28)
+  required: true
+  title: ICT Third-Party Provider Register
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R2554
+- category: compliance
+  doc_type_id: dora_contractual_arrangements
+  notes: Umowy z dostawcami usług ICT (Art. 30)
+  required: true
+  title: Contractual Arrangements with ICT Providers
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R2554
+GDPR / RODO:
+- category: privacy
+  doc_type_id: gdpr_privacy_policy
+  notes: Polityka prywatności / informacja o przetwarzaniu (Art. 13/14)
+  required: true
+  title: Privacy Policy / Privacy Notice
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- category: privacy
+  doc_type_id: gdpr_rop
+  notes: Rejestr czynności przetwarzania (Art. 30)
+  required: true
+  title: Record of Processing Activities (RoPA)
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- category: privacy
+  doc_type_id: gdpr_dpia
+  notes: Ocena skutków dla ochrony danych (Art. 35)
+  required: true
+  title: Data Protection Impact Assessment (DPIA)
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- category: privacy
+  doc_type_id: gdpr_dpa
+  notes: Umowa powierzenia przetwarzania danych (Art. 28)
+  required: true
+  title: Data Processing Agreement (DPA)
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- category: privacy
+  doc_type_id: gdpr_breach_notification
+  notes: Zgłoszenie naruszenia ochrony danych (Art. 33/34)
+  required: true
+  title: Data Breach Notification
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- category: privacy
+  doc_type_id: gdpr_consent_form
+  notes: Formularz zgody na przetwarzanie (Art. 7)
+  required: true
+  title: Consent Form
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- category: privacy
+  doc_type_id: gdpr_data_retention_policy
+  notes: Polityka retencji danych
+  required: true
+  title: Data Retention Policy
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- category: privacy
+  doc_type_id: gdpr_subject_rights_procedure
+  notes: Procedura realizacji praw osób (Art. 15-22)
+  required: true
+  title: Data Subject Rights Procedure
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+HL7 FHIR:
+- category: health
+  doc_type_id: fhir_implementation_guide
+  notes: Przewodnik implementacji FHIR
+  required: true
+  title: FHIR Implementation Guide (IG)
+  url: https://hl7.org/fhir/
+- category: health
+  doc_type_id: fhir_resource_profiles
+  notes: Profile zasobów FHIR — ograniczenia i rozszerzenia
+  required: true
+  title: FHIR Resource Profiles
+  url: https://hl7.org/fhir/
+- category: health
+  doc_type_id: fhir_capability_statement
+  notes: Deklaracja możliwości serwera FHIR
+  required: true
+  title: CapabilityStatement / Conformance
+  url: https://hl7.org/fhir/
+- category: health
+  doc_type_id: fhir_value_sets
+  notes: Definicje zestawów wartości (kody medyczne)
+  required: true
+  title: ValueSet Definitions
+  url: https://hl7.org/fhir/
+- category: health
+  doc_type_id: fhir_integration_guide
+  notes: Przewodnik integracji systemów przez FHIR
+  required: false
+  title: FHIR Integration Guide
+  url: https://hl7.org/fhir/
+IEEE 1012:
+- category: testing
+  doc_type_id: ieee1012_vv_plan
+  notes: Plan weryfikacji i walidacji (IV&V lub IV&V)
+  required: true
+  title: Software V&V Plan
+  url: https://standards.ieee.org/ieee/1012/5609/
+- category: testing
+  doc_type_id: ieee1012_vv_report
+  notes: Raport wyników V&V per faza
+  required: true
+  title: Software V&V Report
+  url: https://standards.ieee.org/ieee/1012/5609/
+- category: testing
+  doc_type_id: ieee1012_anomaly_report
+  notes: Raport anomalii wykrytych podczas V&V
+  required: true
+  title: Anomaly Report
+  url: https://standards.ieee.org/ieee/1012/5609/
+- category: testing
+  doc_type_id: ieee1012_task_report
+  notes: Raport zadania V&V (per aktywność)
+  required: true
+  title: V&V Task Report
+  url: https://standards.ieee.org/ieee/1012/5609/
+IEEE 1016:
+- category: design
+  doc_type_id: ieee1016_sdd
+  notes: Pełny opis projektu oprogramowania — konteksty, architektura, dekompozycja
+  required: true
+  title: Software Design Description (SDD)
+  url: https://standards.ieee.org/ieee/1016/4502/
+- category: design
+  doc_type_id: ieee1016_design_rationale
+  notes: Uzasadnienie decyzji projektowych
+  required: false
+  title: Design Rationale
+  url: https://standards.ieee.org/ieee/1016/4502/
+IEEE 42010:
+- category: architecture
+  doc_type_id: ieee42010_arch_description
+  notes: Formalny opis architektury systemu wg. viewpoints
+  required: true
+  title: Architecture Description
+  url: https://standards.ieee.org/ieee/42010/6205/
+- category: architecture
+  doc_type_id: ieee42010_arch_viewpoint
+  notes: Perspektywa architektoniczna (np. deployment, logical)
+  required: true
+  title: Architecture Viewpoint
+  url: https://standards.ieee.org/ieee/42010/6205/
+- category: architecture
+  doc_type_id: ieee42010_arch_decision
+  notes: Zapis decyzji architektonicznej
+  required: false
+  title: Architecture Decision Record (ADR)
+  url: https://standards.ieee.org/ieee/42010/6205/
+- category: architecture
+  doc_type_id: ieee42010_arch_rationale
+  notes: Uzasadnienie decyzji architektonicznych
+  required: false
+  title: Architecture Rationale
+  url: https://standards.ieee.org/ieee/42010/6205/
+IEEE 829:
+- category: testing
+  doc_type_id: ieee829_test_plan
+  notes: 'Główny plan testowania: zakres, podejście, zasoby, harmonogram'
+  required: true
+  title: Test Plan
+  url: https://standards.ieee.org/ieee/829/776/
+- category: testing
+  doc_type_id: ieee829_test_design
+  notes: Specyfikacja cech do przetestowania i metody
+  required: true
+  title: Test Design Specification
+  url: https://standards.ieee.org/ieee/829/776/
+- category: testing
+  doc_type_id: ieee829_test_case
+  notes: Szczegółowe warunki i dane wejściowe dla testu
+  required: true
+  title: Test Case Specification
+  url: https://standards.ieee.org/ieee/829/776/
+- category: testing
+  doc_type_id: ieee829_test_procedure
+  notes: Kroki wykonania testów
+  required: true
+  title: Test Procedure Specification
+  url: https://standards.ieee.org/ieee/829/776/
+- category: testing
+  doc_type_id: ieee829_test_log
+  notes: Chronologiczny zapis przebiegu testów
+  required: true
+  title: Test Log
+  url: https://standards.ieee.org/ieee/829/776/
+- category: testing
+  doc_type_id: ieee829_test_incident
+  notes: Raport zdarzeń wymagających inspekcji
+  required: true
+  title: Test Incident Report
+  url: https://standards.ieee.org/ieee/829/776/
+- category: testing
+  doc_type_id: ieee829_test_summary
+  notes: 'Podsumowanie: ocena testowania vs kryteria'
+  required: true
+  title: Test Summary Report
+  url: https://standards.ieee.org/ieee/829/776/
+- category: testing
+  doc_type_id: ieee829_transmittal
+  notes: Raport przekazania elementów do testowania
+  required: false
+  title: Test Item Transmittal Report
+  url: https://standards.ieee.org/ieee/829/776/
+IEEE 830:
+- category: requirements
+  doc_type_id: ieee830_srs
+  notes: Kompletna specyfikacja wymagań oprogramowania
+  required: true
+  title: Software Requirements Specification
+  url: https://standards.ieee.org/ieee/830/1191/
+- category: requirements
+  doc_type_id: ieee830_srs_prototype
+  notes: Prototyp do wyjaśnienia niejasnych wymagań
+  required: false
+  title: Requirements Prototype
+  url: https://standards.ieee.org/ieee/830/1191/
+ISO 20000-1:
+- category: itsm
+  doc_type_id: iso20000_smp
+  notes: Plan systemu zarządzania usługami
+  required: true
+  title: Service Management Plan (SMP)
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_service_catalog
+  notes: Katalog usług IT
+  required: true
+  title: Service Catalog
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_sla
+  notes: Umowa o poziomie usług
+  required: true
+  title: Service Level Agreement (SLA)
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_incident_record
+  notes: Rekord incydentu usługowego
+  required: true
+  title: Incident Record
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_problem_record
+  notes: Rekord problemu
+  required: true
+  title: Problem Record
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_change_request
+  notes: Wniosek o zmianę
+  required: true
+  title: Change Request
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_change_schedule
+  notes: Harmonogram zmian
+  required: true
+  title: Change Schedule
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_capacity_plan
+  notes: Plan pojemności i wydajności
+  required: false
+  title: Capacity and Performance Plan
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_availability_plan
+  notes: Plan dostępności usług
+  required: false
+  title: Availability Plan
+  url: https://www.iso.org/standard/70636.html
+- category: itsm
+  doc_type_id: iso20000_continuity_plan
+  notes: Plan ciągłości usług IT
+  required: true
+  title: IT Service Continuity Plan
+  url: https://www.iso.org/standard/70636.html
+ISO 22301:
+- category: continuity
+  doc_type_id: iso22301_bcms_policy
+  notes: Polityka systemu zarządzania ciągłością działania
+  required: true
+  title: BCMS Policy
+  url: https://www.iso.org/standard/75106.html
+- category: continuity
+  doc_type_id: iso22301_bia
+  notes: Analiza wpływu na działalność
+  required: true
+  title: Business Impact Analysis (BIA)
+  url: https://www.iso.org/standard/75106.html
+- category: continuity
+  doc_type_id: iso22301_risk_assessment
+  notes: Ocena ryzyka dla ciągłości działania
+  required: true
+  title: Risk Assessment (BCMS)
+  url: https://www.iso.org/standard/75106.html
+- category: continuity
+  doc_type_id: iso22301_bcp
+  notes: Plan ciągłości działania
+  required: true
+  title: Business Continuity Plan (BCP)
+  url: https://www.iso.org/standard/75106.html
+- category: continuity
+  doc_type_id: iso22301_dr_plan
+  notes: Plan odtwarzania po awarii
+  required: true
+  title: Disaster Recovery Plan (DRP)
+  url: https://www.iso.org/standard/75106.html
+- category: continuity
+  doc_type_id: iso22301_crisis_comms
+  notes: Plan komunikacji kryzysowej
+  required: true
+  title: Crisis Communication Plan
+  url: https://www.iso.org/standard/75106.html
+- category: continuity
+  doc_type_id: iso22301_exercise_report
+  notes: Raport z ćwiczeń i testów ciągłości
+  required: true
+  title: Exercise and Testing Report
+  url: https://www.iso.org/standard/75106.html
+- category: continuity
+  doc_type_id: iso22301_internal_audit
+  notes: Raport audytu wewnętrznego BCMS
+  required: true
+  title: BCMS Internal Audit Report
+  url: https://www.iso.org/standard/75106.html
+ISO 9001:
+- category: quality
+  doc_type_id: iso9001_quality_manual
+  notes: Podręcznik systemu zarządzania jakością (opcjonalny ale praktycznie wymagany)
+  required: true
+  title: Quality Manual
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_quality_policy
+  notes: Polityka jakości organizacji (Art. 5.2)
+  required: true
+  title: Quality Policy
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_quality_objectives
+  notes: Cele jakości (Art. 6.2)
+  required: true
+  title: Quality Objectives
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_process_map
+  notes: Mapa procesów QMS
+  required: true
+  title: Process Map / Process Description
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_documented_info
+  notes: Udokumentowane procedury (Art. 7.5)
+  required: true
+  title: Documented Information (Procedures)
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_risk_register
+  notes: Rejestr ryzyk i szans (Art. 6.1)
+  required: true
+  title: Risk and Opportunities Register
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_corrective_action
+  notes: Raport działania korygującego (Art. 10.2)
+  required: true
+  title: Corrective Action Report
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_internal_audit
+  notes: Raport audytu wewnętrznego (Art. 9.2)
+  required: true
+  title: Internal Audit Report
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_mgmt_review
+  notes: Protokół przeglądu zarządzania (Art. 9.3)
+  required: true
+  title: Management Review Minutes
+  url: https://www.iso.org/standard/62085.html
+- category: quality
+  doc_type_id: iso9001_customer_feedback
+  notes: Badanie satysfakcji klienta
+  required: false
+  title: Customer Feedback / Satisfaction
+  url: https://www.iso.org/standard/62085.html
+ISO/IEC 12207:
+- category: requirements
+  doc_type_id: iso12207_software_req_spec
+  notes: Wymagania systemowe oprogramowania
+  required: true
+  title: Software Requirements Specification
+  url: https://www.iso.org/standard/63712.html
+- category: architecture
+  doc_type_id: iso12207_software_arch
+  notes: Architektura komponentów i interfejsów
+  required: true
+  title: Software Architecture Description
+  url: https://www.iso.org/standard/63712.html
+- category: design
+  doc_type_id: iso12207_detailed_design
+  notes: Szczegółowy projekt modułów
+  required: true
+  title: Software Detailed Design
+  url: https://www.iso.org/standard/63712.html
+- category: testing
+  doc_type_id: iso12207_test_plan
+  notes: Plan testowania oprogramowania
+  required: true
+  title: Software Test Plan
+  url: https://www.iso.org/standard/63712.html
+- category: testing
+  doc_type_id: iso12207_test_report
+  notes: Raport wyników testów
+  required: true
+  title: Software Test Report
+  url: https://www.iso.org/standard/63712.html
+- category: process
+  doc_type_id: iso12207_config_mgmt_plan
+  notes: Plan zarządzania konfiguracją
+  required: true
+  title: Configuration Management Plan
+  url: https://www.iso.org/standard/63712.html
+- category: quality
+  doc_type_id: iso12207_qa_plan
+  notes: Plan zapewnienia jakości oprogramowania
+  required: true
+  title: Software Quality Assurance Plan
+  url: https://www.iso.org/standard/63712.html
+- category: process
+  doc_type_id: iso12207_review_record
+  notes: Protokół przeglądu
+  required: true
+  title: Software Review Record
+  url: https://www.iso.org/standard/63712.html
+- category: process
+  doc_type_id: iso12207_change_request
+  notes: Wniosek o zmianę
+  required: true
+  title: Change Request
+  url: https://www.iso.org/standard/63712.html
+- category: process
+  doc_type_id: iso12207_problem_report
+  notes: Raport problemu/defektu
+  required: true
+  title: Problem Report
+  url: https://www.iso.org/standard/63712.html
+- category: process
+  doc_type_id: iso12207_maintenance_plan
+  notes: Plan konserwacji i wsparcia
+  required: false
+  title: Software Maintenance Plan
+  url: https://www.iso.org/standard/63712.html
+- category: documentation
+  doc_type_id: iso12207_user_docs
+  notes: Dokumentacja użytkownika końcowego
+  required: true
+  title: User Documentation
+  url: https://www.iso.org/standard/63712.html
+- category: operations
+  doc_type_id: iso12207_deployment_plan
+  notes: Plan wdrożenia/instalacji
+  required: false
+  title: Deployment/Installation Plan
+  url: https://www.iso.org/standard/63712.html
+ISO/IEC 15288:
+- category: requirements
+  doc_type_id: iso15288_conops
+  notes: Koncepcja działania systemu
+  required: true
+  title: Concept of Operations (ConOps)
+  url: https://www.iso.org/standard/63711.html
+- category: requirements
+  doc_type_id: iso15288_sys_req_spec
+  notes: Wymagania systemu
+  required: true
+  title: System Requirements Specification
+  url: https://www.iso.org/standard/63711.html
+- category: architecture
+  doc_type_id: iso15288_sys_arch
+  notes: Architektura systemu — elementy i interfejsy
+  required: true
+  title: System Architecture Description
+  url: https://www.iso.org/standard/63711.html
+- category: testing
+  doc_type_id: iso15288_integration_plan
+  notes: Plan integracji podsystemów
+  required: true
+  title: System Integration Plan
+  url: https://www.iso.org/standard/63711.html
+- category: testing
+  doc_type_id: iso15288_verification_plan
+  notes: Plan weryfikacji wymagań systemowych
+  required: true
+  title: System Verification Plan
+  url: https://www.iso.org/standard/63711.html
+- category: testing
+  doc_type_id: iso15288_validation_plan
+  notes: Plan walidacji systemu w środowisku docelowym
+  required: true
+  title: System Validation Plan
+  url: https://www.iso.org/standard/63711.html
+- category: operations
+  doc_type_id: iso15288_maintenance_plan
+  notes: Plan konserwacji systemu
+  required: false
+  title: System Maintenance Plan
+  url: https://www.iso.org/standard/63711.html
+- category: operations
+  doc_type_id: iso15288_disposal_plan
+  notes: Plan wycofania systemu z eksploatacji
+  required: false
+  title: System Disposal Plan
+  url: https://www.iso.org/standard/63711.html
+ISO/IEC 20546:
+- category: data
+  doc_type_id: iso20546_bd_arch
+  notes: Opis architektury Big Data
+  required: true
+  title: Big Data Architecture Description
+  url: https://www.iso.org/standard/68305.html
+- category: data
+  doc_type_id: iso20546_data_governance
+  notes: Polityka ładu danych
+  required: true
+  title: Data Governance Policy
+  url: https://www.iso.org/standard/68305.html
+- category: data
+  doc_type_id: iso20546_data_dictionary
+  notes: Słownik danych
+  required: true
+  title: Data Dictionary
+  url: https://www.iso.org/standard/68305.html
+- category: data
+  doc_type_id: iso20546_data_quality
+  notes: Framework jakości danych
+  required: false
+  title: Data Quality Framework
+  url: https://www.iso.org/standard/68305.html
+ISO/IEC 23053:
+- category: ai
+  doc_type_id: iso23053_ml_system_arch
+  notes: Opis architektury systemu uczenia maszynowego
+  required: true
+  title: ML System Architecture Description
+  url: https://www.iso.org/standard/74438.html
+- category: ai
+  doc_type_id: iso23053_model_card
+  notes: 'Karta modelu ML: cel, dane, ograniczenia'
+  required: true
+  title: Model Card / Model Documentation
+  url: https://www.iso.org/standard/74438.html
+- category: ai
+  doc_type_id: iso23053_data_spec
+  notes: Specyfikacja danych treningowych
+  required: true
+  title: Training Data Specification
+  url: https://www.iso.org/standard/74438.html
+- category: ai
+  doc_type_id: iso23053_eval_plan
+  notes: Plan ewaluacji modelu ML
+  required: true
+  title: ML Model Evaluation Plan
+  url: https://www.iso.org/standard/74438.html
+ISO/IEC 25010:
+- category: quality
+  doc_type_id: iso25010_quality_requirements
+  notes: Specyfikacja wymagań jakościowych (8 cech)
+  required: true
+  title: Quality Requirements Specification
+  url: https://www.iso.org/standard/78176.html
+- category: quality
+  doc_type_id: iso25010_quality_model_ref
+  notes: Odniesienie do cech jakości produktu
+  required: false
+  title: Quality Model Reference (per product)
+  url: https://www.iso.org/standard/78176.html
+- category: requirements
+  doc_type_id: iso25010_nfr_specification
+  notes: Specyfikacja wymagań niefunkcjonalnych
+  required: true
+  title: Non-Functional Requirements Spec
+  url: https://www.iso.org/standard/78176.html
+ISO/IEC 25040:
+- category: quality
+  doc_type_id: iso25040_eval_plan
+  notes: Plan oceny jakości produktu
+  required: true
+  title: Evaluation Plan
+  url: https://www.iso.org/standard/35747.html
+- category: quality
+  doc_type_id: iso25040_eval_specification
+  notes: Specyfikacja oceny — kryteria, miary
+  required: true
+  title: Evaluation Specification
+  url: https://www.iso.org/standard/35747.html
+- category: quality
+  doc_type_id: iso25040_eval_report
+  notes: Raport z oceny jakości produktu
+  required: true
+  title: Evaluation Report
+  url: https://www.iso.org/standard/35747.html
+ISO/IEC 27001:
+- category: security
+  doc_type_id: iso27001_isms_scope
+  notes: Zakres ISMS (Art. 4.3)
+  required: true
+  title: ISMS Scope Statement
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_risk_assessment
+  notes: Ocena ryzyka bezpieczeństwa informacji (Art. 6.1)
+  required: true
+  title: Information Security Risk Assessment
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_risk_treatment
+  notes: Plan postępowania z ryzykiem
+  required: true
+  title: Risk Treatment Plan
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_soa
+  notes: Deklaracja stosowalności zabezpieczeń Annex A
+  required: true
+  title: Statement of Applicability (SoA)
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_isms_policy
+  notes: Polityka bezpieczeństwa informacji
+  required: true
+  title: Information Security Policy
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_asset_inventory
+  notes: Inwentaryzacja aktywów informacyjnych
+  required: true
+  title: Information Asset Inventory
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_internal_audit
+  notes: Raport audytu wewnętrznego ISMS (Art. 9.2)
+  required: true
+  title: ISMS Internal Audit Report
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_mgmt_review
+  notes: Protokół przeglądu zarządzania ISMS (Art. 9.3)
+  required: true
+  title: Management Review Minutes (ISMS)
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_corrective_action
+  notes: Zapis działania korygującego (Art. 10.1)
+  required: true
+  title: Corrective Action Record (ISMS)
+  url: https://www.iso.org/standard/27001
+- category: security
+  doc_type_id: iso27001_objectives
+  notes: Cele bezpieczeństwa informacji (Art. 6.2)
+  required: true
+  title: Information Security Objectives
+  url: https://www.iso.org/standard/27001
+ISO/IEC 27002:
+- category: security
+  doc_type_id: iso27002_access_policy
+  notes: Polityka kontroli dostępu
+  required: true
+  title: Access Control Policy
+  url: https://www.iso.org/standard/75652.html
+- category: security
+  doc_type_id: iso27002_crypto_policy
+  notes: Polityka kryptografii
+  required: true
+  title: Cryptography Policy
+  url: https://www.iso.org/standard/75652.html
+- category: security
+  doc_type_id: iso27002_asset_mgmt_policy
+  notes: Polityka zarządzania aktywami
+  required: true
+  title: Asset Management Policy
+  url: https://www.iso.org/standard/75652.html
+- category: security
+  doc_type_id: iso27002_supplier_policy
+  notes: Polityka bezpieczeństwa dostawców
+  required: true
+  title: Supplier Security Policy
+  url: https://www.iso.org/standard/75652.html
+- category: security
+  doc_type_id: iso27002_incident_proc
+  notes: Procedura zarządzania incydentami
+  required: true
+  title: Incident Management Procedure
+  url: https://www.iso.org/standard/75652.html
+- category: security
+  doc_type_id: iso27002_audit_log_policy
+  notes: Polityka dzienników audytu
+  required: true
+  title: Audit Logging Policy
+  url: https://www.iso.org/standard/75652.html
+- category: security
+  doc_type_id: iso27002_security_awareness
+  notes: Plan szkoleń z bezpieczeństwa
+  required: true
+  title: Security Awareness Training Plan
+  url: https://www.iso.org/standard/75652.html
+ISO/IEC 27005:
+- category: security
+  doc_type_id: iso27005_risk_context
+  notes: Kontekst zarządzania ryzykiem
+  required: true
+  title: Risk Management Context
+  url: https://www.iso.org/standard/80585.html
+- category: security
+  doc_type_id: iso27005_risk_register
+  notes: Rejestr ryzyk bezpieczeństwa
+  required: true
+  title: Information Security Risk Register
+  url: https://www.iso.org/standard/80585.html
+- category: security
+  doc_type_id: iso27005_risk_assessment_rpt
+  notes: Raport z oceny ryzyka
+  required: true
+  title: Risk Assessment Report
+  url: https://www.iso.org/standard/80585.html
+- category: security
+  doc_type_id: iso27005_risk_treatment_plan
+  notes: Plan postępowania z ryzykami
+  required: true
+  title: Risk Treatment Plan
+  url: https://www.iso.org/standard/80585.html
+- category: security
+  doc_type_id: iso27005_monitoring_report
+  notes: Raport monitorowania i przeglądu ryzyk
+  required: true
+  title: Risk Monitoring and Review Report
+  url: https://www.iso.org/standard/80585.html
+ISO/IEC 27017:
+- category: cloud
+  doc_type_id: iso27017_cloud_security_policy
+  notes: Polityka bezpieczeństwa usług chmurowych
+  required: true
+  title: Cloud Security Policy
+  url: https://www.iso.org/standard/43757.html
+- category: cloud
+  doc_type_id: iso27017_shared_responsibility
+  notes: Macierz odpowiedzialności dostawca/klient chmury
+  required: true
+  title: Shared Responsibility Matrix
+  url: https://www.iso.org/standard/43757.html
+- category: cloud
+  doc_type_id: iso27017_cloud_asset_inv
+  notes: Inwentaryzacja zasobów w chmurze
+  required: true
+  title: Cloud Asset Inventory
+  url: https://www.iso.org/standard/43757.html
+- category: cloud
+  doc_type_id: iso27017_virtual_env_policy
+  notes: Polityka bezpieczeństwa środowisk wirtualnych
+  required: true
+  title: Virtual Environment Security Policy
+  url: https://www.iso.org/standard/43757.html
+ISO/IEC 27018:
+- category: privacy
+  doc_type_id: iso27018_pii_policy
+  notes: Polityka ochrony danych osobowych w chmurze
+  required: true
+  title: PII Protection Policy (Cloud)
+  url: https://www.iso.org/standard/76559.html
+- category: privacy
+  doc_type_id: iso27018_consent_mgmt
+  notes: Procedura zarządzania zgodami
+  required: true
+  title: Consent Management Procedure
+  url: https://www.iso.org/standard/76559.html
+- category: privacy
+  doc_type_id: iso27018_pii_inventory
+  notes: Inwentaryzacja danych osobowych w chmurze
+  required: true
+  title: PII Inventory (Cloud)
+  url: https://www.iso.org/standard/76559.html
+- category: privacy
+  doc_type_id: iso27018_incident_notify
+  notes: Procedura powiadamiania o incydentach PII
+  required: true
+  title: PII Incident Notification Procedure
+  url: https://www.iso.org/standard/76559.html
+ISO/IEC 27035:
+- category: security
+  doc_type_id: iso27035_incident_policy
+  notes: Polityka zarządzania incydentami bezpieczeństwa
+  required: true
+  title: Information Security Incident Policy
+  url: https://www.iso.org/standard/74598.html
+- category: security
+  doc_type_id: iso27035_incident_plan
+  notes: Plan reagowania na incydenty bezpieczeństwa
+  required: true
+  title: Incident Response Plan
+  url: https://www.iso.org/standard/74598.html
+- category: security
+  doc_type_id: iso27035_incident_log
+  notes: Dziennik incydentów bezpieczeństwa
+  required: true
+  title: Incident Log
+  url: https://www.iso.org/standard/74598.html
+- category: security
+  doc_type_id: iso27035_incident_report
+  notes: Raport z dochodzenia po incydencie
+  required: true
+  title: Incident Investigation Report
+  url: https://www.iso.org/standard/74598.html
+- category: security
+  doc_type_id: iso27035_lessons_learned
+  notes: Raport wniosków po incydencie
+  required: true
+  title: Lessons Learned Report (Incident)
+  url: https://www.iso.org/standard/74598.html
+ISO/IEC 27701:
+- category: privacy
+  doc_type_id: iso27701_pims_policy
+  notes: Polityka zarządzania informacjami o prywatności
+  required: true
+  title: Privacy Information Management Policy
+  url: https://www.iso.org/standard/71671.html
+- category: privacy
+  doc_type_id: iso27701_pii_processing
+  notes: Rejestr operacji przetwarzania danych osobowych
+  required: true
+  title: PII Processing Register
+  url: https://www.iso.org/standard/71671.html
+- category: privacy
+  doc_type_id: iso27701_privacy_notice
+  notes: Informacja/polityka prywatności dla osób
+  required: true
+  title: Privacy Notice / Privacy Policy
+  url: https://www.iso.org/standard/71671.html
+- category: privacy
+  doc_type_id: iso27701_dpia
+  notes: Ocena skutków dla ochrony danych
+  required: true
+  title: Data Protection Impact Assessment
+  url: https://www.iso.org/standard/71671.html
+- category: privacy
+  doc_type_id: iso27701_dpa_agreement
+  notes: Umowa powierzenia przetwarzania danych
+  required: true
+  title: Data Processing Agreement (DPA)
+  url: https://www.iso.org/standard/71671.html
+ISO/IEC 29110:
+- category: process
+  doc_type_id: iso29110_project_plan
+  notes: Plan projektu dla małej jednostki (VSE)
+  required: true
+  title: Project Plan
+  url: https://www.iso.org/standard/74590.html
+- category: requirements
+  doc_type_id: iso29110_req_spec
+  notes: Specyfikacja wymagań
+  required: true
+  title: Software Requirements Specification
+  url: https://www.iso.org/standard/74590.html
+- category: process
+  doc_type_id: iso29110_config_log
+  notes: Dziennik zarządzania konfiguracją
+  required: true
+  title: Configuration Log
+  url: https://www.iso.org/standard/74590.html
+- category: testing
+  doc_type_id: iso29110_acceptance_criteria
+  notes: Kryteria akceptacji
+  required: true
+  title: Acceptance Criteria
+  url: https://www.iso.org/standard/74590.html
+- category: process
+  doc_type_id: iso29110_progress_report
+  notes: Raport postępu projektu
+  required: true
+  title: Progress Status Report
+  url: https://www.iso.org/standard/74590.html
+- category: process
+  doc_type_id: iso29110_delivery_record
+  notes: Protokół odbioru/dostarczenia
+  required: true
+  title: Delivery Record
+  url: https://www.iso.org/standard/74590.html
+ISO/IEC 38500:
+- category: governance
+  doc_type_id: iso38500_it_governance_policy
+  notes: Polityka ładu informatycznego organizacji
+  required: true
+  title: IT Governance Policy
+  url: https://www.iso.org/standard/62816.html
+- category: governance
+  doc_type_id: iso38500_it_strategy
+  notes: Strategia IT
+  required: true
+  title: IT Strategy
+  url: https://www.iso.org/standard/62816.html
+- category: governance
+  doc_type_id: iso38500_it_portfolio
+  notes: Portfel IT / plan inwestycji
+  required: false
+  title: IT Portfolio / Investment Plan
+  url: https://www.iso.org/standard/62816.html
+- category: governance
+  doc_type_id: iso38500_perf_report
+  notes: Raport wydajności IT
+  required: false
+  title: IT Performance Report
+  url: https://www.iso.org/standard/62816.html
+ISO/IEC 42001:
+- category: ai
+  doc_type_id: iso42001_aims_policy
+  notes: Polityka zarządzania sztuczną inteligencją
+  required: true
+  title: AI Policy
+  url: https://www.iso.org/standard/81230.html
+- category: ai
+  doc_type_id: iso42001_ai_risk_assessment
+  notes: Ocena ryzyk związanych z AI
+  required: true
+  title: AI Risk Assessment
+  url: https://www.iso.org/standard/81230.html
+- category: ai
+  doc_type_id: iso42001_ai_impact_assessment
+  notes: Ocena wpływu systemu AI na osoby i społeczeństwo
+  required: true
+  title: AI Impact Assessment (AIIA)
+  url: https://www.iso.org/standard/81230.html
+- category: ai
+  doc_type_id: iso42001_ai_incident_log
+  notes: Dziennik incydentów systemów AI
+  required: true
+  title: AI Incident Log
+  url: https://www.iso.org/standard/81230.html
+- category: ai
+  doc_type_id: iso42001_ai_governance
+  notes: Framework zarządzania AI w organizacji
+  required: true
+  title: AI Governance Framework
+  url: https://www.iso.org/standard/81230.html
+- category: ai
+  doc_type_id: iso42001_objectives
+  notes: Cele AIMS (Art. 6.2)
+  required: true
+  title: AI Objectives
+  url: https://www.iso.org/standard/81230.html
+ITIL 4:
+- category: itsm
+  doc_type_id: itil4_service_catalog
+  notes: Katalog usług IT
+  required: true
+  title: Service Catalog
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_service_design
+  notes: Pakiet projektowania usługi
+  required: true
+  title: Service Design Package
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_sla
+  notes: Umowa o poziomie usług
+  required: true
+  title: Service Level Agreement (SLA)
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_ola
+  notes: Umowa operacyjna między wewnętrznymi działami
+  required: false
+  title: Operational Level Agreement (OLA)
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_incident_record
+  notes: Rekord incydentu
+  required: true
+  title: Incident Record
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_problem_record
+  notes: Rekord problemu
+  required: true
+  title: Problem Record
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_change_request
+  notes: Wniosek o zmianę
+  required: true
+  title: Change Request
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_cmdb
+  notes: Baza danych zarządzania konfiguracją
+  required: true
+  title: Configuration Management Database (CMDB)
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_known_error_record
+  notes: Rekord znanych błędów
+  required: false
+  title: Known Error Record
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_release_plan
+  notes: Plan wydania usługi
+  required: true
+  title: Release Plan
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_service_report
+  notes: Raport wydajności usługi
+  required: true
+  title: Service Performance Report
+  url: https://www.axelos.com/certifications/itil-service-management/
+- category: itsm
+  doc_type_id: itil4_csi_register
+  notes: Rejestr ciągłego doskonalenia
+  required: false
+  title: Continual Improvement Register
+  url: https://www.axelos.com/certifications/itil-service-management/
+NIS2:
+- category: compliance
+  doc_type_id: nis2_security_policy
+  notes: Polityka bezpieczeństwa sieci i systemów informacyjnych
+  required: true
+  title: Network and Information Systems Security Policy
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022L2555
+- category: compliance
+  doc_type_id: nis2_risk_assessment
+  notes: Ocena ryzyka cyberbezpieczeństwa (Art. 21)
+  required: true
+  title: Cybersecurity Risk Assessment (NIS2)
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022L2555
+- category: compliance
+  doc_type_id: nis2_incident_handling
+  notes: Procedury obsługi incydentów
+  required: true
+  title: Incident Handling Procedures (NIS2)
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022L2555
+- category: compliance
+  doc_type_id: nis2_incident_notification
+  notes: Zgłoszenie incydentu do CSIRT/organu (Art. 23)
+  required: true
+  title: Incident Notification Report (NIS2)
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022L2555
+- category: compliance
+  doc_type_id: nis2_bcp
+  notes: Plan ciągłości działania
+  required: true
+  title: Business Continuity Plan (NIS2)
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022L2555
+- category: compliance
+  doc_type_id: nis2_supply_chain_policy
+  notes: Polityka bezpieczeństwa łańcucha dostaw (Art. 21.2.d)
+  required: true
+  title: Supply Chain Security Policy
+  url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022L2555
+NIST CSF:
+- category: security
+  doc_type_id: nistcsf_cyber_policy
+  notes: Polityka cyberbezpieczeństwa organizacji
+  required: true
+  title: Cybersecurity Policy
+  url: https://www.nist.gov/cyberframework
+- category: security
+  doc_type_id: nistcsf_asset_inventory
+  notes: Inwentaryzacja aktywów (IDENTIFY/ID.AM)
+  required: true
+  title: Asset Inventory
+  url: https://www.nist.gov/cyberframework
+- category: security
+  doc_type_id: nistcsf_risk_assessment
+  notes: Ocena ryzyka cyberbezpieczeństwa (IDENTIFY/ID.RA)
+  required: true
+  title: Cybersecurity Risk Assessment
+  url: https://www.nist.gov/cyberframework
+- category: security
+  doc_type_id: nistcsf_incident_response_plan
+  notes: Plan reagowania na incydenty (RESPOND/RS.RP)
+  required: true
+  title: Incident Response Plan
+  url: https://www.nist.gov/cyberframework
+- category: security
+  doc_type_id: nistcsf_recovery_plan
+  notes: Plan odtwarzania (RECOVER/RC.RP)
+  required: true
+  title: Cybersecurity Recovery Plan
+  url: https://www.nist.gov/cyberframework
+- category: security
+  doc_type_id: nistcsf_access_control
+  notes: Polityka kontroli dostępu (PROTECT/PR.AC)
+  required: true
+  title: Access Control Policy
+  url: https://www.nist.gov/cyberframework
+- category: security
+  doc_type_id: nistcsf_awareness_training
+  notes: Plan szkoleń z bezpieczeństwa (PROTECT/PR.AT)
+  required: true
+  title: Security Awareness Training Plan
+  url: https://www.nist.gov/cyberframework
+- category: security
+  doc_type_id: nistcsf_data_protection
+  notes: Polityka ochrony danych (PROTECT/PR.DS)
+  required: true
+  title: Data Protection Policy
+  url: https://www.nist.gov/cyberframework
+NIST SP 800-53:
+- category: security
+  doc_type_id: nist80053_security_plan
+  notes: Plan bezpieczeństwa systemu (kontrola PL-2)
+  required: true
+  title: System Security Plan (SSP)
+  url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+- category: privacy
+  doc_type_id: nist80053_privacy_plan
+  notes: Plan prywatności systemu
+  required: true
+  title: Privacy Plan
+  url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+- category: security
+  doc_type_id: nist80053_poam
+  notes: Plan działań i kamieni milowych — śledzenie remediacji
+  required: true
+  title: Plan of Action and Milestones (POA&M)
+  url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+- category: security
+  doc_type_id: nist80053_sar
+  notes: Raport oceny bezpieczeństwa
+  required: true
+  title: Security Assessment Report (SAR)
+  url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+- category: security
+  doc_type_id: nist80053_ato
+  notes: Autoryzacja do działania — decyzja organu
+  required: true
+  title: Authorization to Operate (ATO)
+  url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+- category: security
+  doc_type_id: nist80053_ir_plan
+  notes: Plan reagowania na incydenty (IR-8)
+  required: true
+  title: Incident Response Plan
+  url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+- category: security
+  doc_type_id: nist80053_contingency_plan
+  notes: Plan awaryjny (CP-2)
+  required: true
+  title: Contingency Plan
+  url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+- category: security
+  doc_type_id: nist80053_config_mgmt_plan
+  notes: Plan zarządzania konfiguracją (CM-9)
+  required: true
+  title: Configuration Management Plan (ISCM)
+  url: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+OWASP ASVS:
+- category: security
+  doc_type_id: asvs_threat_model
+  notes: Model zagrożeń aplikacji (V1.1)
+  required: true
+  title: Threat Model
+  url: https://owasp.org/www-project-application-security-verification-standard/
+- category: security
+  doc_type_id: asvs_security_req_spec
+  notes: Specyfikacja wymagań bezpieczeństwa
+  required: true
+  title: Security Requirements Specification
+  url: https://owasp.org/www-project-application-security-verification-standard/
+- category: security
+  doc_type_id: asvs_sec_design_doc
+  notes: Dokumentacja bezpiecznej architektury
+  required: true
+  title: Secure Architecture & Design Doc
+  url: https://owasp.org/www-project-application-security-verification-standard/
+- category: security
+  doc_type_id: asvs_auth_design
+  notes: Projekt uwierzytelniania i sesji (V2, V3)
+  required: true
+  title: Authentication & Session Design
+  url: https://owasp.org/www-project-application-security-verification-standard/
+- category: security
+  doc_type_id: asvs_cryptography_policy
+  notes: Polityka kryptografii na poziomie aplikacji (V6)
+  required: true
+  title: Cryptography Policy (App Level)
+  url: https://owasp.org/www-project-application-security-verification-standard/
+- category: security
+  doc_type_id: asvs_error_handling
+  notes: Projekt obsługi błędów i logowania (V7, V8)
+  required: true
+  title: Error Handling & Logging Design
+  url: https://owasp.org/www-project-application-security-verification-standard/
+- category: security
+  doc_type_id: asvs_api_security_design
+  notes: Projekt bezpieczeństwa API (V14)
+  required: true
+  title: API Security Design
+  url: https://owasp.org/www-project-application-security-verification-standard/
+OWASP MASVS:
+- category: security
+  doc_type_id: masvs_mobile_threat_model
+  notes: Model zagrożeń aplikacji mobilnej
+  required: true
+  title: Mobile Threat Model
+  url: https://mas.owasp.org/MASVS/
+- category: security
+  doc_type_id: masvs_mobile_sec_req
+  notes: Wymagania bezpieczeństwa aplikacji mobilnej
+  required: true
+  title: Mobile Security Requirements
+  url: https://mas.owasp.org/MASVS/
+- category: security
+  doc_type_id: masvs_data_storage_design
+  notes: Projekt bezpiecznego przechowywania danych (MASVS-STORAGE)
+  required: true
+  title: Secure Data Storage Design (Mobile)
+  url: https://mas.owasp.org/MASVS/
+- category: security
+  doc_type_id: masvs_network_security_design
+  notes: Projekt bezpieczeństwa sieci mobilnej (MASVS-NETWORK)
+  required: true
+  title: Network Security Design (Mobile)
+  url: https://mas.owasp.org/MASVS/
+- category: security
+  doc_type_id: masvs_platform_interaction
+  notes: Projekt bezpieczeństwa interakcji z platformą
+  required: true
+  title: Platform Interaction Security Design
+  url: https://mas.owasp.org/MASVS/
+- category: security
+  doc_type_id: masvs_code_quality
+  notes: Projekt jakości kodu i odporności (MASVS-RESILIENCE)
+  required: true
+  title: Code Quality and Resilience Design
+  url: https://mas.owasp.org/MASVS/
+OpenAPI 3.x:
+- category: api
+  doc_type_id: openapi_spec
+  notes: Specyfikacja API w formacie OpenAPI 3.x (YAML/JSON)
+  required: true
+  title: OpenAPI Specification Document
+  url: https://spec.openapis.org/oas/v3.1.0
+- category: api
+  doc_type_id: openapi_api_design_guide
+  notes: Przewodnik projektowania API (konwencje, wersjonowanie)
+  required: false
+  title: API Design Guide
+  url: https://spec.openapis.org/oas/v3.1.0
+- category: api
+  doc_type_id: openapi_changelog
+  notes: Historia zmian API
+  required: false
+  title: API Changelog
+  url: https://spec.openapis.org/oas/v3.1.0
+- category: api
+  doc_type_id: openapi_auth_doc
+  notes: Dokumentacja uwierzytelniania API
+  required: true
+  title: API Authentication Documentation
+  url: https://spec.openapis.org/oas/v3.1.0
+PCI DSS:
+- category: compliance
+  doc_type_id: pcidss_cde_diagram
+  notes: Diagram środowiska danych posiadacza karty (Req. 1)
+  required: true
+  title: Cardholder Data Environment (CDE) Diagram
+  url: https://www.pcisecuritystandards.org/
+- category: compliance
+  doc_type_id: pcidss_network_diagram
+  notes: Diagram sieci ze wskazaniem przepływu danych kart
+  required: true
+  title: Network Diagram (PCI DSS)
+  url: https://www.pcisecuritystandards.org/
+- category: compliance
+  doc_type_id: pcidss_security_policy
+  notes: Polityka bezpieczeństwa informacji (Req. 12)
+  required: true
+  title: Information Security Policy (PCI DSS)
+  url: https://www.pcisecuritystandards.org/
+- category: compliance
+  doc_type_id: pcidss_vulnerability_scan
+  notes: Raport skanowania podatności (Req. 11)
+  required: true
+  title: Vulnerability Scan Report
+  url: https://www.pcisecuritystandards.org/
+- category: compliance
+  doc_type_id: pcidss_pentest_report
+  notes: Raport testów penetracyjnych (Req. 11.3)
+  required: true
+  title: Penetration Test Report (PCI DSS)
+  url: https://www.pcisecuritystandards.org/
+- category: compliance
+  doc_type_id: pcidss_change_control
+  notes: Procedura kontroli zmian (Req. 6.4)
+  required: true
+  title: Change Control Procedure
+  url: https://www.pcisecuritystandards.org/
+- category: compliance
+  doc_type_id: pcidss_access_control_policy
+  notes: Polityka kontroli dostępu (Req. 7, 8)
+  required: true
+  title: Access Control Policy (PCI DSS)
+  url: https://www.pcisecuritystandards.org/
+- category: compliance
+  doc_type_id: pcidss_roc
+  notes: Raport zgodności PCI DSS (QSA assessment)
+  required: true
+  title: Report on Compliance (RoC)
+  url: https://www.pcisecuritystandards.org/
+- category: compliance
+  doc_type_id: pcidss_saq
+  notes: Kwestionariusz samooceny
+  required: true
+  title: Self-Assessment Questionnaire (SAQ)
+  url: https://www.pcisecuritystandards.org/
+PMBOK 7:
+- category: project_mgmt
+  doc_type_id: pmbok7_project_charter
+  notes: Karta projektu
+  required: true
+  title: Project Charter
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_scope_baseline
+  notes: Linia bazowa zakresu
+  required: true
+  title: Scope Baseline (WBS + WBS Dict + Scope Stmt)
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_schedule_baseline
+  notes: Linia bazowa harmonogramu
+  required: true
+  title: Schedule Baseline
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_cost_baseline
+  notes: Linia bazowa kosztów
+  required: true
+  title: Cost Baseline
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_quality_mgmt_plan
+  notes: Plan zarządzania jakością projektu
+  required: true
+  title: Quality Management Plan
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_risk_register
+  notes: Rejestr ryzyk projektu
+  required: true
+  title: Risk Register
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_stakeholder_register
+  notes: Rejestr interesariuszy
+  required: true
+  title: Stakeholder Register
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_comms_mgmt_plan
+  notes: Plan zarządzania komunikacją
+  required: true
+  title: Communications Management Plan
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_change_log
+  notes: Dziennik zmian projektu
+  required: true
+  title: Change Log
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_issue_log
+  notes: Dziennik problemów/zagadnień
+  required: true
+  title: Issue Log
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_lessons_learned
+  notes: Rejestr wniosków z projektu
+  required: true
+  title: Lessons Learned Register
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_project_mgmt_plan
+  notes: Plan zarządzania projektem (integralny)
+  required: true
+  title: Project Management Plan
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_status_report
+  notes: Raport statusu projektu
+  required: false
+  title: Project Status Report
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+- category: project_mgmt
+  doc_type_id: pmbok7_procurement_docs
+  notes: Dokumenty zamówień
+  required: false
+  title: Procurement Documents
+  url: https://www.pmi.org/pmbok-guide-standards/foundational/pmbok
+PRINCE2 7:
+- category: project_mgmt
+  doc_type_id: prince2_project_brief
+  notes: Krótki opis projektu (pre-initiation)
+  required: true
+  title: Project Brief
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_pid
+  notes: Dokumentacja inicjalizacji projektu
+  required: true
+  title: Project Initiation Documentation (PID)
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_business_case
+  notes: Uzasadnienie biznesowe projektu
+  required: true
+  title: Business Case
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_risk_register
+  notes: Rejestr ryzyk PRINCE2
+  required: true
+  title: Risk Register
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_quality_register
+  notes: Rejestr jakości
+  required: true
+  title: Quality Register
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_issue_register
+  notes: Rejestr zagadnień
+  required: true
+  title: Issue Register
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_lessons_log
+  notes: Dziennik wniosków
+  required: true
+  title: Lessons Log
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_product_desc
+  notes: Opis produktu
+  required: true
+  title: Product Description
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_stage_plan
+  notes: Plan etapu
+  required: true
+  title: Stage Plan
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_end_project_report
+  notes: Raport zamknięcia projektu
+  required: true
+  title: End Project Report
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_highlight_report
+  notes: Raport wyróżnień (periody)
+  required: true
+  title: Highlight Report
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+- category: project_mgmt
+  doc_type_id: prince2_exception_report
+  notes: Raport wyjątku
+  required: true
+  title: Exception Report
+  url: https://www.axelos.com/certifications/propath/prince2-project-management/
+SAFe 6.0:
+- category: agile
+  doc_type_id: safe_pi_plan
+  notes: Wejścia do planowania Przyrostu Programu
+  required: true
+  title: PI Planning Inputs (Vision, Backlog)
+  url: https://scaledagileframework.com/pi-planning/
+- category: agile
+  doc_type_id: safe_pi_objectives
+  notes: Cele PI per zespół i ART
+  required: true
+  title: PI Objectives
+  url: https://scaledagileframework.com/pi-objectives/
+- category: agile
+  doc_type_id: safe_team_iteration_plan
+  notes: Plan iteracji zespołu
+  required: true
+  title: Team Iteration Plan
+  url: https://scaledagileframework.com/iteration-planning/
+- category: agile
+  doc_type_id: safe_system_demo
+  notes: Demonstracja systemu na poziomie ART
+  required: true
+  title: System Demo
+  url: https://scaledagileframework.com/system-demo/
+- category: agile
+  doc_type_id: safe_inspect_adapt
+  notes: Raport I&A — retrospektywa PI
+  required: true
+  title: Inspect and Adapt Report
+  url: https://scaledagileframework.com/inspect-and-adapt/
+- category: agile
+  doc_type_id: safe_arch_runway
+  notes: Dokumentacja pasa startowego architektury
+  required: false
+  title: Architectural Runway Documentation
+  url: https://scaledagileframework.com/architectural-runway/
+- category: agile
+  doc_type_id: safe_value_stream_mapping
+  notes: Mapowanie strumienia wartości
+  required: false
+  title: Value Stream Mapping
+  url: https://scaledagileframework.com/value-streams/
+- category: agile
+  doc_type_id: safe_portfolio_kanban
+  notes: Portfolio Kanban — pipeline epics
+  required: false
+  title: Portfolio Kanban
+  url: https://scaledagileframework.com/portfolio-kanban/
+SCRUM Guide:
+- category: agile
+  doc_type_id: scrum_product_backlog
+  notes: Zaległości produktu — uporządkowana lista pracy
+  required: true
+  title: Product Backlog
+  url: https://scrumguides.org/
+- category: agile
+  doc_type_id: scrum_sprint_backlog
+  notes: Zaległości sprintu — plan sprintu + backlog
+  required: true
+  title: Sprint Backlog
+  url: https://scrumguides.org/
+- category: agile
+  doc_type_id: scrum_increment
+  notes: Przyrost — działający produkt po sprincie
+  required: true
+  title: Increment
+  url: https://scrumguides.org/
+- category: agile
+  doc_type_id: scrum_definition_of_done
+  notes: Definicja Ukończenia
+  required: true
+  title: Definition of Done (DoD)
+  url: https://scrumguides.org/
+- category: agile
+  doc_type_id: scrum_sprint_goal
+  notes: Cel sprintu
+  required: true
+  title: Sprint Goal
+  url: https://scrumguides.org/
+- category: agile
+  doc_type_id: scrum_product_goal
+  notes: Cel produktu
+  required: true
+  title: Product Goal
+  url: https://scrumguides.org/
+- category: agile
+  doc_type_id: scrum_sprint_review_notes
+  notes: Notatki z przeglądu sprintu
+  required: false
+  title: Sprint Review Notes
+  url: https://scrumguides.org/
+- category: agile
+  doc_type_id: scrum_sprint_retro_notes
+  notes: Notatki z retrospektywy sprintu
+  required: false
+  title: Sprint Retrospective Notes
+  url: https://scrumguides.org/
+SOC 2:
+- category: compliance
+  doc_type_id: soc2_security_policy
+  notes: Polityka bezpieczeństwa wg. Trust Service Criteria
+  required: true
+  title: Security Policy (SOC 2 TSC)
+  url: https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/socforserviceorganizations.html
+- category: compliance
+  doc_type_id: soc2_availability_policy
+  notes: Polityka dostępności
+  required: true
+  title: Availability Policy
+  url: https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/socforserviceorganizations.html
+- category: compliance
+  doc_type_id: soc2_processing_integrity
+  notes: Polityka integralności przetwarzania
+  required: false
+  title: Processing Integrity Policy
+  url: https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/socforserviceorganizations.html
+- category: compliance
+  doc_type_id: soc2_confidentiality_policy
+  notes: Polityka poufności
+  required: true
+  title: Confidentiality Policy
+  url: https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/socforserviceorganizations.html
+- category: compliance
+  doc_type_id: soc2_control_description
+  notes: Opis systemu i kontroli (sekcja 3 raportu SOC 2)
+  required: true
+  title: System Description & Controls
+  url: https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/socforserviceorganizations.html
+- category: compliance
+  doc_type_id: soc2_risk_assessment
+  notes: Ocena ryzyka per TSC
+  required: true
+  title: Risk Assessment (SOC 2)
+  url: https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/socforserviceorganizations.html
+- category: compliance
+  doc_type_id: soc2_vendor_mgmt
+  notes: Polityka zarządzania dostawcami
+  required: true
+  title: Vendor Management Policy
+  url: https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/socforserviceorganizations.html
+TOGAF ADM:
+- category: architecture
+  doc_type_id: togaf_arch_vision
+  notes: Wizja architektoniczna (Phase A)
+  required: true
+  title: Architecture Vision
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_business_arch
+  notes: Architektura biznesowa (Phase B)
+  required: true
+  title: Business Architecture
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_data_arch
+  notes: Architektura danych (Phase C)
+  required: true
+  title: Data Architecture
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_app_arch
+  notes: Architektura aplikacji (Phase C)
+  required: true
+  title: Applications Architecture
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_tech_arch
+  notes: Architektura technologiczna (Phase D)
+  required: true
+  title: Technology Architecture
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_gap_analysis
+  notes: Analiza luk bieżąca vs docelowa architektura
+  required: true
+  title: Gap Analysis
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_migration_plan
+  notes: Plan migracji architektonicznej (Phase F)
+  required: true
+  title: Architecture Migration Plan
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_arch_roadmap
+  notes: Mapa drogowa architektury
+  required: true
+  title: Architecture Roadmap
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_arch_req_spec
+  notes: Specyfikacja wymagań architektonicznych
+  required: true
+  title: Architecture Requirements Specification
+  url: https://www.opengroup.org/togaf/
+- category: architecture
+  doc_type_id: togaf_arch_contract
+  notes: Kontrakt architektoniczny między działami
+  required: false
+  title: Architecture Contract
+  url: https://www.opengroup.org/togaf/

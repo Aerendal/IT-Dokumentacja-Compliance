@@ -146,16 +146,18 @@ def test_catalog_has_multiple_standards():
     assert len(CATALOG) >= 5
 
 
-def test_catalog_each_entry_has_six_fields():
+def test_catalog_each_entry_has_required_fields():
+    required_keys = {"doc_type_id", "title", "required", "category"}
     for code, entries in CATALOG.items():
         for entry in entries:
-            assert len(entry) == 6, f"Entry for {code} has wrong field count: {entry}"
+            missing = required_keys - entry.keys()
+            assert not missing, f"Entry for {code} missing keys: {missing}"
 
 
 def test_catalog_is_required_is_bool():
     for code, entries in CATALOG.items():
         for entry in entries:
-            assert isinstance(entry[2], bool), f"is_required not bool in {code}: {entry}"
+            assert isinstance(entry["required"], bool), f"required not bool in {code}: {entry}"
 
 
 # ── sync_docs_ids: utc_now_iso ────────────────────────────────────────────────
