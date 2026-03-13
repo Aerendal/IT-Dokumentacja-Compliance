@@ -393,6 +393,45 @@ def check(ctx, fix):
             console.print(f"\n[yellow]Użyj --fix aby naprawić automatycznie naprawialne problemy[/yellow]")
 
 
+@cli.command("export")
+@click.argument("export_type", metavar="TYPE",
+                type=click.Choice(["requirements", "module", "sprints"]))
+@click.option("--filter", "-f", "filter_val", default=None,
+              help="Filtr: dla 'requirements' podaj typ (FR/NFR/CR/IR/DR/SR/TR), "
+                   "dla 'module' podaj nazwę modułu")
+@click.option("--output", "-o", default=None, help="Plik wyjściowy .md")
+@click.pass_context
+def export_cmd(ctx, export_type, filter_val, output):
+    """Eksportuj węzły grafu z powrotem do Markdown.
+
+    \b
+    Typy eksportu:
+      requirements  — rejestr wymagań (opcjonalnie --filter FR/NFR/CR/…)
+      module        — spec modułu (wymagaj --filter NazwaModułu)
+      sprints       — plan sprintów z tabelami
+    """
+    from metagraph.core.export import (
+        export_requirements, export_module_spec, export_sprint_plan
+    )
+    with get_conn(ctx.obj["db"]) as conn:
+        if export_type == "requirements":
+            md = export_requirements(conn, req_type=filter_val)
+        elif export_type == "module":
+            if not filter_val:
+                console.print("[red]Podaj nazwę modułu: --filter BriefParser[/red]")
+                return
+            md = export_module_spec(conn, filter_val)
+        elif export_type == "sprints":
+            md = export_sprint_plan(conn)
+
+    if output:
+        Path(output).write_text(md)
+        lines = md.count('\n')
+        console.print(f"[green]✓[/green] Zapisano {lines} linii → {output}")
+    else:
+        console.print(md)
+
+
 @cli.group("db")
 def db_group():
     """Zarządzanie bazą danych."""
