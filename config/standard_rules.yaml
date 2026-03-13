@@ -1,0 +1,364 @@
+# Reguły mapowania słów kluczowych na standardy IT
+# Generowany z: scripts/map_standards_to_docs.py
+
+rules:
+- keywords:
+  - security
+  - bezpiecze
+  - isms
+  - access_control
+  - access control
+  - vulnerability
+  - penetration
+  - pentest
+  - threat
+  - risk
+  - incident
+  - forensic
+  - 'soc '
+  - siem
+  - dlp
+  - encryption
+  - cryptograph
+  - firewall
+  - iam
+  - identity
+  - authentication
+  - authorization
+  - zero_trust
+  - zero trust
+  - hardening
+  standards:
+  - ISO/IEC 27001
+  - ISO/IEC 27002
+  - ISO/IEC 27005
+  - CIS Controls v8
+  - NIST CSF
+- keywords:
+  - api_security
+  - api security
+  - owasp
+  - web_security
+  - application_security
+  - secure_coding
+  - code_review_security
+  - xss
+  - sql_injection
+  - csrf
+  standards:
+  - OWASP ASVS
+  - ISO/IEC 27001
+  - ISO/IEC 27002
+- keywords:
+  - mobile_security
+  - android_security
+  - ios_security
+  - masvs
+  - mstg
+  standards:
+  - OWASP MASVS
+  - ISO/IEC 27001
+- keywords:
+  - cloud
+  - chmura
+  - azure
+  - aws
+  - gcp
+  - kubernetes
+  - container
+  - serverless
+  - saas
+  - paas
+  - iaas
+  standards:
+  - ISO/IEC 27017
+  - ISO/IEC 27018
+  - SOC 2
+  - CIS Controls v8
+- keywords:
+  - privacy
+  - prywatno
+  - gdpr
+  - rodo
+  - personal_data
+  - dane_osobowe
+  - pii
+  - dpia
+  - data_protection
+  - ochrona_danych
+  - consent
+  - anonymiz
+  - pseudonymiz
+  standards:
+  - GDPR / RODO
+  - ISO/IEC 27701
+  - ISO/IEC 27018
+- keywords:
+  - quality
+  - jakosc
+  - test
+  - qa
+  - defect
+  - bug
+  - verification
+  - validation
+  - acceptance
+  - review
+  - inspection
+  - metric
+  - kpi
+  - sla
+  - nfr
+  - non_functional
+  - performance
+  - load_test
+  - stress_test
+  standards:
+  - ISO/IEC 25010
+  - ISO 9001
+  - IEEE 829
+- keywords:
+  - requirement
+  - wymagani
+  - srs
+  - brd
+  - frs
+  - use_case
+  - user_story
+  - backlog
+  - specification
+  standards:
+  - IEEE 830
+  - ISO/IEC 12207
+  - ISO 9001
+- keywords:
+  - design
+  - architecture
+  - architektur
+  - sdd
+  - adr
+  - decision
+  - pattern
+  - uml
+  - diagram
+  - blueprint
+  - solution
+  standards:
+  - IEEE 1016
+  - IEEE 42010
+  - TOGAF ADM
+  - ISO/IEC 15288
+- keywords:
+  - project
+  - projekt
+  - gantt
+  - roadmap
+  - milestone
+  - sprint
+  - scrum
+  - agile
+  - kanban
+  - wbs
+  - charter
+  - kickoff
+  - retrospect
+  - standup
+  - planning
+  standards:
+  - PMBOK 7
+  - PRINCE2 7
+  - SCRUM Guide
+  - ISO/IEC 12207
+- keywords:
+  - product
+  - produkt
+  - vision
+  - wizja
+  - okr
+  - north_star
+  - go_to_market
+  - launch
+  - roadmap
+  standards:
+  - PMBOK 7
+  - SCRUM Guide
+- keywords:
+  - incident_management
+  - problem_management
+  - change_management
+  - service_desk
+  - helpdesk
+  - cmdb
+  - configuration_management
+  - release_management
+  - itsm
+  - servicedesk
+  - service_catalog
+  - sla
+  - escalation
+  - on_call
+  standards:
+  - ITIL 4
+  - ISO 20000-1
+- keywords:
+  - business_continuity
+  - disaster_recovery
+  - bcp
+  - drp
+  - rto
+  - rpo
+  - backup
+  - failover
+  - restore
+  - recovery
+  - ciaglo
+  - bcm
+  standards:
+  - ISO 22301
+  - ISO/IEC 27001
+  - ITIL 4
+- keywords:
+  - devops
+  - ci_cd
+  - cicd
+  - pipeline
+  - deployment
+  - release
+  - infrastructure_as_code
+  - iac
+  - terraform
+  - ansible
+  - gitops
+  - monitoring
+  - observability
+  - alerting
+  - sre
+  - reliability
+  standards:
+  - ISO/IEC 12207
+  - ITIL 4
+  - CIS Controls v8
+- keywords:
+  - machine_learning
+  - deep_learning
+  - ai_
+  - _ai
+  - mlops
+  - model
+  - neural
+  - llm
+  - nlp
+  - computer_vision
+  - dataset
+  - training
+  - inference
+  - bias
+  - fairness
+  - explainab
+  - ai_ethics
+  standards:
+  - ISO/IEC 42001
+  - ISO/IEC 23053
+  - NIST CSF
+- keywords:
+  - data_governance
+  - data_quality
+  - data_catalog
+  - data_lineage
+  - data_warehouse
+  - data_lake
+  - etl
+  - elt
+  - pipeline_data
+  - master_data
+  - metadata
+  - big_data
+  - analytics
+  - bi_
+  standards:
+  - ISO/IEC 20546
+  - ISO 9001
+  - ISO/IEC 25010
+- keywords:
+  - api_design
+  - api_documentation
+  - openapi
+  - swagger
+  - rest_api
+  - graphql
+  - grpc
+  - api_gateway
+  - api_versioning
+  - api_management
+  standards:
+  - OpenAPI 3.x
+  - ISO/IEC 27001
+  - ITIL 4
+- keywords:
+  - payment
+  - platno
+  - pci
+  - card
+  - transaction
+  - billing
+  - fintech
+  - banking
+  - wallet
+  - checkout
+  standards:
+  - PCI DSS
+  - GDPR / RODO
+  - ISO/IEC 27001
+- keywords:
+  - health
+  - medical
+  - clinical
+  - patient
+  - ehr
+  - fhir
+  - hl7
+  - telemedicine
+  - telemedycyn
+  - dicom
+  - hipaa
+  standards:
+  - HL7 FHIR
+  - ISO/IEC 27001
+  - GDPR / RODO
+- keywords:
+  - enterprise_architecture
+  - ea_
+  - _ea_
+  - governance
+  - lad
+  - board
+  - audit
+  - compliance
+  - regulatory
+  - cobit
+  standards:
+  - COBIT 2019
+  - TOGAF ADM
+  - ISO/IEC 38500
+- keywords:
+  - technical_documentation
+  - system_documentation
+  - software_documentation
+  - dokumentacja_techniczna
+  - release_notes
+  - changelog
+  - wiki
+  standards:
+  - ISO/IEC 12207
+  - IEEE 829
+  - ISO 9001
+- keywords:
+  - safe_
+  - agile_at_scale
+  - scaled_agile
+  - pi_planning
+  - art_
+  - portfolio_management
+  standards:
+  - SAFe 6.0
+  - PMBOK 7
