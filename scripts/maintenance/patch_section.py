@@ -1087,59 +1087,54 @@ def report_matrix(
 # ---------------------------------------------------------------------------
 
 
-def run_batch(batch_file: str, global_dry_run: bool, db_path: Optional[Path] = None) -> None:
+
+def _load_batch_file(batch_file: str) -> tuple[list[dict], dict]:
+    """Wczytuje i waliduje plik YAML z operacjami batch. Zwraca (operations, global_vars)."""
     if not YAML_AVAILABLE:
         safe_print(colored("[BŁĄD] Wymagany PyYAML: pip install pyyaml", ANSI_RED))
-        return
+        return [], {}
     if not os.path.exists(batch_file):
         safe_print(colored(f"[BŁĄD] Brak pliku batch: {batch_file}", ANSI_RED))
-        return
-
+        return [], {}
     with open(batch_file, encoding="utf-8") as f:
         batch = yaml.safe_load(f)
-
     global_vars = batch.get("variables", {})
     now_str = datetime.now().strftime("%Y-%m-%d")
     global_vars.setdefault("date", now_str)
     global_vars.setdefault("version", "1.0")
-
     operations = batch.get("operations", [])
     if not operations:
         safe_print("[WARN] Brak operacji w pliku batch.")
-        return
+    return operations, global_vars
 
-    safe_print(f"[INFO] Batch: {len(operations)} operacji z '{batch_file}'")
+
+def _run_batch_operations(
+    operations: list[dict],
+    global_vars: dict,
+    batch_file: str,
+    global_dry_run: bool,
+    db_path: Optional[Path],
+) -> None:
+    """Wykonuje każdą operację z listy batch, loguje rezultat."""
     session_id = timestamp_str()
     prev_modified = -1
-
     for i, op in enumerate(operations, 1):
         safe_print(f"\n{'=' * 60}")
-        safe_print(
-            colored(
-                f"OPERACJA {i}/{len(operations)}: {op.get('action', 'replace')} / {op.get('section', '')}",
-                ANSI_BOLD,
-            )
-        )
+        safe_print(colored(
+            f"OPERACJA {i}/{len(operations)}: {op.get('action', 'replace')} / {op.get('section', '')}",
+            ANSI_BOLD,
+        ))
         safe_print(f"{'=' * 60}")
-
-        stop_if_zero = op.get("stop_if_no_changes", False)
-        if stop_if_zero and prev_modified == 0:
-            safe_print(
-                colored(
-                    "[INFO] Poprzedni krok zmienił 0 plików. Zatrzymanie pipeline.", ANSI_YELLOW
-                )
-            )
+        if op.get("stop_if_no_changes", False) and prev_modified == 0:
+            safe_print(colored("[INFO] Poprzedni krok zmienił 0 plików. Zatrzymanie pipeline.", ANSI_YELLOW))
             break
-
         op_vars = {**global_vars, **op.get("variables", {})}
         content = op.get("content", "")
         if op_vars and content:
             for k, v in op_vars.items():
                 content = content.replace("{{ " + k + " }}", str(v))
-
-        op_dir = op.get("dir", str(DEFAULT_TEMPLATES_DIR))
         result = patch_section(
-            directory=op_dir,
+            directory=op.get("dir", str(DEFAULT_TEMPLATES_DIR)),
             section_name=op.get("section"),
             section_regex=op.get("section_regex"),
             new_content=content,
@@ -1169,8 +1164,16 @@ def run_batch(batch_file: str, global_dry_run: bool, db_path: Optional[Path] = N
             db_path=db_path,
         )
         prev_modified = result.get("stats", {}).get("modified", 0) if result else 0
-
     safe_print(colored(f"\n[OK] Batch '{batch_file}' zakończony. Sesja: {session_id}", ANSI_GREEN))
+
+
+def run_batch(batch_file: str, global_dry_run: bool, db_path: Optional[Path] = None) -> None:
+    """Wczytuje i wykonuje operacje wsadowe z pliku YAML."""
+    operations, global_vars = _load_batch_file(batch_file)
+    if not operations:
+        return
+    safe_print(f"[INFO] Batch: {len(operations)} operacji z '{batch_file}'")
+    _run_batch_operations(operations, global_vars, batch_file, global_dry_run, db_path)
 
 
 # ---------------------------------------------------------------------------
@@ -1197,106 +1200,156 @@ def output_json(result: dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 
 
+
+def _add_target_args(p: argparse.ArgumentParser) -> None:
+    """Argumenty celu: katalog, sekcja, operacja, treść."""
+    p.add_argument("--dir", default=str(DEFAULT_TEMPLATES_DIR), help="Katalog z szablonami")
+    p.add_argument("--db", default=str(DEFAULT_DB_PATH), help="Ścieżka do bazy SQLite (template_changelog)")
+    p.add_argument("--pattern", default="*.md", help="Wzorzec plików (glob)")
+    p.add_argument("--section", help="Dokładna nazwa nagłówka sekcji")
+    p.add_argument("--section-regex", help="Regex dla nazwy nagłówka (zamiast --section)")
+    p.add_argument(
+        "--operation", "--action", dest="operation",
+        choices=VALID_OPERATIONS, default="replace", help="Operacja na sekcji",
+    )
+    p.add_argument("--content", default="", help="Nowa treść sekcji (całkowita podmiana lub append/prepend)")
+    p.add_argument("--old", help="Tekst do znalezienia wewnątrz sekcji (dla --operation replace)")
+    p.add_argument("--new", dest="new_text", default="", help="Tekst zastępujący (dla --operation replace z --old)")
+    p.add_argument("--content-file", help="Plik z nową treścią sekcji (zamiast --content)")
+    p.add_argument("--new-name", help="Nowa nazwa nagłówka (dla --operation rename)")
+    p.add_argument("--wrap-tag", default=">", help="Prefix owijania (dla --operation wrap)")
+    p.add_argument("--level", type=int, help="Poziom nagłówka (1=# 2=## 3=### itd.)")
+
+
+def _add_filter_args(p: argparse.ArgumentParser) -> None:
+    """Argumenty filtrowania plików."""
+    p.add_argument("--only-if-empty", action="store_true", help="Tylko pliki gdzie sekcja jest pusta")
+    p.add_argument("--only-if-missing", action="store_true", help="Tylko pliki bez tej sekcji")
+    p.add_argument("--min-length", type=int, help="Filtruj sekcje krótsze niż N znaków")
+    p.add_argument("--max-length", type=int, help="Filtruj sekcje dłuższe niż N znaków")
+    p.add_argument("--changed-since", type=int, dest="changed_since_days",
+                   help="Tylko pliki zmienione przez Git w ostatnich N dniach")
+    p.add_argument("--only-if-contains", help="Tylko pliki zawierające podany tekst (gdziekolwiek)")
+    p.add_argument("--if-section", help="Filtr warunkowy: nazwa sekcji warunku")
+    p.add_argument("--if-section-contains", help="Filtr warunkowy: sekcja musi zawierać ten tekst")
+
+
+def _add_output_args(p: argparse.ArgumentParser) -> None:
+    """Argumenty wyjścia i zapisu."""
+    p.add_argument("--dry-run", action="store_true", default=False,
+                   help="Tylko podgląd — nie zapisuje zmian (domyślnie: True jeśli brak --apply)")
+    p.add_argument("--apply", action="store_true", help="Zapisz zmiany (bez tego flagi: dry-run)")
+    p.add_argument("--backup", action="store_true", help="Twórz wersjonowane kopie .bak_TIMESTAMP")
+    p.add_argument("--interactive", action="store_true", help="Pytaj przed każdą zmianą")
+    p.add_argument("--diff", action="store_true", help="Pokazuj kolorowany diff przed zapisem")
+    p.add_argument("--snapshot", action="store_true", help="Archiwum ZIP katalogu przed operacją")
+    p.add_argument("--workers", type=int, default=4, help="Liczba równoległych wątków")
+    p.add_argument("--json-output", action="store_true", help="Wynik operacji jako JSON (dla agentów)")
+    p.add_argument("--extract-dir", help="Katalog docelowy dla --operation extract")
+    p.add_argument("--template-vars", nargs="*", metavar="KLUCZ=WARTOSC",
+                   help="Zmienne dla szablonu Jinja2 (np. version=1.2 date=2025-01-01)")
+
+
+def _add_meta_args(p: argparse.ArgumentParser) -> None:
+    """Argumenty meta: audit, batch, undo, raport, wersja."""
+    p.add_argument("--audit-log", default=AUDIT_LOG_FILE, help="Plik JSONL z historią operacji")
+    p.add_argument("--simulate-jsonl", help="Zapisz symulację operacji do JSONL bez wykonywania")
+    p.add_argument("--batch", help="Plik YAML z listą operacji wsadowych")
+    p.add_argument("--undo-session", help="ID sesji do cofnięcia (z patch_audit.jsonl)")
+    p.add_argument("--report-matrix", action="store_true", help="Raport macierzy sekcji w katalogu")
+    p.add_argument("--matrix-csv", help="Eksport macierzy sekcji do CSV")
+    p.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
+
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
+    """Buduje parser argumentów CLI."""
+    p = argparse.ArgumentParser(
         description="Masowa edycja sekcji w plikach Markdown.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("--dir", default=str(DEFAULT_TEMPLATES_DIR), help="Katalog z szablonami")
-    parser.add_argument(
-        "--db", default=str(DEFAULT_DB_PATH), help="Ścieżka do bazy SQLite (template_changelog)"
-    )
-    parser.add_argument("--pattern", default="*.md", help="Wzorzec plików (glob)")
-    parser.add_argument("--section", help="Dokładna nazwa nagłówka sekcji")
-    parser.add_argument("--section-regex", help="Regex dla nazwy nagłówka (zamiast --section)")
-    parser.add_argument(
-        "--operation",
-        "--action",
-        dest="operation",
-        choices=VALID_OPERATIONS,
-        default="replace",
-        help="Operacja na sekcji",
-    )
-    parser.add_argument(
-        "--content", default="", help="Nowa treść sekcji (całkowita podmiana lub append/prepend)"
-    )
-    parser.add_argument(
-        "--old", help="Tekst do znalezienia wewnątrz sekcji (dla --operation replace)"
-    )
-    parser.add_argument(
-        "--new",
-        dest="new_text",
-        default="",
-        help="Tekst zastępujący (dla --operation replace z --old)",
-    )
-    parser.add_argument("--content-file", help="Plik z nową treścią sekcji (zamiast --content)")
-    parser.add_argument("--new-name", help="Nowa nazwa nagłówka (dla --operation rename)")
-    parser.add_argument("--wrap-tag", default=">", help="Prefix owijania (dla --operation wrap)")
-    parser.add_argument("--level", type=int, help="Poziom nagłówka (1=# 2=## 3=### itd.)")
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        default=False,
-        help="Tylko podgląd — nie zapisuje zmian (domyślnie: True jeśli brak --apply)",
-    )
-    parser.add_argument(
-        "--apply", action="store_true", help="Zapisz zmiany (bez tego flagi: dry-run)"
-    )
-    parser.add_argument(
-        "--backup", action="store_true", help="Twórz wersjonowane kopie .bak_TIMESTAMP"
-    )
-    parser.add_argument("--interactive", action="store_true", help="Pytaj przed każdą zmianą")
-    parser.add_argument("--diff", action="store_true", help="Pokazuj kolorowany diff przed zapisem")
-    parser.add_argument(
-        "--snapshot", action="store_true", help="Archiwum ZIP katalogu przed operacją"
-    )
-    parser.add_argument("--workers", type=int, default=4, help="Liczba równoległych wątków")
-    parser.add_argument(
-        "--only-if-empty", action="store_true", help="Tylko pliki gdzie sekcja jest pusta"
-    )
-    parser.add_argument("--only-if-missing", action="store_true", help="Tylko pliki bez tej sekcji")
-    parser.add_argument("--min-length", type=int, help="Filtruj sekcje krótsze niż N znaków")
-    parser.add_argument("--max-length", type=int, help="Filtruj sekcje dłuższe niż N znaków")
-    parser.add_argument(
-        "--changed-since",
-        type=int,
-        dest="changed_since_days",
-        help="Tylko pliki zmienione przez Git w ostatnich N dniach",
-    )
-    parser.add_argument(
-        "--only-if-contains", help="Tylko pliki zawierające podany tekst (gdziekolwiek)"
-    )
-    parser.add_argument("--if-section", help="Filtr warunkowy: nazwa sekcji warunku")
-    parser.add_argument(
-        "--if-section-contains", help="Filtr warunkowy: sekcja musi zawierać ten tekst"
-    )
-    parser.add_argument("--extract-dir", help="Katalog docelowy dla --operation extract")
-    parser.add_argument(
-        "--template-vars",
-        nargs="*",
-        metavar="KLUCZ=WARTOSC",
-        help="Zmienne dla szablonu Jinja2 (np. version=1.2 date=2025-01-01)",
-    )
-    parser.add_argument(
-        "--audit-log", default=AUDIT_LOG_FILE, help="Plik JSONL z historią operacji"
-    )
-    parser.add_argument(
-        "--simulate-jsonl", help="Zapisz symulację operacji do JSONL bez wykonywania"
-    )
-    parser.add_argument("--batch", help="Plik YAML z listą operacji wsadowych")
-    parser.add_argument("--undo-session", help="ID sesji do cofnięcia (z patch_audit.jsonl)")
-    parser.add_argument(
-        "--report-matrix", action="store_true", help="Raport macierzy sekcji w katalogu"
-    )
-    parser.add_argument("--matrix-csv", help="Eksport macierzy sekcji do CSV")
-    parser.add_argument(
-        "--json-output", action="store_true", help="Wynik operacji jako JSON (dla agentów)"
-    )
-    parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
-    return parser
+    _add_target_args(p)
+    _add_filter_args(p)
+    _add_output_args(p)
+    _add_meta_args(p)
+    return p
+
+
+
+def _validate_patch_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
+    """Waliduje kombinacje argumentów. Rzuca parser.error() przy błędzie."""
+    if not args.section and not args.section_regex:
+        parser.error("Wymagane --section lub --section-regex (chyba że używasz --batch lub --report-matrix).")
+    if args.old and args.operation not in ("replace",):
+        parser.error("--old/--new wymaga --operation replace.")
+    if (
+        args.operation in ("replace", "append", "prepend")
+        and not args.old and not args.content and not args.content_file
+    ):
+        parser.error(f"--content lub --content-file jest wymagane dla --operation '{args.operation}'.")
+    if args.operation == "rename" and not args.new_name:
+        parser.error("--new-name jest wymagane dla --operation rename.")
+    if args.operation == "extract" and not args.extract_dir:
+        parser.error("--extract-dir jest wymagane dla --operation extract.")
+
+
+def _parse_template_vars(args: argparse.Namespace) -> Optional[dict[str, str]]:
+    """Parsuje --template-vars KEY=VALUE do dict lub zwraca None."""
+    if not args.template_vars:
+        return None
+    result: dict[str, str] = {}
+    for item in args.template_vars:
+        if "=" in item:
+            k, v = item.split("=", 1)
+            result[k.strip()] = v.strip()
+    return result
+
+
+def _execute_old_new_replace(
+    args: argparse.Namespace, db_path: Optional[Path], dry_run: bool
+) -> None:
+    """Obsługuje tryb --old/--new (podmiana podłańcucha) w pętli po plikach."""
+    base_path = Path(args.dir)
+    all_files = list(base_path.rglob(args.pattern))
+    db_conn = _open_db(db_path)
+    modified = 0
+    for md_file in all_files:
+        try:
+            full = md_file.read_text(encoding="utf-8", errors="replace")
+            fm, body = strip_frontmatter(full)
+            new_body = apply_operation(body, args.section, args.operation, old=args.old, new=args.new_text)
+            if new_body == body:
+                continue
+            new_full = fm + new_body
+            if args.diff:
+                diff_out = unified_diff_ansi(full, new_full, md_file.name)
+                if diff_out:
+                    safe_print(f"\n{diff_out}")
+            if not dry_run:
+                if args.backup:
+                    shutil.copy2(md_file, f"{md_file}.bak_{timestamp_str()}")
+                atomic_write(md_file, new_full)
+                if db_conn is not None:
+                    diff_summary = build_diff(full, new_full, md_file.name)
+                    patch_args_s = json.dumps(
+                        {"section": args.section, "old": args.old, "new": args.new_text},
+                        ensure_ascii=False,
+                    )
+                    try:
+                        log_change(db_conn, str(md_file), args.operation, diff_summary, patch_args_s)
+                    except Exception as exc:  # nosec: logging fallback, non-critical
+                        safe_print(colored(f"  [WARN] Błąd zapisu do DB: {exc}", ANSI_YELLOW))
+            mode = "DRY-RUN" if dry_run else "ZAPISANO"
+            safe_print(f"  [{colored(mode, ANSI_YELLOW if dry_run else ANSI_GREEN)}] {md_file.name}")
+            modified += 1
+        except Exception as exc:  # nosec: per-file error must not abort batch
+            safe_print(colored(f"  [BŁĄD] {md_file}: {exc}", ANSI_RED))
+    if db_conn is not None:
+        db_conn.close()
+    safe_print(f"\n[OK] Zmodyfikowano {modified}/{len(all_files)} plików.")
 
 
 def main() -> None:
+    """Punkt wejścia CLI do masowej edycji sekcji Markdown."""
     parser = build_parser()
     args = parser.parse_args()
 
@@ -1304,119 +1357,32 @@ def main() -> None:
     if args.db and Path(args.db).parent.exists():
         db_path = Path(args.db)
 
+    # Szybki dispatch dla trybów specjalnych
     if args.undo_session:
         undo_session(args.audit_log, args.undo_session)
         return
-
     if args.report_matrix:
         report_matrix(args.dir, args.pattern, args.matrix_csv)
         return
-
     if args.batch:
         run_batch(args.batch, global_dry_run=not args.apply, db_path=db_path)
         return
 
-    if not args.section and not args.section_regex:
-        parser.error(
-            "Wymagane --section lub --section-regex (chyba że używasz --batch lub --report-matrix)."
-        )
-
-    operation = args.operation
-
-    # Ustal treść nową
-    if args.old:
-        # Podmiana podłańcucha — --content ignorowane
-        if operation not in ("replace",):
-            parser.error("--old/--new wymaga --operation replace.")
-        new_content = ""  # nie używane bezpośrednio — obsługiwane przez --old/--new
-    else:
-        new_content = args.content
-
-    if (
-        operation in ("replace", "append", "prepend")
-        and not args.old
-        and not new_content
-        and not args.content_file
-    ):
-        parser.error(f"--content lub --content-file jest wymagane dla --operation '{operation}'.")
-
-    if operation == "rename" and not args.new_name:
-        parser.error("--new-name jest wymagane dla --operation rename.")
-
-    if operation == "extract" and not args.extract_dir:
-        parser.error("--extract-dir jest wymagane dla --operation extract.")
-
-    template_vars: Optional[dict[str, str]] = None
-    if args.template_vars:
-        template_vars = {}
-        for item in args.template_vars:
-            if "=" in item:
-                k, v = item.split("=", 1)
-                template_vars[k.strip()] = v.strip()
+    _validate_patch_args(args, parser)
 
     dry_run = not args.apply
+    template_vars = _parse_template_vars(args)
 
-    # Obsługa --old/--new przez apply_operation zamiast patch_section bezpośrednio
     if args.old:
-        # Przetwarzamy pliki po jednym przez apply_operation
-        base_path = Path(args.dir)
-        all_files = list(base_path.rglob(args.pattern))
-        db_conn = _open_db(db_path)
-        modified = 0
-        for md_file in all_files:
-            try:
-                full = md_file.read_text(encoding="utf-8", errors="replace")
-                fm, body = strip_frontmatter(full)
-                new_body = apply_operation(
-                    body,
-                    args.section,
-                    operation,
-                    old=args.old,
-                    new=args.new_text,
-                )
-                if new_body == body:
-                    continue
-                new_full = fm + new_body
-                if args.diff:
-                    diff_out = unified_diff_ansi(full, new_full, md_file.name)
-                    if diff_out:
-                        safe_print(f"\n{diff_out}")
-                if not dry_run:
-                    if args.backup:
-                        shutil.copy2(md_file, f"{md_file}.bak_{timestamp_str()}")
-                    atomic_write(md_file, new_full)
-                    if db_conn is not None:
-                        diff_summary = build_diff(full, new_full, md_file.name)
-                        patch_args_s = json.dumps(
-                            {
-                                "section": args.section,
-                                "old": args.old,
-                                "new": args.new_text,
-                            },
-                            ensure_ascii=False,
-                        )
-                        try:
-                            log_change(db_conn, str(md_file), operation, diff_summary, patch_args_s)
-                        except Exception as exc:
-                            safe_print(colored(f"  [WARN] Błąd zapisu do DB: {exc}", ANSI_YELLOW))
-                mode = "DRY-RUN" if dry_run else "ZAPISANO"
-                safe_print(
-                    f"  [{colored(mode, ANSI_YELLOW if dry_run else ANSI_GREEN)}] {md_file.name}"
-                )
-                modified += 1
-            except Exception as exc:
-                safe_print(colored(f"  [BŁĄD] {md_file}: {exc}", ANSI_RED))
-        if db_conn is not None:
-            db_conn.close()
-        safe_print(f"\n[OK] Zmodyfikowano {modified}/{len(all_files)} plików.")
+        _execute_old_new_replace(args, db_path, dry_run)
         return
 
     result = patch_section(
         directory=args.dir,
         section_name=args.section,
         section_regex=args.section_regex,
-        new_content=new_content,
-        action=operation,
+        new_content=args.content,
+        action=args.operation,
         file_pattern=args.pattern,
         dry_run=dry_run,
         backup=args.backup,
