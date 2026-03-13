@@ -1,3 +1,9 @@
+"""tests/test_graph_engine_sqlite.py — integration tests for the SQLite-backed graph engine.
+
+Tests cover: build_nodes pipeline (node flush, doc/section map), edge materialization,
+graph traversal queries (upstream/downstream rhythm), and schema integrity checks.
+"""
+
 from __future__ import annotations
 
 import sqlite3

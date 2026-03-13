@@ -235,7 +235,11 @@ def run(conn: sqlite3.Connection) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--db", default=DB_DEFAULT)
+    ap.add_argument(
+        "--db",
+        default=DB_DEFAULT,
+        help="Ścieżka do pliku .db (domyślnie: reports/it_doc_matrix.db)",
+    )
     ap.add_argument(
         "--output",
         default=None,

@@ -255,27 +255,38 @@ def main():
     parser = argparse.ArgumentParser(description="Compliance check CLI")
     sub = parser.add_subparsers(dest="command")
 
+    _db_help = "Ścieżka do pliku .db (domyślnie: reports/it_doc_matrix.db)"
+
     # check-schema subcommand
-    p_schema = sub.add_parser("check-schema")
-    p_schema.add_argument("--strict", action="store_true")
-    p_schema.add_argument("--db", default=str(DB_DEFAULT))
+    p_schema = sub.add_parser("check-schema", help="Sprawdź integralność schematu DB")
+    p_schema.add_argument("--strict", action="store_true", help="Traktuj ostrzeżenia jako błędy")
+    p_schema.add_argument("--db", default=str(DB_DEFAULT), help=_db_help)
 
     # coverage-report subcommand
-    p_cov = sub.add_parser("coverage-report")
-    p_cov.add_argument("--format", choices=["html", "json", "csv"], default="html")
-    p_cov.add_argument("--db", default=str(DB_DEFAULT))
+    p_cov = sub.add_parser("coverage-report", help="Generuj raport pokrycia norm")
+    p_cov.add_argument(
+        "--format",
+        choices=["html", "json", "csv"],
+        default="html",
+        help="Format wyjścia (domyślnie: html)",
+    )
+    p_cov.add_argument("--db", default=str(DB_DEFAULT), help=_db_help)
 
     # backfill subcommand
-    p_bf = sub.add_parser("backfill")
-    p_bf.add_argument("--apply", action="store_true")
-    p_bf.add_argument("--dry-run", action="store_true", dest="dry_run")
-    p_bf.add_argument("--db", default=str(DB_DEFAULT))
+    p_bf = sub.add_parser("backfill", help="Uzupełnij brakujące mapowania (backfill)")
+    p_bf.add_argument("--apply", action="store_true", help="Zastosuj zmiany (domyślnie: dry-run)")
+    p_bf.add_argument(
+        "--dry-run", action="store_true", dest="dry_run", help="Podgląd zmian bez zapisu"
+    )
+    p_bf.add_argument("--db", default=str(DB_DEFAULT), help=_db_help)
 
     # full-audit subcommand
-    p_audit = sub.add_parser("full-audit")
-    p_audit.add_argument("--apply", action="store_true")
-    p_audit.add_argument("--ci", action="store_true")
-    p_audit.add_argument("--db", default=str(DB_DEFAULT))
+    p_audit = sub.add_parser("full-audit", help="Pełny audyt: schema + backfill + raport")
+    p_audit.add_argument("--apply", action="store_true", help="Zastosuj backfill podczas audytu")
+    p_audit.add_argument(
+        "--ci", action="store_true", help="Tryb CI — niezerowy exit code przy błędach"
+    )
+    p_audit.add_argument("--db", default=str(DB_DEFAULT), help=_db_help)
 
     args = parser.parse_args()
     if args.command is None:

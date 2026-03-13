@@ -218,7 +218,11 @@ def main():
         default=50,
         help="Probka mapowań do sprawdzenia jakosci (domyslnie: 50)",
     )
-    parser.add_argument("--db", default=str(DB_PATH))
+    parser.add_argument(
+        "--db",
+        default=str(DB_PATH),
+        help="Ścieżka do pliku .db (domyślnie: reports/it_doc_matrix.db)",
+    )
     args = parser.parse_args()
 
     db_path = Path(args.db)

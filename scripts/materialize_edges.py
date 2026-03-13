@@ -12,7 +12,7 @@ from pathlib import Path
 
 from ulid import ulid
 
-MASTER_DB = Path("../reports/it_doc_matrix.db")
+MASTER_DB = Path(__file__).resolve().parent.parent / "reports" / "it_doc_matrix.db"
 
 EMOJI_RE = re.compile(r"[\U00010000-\U0010ffff]", flags=re.UNICODE)
 NUM_PREFIX_RE = re.compile(r"^\s*(\d+[\.\)]\s+)+")

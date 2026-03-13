@@ -43,6 +43,7 @@ def _db(db_path: Optional[str] = None):
 
 
 def cmd_find(args) -> int:
+    """Find templates by standard code (--standard) or regulation code (--regulation)."""
     try:
         with _db(args.db) as conn:
             if args.standard:
@@ -73,6 +74,7 @@ def cmd_find(args) -> int:
 
 
 def cmd_contract(args) -> int:
+    """Print the interface contract (inputs/outputs/gates) for a document by UID."""
     try:
         with _db(args.db) as conn:
             result = get_contract(conn, args.uid)
@@ -98,6 +100,7 @@ def cmd_contract(args) -> int:
 
 
 def cmd_validate(args) -> int:
+    """Validate a template .md file against required schema (frontmatter + sections)."""
     path = Path(args.path)
     try:
         tmpl = load_template(path)
@@ -116,6 +119,7 @@ def cmd_validate(args) -> int:
 
 
 def cmd_db_check(args) -> int:
+    """Check database schema integrity — verify required tables and columns exist."""
     with _db(args.db) as conn:
         errors = validate_schema(conn)
 
@@ -128,6 +132,7 @@ def cmd_db_check(args) -> int:
 
 
 def cmd_rhythm(args) -> int:
+    """Show information flow graph (upstream/downstream) for a document by UID."""
     try:
         with _db(args.db) as conn:
             up = rhythm_upstream(conn, args.uid, depth=args.depth)
@@ -152,6 +157,7 @@ def cmd_rhythm(args) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build and return the argument parser for the itdoc CLI."""
     p = argparse.ArgumentParser(
         prog="itdoc",
         description="IT Dokumentacja CLI",
@@ -190,6 +196,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None) -> int:
+    """Entry point for the itdoc CLI. Returns exit code."""
     parser = build_parser()
     args = parser.parse_args(argv)
 

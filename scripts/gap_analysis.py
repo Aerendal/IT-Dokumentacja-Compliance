@@ -358,7 +358,11 @@ def print_standard_summary(conn: sqlite3.Connection) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--db", default=DB_DEFAULT)
+    ap.add_argument(
+        "--db",
+        default=DB_DEFAULT,
+        help="Ścieżka do pliku .db (domyślnie: reports/it_doc_matrix.db)",
+    )
     ap.add_argument("--verbose", "-v", action="store_true", help="Print each match/miss")
     ap.add_argument("--report", action="store_true", help="Print missing + extra report")
     ap.add_argument("--summary", action="store_true", help="Print per-standard summary table")
@@ -375,6 +379,7 @@ def main() -> None:
         print_standard_summary(conn)
 
     conn.close()
+    print("✓ Analiza luk zakończona.")
 
 
 if __name__ == "__main__":
