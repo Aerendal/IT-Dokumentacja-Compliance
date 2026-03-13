@@ -537,3 +537,90 @@ workshop-lint:
 
 workshop-check: workshop-lint workshop-test
 ```
+
+---
+
+## 10. E2E Scenariusze — kompletna lista
+
+Pięć scenariuszy pokrywających happy paths i kluczowe error paths:
+
+### S1 — Fintech greenfield (happy path, pełny flow)
+
+```python
+# brief: projekt fintech greenfield z PCI DSS + RODO
+# oczekiwany wynik:
+SAMPLE_FINTECH_BRIEF = """
+Tworzymy platformę płatniczą SaaS dla e-commerce. Wymagamy zgodności z PCI DSS i RODO.
+Architektura mikroserwisów na AWS, 3 zespoły (Backend, Frontend, DevOps).
+Fazy: Discovery, Architecture, Security, Testing, Compliance, Deployment.
+"""
+expected_min_docs = 25
+expected_phases = {3, 4, 6, 13, 19}  # Architecture, Design, Security, Security, Compliance
+expected_confidence_avg_min = 0.60
+```
+
+### S2 — Internal tool (skromny brief, małe wyjście)
+
+```python
+# brief: prosty tool wewnętrzny bez compliance
+SAMPLE_INTERNAL_BRIEF = """
+Narzędzie do zarządzania urlopami dla 50-osobowej firmy. REST API + React.
+Brak specjalnych wymagań regulacyjnych.
+"""
+expected_max_docs = 15
+expected_domains = ["internal_tool"]
+expected_complexity = "low"  # total_h_likely < 80
+```
+
+### S3 — Empty/invalid brief (error path)
+
+```python
+# brief: zbyt krótki lub bez treści
+SAMPLE_EMPTY_BRIEF = "Projekt IT."
+
+async def test_empty_brief_returns_insufficient(client, ...):
+    # Upload
+    brief_id = (await client.post("/brief/upload", files={"file": ("b.txt", SAMPLE_EMPTY_BRIEF.encode())})).json()["brief_id"]
+    # Map
+    result = (await client.post(f"/brief/{brief_id}/map")).json()
+    assert result["status"] in ("insufficient", "done")
+    # Jeśli insufficient → EstimationEngine musi rzucić InsufficientMappingError (422)
+    resp = await client.post(f"/reports/estimate/{brief_id}")
+    assert resp.status_code == 422
+```
+
+### S4 — LLM-free mode (keyword-only fallback)
+
+```python
+# Konfiguracja: LLM_ENABLED=false
+# Mapping powinien działać z obniżoną jakością
+
+async def test_llm_free_mode_returns_result(client, settings_override):
+    with settings_override(llm_enabled=False):
+        brief_id = upload_brief(client, SAMPLE_FINTECH_BRIEF)
+        result = (await client.post(f"/brief/{brief_id}/map")).json()
+        assert result["status"] in ("done", "llm_free")
+        # Keyword fallback musi zwrócić cokolwiek, nie crashować
+        assert isinstance(result["items"], list)
+```
+
+### S5 — Plan rebuild po zmianie mappingu
+
+```python
+async def test_plan_rebuild_on_mapping_change(client, ...):
+    # Full flow do planu
+    brief_id, report_id, plan_id_v1 = await _full_flow_to_plan(client, SAMPLE_FINTECH_BRIEF)
+
+    # PM zmienia threshold i re-mapuje
+    await client.post(f"/brief/{brief_id}/map", json={"confidence_threshold": 0.3})
+
+    # Stary plan powinien być stale
+    old_plan = (await client.get(f"/planning/{plan_id_v1}")).json()
+    assert old_plan["status"] == "stale"
+
+    # Nowy plan powinien istnieć
+    new_plans = (await client.get(f"/planning/?report_id={report_id}")).json()
+    active = [p for p in new_plans if p["status"] == "active"]
+    assert len(active) == 1
+    assert active[0]["id"] != str(plan_id_v1)
+```

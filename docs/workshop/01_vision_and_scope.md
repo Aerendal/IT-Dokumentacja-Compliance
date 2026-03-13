@@ -142,6 +142,18 @@ Wyjście: Warsztat używa skonfigurowanego dostawcy dla wszystkich operacji LLM
 
 1. **itdoc jako read-only oracle:** Warsztat pyta bibliotekę o wiedzę (`find_by_standard`, `rhythm_upstream`, `get_contract`) ale nigdy jej nie modyfikuje.
 2. **LLM jest opcjonalny dla Side 1 i Side 4:** Ingestia i planowanie mogą działać bez LLM (rule-based fallback); LLM wymagany dla Side 2 (mapowanie semantyczne).
+
+   **LLM-free fallback mode (gdy `LLM_PROVIDER=none` lub LLM niedostępny):**
+   - Side 1 (Ingestion): szablony ingestowane przez parsowanie nazw plików + reguły regex bez LLM ✅
+   - Side 2 (Mapping): **tryb keyword-only** — pomija ekstrakcję encji przez LLM, przechodzi
+     od razu do L4 (keyword fallback) + L5 (phase fallback) z `spec09 §11`. Jakość mapowania
+     spada do ~40-50% (brak rozpoznania standardów/regulacji). Wynik MappingResult dostaje
+     `status="llm_free"` — front-end powinien pokazać ostrzeżenie.
+   - Side 3 (Estimation): nie używa LLM — działa normalnie ✅
+   - Side 4 (Planning): nie używa LLM — działa normalnie ✅
+
+   Konfiguracja: `LLM_PROVIDER=none` lub `LLM_ENABLED=false` → SemanticMapper używa
+   `_extract_keywords_without_llm()` (spec07 §11.4) zamiast `llm_adapter.extract_entities()`.
 3. **Brief to niestrukturyzowany tekst:** System musi działać z niedoskonałymi, nieformalnymi briefami — nie wymaga ustrukturyzowanego wejścia od klienta.
 4. **PostgreSQL jako single source of truth:** Stan projektów, sesji, mapowań i raportów jest w `workshop.db` (PostgreSQL), nie w plikach.
 5. **Atomowość operacji:** Każdy z 4 mikroserwisów może działać niezależnie — awaria jednego nie blokuje pozostałych.

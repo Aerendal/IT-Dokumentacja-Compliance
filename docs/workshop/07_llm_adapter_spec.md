@@ -395,7 +395,8 @@ if response.finish_reason == "length":
 
 ```ini
 # .env — LLM Provider
-LLM_PROVIDER=openai                    # openai | anthropic | ollama
+LLM_PROVIDER=openai                    # openai | anthropic | ollama | none (keyword-only fallback)
+LLM_ENABLED=true                       # false → keyword-only fallback (spec01 §6.2)
 
 # OpenAI
 OPENAI_API_KEY=sk-...
@@ -413,6 +414,56 @@ OLLAMA_MODEL=llama3.2
 # Cache
 LLM_CACHE_TTL_HOURS=24
 LLM_CACHE_ENABLED=true
+
+# Throttling — ograniczenie współbieżnych wywołań LLM
+LLM_MAX_CONCURRENT=3                   # maks. równoczesnych wywołań (semaphore)
+LLM_QUEUE_TIMEOUT=60                   # sek — jak długo czekać na wolny slot przed LLMQueueFullError
+```
+
+---
+
+## 8a. Throttling — kolejkowanie wywołań LLM
+
+SemanticMapper może generować wiele równoczesnych wywołań LLM (np. 3 chunki × 1 extract_entities
+= 3 wywołania naraz). Bez ograniczenia możemy przekroczyć rate limit dostawcy.
+
+```python
+# W BaseLLMAdapter:
+import asyncio
+
+_semaphore: asyncio.Semaphore | None = None
+
+def _get_semaphore(self) -> asyncio.Semaphore:
+    """Semaphore na poziomie instancji adaptera — LLM_MAX_CONCURRENT slotów."""
+    if self._semaphore is None:
+        self._semaphore = asyncio.Semaphore(self._settings.llm_max_concurrent)
+    return self._semaphore
+
+async def _call_with_throttle(self, operation: str, *args, **kwargs):
+    """Opakowuje _call_with_retry w semaphore."""
+    sem = self._get_semaphore()
+    try:
+        async with asyncio.timeout(self._settings.llm_queue_timeout):
+            async with sem:
+                return await self._call_with_retry(operation, *args, **kwargs)
+    except asyncio.TimeoutError:
+        raise LLMQueueFullError(
+            f"LLM queue full after {self._settings.llm_queue_timeout}s "
+            f"(max_concurrent={self._settings.llm_max_concurrent})"
+        )
+```
+
+**Tabela zachowań per dostawca:**
+
+| Dostawca | Domyślny rate limit | Rekomendowany `LLM_MAX_CONCURRENT` |
+|----------|--------------------|------------------------------------|
+| OpenAI gpt-4o | 500 RPM | 5 |
+| Anthropic claude-3.5 | 50 RPM | 3 |
+| Ollama (lokalny) | brak | 2 (CPU-bound) |
+
+```python
+class LLMQueueFullError(LLMAdapterError):
+    """Rzucany gdy nie można uzyskać slotu w ciągu llm_queue_timeout sekund."""
 ```
 
 ---

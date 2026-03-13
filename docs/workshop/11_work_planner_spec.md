@@ -607,3 +607,67 @@ if received < requested:
 Pole `WorkPlan.total_packages_requested: int | None` — `None` gdy nie znamy limitu,
 `int` gdy znamy. Jeśli `total_packages_requested > total_packages` → truncation warning
 dla front-endu.
+
+---
+
+## 10. Plan Invalidation — zmiana mappingu po akceptacji
+
+### 10.1 Wybrana strategia: Rebuild z archiwizacją
+
+Po analizie 3 wzorców (block, incremental, rebuild) wybrano **pełny rebuild z archiwizacją**
+poprzedniego planu. Uzasadnienie: incremental update przy zmianie mappingu może zostawić
+nieaktualny graf zależności; blokada edycji jest zbyt restrykcyjna dla PM.
+
+### 10.2 Warunki triggera
+
+| Akcja PM | Skutek dla WorkPlan |
+|----------|---------------------|
+| Zmiana confidence_threshold w zaakceptowanym raporcie | WorkPlan → `status="stale"`, powiadomienie PM |
+| Ręczna korekta MappingItem (dodanie/usunięcie doc) | WorkPlan → `status="stale"` |
+| Re-run mapowania dla istniejącego briefu | WorkPlan → `status="stale"` |
+| Zmiana project_settings (mnożniki) | **Nie** invaliduje planu — tylko EstimationReport |
+
+### 10.3 Algorytm rebuild
+
+```python
+async def rebuild_plan_if_stale(
+    self,
+    report_id: UUID,
+    reason: str
+) -> WorkPlan:
+    """
+    Wywoływane gdy MappingResult lub EstimationReport zmienił się po akceptacji.
+    
+    Strategia: archiwizuj stary plan → utwórz nowy.
+    NIE usuwa poprzednich planów — zostają z status='stale' jako historia.
+    """
+    async with db.transaction():
+        # 1. Oznacz istniejący plan jako stale
+        await db.execute("""
+            UPDATE work_plans
+            SET status = 'stale',
+                stale_reason = $2,
+                updated_at = NOW()
+            WHERE report_id = $1 AND status NOT IN ('stale', 'archived')
+        """, report_id, reason)
+
+        # 2. Pobierz świeży raport i zbuduj nowy plan
+        fresh_report = await self._get_report(report_id)
+        new_plan = await self.create_plan(fresh_report)
+
+        # 3. Aktywuj nowy plan
+        await db.execute("""
+            UPDATE work_plans SET status = 'active' WHERE id = $1
+        """, new_plan.id)
+
+    return new_plan
+```
+
+### 10.4 Statusy WorkPlan
+
+| Status | Znaczenie |
+|--------|-----------|
+| `draft` | Właśnie utworzony, przed akceptacją przez PM |
+| `active` | Zaakceptowany, trwa praca |
+| `stale` | Zastąpiony przez nowszy (mapping zmieniony) — tylko do historii |
+| `archived` | Manualnie zarchiwizowany przez PM |

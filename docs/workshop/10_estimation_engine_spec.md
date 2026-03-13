@@ -485,3 +485,50 @@ class ProjectStatusError(ValueError):
     """Rzucany gdy projekt ma status uniemożliwiający generowanie raportu."""
     pass
 ```
+
+---
+
+## 9. Pochodzenie i kalibracja mnożników
+
+### 9.1 Źródło wartości baseline
+
+Wartości w `DOCUMENT_TYPE_POINTS` i `COMPLEXITY_MULTIPLIERS` są **wstępnymi założeniami
+eksperckimi**, nie danymi empirycznymi. Muszą być traktowane jako punkt startowy i kalibrowane
+na podstawie rzeczywistych realizacji.
+
+| Parametr | Wartość startowa | Uzasadnienie |
+|----------|-----------------|--------------|
+| `H_PER_POINT = 0.5` | 30 min/punkt | Szacunek: docs AI pisze 2× szybciej niż człowiek; człowiek = 1.0h/pkt |
+| `architecture = 8.0 pkt` | 4h | Empirycznie: document architektury wymaga ~3-5h dla AI + review |
+| `checklist = 1.5 pkt` | 45 min | Szablon + wypełnienie = ~30-60 min |
+| `domain_healthcare = 1.4×` | +40% | Rygor 21 CFR, HIPAA, więcej walidacji i przeglądów |
+| `domain_fintech = 1.3×` | +30% | Compliance regulacyjny (KSC, PSD2) + security documentation |
+
+### 9.2 Mechanizm kalibracji (po wdrożeniu MVP)
+
+System **nie uczy się automatycznie** w v1 — kalibracja jest manualna. Po zebraniu
+danych z pierwszych 10+ projektów PM może zaktualizować wartości przez `app_settings`:
+
+```python
+# Nadpisanie globalne przez DB (tabela project_settings, klucz = h_per_point)
+# Pierwsze projekty: loguj (doc_uid, estimated_h, actual_h) do tabeli actual_hours
+# Po 10+ obserwacjach: oblicz avg_ratio = mean(actual/estimated) per doc_type
+# Jeśli avg_ratio > 1.2 → zwiększ H_PER_POINT lub konkretny doc_type multiplier
+
+# Przykład po kalibracji:
+# Okazało się że 'architecture' w healthcare zajmuje ~7h nie 4h
+# → doc_type_points["architecture"] = 14.0 (7h / 0.5 h_per_point)
+```
+
+### 9.3 Per-projekt override przez PM
+
+```python
+# Tabela project_settings (dok.04):
+# klucz: "estimation_h_per_point"    wartość: "0.4"   → szybszy AI agent
+# klucz: "domain_multiplier_override" wartość: "1.5"  → trudniejszy projekt
+# klucz: "confidence_threshold"       wartość: "0.45" → bardziej liberalny próg
+
+# EstimationEngine przy tworzeniu raportu sprawdza project_settings PRZED globalnymi:
+settings_value = await db.get_project_setting(project_id, "estimation_h_per_point")
+h_per_point = float(settings_value) if settings_value else H_PER_POINT
+```
