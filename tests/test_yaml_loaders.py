@@ -172,6 +172,12 @@ class TestMapStandardsLoader:
         assert isinstance(STANDARD_RULES, list)
         assert len(STANDARD_RULES) >= 21
 
+    def test_module_level_regulation_rules_constant(self):
+        """REGULATION_RULES jest załadowany przy imporcie (naprawiony bug z refaktoru Fazy 1C)."""
+        from scripts.map_standards_to_docs import REGULATION_RULES
+        assert isinstance(REGULATION_RULES, list)
+        assert len(REGULATION_RULES) >= 12
+
     def test_iso27001_present_in_some_rule(self, rules):
         all_standards = [s for _, standards in rules for s in standards]
         assert "ISO/IEC 27001" in all_standards, "ISO/IEC 27001 musi być w regułach mapowania"

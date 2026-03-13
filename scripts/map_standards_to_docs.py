@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 map_standards_to_docs.py — Mapuje dokumenty IT na standardy według słów kluczowych.
-Dane reguł: config/standard_rules.yaml
+Dane reguł: config/standard_rules.yaml, config/regulation_rules.yaml
 """
 
 from __future__ import annotations
@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import re
 import sqlite3
+import sys
 from pathlib import Path
 
 import yaml
@@ -16,6 +17,7 @@ import yaml
 DB_DEFAULT = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
 
 _RULES_YAML = Path(__file__).parent.parent / "config" / "standard_rules.yaml"
+_REGULATION_RULES_YAML = Path(__file__).parent.parent / "config" / "regulation_rules.yaml"
 
 
 def _load_rules() -> list[tuple[list[str], list[str]]]:
@@ -24,7 +26,14 @@ def _load_rules() -> list[tuple[list[str], list[str]]]:
     return [(r["keywords"], r["standards"]) for r in data["rules"]]
 
 
+def _load_regulation_rules() -> list[tuple[list[str], list[str]]]:
+    """Wczytuje reguły mapowania regulacji z config/regulation_rules.yaml."""
+    data = yaml.safe_load(_REGULATION_RULES_YAML.read_text(encoding="utf-8"))
+    return [(r["keywords"], r["standards"]) for r in data["regulation_rules"]]
+
+
 STANDARD_RULES: list[tuple[list[str], list[str]]] = _load_rules()
+REGULATION_RULES: list[tuple[list[str], list[str]]] = _load_regulation_rules()
 
 # ---------------------------------------------------------------------------
 
@@ -113,7 +122,7 @@ def inject_standards_section(dry_run: bool = False, limit: int = 0):
     Wstrzykuje sekcje 'Majace zastosowanie standardy i normy' do plikow .md.
     Pomija pliki, ktore juz maja te sekcje.
     """
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_DEFAULT)
     cur = conn.cursor()
 
     # Pobierz mapowanie path -> standardy + regulacje
@@ -213,7 +222,7 @@ def main():
     if dry_run:
         print("=== TRYB DRY-RUN ===")
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_DEFAULT)
     create_mapping_tables(conn)
     build_mappings(conn, dry_run=dry_run)
     conn.close()

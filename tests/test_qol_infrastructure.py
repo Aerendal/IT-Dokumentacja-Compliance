@@ -279,3 +279,76 @@ class TestStrictModeIntegration:
                 os.environ.pop("ITDOC_STRICT", None)
             else:
                 os.environ["ITDOC_STRICT"] = old
+
+
+# ---------------------------------------------------------------------------
+# Smoke tests — import skryptów bez błędów (Krok 4: CI gate)
+# ---------------------------------------------------------------------------
+
+class TestSmokeImports:
+    """Weryfikuje że skrypty z 0% pokryciem importują się bez błędów.
+
+    Smoke test = 'czy aplikacja w ogóle startuje' wg hierarchii z 'Jak pisać testy.md'.
+    Uruchamiane po każdym commicie jako gate CI.
+    """
+
+    def test_import_seed_base_dicts(self):
+        """seed_base_dicts.py importuje się bez błędów (był 0% pokrycia)."""
+        import scripts.seed_base_dicts  # noqa: F401
+
+    def test_import_seed_document_types(self):
+        """seed_document_types.py importuje się bez błędów."""
+        import scripts.seed_document_types  # noqa: F401
+
+    def test_import_seed_standards(self):
+        """seed_standards.py importuje się bez błędów."""
+        import scripts.seed_standards  # noqa: F401
+
+    def test_import_update_linkage_with_branch(self):
+        """update_linkage_with_branch.py wymaga pliku branch_isic_index.jsonl — skip jeśli brak."""
+        _branch_index = PROJECT_ROOT / "reports" / "branch_isic_index.jsonl"
+        if not _branch_index.exists():
+            pytest.skip(f"Plik {_branch_index.name} nie istnieje — skrypt wymaga danych produkcyjnych")
+        import scripts.update_linkage_with_branch  # noqa: F401
+
+    def test_import_map_standards_to_docs(self):
+        """map_standards_to_docs.py importuje się — REGULATION_RULES bug naprawiony."""
+        import scripts.map_standards_to_docs as m  # noqa: F401
+        # Weryfikacja naprawionego bugu: REGULATION_RULES musi być zdefiniowany
+        assert hasattr(m, "REGULATION_RULES"), "REGULATION_RULES musi być zdefiniowany w module"
+        assert isinstance(m.REGULATION_RULES, list)
+
+
+class TestSmokeHelpArgs:
+    """Weryfikuje że --help działa dla brakujących skryptów (exit code 0)."""
+
+    def _run_help(self, script: str) -> None:
+        import subprocess, sys as _sys
+        env = os.environ.copy()
+        env["PYTHONPATH"] = str(PROJECT_ROOT)
+        result = subprocess.run(
+            [_sys.executable, script, "--help"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        assert result.returncode == 0, (
+            f"{script} --help zwrócił kod {result.returncode}:\n{result.stderr}"
+        )
+
+    def test_seed_base_dicts_has_no_help_flag(self):
+        """seed_base_dicts.py nie ma --help (nie ma argparse) — ale powinien importować się OK."""
+        import scripts.seed_base_dicts  # noqa: F401 — jeśli to przeszło, skrypt działa
+
+    def test_gap_analysis_help(self):
+        self._run_help("scripts/gap_analysis.py")
+
+    def test_compliance_check_help(self):
+        self._run_help("scripts/compliance_check.py")
+
+    def test_map_standards_import_clean(self):
+        """map_standards_to_docs.py importuje się bez błędów (nie ma --help, używa sys.argv)."""
+        import scripts.map_standards_to_docs as m  # noqa: F401
+        assert hasattr(m, "STANDARD_RULES")
+        assert hasattr(m, "REGULATION_RULES")

@@ -1,0 +1,156 @@
+# config/regulation_rules.yaml
+# Reguły mapowania dokumentów na regulacje prawne (KSC, RODO, NIS2 itp.)
+regulation_rules:
+- keywords:
+  - security
+  - bezpiecze
+  - ksc
+  - csirt
+  - incident
+  - vulnerability
+  - penetration
+  - cybersecu
+  - nis2
+  - dora
+  standards:
+  - KSC-PL
+  - CERT-PL-WYTYCZNE
+- keywords:
+  - privacy
+  - prywatno
+  - gdpr
+  - rodo
+  - personal_data
+  - dane_osobowe
+  - dpia
+  - data_protection
+  - ochrona_danych
+  - consent
+  - anonymiz
+  - pii
+  standards:
+  - UODO-PL
+- keywords:
+  - e_commerce
+  - ecommerce
+  - web_service
+  - online_service
+  - portal
+  - sklep
+  - marketplace
+  - cookies
+  - regulamin
+  standards:
+  - UŚUDE-PL
+  - UODO-PL
+- keywords:
+  - payment
+  - platno
+  - billing
+  - fintech
+  - banking
+  - financial
+  - finans
+  - trading
+  - investment
+  - portfolio_financial
+  - mifid
+  - kyc
+  - aml
+  - credit
+  - loan
+  standards:
+  - MIFID2-PL
+  - KNF-REKOM-IT
+  - UODO-PL
+- keywords:
+  - insurance
+  - ubezpiecz
+  - solvency
+  - actuarial
+  - claim
+  - policy_insurance
+  standards:
+  - SOLVENCY2-PL
+  - KNF-REKOM-IT
+- keywords:
+  - public_sector
+  - administrac
+  - government
+  - e_government
+  - public_procurement
+  - zamowien
+  - pzp
+  - epuap
+  - obywatel
+  standards:
+  - PZP-PL
+  - MC-INTEROP-PL
+  - CYBERSEC-STRATEGIA-PL
+- keywords:
+  - telecom
+  - telekomunikac
+  - network
+  - 5g
+  - lte
+  - uke
+  - carrier
+  - operator
+  standards:
+  - PT-PL
+  - UKE-WYTYCZNE
+  - KSC-PL
+- keywords:
+  - accounting
+  - rachunko
+  - erp
+  - financial_reporting
+  - ledger
+  - invoice
+  - faktura
+  - ksiegowosc
+  standards:
+  - UoR-PL
+- keywords:
+  - electronic_signature
+  - podpis_elektroniczny
+  - kep
+  - eidas
+  - qualified_signature
+  - timestamp
+  - certificate_management
+  standards:
+  - KEP-PL
+- keywords:
+  - quality
+  - jakosc
+  - iso_9001
+  - qms
+  - iso_27001
+  - isms
+  - iso_20000
+  - itsm
+  - iso_25010
+  - squale
+  standards:
+  - PN-EN-ISO-9001
+  - PN-ISO/IEC-27001
+  - PN-EN-ISO-IEC-20000-1
+- keywords:
+  - business_continuity
+  - disaster_recovery
+  - bcp
+  - drp
+  - bcm
+  standards:
+  - PN-ISO-22301
+  - KSC-PL
+- keywords:
+  - machine_learning
+  - ai_
+  - _ai
+  - mlops
+  - artificial_intelligence
+  - deep_learning
+  standards:
+  - UODO-PL

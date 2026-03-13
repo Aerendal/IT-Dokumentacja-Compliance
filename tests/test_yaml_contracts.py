@@ -232,8 +232,47 @@ class TestStandardRulesContract:
 
 
 # ===========================================================================
-# base_dicts — wspólna parametryzacja
+# regulation_rules.yaml (naprawiony bug z refaktoru Fazy 1C)
 # ===========================================================================
+
+class TestRegulationRulesContract:
+    """Kontrakt dla config/regulation_rules.yaml — plik odzyskany podczas naprawy bugu."""
+
+    @pytest.fixture(scope="class")
+    def rules(self) -> list[dict]:
+        data = _load(_CONFIG / "regulation_rules.yaml")
+        return data["regulation_rules"]
+
+    def test_file_exists(self):
+        assert (_CONFIG / "regulation_rules.yaml").is_file()
+
+    def test_top_key_is_regulation_rules(self):
+        data = _load(_CONFIG / "regulation_rules.yaml")
+        assert "regulation_rules" in data
+
+    def test_rules_is_list(self, rules):
+        assert isinstance(rules, list)
+
+    def test_has_minimum_rules(self, rules):
+        assert len(rules) >= 12
+
+    def test_each_rule_has_keywords_and_standards(self, rules):
+        for i, rule in enumerate(rules):
+            assert "keywords" in rule, f"regulation_rules[{i}]: brak 'keywords'"
+            assert "standards" in rule, f"regulation_rules[{i}]: brak 'standards'"
+
+    def test_keywords_is_nonempty_list(self, rules):
+        for i, rule in enumerate(rules):
+            assert isinstance(rule["keywords"], list) and rule["keywords"], (
+                f"regulation_rules[{i}].keywords musi być niepustą listą"
+            )
+
+    def test_standards_is_nonempty_list(self, rules):
+        for i, rule in enumerate(rules):
+            assert isinstance(rule["standards"], list) and rule["standards"], (
+                f"regulation_rules[{i}].standards musi być niepustą listą"
+            )
+
 
 @pytest.mark.parametrize("filename,top_key,min_len,required_fields", [
     ("roles.yaml",               "roles",              40, {"code", "name_pl", "name_en", "description"}),
