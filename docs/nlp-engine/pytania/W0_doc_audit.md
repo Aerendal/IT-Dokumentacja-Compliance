@@ -404,6 +404,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zapewnić że zmiana algorytmu `DuplicateDetector` nie obniży Precision poniżej 85% na corpus testowym?
 - Stwórz test regresyjny dla `GapDetector` — baseline snapshot raportów luk zapisany jako golden file.
 - Jak napisać test E2E: wgraj dokument SRS → przejdź przez W0 → W8 → sprawdź że `GapAnalysisReport` ma ≥ 1 naruszenie ARCH-01?
+- Napiszmy RED test dla `EventReasoningEngine.apply()` — `def test_event_reasoning_detects_missing_agent(): session=Mock(); session.run.side_effect=[[], [{'node_id':'e_no_agent'}], [], []]; engine=(DeductionEngine().register(RoleCompletenessRule()).register(TemporalConstraintRule()).register(CausalChainRule()).register(DomainConsistencyRule())); violations=engine.apply(session); assert any(v.rule_id=='ROLE_COMPLETENESS' and v.node_id=='e_no_agent' for v in violations)`; `side_effect=[[], [...], [], []]` symuluje: ROLE_COMPLETENESS odpala, pozostałe 3 nie; RED bo `DeductionEngine` i `RoleCompletenessRule` nie istnieją jeszcze; domknięcie przez `DeductionEngine.register()` chain builder?
 
 ### 5. Obsługa błędów
 
