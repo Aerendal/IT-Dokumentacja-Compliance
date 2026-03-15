@@ -196,6 +196,17 @@ _brak pytań źródłowych w tej kategorii_
 - Jak napisać test integracyjny dla scalania węzłów (`MERGE`) na embedded Neo4j?
 - Jak testować `build_document()` dla zdania "Wykonawca dostarczył dokumentację techniczną z opóźnieniem" — sprawdzić węzły i krawędzie?
 - Jak testować wykrywanie sprzecznych relacji w modelu zdarzenia?
+#### Kompletna hierarchia TDD
+- Zaimplementuj Fazę GREEN dla `Neo4jAdapter.save_event()` — minimalna implementacja: stwórz węzeł Event i krawędź AGENT bez walidacji typów.
+- Jak zrefaktoryzować `GraphDatabaseAdapter` po GREEN — oddzielić `CypherBuilder` od `Neo4jClient` żeby można było testować generowanie Cypher bez połączenia z bazą?
+- Zrefaktoryzuj `generate_cypher()` — każdy typ relacji (AGENT, PATIENT, IS_A) jako osobna metoda z testem jednostkowym.
+- Jak napisać test jednostkowy dla `CypherBuilder.build_merge_query()` — bez połączenia z Neo4j, sprawdzić tylko poprawność składniową?
+- Jak zbudować oracle dataset dla W4 — 20 zdań kontraktowych + oczekiwane grafy Cypher jako golden files?
+- Jak zmierzyć Mutation Score dla `GraphDatabaseAdapter` — które warunki MERGE vs CREATE są najtrudniejsze do pokrycia?
+- Jak napisać test własnościowy (Hypothesis) dla `save_event()` — dla każdego poprawnego `EventRoleDict` zapis powinien być idempotentny (3x MERGE = 1 węzeł)?
+- Jak zapewnić że migracja Neo4j (3.x→5.x) nie zmienia semantyki zapytań Cypher — golden file z wynikami 10 kluczowych zapytań?
+- Stwórz test regresyjny schematu grafu — snapshot węzłów i krawędzi dla 5 zdań testowych; CI fail gdy schemat się zmieni.
+- Jak przetestować W1→W2→W3→W4 end-to-end — zdanie → sprawdź że graf zawiera węzeł IS_A z hyperonimem z W3?
 
 ### 5. Obsługa błędów
 

@@ -185,6 +185,18 @@ _brak pytań źródłowych w tej kategorii_
 - Jak pisać testy regresyjne z logów stress testu — każdy BRIDGE_ERROR = nowy test?
 - Jak testować EventFrame.missing_dimensions() dla zdania bez LOCATION?
 - Jak napisać skrypt testowy dla reguły CONSTRAINT_VIOLATION na danych NKJP — jakie zdania powinny tę regułę wyzwalać, a jakie nie?
+#### Kompletna hierarchia TDD
+- Napisz czerwony test TDD dla `AuditEngine.run(doc)` — `test_finds_cons02()`: dokument z naruszeniem terminu → `AuditFinding(rule_id='CONS-02', severity=HIGH)`.
+- Zaimplementuj Fazę GREEN dla `AuditEngine` — minimalna logika: przyjmij `AuditFinding[]` z W5, dodaj `doc_ref` i `timestamp`, zwróć `GapAnalysisReport`.
+- Jak zrefaktoryzować `AuditEngine` po GREEN — wydzielić `TraceabilityMapper` (łączący finding z zdaniem) i `HistoryDiff` (zmiana między rewizjami)?
+- Zrefaktoryzuj `AuditEngine` — każdy wymiar `EventFrame` (AGENT, ACTION, PATIENT...) walidowany przez osobny `DimensionValidator` z testem jednostkowym.
+- Jak napisać test jednostkowy dla `NKJPBridge.map_tag_to_role()` — mock tagu NKJP, sprawdzić mapowanie na rolę semantyczną?
+- Jak zbudować oracle dataset dla W8 — 15 dokumentów prawnych z oczekiwanymi `GapAnalysisReport` jako golden files?
+- Jak zmierzyć Mutation Score dla `StateMatrix` — które warunki deduplikacji findings są najtrudniejsze do pokrycia?
+- Jak napisać test własnościowy (Hypothesis) dla `AuditEngine` — idempotentność: ten sam dokument audytowany 2× → identyczny `GapAnalysisReport` (StateMatrix działa)?
+- Jak zapewnić że zmiana formatu `EventFrame` nie zmienia struktury `GapAnalysisReport` eksportowanego przez API W7?
+- Stwórz test regresyjny `AuditEngine` — golden file: 5 dokumentów kontraktowych + oczekiwany raport compliance; CI fail gdy kształt się zmieni.
+- Jak przetestować W0→W8 end-to-end: dokument SRS → `doc_auditor` → pipeline NLP → `AuditEngine` → sprawdź audit trail z timestampem i `doc_ref` per finding?
 
 ### 5. Obsługa błędów
 

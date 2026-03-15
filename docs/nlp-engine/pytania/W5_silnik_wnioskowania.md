@@ -74,7 +74,6 @@ _brak pytań źródłowych w tej kategorii_
 - Jakie reguły logiczne wdrożyć dla automatycznej ontologii?
 - Pokaż przykład implementacji reguł Drools dla grafu..
 - Jak stworzyć model ontologii zdarzeń dla domeny prawnej?
-- Napiszmy funkcję build_event_graph w Fazie GREEN..
 - Jakie reguły weryfikacji zastosować dla ontologii zdarzeń w fazie 2?
 - Jak wdrożyć model danych grafu (Neo4j) dla analizy zdarzeń?
 - Czy system może sam wywnioskować intencję na podstawie narzędzia?
@@ -156,6 +155,7 @@ _brak pytań źródłowych w tej kategorii_
 - Stwórzmy test dla reguły skutku akcji 'dostarczyć z opóźnieniem' w InferenceEngine.
 - Przetestujmy ramy walencyjne dla nowych czasowników..
 - Napiszmy czerwony test dla nowej reguły posiadania w InferenceEngine..
+- Napiszmy funkcję build_event_graph w Fazie GREEN..
 
 ### 5. Obsługa błędów
 - Jak obsłużyć zaprzeczenia w regule _rule_possession_transfer?
@@ -206,6 +206,18 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować negację: `"Wykonawca nie dostarczył dokumentacji"` → `dostawa=NOT_OCCURRED`?
 - Jak testować łańcuch: zdanie 1 = "Wykonawca złożył ofertę", zdanie 2 = "Wykonawca dostarczył dokumentację z opóźnieniem" → wnioskowanie o naruszeniu?
 - Jak testować zapytania o lokalizację: `"Gdzie jest dokumentacja?"` → przeszukanie grafu → odpowiedź?
+#### Kompletna hierarchia TDD
+- Zaimplementuj Fazę GREEN dla `InferenceEngine` — minimalna reguła: IF AGENT=Wykonawca AND action=dostarczyć AND MANNER=opóźnienie THEN AuditFinding(CONS-02).
+- Jak zrefaktoryzować `InferenceEngine` po GREEN — zastąpić hardkodowaną regułę deklaratywnym Drools DRL?
+- Zrefaktoryzuj `InferenceEngine` — każda reguła compliance jako osobny plik DRL załadowany przez `RuleLoader`, testowalny w izolacji.
+- Jak napisać test jednostkowy dla pojedynczej reguły DRL — mock grafu W4, sprawdzić że jedna reguła odpala się na właściwych faktach?
+- Jak napisać test integracyjny W4→W5: załaduj rzeczywiste fakty z Neo4j → sprawdź że `InferenceEngine` generuje `AuditFinding(CONS-02)`?
+- Jak zbudować oracle dataset dla W5 — 30 zdań kontraktowych + oczekiwane `AuditFinding[]` per zdanie?
+- Jak zmierzyć Mutation Score dla reguł DRL — jak mutować warunki reguły żeby sprawdzić czy testy to wykrywają?
+- Jak napisać test własnościowy (Hypothesis) dla `InferenceEngine` — idempotentność: to samo zdarzenie wnioskowane 2× → 1 `AuditFinding` (nie duplikat)?
+- Jak wykryć regresję reguł: zmiana hierarchii synsetów W3 może sprawić że CONS-02 przestaje odpalać — baseline snapshot wyników per corpus?
+- Stwórz test regresyjny `InferenceEngine` — golden file: 20 zdarzeń kontraktowych + oczekiwane reguły które mają się odpalić; CI fail przy rozbieżności.
+- Jak przetestować W1→W5 end-to-end — dokument z 3 naruszeniami → sprawdź że `AuditFinding[]` ma dokładnie 3 wyniki z właściwymi `rule_id`?
 
 ### 5. Obsługa błędów
 

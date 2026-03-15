@@ -157,6 +157,16 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zmierzyć pokrycie mutacyjne (Mutation Score) dla W0 — jakie są minima dla projektu zarobkowego?
 - Jakie testy integracyjne należy napisać dla subkomendy `doc-audit` w `compliance_check.py`?
 - Jak testować wyniki audytu SQLite, żeby sprawdzić idempotentność skanowania?
+#### Kompletna hierarchia TDD
+- Napisz czerwony test TDD dla `GapDetector` — `detect_gaps(doc)` z brakującą sekcją → `[GapFinding(section='Wymagania', severity=HIGH)]`.
+- Jak zaimplementować minimalną logikę `GapDetector` żeby przejść z fazy RED do GREEN — który warunek sprawdzać jako pierwszy?
+- Jak zrefaktoryzować `GapDetector` po uzyskaniu zielonego testu — wydzielić `SectionValidator`, `RelationChecker`, `DuplicateScorer` jako osobne klasy?
+- Zrefaktoryzuj `GapDetector` do strategii per-rule — każda reguła (ARCH-01, SEC-01) jako osobna klasa walidatora.
+- Jak napisać test jednostkowy dla `DuplicateDetector.score_similarity()` — izolacja od zewnętrznych zależności?
+- Jak zbudować oracle dataset dla W0 — 30 dokumentów z ręcznie oznaczonymi lukami, duplikatami i zerowanymi relacjami?
+- Jak zapewnić że zmiana algorytmu `DuplicateDetector` nie obniży Precision poniżej 85% na corpus testowym?
+- Stwórz test regresyjny dla `GapDetector` — baseline snapshot raportów luk zapisany jako golden file.
+- Jak napisać test E2E: wgraj dokument SRS → przejdź przez W0 → W8 → sprawdź że `GapAnalysisReport` ma ≥ 1 naruszenie ARCH-01?
 
 ### 5. Obsługa błędów
 

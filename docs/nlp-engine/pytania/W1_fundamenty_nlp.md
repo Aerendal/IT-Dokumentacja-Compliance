@@ -81,10 +81,8 @@ Plik NKJP (XML/TEI P5)
 - Pokaż skrypt Python do konwersji XML z NKJP na JSONL..
 
 ### 3. Implementacja
-- Pokaż jak zaimplementować funkcję get_lemma w fazie GREEN..
 - Przedstaw model danych grafu wiedzy dla przykładu z dokumentacją techniczną.
 - Wyszukaj źródła i skrypty do automatyzacji ekstrakcji danych z NKJP..
-- Pokażmy Fazę GREEN i implementację logiki get_lemma..
 - Skonfigurujmy UDPipe jako parser składni zależności w modules..
 - Jakie biblioteki Python ułatwią parsowanie formatów XML z NKJP?
 - Jakie są główne słabości modelu symbolicznego w porównaniu do LLM?
@@ -189,22 +187,15 @@ Plik NKJP (XML/TEI P5)
 - Jakie konkretne dane z NKJP pobrać do testów lematyzacji?
 - Jakie dokładnie dane z NKJP pobrać do testów lematyzacji?
 - Jak zautomatyzować wyciąganie zdań z NKJP do datasetu testowego?
-- Jak wdrożyć Mutation Score powyżej 60% dla modułu lematyzacji?
 - Pokaż jak zintegrować Universal Dependencies z naszym pipeline testowym..
 - Pokaż jak zdefiniować testy integracyjne dla warstwy lingwistycznej..
-- Jak w Fazie 0 mierzyć Code Coverage i Mutation Score?
 - Pokaż kod testu weryfikującego strukturę drzewa Universal Dependencies..
 - Zaproponuj strukturę pliku JSONL dla datasetu testowego z NKJP..
 - Zaprojektuj strukturę pliku JSONL dla datasetu testowego z NKJP..
-- Jakie metryki, poza Mutation Score, warto mierzyć w Fazie 0?
 - Pokaż przykład pliku JSONL z datasetem testowym z NKJP..
 - Zaprojektujmy strukturę pliku JSONL dla datasetu testowego z NKJP..
 - Jak zbudować testy weryfikujące strukturę drzewa zależności w Pythonie?
-- Jak zmierzyć Code Coverage i Mutation Score w spaCy?
-- Pokaż szkielet testu własnościowego z użyciem biblioteki Hypothesis..
-- Dodajmy do grafu pojęcia testów integracyjnych i E2E..
 - Pokaż przykład kodu testu weryfikującego strukturę drzewa zależności..
-- Pokaż szkielet testu w Hypothesis dla reguł ARCH i SEC..
 - Dodajmy do grafu relacje dla testów integracyjnych..
 - Pokaż przykład kodu dla testu kontraktowego formatu JSON..
 - Pokaż jak napisać test kontraktowy dla wyjścia modułu morfologii..
@@ -218,7 +209,6 @@ Plik NKJP (XML/TEI P5)
 - Jak zaimplementować funkcję wyliczającą dokładność LAS i UAS dla drzew?
 - Jakie są metryki LAS i UAS dla oceny jakości parsera?
 - Pokaż przykład implementacji funkcji wyliczającej metryki LAS i UAS..
-- Pokaż szkielet testu w Pythonie przy użyciu biblioteki hypothesis.
 - Jak wdrożyć testy mutacyjne w projekcie NLP?
 - Pokaż przykład reguły DRL wiążącej UDPipe z testem integracyjnym..
 - Pokaż przykład testu integracyjnego dla parsera UDPipe..
@@ -228,12 +218,29 @@ Plik NKJP (XML/TEI P5)
 - Pokaż jak zmapować wynik z UDPipe na relacje WYMUSZA_TEST..
 - Wdrożymy Smoke Test dla całego pipeline'u?
 - Napisz czerwony test dla zdania w stronie biernej..
-- Jak dodać relację dla testu E2E?
 - Napiszmy test jednostkowy dla relacji przed i po..
 - Jak zaimplementować test sprawdzający generowanie stanu końcowego dla akcji?
 - Stwórzmy test dla reguły narzędzia (Case=Ins), np. 'Zamawiający odrzucił ofertę pismem z dnia 15 marca'..
 - Jak napisać test dla pytania "Gdzie znajduje się Jan?"?
 - Pokaż test dla pytania "Gdzie znajduje się Jan?".
+
+
+#### GREEN — implementacja minimalna
+- Pokaż jak zaimplementować funkcję get_lemma w fazie GREEN..
+- Pokażmy Fazę GREEN i implementację logiki get_lemma..
+
+#### Metryki jakości testów
+- Jak wdrożyć Mutation Score powyżej 60% dla modułu lematyzacji?
+- Jak w Fazie 0 mierzyć Code Coverage i Mutation Score?
+- Jakie metryki, poza Mutation Score, warto mierzyć w Fazie 0?
+- Jak zmierzyć Code Coverage i Mutation Score w spaCy?
+- Pokaż szkielet testu własnościowego z użyciem biblioteki Hypothesis..
+- Pokaż szkielet testu w Hypothesis dla reguł ARCH i SEC..
+- Pokaż szkielet testu w Pythonie przy użyciu biblioteki hypothesis.
+
+#### E2E
+- Dodajmy do grafu pojęcia testów integracyjnych i E2E..
+- Jak dodać relację dla testu E2E?
 
 ### 5. Obsługa błędów
 - Jak obsłużyć błędy UDPipe w kaskadowym potoku?
@@ -307,6 +314,13 @@ Plik NKJP (XML/TEI P5)
 - Jak wdrożyć pomiar LAS/UAS dla drzew zależności UDPipe na zbiorze testowym?
 - Jak mierzyć Mutation Score ≥ 60% dla modułu lematyzacji?
 - Jak pisać testy złotego wzorca dla parsera, których dane nie mogą być generowane przez LLM?
+#### Kompletna hierarchia TDD
+- Jak zrefaktoryzować `LemmatizationEngine` po fazie GREEN — wydzielić `MorfeuszAdapter`, `UDPipeAdapter` za interfejsem `ILemmatizer`?
+- Zrefaktoryzuj moduł W1 tak aby `DependencyParser` i `Lemmatizer` były wymienialne — test powinien pozostać zielony po swapie.
+- Jak napisać test integracyjny W1→W2: `tokenize('Wykonawca dostarczył dokumentację z opóźnieniem')` → sprawdź że W2 dostaje `dep_rel` per token?
+- Jak wykryć że aktualizacja modelu UDPipe (v2→v3) regresuje quality metryki — co zautomatyzować w CI?
+- Stwórz snapshot test lematyzacji: 100 zdań + oczekiwane lematy zapisane jako golden file — alarm gdy Morfeusz2 zwróci inny lemat.
+- Jak przetestować W1 end-to-end na zdaniu wielozdaniowym (10 zdań) — sprawdzić że wszystkie tokeny mają `feats.Case` gdzie `upos=NOUN`?
 
 ### 5. Obsługa błędów
 

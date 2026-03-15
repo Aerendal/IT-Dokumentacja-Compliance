@@ -72,7 +72,6 @@ SlowosiecAdapter           WalentyAdapter
 _brak pytań źródłowych w tej kategorii_
 
 ### 3. Implementacja
-- Zaimplementujmy logikę ujednoznaczniania w Fazie GREEN przy użyciu UDPipe..
 - Jakie reguły ujednoznaczniania dodać do silnika disambiguation?
 - Pokaż słownik kolokacji ułatwiający ujednoznacznianie..
 - Jak wdrożyć silnik ujednoznaczniający dla polisemicznych pojęć?
@@ -125,6 +124,7 @@ _brak pytań źródłowych w tej kategorii_
 - Stwórzmy test jednostkowy dla PhraseologyDetector w Fazie 3..
 - Pokaż logikę detekcji idiomów zapalającą test na zielono..
 - Pokaż test dla idiomu 'odnieść sukces' w zdaniu..
+- Zaimplementujmy logikę ujednoznaczniania w Fazie GREEN przy użyciu UDPipe..
 
 ### 5. Obsługa błędów
 - Jak obsłużyć wieloznaczność słowa klucz w grafie?
@@ -185,6 +185,17 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować idiom "rzucić okiem" — `detect_mwe` musi zwrócić `MWESpan` zamiast 2 tokenów?
 - Jak zbudować oracle dataset dla WSD polskiego (50 polisemicznych słów × 5 kontekstów)?
 - Jak testować Walenty — czy "dostarczyć" ma ramę z AGENT:NP, PATIENT:NP i RECIPIENT:NP?
+#### Kompletna hierarchia TDD
+- Zaimplementuj Fazę GREEN dla `SlowosiecAdapter` — minimalna logika `get_synsets(lemma)` zwracająca [] dla nieznanych lematów zamiast rzucania wyjątku.
+- Jak zrefaktoryzować `SlowosiecAdapter` po GREEN — dodać cache LRU żeby nie odpytywać API przy każdym wywołaniu?
+- Zrefaktoryzuj `SlowosiecAdapter` — strategia fallback: Słowosieć → morfologiczny heurystyk → [] bez propagacji wyjątku do wyższych warstw.
+- Jak napisać test jednostkowy dla `_resolve_polysemy()` — mock wywołania Słowosieci, testować tylko logikę WSD na fiksowanych danych?
+- Jak napisać test integracyjny W3→W2: wzbogacony token z synsetem → sprawdź że `SemanticMapper` wybiera poprawną rolę dla polisemicznego słowa?
+- Jak zmierzyć Mutation Score dla `WSDResolver` — które gałęzie decyzyjne są najtrudniejsze do mutacji?
+- Jak napisać test własnościowy (Hypothesis) dla `SlowosiecAdapter` — dla każdego lematu z NKJP wynik powinien być listą lub pustą listą, nigdy None?
+- Jak zapewnić że aktualizacja Słowosieci (nowa wersja) nie usuwa synsetów używanych przez reguły W5 — diff synsetów jako test regresyjny?
+- Stwórz snapshot test: 20 kluczowych lematów (dostarczyć, odstąpić, odmówić...) + oczekiwane hypernimy — alarm gdy Słowosieć zwróci inne IS_A.
+- Jak przetestować W1→W3→W5 end-to-end: zdanie z neologizmem → sprawdź że W5 loguje WARNING zamiast rzucać wyjątek?
 
 ### 5. Obsługa błędów
 

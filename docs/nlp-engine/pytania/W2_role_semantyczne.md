@@ -173,6 +173,17 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zbudować oracle dataset 100 zdań z ręcznie annotowanymi rolami semantycznymi?
 - Jak mierzyć Precision/Recall/F1 dla SRL na oracle datasecie?
 - Jak testować relacje czasowe `before`/`after` w zdaniach z "przed" i "po"?
+#### Kompletna hierarchia TDD
+- Jak zaimplementować minimalną wersję `SemanticMapper` żeby przejść test RED — mapowanie tylko nsubj→AGENT i obj→PATIENT bez obsługi strony biernej?
+- Zaimplementuj Fazę GREEN dla `SemanticMapper` — minimalny kod który mapuje `nsubj+Voice=Act → AGENT` i `obj → PATIENT`.
+- Jak zrefaktoryzować `SemanticMapper` po GREEN — zastąpić if-elif kaskadę tablicą priorytetów ról (`RoleMapping` dataclass)?
+- Zrefaktoryzuj `SemanticMapper` — każda reguła mapowania (nsubj→AGENT, obl+Case=Ins→INSTRUMENT) jako osobny `RuleHandler` z testem jednostkowym.
+- Jak napisać test jednostkowy dla `_map_obl_to_role()` izolując od W1 — mock `DependencyNode` z różnymi `feats.Case`?
+- Jak napisać test integracyjny W1→W2: podaj zdanie → sprawdź że `EventRoleDict.AGENT` ma właściwą wartość dla strony czynnej i biernej?
+- Jak zmierzyć Mutation Score dla `SemanticMapper` — które reguły mapowania ról są najtrudniejsze do pokrycia mutantami?
+- Jak zabezpieczyć się przed regresją precyzji ról gdy zmieniamy wersję modelu UDPipe — golden file z 100 zdaniami i oczekiwanymi rolami?
+- Stwórz test regresyjny `SemanticMapper`: corpus 50 zdań kontraktowych z oczekiwanymi rolami jako golden file — CI fail przy F1 < 0.90.
+- Jak przetestować W1→W2→W4 end-to-end: zdanie → `EventRoleDict` → graf Neo4j — sprawdzić krawędzie AGENT/PATIENT/INSTRUMENT?
 
 ### 5. Obsługa błędów
 

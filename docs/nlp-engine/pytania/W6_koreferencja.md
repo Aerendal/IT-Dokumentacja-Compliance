@@ -145,6 +145,16 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować rozróżnienie płci: "Jan i Maria wyszli. Ona była zmęczona." → `Ona → Maria`?
 - Jak przetestować `merge_coreferences` — czy Neo4j ma 1 węzeł dla "Jan" po zmergowaniu?
 - Jak zbudować oracle dataset koreferencji polskiej (50 par zdań z annotowanymi łańcuchami)?
+#### Kompletna hierarchia TDD
+- Zaimplementuj Fazę GREEN dla `CoreferenceResolver` — heurystyka Recency: dla 'on' znajdź najbliższy Masc.Sing noun w poprzednim zdaniu.
+- Jak zrefaktoryzować `CoreferenceResolver` po GREEN — zastąpić Recency-Heuristic modelowym MentionPairClassifier?
+- Zrefaktoryzuj `CoreferenceResolver` — metoda `resolve()` powinna być chain of responsibility: Recency → Agreement → Model, zatrzymać się na pierwszym pewnym dopasowaniu.
+- Jak napisać test jednostkowy dla `_agreement_check(mention, candidate)` — izolacja od parsera, mock `CoreferenceChain`?
+- Jak napisać test integracyjny W1→W6→W2: zdanie z elipsą podmiotu → sprawdź że W2 dostaje rozwiązany AGENT?
+- Jak zmierzyć Mutation Score dla algorytmu Recency-Heuristic — które warunki zgodności (Gender, Number) są najtrudniejsze do pokrycia?
+- Jak zapewnić że zmiana modelu koreferencji nie obniży F1 poniżej 0.75 na corpus polskich dokumentów prawnych?
+- Stwórz test regresyjny: 20 par zdań z zaimkami + oczekiwane antecedenty jako golden file; CI fail gdy chain się zmieni.
+- Jak przetestować W1→W6→W2→W4 end-to-end — zdanie z elipsą → sprawdź że w grafie Neo4j AGENT jest właściwym podmiotem a nie 'unknown'?
 
 ### 5. Obsługa błędów
 

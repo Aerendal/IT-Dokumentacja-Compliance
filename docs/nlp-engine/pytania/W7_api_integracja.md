@@ -129,6 +129,18 @@ _brak pytań źródłowych w tej kategorii_
 - Jak pisać testy kontraktowe dla API (OpenAPI schema validation)?
 - Jak testować endpoint pod obciążeniem — 100 równoległych żądań?
 - Gdzie w CI/CD uruchomić testy integracyjne API?
+#### Kompletna hierarchia TDD
+- Napisz czerwony test TDD dla `POST /nlp/audit` — `test_audit_returns_findings()`: żądanie z dokumentem → oczekiwany status 200 i lista `AuditFinding`.
+- Zaimplementuj Fazę GREEN dla endpointu `POST /nlp/audit` — minimalna wersja: przyjmij tekst, wywołaj `InferenceEngine.run()`, zwróć JSON.
+- Jak zrefaktoryzować endpoint `/nlp/audit` po GREEN — dodać walidację Pydantic, obsługę błędów HTTP 422 i rate limiting?
+- Zrefaktoryzuj endpoint API — wydzielić `AuditRequestValidator`, `PipelineOrchestrator`, `ResponseFormatter` jako osobne klasy z testami jednostkowymi.
+- Jak napisać test jednostkowy dla `AuditRequestValidator.validate()` — sprawdzić odrzucenie żądania bez pola `document_text`?
+- Jak zbudować oracle dataset dla API — 10 dokumentów kontraktowych + oczekiwany `AuditFinding[]` per dokument — zapiąć w CI?
+- Jak zmierzyć Mutation Score dla walidacji API — które gałęzie obsługi błędów są najtrudniejsze do pokrycia?
+- Jak napisać test własnościowy (Hypothesis) dla API — dla każdego poprawnego dokumentu odpowiedź powinna być deterministyczna (ten sam dokument → te same findings)?
+- Jak wykryć regresję API po deployu — automatyczny smoke test: wyślij 3 znane dokumenty → sprawdź że wyniki nie zmieniły się vs baseline?
+- Stwórz test regresyjny API — golden file: 5 dokumentów + oczekiwany JSON response; CI fail przy zmianie kształtu odpowiedzi.
+- Jak przetestować pełne API E2E — `POST /nlp/audit` z dokumentem SRS → sprawdź że response zawiera CONS-02 i RISK-01 findings z doc_ref?
 
 ### 5. Obsługa błędów
 
