@@ -143,6 +143,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zaprojektować system testów dla relacji agent-akcja-obiekt — parametryczny pytest z listą zdań wzorcowych `[(zdanie, expected_agent, expected_action, expected_patient)]` pokrywający co najmniej 5 wariantów szyku?
 - Napiszmy test sprawdzający role semantyczne dla różnych szyków zdania — `@pytest.mark.parametrize` z parami `(zdanie_SVO, zdanie_OVS, zdanie_VSO)` i asercją że `frame.agent == expected_agent` niezależnie od kolejności tokenów?
 - Stwórz testy dla ról semantycznych w zdaniach OVS — `SemanticMapper.map("Dokumentację Wykonawca dostarczył")` → `frame.agent == 'Wykonawca'` i `frame.patient == 'dokumentacja'`; weryfikacja że spaCy-pl poprawnie identyfikuje nsubj w zdaniu z wyprzedzonym obiektem?
+- Stwórz testy jednostkowe dla różnych szyków zdania SVO/OVS/VSO — `@pytest.mark.parametrize("sentence,exp_agent,exp_patient", [("Wykonawca złożył ofertę","Wykonawca","oferta"), ("Ofertę złożył Wykonawca","Wykonawca","oferta"), ("Złożył Wykonawca ofertę","Wykonawca","oferta")])` z asercją że AGENT stały dla wszystkich wariantów?
 - Stwórzmy testy jednostkowe dla klasy SemanticMapper w cyklu TDD..
 - Napiszmy czerwony test dla SemanticMapper mapujący AGENT i PATIENT.
 - Napiszmy testy dla klasy SemanticMapper.

@@ -233,6 +233,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zoptymalizować łączenie Słowosieci z grafem przyczynowym — batch UNWIND zamiast pojedynczych MERGE: `UNWIND $synsets AS s MERGE (:Synset {id: s.id})` przy imporcie?
 - Jak graf synsetów Słowosieci pozwala regule dopasować "wręczyć" gdy oczekuje "dostarczyć" — ścieżka przez wspólny hiperonim 'działanie transferu'?
 - Jak testować integrację Słowosieci z grafem dla synonimów — asercja MATCH(:Synset)-[:IS_SYNONYM]->(:Synset) dla pary 'dostarczyć'/'przekazać'?
+- Jak zintegrować DeepER NER z lokalną bazą Słowosieci (SQLite wordnet.db) — dla każdej encji rozpoznanej przez NERAdapter: `SlowosiecAdapter.get_synsets(entity.lemma, pos='n')`, jeśli pusta lista → `KGT.capture_ign(entity.form)`, jeśli ≥1 → `entity.synset_id = synsets[0].id` i wzbogać EventFrame.PATIENT o synset?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
