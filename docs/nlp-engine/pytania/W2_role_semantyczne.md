@@ -131,6 +131,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak SemanticMapper tworzy EventFrame z drzewa zależności — wyodrębnia `root` jako predicate, `nsubj` jako AGENT, `obj` jako PATIENT, `obl` + feats.Case jako MANNER/INSTRUMENT/LOCATION?
 - Jak wpiąć DependencyParserAdapter do metody generującej EventFrame — `SemanticMapper.__init__(self, parser: DependencyParser)` dependency injection, `parser.parse(sentence)` zwraca `List[DependencyNode]` przetwarzane przez `map_roles()`?
 - Jak wpiąć NERAdapter do generowania EventFrame — przed `map_roles()` wywołaj `ner_adapter.recognize(sentence)`, scalaj wyniki z DependencyNode przez `token.ner_label = ner_result[token.start]`?
+- Zaktualizujmy klasę EventFrame o automatyczne mapowanie ról z parsera — metoda fabryczna `EventFrame.from_dep_tree(nodes: List[DependencyNode]) → EventFrame` wypełnia AGENT (nsubj), PATIENT (obj), INSTRUMENT (obl + feats.Case=Ins) bez potrzeby zewnętrznego SemanticMapper?
+- Jak `EventFrame.from_dep_tree()` obsługuje zdania bez nsubj — AGENT=None, `confidence=0.5`, flaga `roles_incomplete=True` zamiast ValueError; `KGT.capture_orphan(event)` gdy flaga ustawiona zanim trafi do InferenceEngine?
 
 ### 4. Testowanie
 - Zdefiniujmy test integracyjny dla relacji agent-patient w tym modelu..

@@ -177,6 +177,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak buforować wyniki SlowosiecAdapter w CausalChainBuilder — `@lru_cache(maxsize=512)` na metodzie `_get_synonym_set(predicate)` aby uniknąć powtórnych zapytań SQLite podczas analizy dokumentu?
 - Jak skonfigurować próg semantycznego soft matchingu w CausalChainBuilder — parametr `threshold: float = 0.5` w konstruktorze, porównanie jaccard@synsets między predykatem a wzorcem?
 - Jak przetestować integrację SlowosiecAdapter+CausalChainBuilder dla soft matchingu — asercja że dokument z 'przekazać' aktywuje regułę CONS-02 zdefiniowaną dla 'dostarczyć'?
+- Jak wpiąć DependencyParserAdapter do CausalChainBuilder — `CausalChainBuilder.__init__(self, parser: DependencyParser, lexicon: SlowosiecAdapter)` umożliwia re-parsowanie zdania źródłowego gdy EventFrame.agent jest None przy budowaniu łańcucha?
+- Jak CausalChainBuilder używa DependencyParser gdy EventFrame nie ma wypełnionych ról — fallback `parser.parse(event.raw_sentence)` wydobywa nsubj i uzupełnia EventFrame.agent zamiast odrzucania zdarzenia z łańcucha?
+- Jak CausalChainBuilder propaguje SituationalContext przez łańcuch kauzalny — węzeł B dziedziczy `context.temporal` od A gdy zdarzenie B następuje bezpośrednio po A (AFTER); `context.causal.cause_id = e_prev.id` ustawiany automatycznie po emisji krawędzi :CAUSES?
+- Jak modelować wielowymiarowy kontekst zdarzenia w grafie przyczynowym — każdy EventFrame w CausalChainBuilder nosi `context.causal: {cause_id, effect_id}` aktualizowany po MERGE :CAUSES; `context.temporal` dziedziczony z relacji temporalnych wnioskowanych przez parser?
 - Jak rozszerzyć `_soft_match` o relacje hiperonimii — oprócz synonimów sprawdzaj `_lexicon.get_hypernyms(predicate)` i porównaj hiperonim ze wzorcem reguły (np. 'przekazać' → 'dostarczyć' → 'działanie')?
 - Jak ustalić głębokość przeszukiwania hiperonimii w `_soft_match` — parametr `max_depth: int = 3` w konstruktorze, BFS po ścieżce hiperonimów do korzenia ontologii przez `get_hypernym_path()`?
 - Zaimplementujmy klasę KnowledgeGapTracker do logowania nieznanych zdarzeń i słów — jakie typy luk rozróżnia (UNKNOWN_PREDICATE, MISSING_SYNSET, UNMATCHED_RULE)?

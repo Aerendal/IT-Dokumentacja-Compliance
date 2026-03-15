@@ -94,10 +94,14 @@ Plik NKJP (XML/TEI P5)
 - Jak porównać `UDPipeParser` i `SpacyParser` dla zdań prawnych — testy parametryczne z tymi samymi zdaniami, asercja że dep_rel AGENT/PATIENT zgadzają się w ≥ 90% przypadków?
 - Czy spaCy-pl poradzi sobie ze swobodnym szykiem zdania w polskim — `pl_core_news_lg` trenowany na NKJP/PolEval; testuj inversję 'Dokumentację Wykonawca dostarczył' vs 'Wykonawca dostarczył dokumentację' i porównaj dep_rel?
 - Jak UDPipe vs spaCy-pl radzi sobie ze swobodnym szykiem — oba opierają się na feats.Case zamiast pozycji tokenu, ale UDPipe (UD-Polish-PDB) może dawać lepsze wyniki dla inversji zdań prawnych?
+- Jak spaCy-pl obsługuje zdanie z przeczeniem w niestandardowym szyku — 'Dokumentacji Wykonawca nie dostarczył': dep_rel 'nsubj' dla 'Wykonawca' nie zmienia się pomimo negacji i inwersji, ale token 'nie' powinien mieć dep_rel='advmod' jako modyfikator czasownika?
+- Jak wykryć zdanie o niskiej pewności parsowania w spaCy-pl przy nietypowym szyku — token.dep_=='dep' (nieoznaczone relacje) jako sygnał że szyk jest zbyt nieregularny dla parsera; log jako UNKNOWN_STRUCTURE w KnowledgeGapTracker?
 - Jak NER (DeepER/poldeepner) uzupełnia pipeline W1 — rozpoznane encje OSOBA/ORGANIZACJA są kandydatami do roli AGENT/PATIENT w SemanticMapper W2 przed analizą dep_rel?
 - Jak zaimplementować `NERAdapter` jako wrapper dla DeepER — `recognize(sentence) → List[Entity]` gdzie Entity: `{form, label: OSOBA|ORGANIZACJA|LOKALIZACJA|DATA|UMOWA, start, end}`?
 - Jak zintegrować DeepER do rozpoznawania nazw własnych — załaduj model `poldeepner.load('pl-nkjp')`, przekaż tokenizowane zdanie z Morfeusza, zmapuj span offsets na pozycje DependencyNode?
 - Jak obsłużyć encje wielotokenowe w DeepER (np. 'Poczta Polska') — BIO tagi: B-ORG, I-ORG; scalaj tokeny z tym samym chunk_id do jednej Entity zanim przekażesz do SemanticMapper W2?
+- Pokaż przykład analizy zdania technicznego przez SpacyParser — `parser.parse("Wykonawca dostarczył dokumentację projektową")` zwraca: node[0] `{form:'Wykonawca', dep_rel:'nsubj', head:1}`, node[1] `{form:'dostarczył', dep_rel:'root'}`, node[2] `{form:'dokumentację', dep_rel:'obj', head:1}`, node[3] `{form:'projektową', dep_rel:'amod', head:2}`?
+- Jak SpacyParser tokenizuje zdanie techniczne z identyfikatorem dokumentu (np. 'CONS-02') — token 'CONS-02' rozpoznawany jako PROPN, dep_rel='nmod' gdy odnosi się do rzeczownika lub 'obj' gdy jest bezpośrednim dopełnieniem czasownika?
 - Jakie biblioteki Python ułatwią parsowanie formatów XML z NKJP?
 - Jakie są główne słabości modelu symbolicznego w porównaniu do LLM?
 - Jakie narzędzia w Pythonie pomogą mi zautomatyzować ekstrakcję z NKJP?
