@@ -92,6 +92,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak weryfikować rekonstrukcję IMPLICIT_SUBJECT gdy czasownik ma formę 1. vs. 3. osoby liczby pojedynczej?
 - Pokaż kod testu jednostkowego dla IMPLICIT_SUBJECT przy zdaniu "Dostarczono dokumentację techniczną."
 - Jak obsłużyć nieregularne formy czasownikowe (bywał, rzekł) gdzie rekonstrukcja osoby jest niejednoznaczna?
+- Jak obsłużyć czasowniki zwrotne (zobowiązał się, zastrzegł sobie) przy rekonstrukcji podmiotu domyślnego?
+- Jaki jest priorytet rekonstrukcji z końcówki vs. rozwiązania koreferencji gdy obie metody dają inny podmiot?
+- Jak mapować morfemy końcówek polskich czasowników na osobę i liczbę — pokaż tabelę: -m→1sg, -sz→2sg, -ł→3sg.m?
 
 ### 4. Testowanie
 - Stwórzmy czerwony test dla CoreferenceResolvera.

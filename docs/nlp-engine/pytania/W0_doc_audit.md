@@ -110,6 +110,19 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zdefiniować enum dozwolonych wartości dla tagu [Component:] w schemacie JSON — skąd pobierać listę komponentów?
 - Jak zautomatyzować dodawanie tagu [ARCH-01] do dokumentów warstwy W_x które opisują architekturę komponentu?
 - Jak walidować że tagi [Component:] w plikach Markdown są spójne z listą komponentów w ARCHITECTURE.md?
+- Uruchommy walidator Markdown jako dogfooding lintera — uruchom na plikach dokumentacji własnego projektu.
+- Jak skonfigurować walidator Markdown (markdownlint, pymarkdown) jako pre-commit hook w CI/CD?
+- Jak walidator W0 używa własnych reguł do weryfikacji plików W_x — przykład dogfooding z wynikiem audytu?
+- Jaki jest minimalny zestaw reguł markdownlint dla plików W_x — które reguły są wymagane a które opcjonalne?
+- Pokaż kompletny przykład GapAnalysisReport w JSON dla dokumentu z 3 lukami, 1 duplikatem i 2 relacjami.
+- Jak renderować raport luk jako Markdown z tabelą naruszeń posortowaną po severity (CRITICAL → INFO)?
+- Jakie sekcje zawiera raport luk — Executive Summary, Gaps, Duplicates, Relations, Recommendations?
+- Co zawiera nagłówek raportu luk — document_id, audited_at, auditor_version, total_findings, pass/fail status?
+- Uruchommy skrypt audytujący wszystkie pliki Markdown w katalogu docs/ — pokaż wywołanie z argumentami ścieżki i wyjścia.
+- Jak skonfigurować skrypt audytu do rekursywnego przeszukiwania podkatalogów i filtrowania plików po *.md?
+- Jak uruchomić skrypt audytujący w trybie CI/CD — exit code 0 gdy 0 błędów krytycznych, exit code 1 gdy są luki?
+- Jak zbatchować wyniki audytu wielu plików Markdown do jednego zbiorczego raportu JSON?
+- Jak zparallelizować audyt wielu plików Markdown — multiprocessing.Pool czy async/await?
 
 ### 4. Testowanie
 - Jak zaimplementować testy własnościowe dla reguł ARCH-01 i SEC-01?
@@ -139,6 +152,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak obsłużyć przekroczenie limitu czasu audytu dla bardzo długiego dokumentu (>100 MB)?
 - Co się dzieje gdy plik dokumentu jest uszkodzony (truncated) w połowie analizy?
 - Jak obsłużyć błąd kodowania znaków (nie-UTF8) w pliku dokumentu wejściowego?
+- Jak obsłużyć błąd broken link w raporcie Lintera — oflagnuj, pomiń plik, czy zatrzymaj audyt?
+- Jak agregować błędy Lintera per plik do zbiorczego raportu bez duplikowania wpisów?
 
 ### 6. Integracja z innymi warstwami
 - Pokaż jak zaimplementować AuditEngine do obsługi tych reguł..
@@ -162,6 +177,10 @@ _brak pytań źródłowych w tej kategorii_
 - Czy moduł audytu może operować na niespójnej wersji dokumentu przy równoległym edytowaniu (race condition)?
 - Jak obsłużyć dokument w formacie binarnym (PDF, DOCX) gdy audyt oczekuje płaskiego tekstu?
 - Co oznacza 0 luk dla dokumentu o złożoności 500+ zdań — czy to sygnał błędu czy rzeczywistego stanu kompletności?
+- Jakie kategorie błędów Markdown wykrywa Linter — broken links, brak front matter, zduplikowane nagłówki, malformed code block?
+- Jak sklasyfikować błędy Lintera według krytyczności — BLOCKER (brak front matter), WARNING (brakujące pole), INFO (formatowanie)?
+- Jak odróżnić błąd struktury Markdown od błędu merytorycznego (brakująca sekcja) w raporcie Lintera?
+- Jak obsłużyć plik Markdown który nie jest dokumentem W_x (np. README.md) — pominąć czy audytować innym zestawem reguł?
 
 ## Pytania uzupełniające
 - **Pułapka 3:** `completeness_score` logarytmiczny może maskować wiele małych błędów — dokument z 20 ostrzeżeniami i 0 błędami krytycznych dostanie wynik ~0.60, co wygląda jak "akceptowalny", choć nie jest.

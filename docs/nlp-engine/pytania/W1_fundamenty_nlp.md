@@ -187,6 +187,8 @@ Plik NKJP (XML/TEI P5)
 - Jak NKJPPipeline buforuje wyniki pośrednie przed wygenerowaniem końcowego GapAnalysisReport?
 - Jaki jest sygnał zakończenia pipeline'u — wszystkie dokumenty przetworzone, timeout, czy explicit close()?
 - Jak obsłużyć przerwanie NKJPPipeline w połowie przetwarzania — checkpoint i resume od ostatniego dokumentu?
+- Jak wdrożyć rekonstrukcję domyślnego podmiotu z końcówki czasownika — jakie pola feats.Person, feats.Number z Morfeusz są potrzebne?
+- Jak Morfeusz taguje końcówki bezosobowe (dostarczono, podpisano) — jaki feats zwraca dla form pasywno-bezosobowych?
 
 ### 4. Testowanie
 - Jakie konkretne dane z NKJP pobrać do testów lematyzacji?
