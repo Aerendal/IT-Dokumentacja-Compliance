@@ -213,3 +213,22 @@ DependencyTree (CoNLL-U z W1)
 - Jak hot-add nową regułę przyimkową do `SemanticMapper` bez restartu pipeline?
 - Jak wersjonować zestaw reguł mapowania osobno od kodu (YAML/JSON reguły vs Python logika)?
 - Jak mierzyć coverage reguł — ile % zdań jest pokrytych przez aktualne reguły przyimkowe?
+
+---
+
+## Luki zidentyfikowane przez audyt cross-warstwowy
+
+### Kolejność W3 vs W2 w pipeline (niepodjęta decyzja architektoniczna)
+
+- Czy W3 (WSD / Słowosieć) musi działać **przed** W2 (SemanticMapper) — czy `EnrichedToken` z synset_id jest prerequisite dla mapowania ról?
+- Jeśli TAK: pipeline ma formę `W1 → W3 → W2`. Jak `SemanticMapper` przyjmuje `EnrichedToken` zamiast surowego `Token`?
+- Jeśli NIE: `SemanticMapper` wywołuje W3 wewnętrznie. Jak zdefiniować tę granicę żeby nie było cyklicznej zależności W2↔W3?
+- Jaka jest formalna decyzja architektoniczna i gdzie jest udokumentowana (ADR — Architecture Decision Record)?
+- Jak przetestować oba scenariusze (W3-before vs W3-inside) żeby wybrać lepszy?
+
+### Kolejność W6 vs W2 w pipeline (koreferencja przed rolami)
+
+- Czy `CoreferenceResolver` (W6) musi działać **przed** `SemanticMapper` (W2) — decyzja: `W1 → W6 → W2` czy `W1 → W2 → W6 → aktualizacja ról`?
+- Co się dzieje, gdy W2 dostaje zaimek "on" bez rozwiązania — czy mapuje AGENT="on" czy zwraca `AGENT=UNRESOLVED`?
+- Jak `SemanticMapper` oznacza nieroz wiązane zaimki żeby W6 mogło je później scalić?
+- Jak testować scenariusz, w którym koreferencja zmienia przypisanie roli (zaimek był PATIENT, po rozwiązaniu okazuje się tym samym bytem co AGENT)?

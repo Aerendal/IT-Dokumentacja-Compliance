@@ -364,3 +364,30 @@ Plik NKJP (XML/TEI P5)
 - Jak aktualizować model UDPipe bez przerywania działającego serwisu?
 - Jak zachować backwards-compatibility testów gdy model lematyzacji jest ulepszony?
 - Jak wersjonować pliki modeli (morfeusz.dict, udpipe.model) — hash SHA + git LFS?
+
+---
+
+## Luki zidentyfikowane przez audyt cross-warstwowy
+
+### Kontrakt W1 → W2: pole `feats` (Case, Voice, Number)
+
+- Które pola `feats` z Morfeusza są **obowiązkowe** w `DependencyNode` przekazywanym do W2 — minimum: `Case`, `Voice`, `Number`, `Gender`?
+- Jak zakodować brak pola `feats` dla tokenów, których Morfeusz nie przeanalizował?
+- Jak zwalidować, że `DependencyNode` ma wymagane `feats` zanim trafi do `SemanticMapper` (W2)?
+- Dlaczego `Case=Ins` (narzędnik) jest krytyczny dla W2 — jakie role nie zadziałają bez tego pola?
+- Jak testować, że `feats` są poprawnie propagowane przez cały pipeline (unit + integracyjny)?
+
+### Fallback parser (gdy UDPipe zawodzi ~8% zdań)
+
+- Kiedy pipeline ma przełączyć się z UDPipe na Concraft — jaki próg błędu (`parse_score < X`) triggeruje fallback?
+- Jak zaimplementować `parse_with_fallback(sentence)` — try UDPipe → on failure → Concraft → on failure → rule-based?
+- Jak mierzyć, ile % zdań w korpusie testowym wymaga fallbacku?
+- Jak testować, że wynik fallbacku Concraft jest kompatybilny ze schematem `DependencyNode` oczekiwanym przez W2?
+- Czy fallback ma być synchroniczny (w tym samym wywołaniu) czy asynchroniczny (flagowanie do re-analizy)?
+
+### Hak W0 na lematyzację W1 (integracja zwrotna)
+
+- Jak W0 (`doc_auditor.py`) podpina się pod lematyzację W1 jako wymienialny backend — interfejs czy bezpośredni import?
+- Jak zdefiniować interfejs `ILemmatizer` który implementuje zarówno prosty stemmer W0 jak i Morfeusz W1?
+- Jak W0 wykrywa, że W1 jest dostępne i przełącza się automatycznie (lub przez konfigurację)?
+- Jak przetestować W0 z backendem W1 vs własnym TF-IDF — czy wyniki `completeness_score` się poprawiają?

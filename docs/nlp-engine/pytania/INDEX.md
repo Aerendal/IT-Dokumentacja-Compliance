@@ -223,3 +223,21 @@ Poniżej zestawienie kluczowych osi ekspansji i gdzie szukać pytań:
 > 2. Być pokryta testem regresyjnym przed wdrożeniem
 > 3. Być wersjonowana z opisem zmiany (changelog)
 > 4. Nie zmieniać istniejących kontraktów danych (backwards-compatible schema)
+
+---
+
+## Niepodjęte decyzje architektoniczne (ADR — do rozstrzygnięcia przed implementacją)
+
+Poniższe pytania muszą mieć **jednoznaczną odpowiedź zanim dana warstwa zostanie uznana za gotową do implementacji**.
+Odpowiedź powinna być zapisana w `docs/nlp-engine/ADR/` jako Architecture Decision Record.
+
+| ADR | Pytanie | Dotyczy warstw | Konsekwencja dla pipeline |
+|-----|---------|---------------|--------------------------|
+| ADR-01 | Czy W3 (WSD) działa **przed** W2 (SRL) czy **wewnątrz** W2? | W2, W3 | Kolejność pipeline: `W1→W3→W2` vs `W1→W2(+W3)` |
+| ADR-02 | Czy W6 (koreferencja) działa **przed** W2 czy **po** W2? | W2, W6 | Czy `SemanticMapper` dostaje rozwiązane zaimki czy surowe |
+| ADR-03 | Jak W5 (InferenceEngine) dostaje aktualizacje ontologii z W3 — callback, event, hot-reload? | W3, W5 | Czy W5 wymaga restartu po każdej zmianie Słowosieci |
+| ADR-04 | Jak W0 (doc audit) podpina się pod lematyzację W1 — interfejs `ILemmatizer` czy konfiguracja? | W0, W1 | Czy W0 może działać bez W1 (degraded mode) |
+| ADR-05 | Jaka jest strategia fallback parsera W1 (UDPipe → Concraft → rule-based) — synchroniczna czy async? | W1 | Czy błędy parsowania blokują pipeline czy są obsługiwane gracefully |
+
+> **Ważne:** Każda z tych decyzji wpływa na więcej niż jedną warstwę.
+> Podjęcie decyzji w jednym pliku W_x bez aktualizacji sąsiednich warstw **jest błędem implementacyjnym**.

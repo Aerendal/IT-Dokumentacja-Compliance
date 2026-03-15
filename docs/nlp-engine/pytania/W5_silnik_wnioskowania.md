@@ -256,3 +256,20 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Jak system uczy się nowych wzorców z corpus feedback — semi-supervised rule induction?
 - Jak zaimplementować `suggest_rule(false_negative_examples)` — propozycja nowej reguły?
 - Jak weryfikować automatycznie wygenerowane reguły przed wdrożeniem (human-in-the-loop)?
+
+---
+
+## Luki zidentyfikowane przez audyt cross-warstwowy
+
+### Powiadamianie W5 o zmianach ontologii W3 (brak mechanizmu)
+
+- Jak `InferenceEngine` dostaje powiadomienie o nowym synsecie dodanym do W3 bez restartu serwisu?
+- Jak zaimplementować `on_lexicon_update(event)` — callback wywoływany gdy W3 dodaje nowy leksem/synset?
+- Jakie reguły Drools trzeba recompilować po dodaniu nowego synset, a jakie są odporny na tę zmianę?
+- Jak testować, że nowy synset ze Słowosieci (np. neologizm "hackować" IS_A "atakować") jest od razu dostępny dla reguł W5?
+- Jak izolować "gorące" reguły (zależne od ontologii W3) od "zimnych" (czysto składniowych) żeby minimalizować zakres recompilacji?
+
+### Brakująca decyzja: W3 before/inside W5
+
+- Czy W5 wywołuje W3 bezpośrednio (np. `SlowosiecAdapter.get_hypernyms(lemma)`) czy dostaje już wzbogacony `EnrichedToken`?
+- Jak zdefiniować interfejs `IOntologyProvider` który W5 przyjmuje jako dependency — niezależnie od tego czy to W3 czy wbudowana ontologia?
