@@ -184,7 +184,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować WSD dla klasycznego przykładu "zamek" — kontekst "klucz" → "zamek do drzwi" vs "budowla"?
 - Jak testować idiom "rzucić okiem" — `detect_mwe` musi zwrócić `MWESpan` zamiast 2 tokenów?
 - Jak zbudować oracle dataset dla WSD polskiego (50 polisemicznych słów × 5 kontekstów)?
-- Jak testować Walenty — czy "zabić" ma ramę z AGENT:NP i PATIENT:NP?
+- Jak testować Walenty — czy "dostarczyć" ma ramę z AGENT:NP, PATIENT:NP i RECIPIENT:NP?
 
 ### 5. Obsługa błędów
 

@@ -194,7 +194,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak napisać czerwony test TDD dla `Neo4jAdapter.save_event()` bez real Neo4j (mock/stub)?
 - Jak testować `generate_cypher()` — sprawdzić, czy wygenerowany Cypher jest poprawny składniowo?
 - Jak napisać test integracyjny dla scalania węzłów (`MERGE`) na embedded Neo4j?
-- Jak testować `build_document()` dla zdania "Jan zabił zwierzę" — sprawdzić węzły i krawędzie?
+- Jak testować `build_document()` dla zdania "Wykonawca dostarczył dokumentację techniczną z opóźnieniem" — sprawdzić węzły i krawędzie?
 - Jak testować wykrywanie sprzecznych relacji w modelu zdarzenia?
 
 ### 5. Obsługa błędów

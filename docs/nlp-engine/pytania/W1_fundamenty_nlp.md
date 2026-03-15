@@ -19,7 +19,7 @@ Jest fundamentem dla wszystkich warstw W2–W8.
 ## Uzasadnienie istnienia warstwy
 
 **Dlaczego ta warstwa jest potrzebna:**
-W1 istnieje bo język polski jest silnie fleksyjny — "zabił/zabije/zabijał/zabiłem/zabiłaś" to formy tego samego lematu `zabić`. Bez W1 żadna wyższa warstwa nie wie że te słowa znaczą "to samo". Morfeusz dostarcza lemat + morfologię (fleksja, przypadek, rodzaj), UDPipe buduje drzewo zależności składniowych (`nsubj`, `obj`, `obl`). Te dwie informacje razem są warunkiem koniecznym dla W2 żeby przypisać role semantyczne: bez `dep_rel` W2 nie wie że Jan jest podmiotem, bez `feats.Case` W2 nie odróżnia INSTRUMENT (narzędnik) od LOCATION (miejscownik).
+W1 istnieje bo język polski jest silnie fleksyjny — "dostarczył/dostarczy/dostarczał/dostarczyłem/dostarczyłaś" to formy tego samego lematu `dostarczyć`. Bez W1 żadna wyższa warstwa nie wie że te słowa znaczą "to samo". Morfeusz dostarcza lemat + morfologię (fleksja, przypadek, rodzaj), UDPipe buduje drzewo zależności składniowych (`nsubj`, `obj`, `obl`). Te dwie informacje razem są warunkiem koniecznym dla W2 żeby przypisać role semantyczne: bez `dep_rel` W2 nie wie że Wykonawca jest podmiotem, bez `feats.Case` W2 nie odróżnia INSTRUMENT (narzędnik) od LOCATION (miejscownik).
 
 **Co się sypie bez tej warstwy:**
 - W2 dostaje surowy tekst — próba mapowania ról bez fleksji to ~20-30% precision dla polskiego
@@ -61,8 +61,8 @@ Plik NKJP (XML/TEI P5)
 - Chcę przejść do projektowania struktury grafu wiedzy dla lintera.
 - Które moduły warto zrealizować najpierw w planie 12-18 miesięcy?
 - Pokaż jak rozwiązać konflikt między modułami Unit i Security..
-- Pokaż strukturę grafu dla zdania Jan zabił zwierzę.
-- Jak zaprojektować ontologię dla wielowymiarowej analizy zdarzenia „zabić”?
+- Pokaż strukturę grafu dla zdania 'Wykonawca dostarczył dokumentację techniczną z opóźnieniem'.
+- Jak zaprojektować ontologię dla wielowymiarowej analizy zdarzenia „dostarczyć / odstąpić od umowy"?
 - Pokaż jak sfinalizować architekturę i podsumować ten etap..
 - Pokaż strukturę ontologii dla wielodomenowej klasyfikacji zdarzeń..
 
@@ -82,7 +82,7 @@ Plik NKJP (XML/TEI P5)
 
 ### 3. Implementacja
 - Pokaż jak zaimplementować funkcję get_lemma w fazie GREEN..
-- Przedstaw model danych grafu wiedzy dla przykładu ze zwierzęciem..
+- Przedstaw model danych grafu wiedzy dla przykładu z dokumentacją techniczną.
 - Wyszukaj źródła i skrypty do automatyzacji ekstrakcji danych z NKJP..
 - Pokażmy Fazę GREEN i implementację logiki get_lemma..
 - Skonfigurujmy UDPipe jako parser składni zależności w modules..
@@ -120,7 +120,7 @@ Plik NKJP (XML/TEI P5)
 - Pokaż jak zmapować wynik CoNLL-U na obiekty grafu wiedzy..
 - Pokaż jak napisać dekoder formatu CoNLL-U na obiekty grafu..
 - Pokaż przykład analizy wymiarów dla zdania z raportu wojskowego.
-- Pokaż przykład analizy zdania "Jan zabił zwierzę" w Twoim grafie..
+- Pokaż przykład analizy zdania 'Wykonawca dostarczył dokumentację techniczną z opóźnieniem' w Twoim grafie..
 - Jak zapisać ontologię dla Twojego modelu semantycznego?
 - Jakie są 3 bariery hamujące rozwój systemów symbolicznych?
 - Jakie są korzyści z połączenia LLM z systemem symbolicznym?
@@ -175,8 +175,8 @@ Plik NKJP (XML/TEI P5)
 - Jak zaimplementować regułę posiadania po akcji 'dać'?
 - Jak rozbudować ontologię o wymiary narzędzia i intencji z Fazy 6?
 - Jak zaimplementować klasyfikator intencji dla pytań typu 'Gdzie'?
-- Jak rozbudować regułę o wymiar narzędzia (np. broń)?
-- Pokaż implementację logiki QUESTION dla zapytań o lokalizację Jana..
+- Jak rozbudować regułę o wymiar narzędzia (np. pismo, pieczęć, podpis elektroniczny)?
+- Pokaż implementację logiki QUESTION dla zapytań o lokalizację dokumentacji..
 - Jak rozbudować regułę o detekcję zaprzeczeń dla akcji dać?
 - Pokaż logikę wykrywania zaprzeczeń dla relacji posiadania..
 - Jak załadować dane Słowosieci z plików tekstowych do silnika?
@@ -231,7 +231,7 @@ Plik NKJP (XML/TEI P5)
 - Jak dodać relację dla testu E2E?
 - Napiszmy test jednostkowy dla relacji przed i po..
 - Jak zaimplementować test sprawdzający generowanie stanu końcowego dla akcji?
-- Stwórzmy test dla reguły narzędzia, np. 'Jan zabił zwierzę nożem'..
+- Stwórzmy test dla reguły narzędzia (Case=Ins), np. 'Zamawiający odrzucił ofertę pismem z dnia 15 marca'..
 - Jak napisać test dla pytania "Gdzie znajduje się Jan?"?
 - Pokaż test dla pytania "Gdzie znajduje się Jan?".
 

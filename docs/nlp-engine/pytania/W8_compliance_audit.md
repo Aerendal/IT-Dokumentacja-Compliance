@@ -76,23 +76,23 @@ Tekst z NKJP (XML)
 - Jak zmapować tagi MSD z NKJP na relacje w grafie?
 
 ### 3. Implementacja
-- Pokaż jak zapisać zdarzenie „Jan zabił zwierzę” w grafie..
+- Pokaż jak zapisać zdarzenie „Wykonawca dostarczył dokumentację techniczną z opóźnieniem" w grafie..
 - Jak wygenerować Raport Luk w formacie tabeli pokrycia?
-- Pokaż model danych dla zdarzenia Jan zabił zwierzę..
-- Jak zaimplementować wymiar kłusownictwa w regułach wnioskowania?
-- Stwórzmy model danych dla zdarzenia 'Jan zabił zwierzę'..
+- Pokaż model danych dla zdarzenia 'Wykonawca dostarczył dokumentację z opóźnieniem' (CONS-02)..
+- Jak zaimplementować wymiar naruszenia_zobowiązania w regułach wnioskowania?
+- Stwórzmy model danych dla zdarzenia kontraktowego z AGENT, ACTION, PATIENT, MANNER..
 - Jak zmapować 6 wymiarów zdarzenia na graf Neo4j?
-- Pokaż model danych dla zdarzenia 'Jan zabił zwierzę'..
-- Pokaż dokładny model danych dla zdarzenia Jan zabił zwierzę..
+- Pokaż model danych dla zdarzenia 'Zamawiający odstąpił od umowy pismem'..
+- Pokaż dokładny model danych dla zdarzenia 'Wykonawca nie dostarczył dokumentacji w terminie'..
 - Jak rozbudować regułę POSSESSION o wymiar ekonomiczny i prawny?
-- Jak wdrożyć regułę klasyfikacji kłusownictwa w InferenceEngine?
-- Zaimplementujmy regułę klasyfikacji prawnej dla kłusownictwa..
-- Pokaż kod reguły klasyfikacji prawnej na podstawie kłusownictwa.
+- Jak wdrożyć regułę klasyfikacji naruszenia_terminowego (CONS-02) w InferenceEngine?
+- Zaimplementujmy regułę klasyfikacji naruszenia zobowiązania kontraktowego..
+- Pokaż kod reguły klasyfikacji prawnej na podstawie naruszenia terminu.
 - Pokaż przykład analizy incydentu w 6 wymiarach event reasoning..
 - Zaimplementujmy regułę RISK-01 dla analizy ryzyka w API..
 - Zaimplementujmy regułę CONS-02 sprawdzającą opisy komponentów w grafie.
 - Pokaż jak zmapować tagi NKJP na relacje w grafie.
-- Zaimplementujmy 6 wymiarów analizy zdarzeń dla zdania o zwierzęciu.
+- Zaimplementujmy 6 wymiarów analizy zdarzeń dla zdania o dostarczeniu dokumentacji.
 - Zaimplementujmy Data Bridge do mapowania tagów NKJP na graf..
 - Jakie jest 6 wymiarów wielowymiarowego modelu zdarzeń?
 - Napiszmy Data Bridge do mapowania tagów NKJP na graf..

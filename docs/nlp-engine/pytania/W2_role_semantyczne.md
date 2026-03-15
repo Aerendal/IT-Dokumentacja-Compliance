@@ -51,7 +51,7 @@ DependencyTree (CoNLL-U z W1)
   SlowosiecAdapter   ← WSD dla polisemicznych słów
        │
        ▼
-  EventRoleDict: {AGENT: "Jan", PATIENT: "zwierzę", ...}
+  EventRoleDict: {AGENT: "Wykonawca", PATIENT: "dokumentacja_techniczna", ...}
        │
        ▼
   W4 (Neo4j) / W5 (InferenceEngine)
@@ -168,8 +168,8 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 4. Testowanie
 
-- Jak napisać czerwony test TDD dla `SemanticMapper.map_roles("Jan zabił zwierzę")` → `{AGENT: "Jan", PATIENT: "zwierzę"}`?
-- Jak testować stronę bierną: `map_roles("Zwierzę zostało zabite przez Jana")` → `{AGENT: "Jan", PATIENT: "zwierzę"}`?
+- Jak napisać czerwony test TDD dla `SemanticMapper.map_roles("Wykonawca dostarczył dokumentację techniczną z opóźnieniem")` → `{AGENT: "Wykonawca", PATIENT: "dokumentacja_techniczna", MANNER: "opóźnienie"}`?
+- Jak testować stronę bierną: `map_roles("Dokumentacja techniczna została odrzucona przez Zamawiającego")` → `{AGENT: "Zamawiający", PATIENT: "dokumentacja_techniczna"}`?
 - Jak zbudować oracle dataset 100 zdań z ręcznie annotowanymi rolami semantycznymi?
 - Jak mierzyć Precision/Recall/F1 dla SRL na oracle datasecie?
 - Jak testować relacje czasowe `before`/`after` w zdaniach z "przed" i "po"?
@@ -241,10 +241,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak stopniowo rozszerzać mapowanie: najpierw AGENT/PATIENT → potem INSTRUMENT/LOCATION → potem TIME/CAUSE?
 
 ### Skalowanie na złożone struktury zdań
-
-- Jak `SemanticMapper` obsługuje zdania z wieloma AGENT (podmiot zbiorowy: "Jan i Maria zabili")?
-- Jak mapować role dla nominalizacji ("zabójstwo Jana" — kto jest AGENT?)?
-- Jak obsługiwać strony bierne wielokrotne ("Zwierzę zostało zabite i zjedzone")?
+- Jak `SemanticMapper` obsługuje zdania z wieloma AGENT (podmiot zbiorowy: "Wykonawca i Podwykonawca dostarczyli")?
+- Jak mapować role dla nominalizacji ("naruszenie zobowiązania przez Wykonawcę" — kto jest AGENT)?
+- Jak obsługiwać strony bierne wielokrotne ("Dokumentacja została odrzucona i zarchiwizowana")?
 - Jak testować W2 na zdaniach prawnych (zdania wieloklauzowe, pasywne, z nominalnym orzecznikiem)?
 - Jak stopniowo rozszerzać słownik przyimków z 20 do 100 (kolejne domeny: medyczna, wojskowa, prawna)?
 

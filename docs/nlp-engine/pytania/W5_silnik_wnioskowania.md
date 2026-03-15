@@ -13,7 +13,7 @@ tags: [InferenceEngine, Drools, DRL, wnioskowanie, dedukcja, lancuchy_przyczynow
 
 Warstwa 5 implementuje logiczne wnioskowanie na grafie wiedzy z W4.
 Przetwarza `EventRoleDict` przez reguły IF-THEN (Python lub Drools DRL),
-buduje łańcuchy przyczynowe i inferencje (stan obiektu, posiadanie, lokalizacja, kłusownictwo).
+buduje łańcuchy przyczynowe i inferencje (stan obiektu, posiadanie, lokalizacja, naruszenie_zobowiązania).
 
 Kluczowe klasy: `InferenceEngine`, `StateMatrix`, `IntentClassifier`.
 
@@ -43,7 +43,7 @@ Graf Neo4j (W4) + EventRoleDict (W2)
   │  _rule_location(event) → LOCATED_AT        │
   │  _rule_possession_transfer(event) → OWNS   │
   │  _rule_state_change(event) → state=dead    │
-  │  _rule_classify_legal(event) → kłusownictwo│
+  │  _rule_classify_legal(event) → naruszenie_zobowiązania│
   │  _rule_negation(event) → NOT_OCCURRED      │
   └────────────────────────────────────────────┘
        │
@@ -118,8 +118,8 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż przykład pliku .drl dla reguły lokalizacji.
 - Jak połączyć Walentego z naszym modelem zdarzeń i ról?
 - Jakie reguły wnioskowania najlepiej obsłużą hierarchię gatunków ze Słowosieci?
-- Jak zaimplementować wykrywanie ramy subkategoryzacyjnej dla czasownika 'zabić'?
-- Pokaż regułę wnioskowania o posiadaniu dla Jana i Marii.
+- Jak zaimplementować wykrywanie ramy subkategoryzacyjnej dla czasownika 'dostarczyć'?
+- Pokaż regułę wnioskowania o posiadaniu dla Wykonawcy i Zamawiającego.
 - Jakie są najtrudniejsze ramy walencyjne w języku polskim?
 - Pokaż przykład złożonej ramy walencyjnej dla nowej domeny..
 - Jak rozbudować model zdarzenia o wymiar narzędzia i intencji?
@@ -153,7 +153,7 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż regułę Drools dla testu integracyjnego.
 - Stwórzmy czerwony test dla nowej klasy InferenceEngine.
 - Pokaż pętlę dedukcji, która zapali test na zielono..
-- Stwórzmy test dla reguły skutku akcji 'zabić' w InferenceEngine.
+- Stwórzmy test dla reguły skutku akcji 'dostarczyć z opóźnieniem' w InferenceEngine.
 - Przetestujmy ramy walencyjne dla nowych czasowników..
 - Napiszmy czerwony test dla nowej reguły posiadania w InferenceEngine..
 
@@ -196,16 +196,16 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zaimplementować `_rule_location(event)` — kiedy `EventRoleDict` ma LOCATION → zapisz `LOCATED_AT`?
 - Jak zaimplementować `_rule_possession_transfer(give_event)` → `Maria OWNS książka`?
 - Jak wykrywać negację (`nie dał`) i zapisać `NOT_OCCURRED` w StateMatrix?
-- Jak zaimplementować `_rule_classify_legal(event)` wykrywającą kłusownictwo (AGENT + zabić + gatunek chroniony)?
+- Jak zaimplementować `_rule_classify_legal(event)` wykrywającą naruszenie_terminowe (AGENT + dostarczyć + MANNER:opóźnienie)?
 - Jak zaimplementować `IntentClassifier` — detekcja QUESTION przez słowa pytajne?
 
 ### 4. Testowanie
 
-- Jak napisać czerwony test TDD dla `InferenceEngine` — `"Jan zabił zwierzę"` → `{state: dead, legal: kłusownictwo}`?
+- Jak napisać czerwony test TDD dla `InferenceEngine` — `"Wykonawca dostarczył dokumentację z opóźnieniem"` → `{cons: CONS-02, rule: naruszenie_terminu}`?
 - Jak testować wielowymiarowy model zdarzenia: AGENT + ACTION + PATIENT + INSTRUMENT + LOCATION + TIME?
-- Jak testować negację: `"Jan nie dał Marii książki"` → `posiadanie=NOT_OCCURRED`?
-- Jak testować łańcuch: zdanie 1 = "Jan zabrał broń", zdanie 2 = "Jan zabił" → wnioskowanie o narzędziu?
-- Jak testować zapytania o lokalizację: `"Gdzie jest Jan?"` → przeszukanie grafu → odpowiedź?
+- Jak testować negację: `"Wykonawca nie dostarczył dokumentacji"` → `dostawa=NOT_OCCURRED`?
+- Jak testować łańcuch: zdanie 1 = "Wykonawca złożył ofertę", zdanie 2 = "Wykonawca dostarczył dokumentację z opóźnieniem" → wnioskowanie o naruszeniu?
+- Jak testować zapytania o lokalizację: `"Gdzie jest dokumentacja?"` → przeszukanie grafu → odpowiedź?
 
 ### 5. Obsługa błędów
 
@@ -241,7 +241,7 @@ _brak pytań źródłowych w tej kategorii_
 |---|---|
 | Czas wnioskowania dla 1 zdania (1000 reguł) | < 100 ms |
 | Czas wnioskowania batch 100 zdań | < 10 s |
-| Precision klasyfikacji prawnej (kłusownictwo) | ≥ 95% |
+| Precision klasyfikacji naruszenia terminowego (CONS-02) | ≥ 95% |
 | F1 detekcji intencji QUESTION vs ASSERT | ≥ 90% |
 | Pokrycie testów linii | ≥ 85% |
 
@@ -261,7 +261,7 @@ _brak pytań źródłowych w tej kategorii_
 
 - Jak logować pełny ślad wnioskowania: "reguła X aktywowana bo warunek Y spełniony przez fakt Z"?
 - Jak przechowywać activation trace per zdanie dla celów dowodowych (odpowiedzialność cywilna)?
-- Jak wygenerować raport "dlaczego system sklasyfikował zdarzenie jako kłusownictwo"?
+- Jak wygenerować raport "dlaczego system sklasyfikował zdarzenie jako naruszenie_zobowiązania"?
 
 ---
 
