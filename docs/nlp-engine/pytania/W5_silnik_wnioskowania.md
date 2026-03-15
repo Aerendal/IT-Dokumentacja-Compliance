@@ -328,6 +328,7 @@ _brak pytań źródłowych w tej kategorii_
 - Napiszmy minimalny kod klasy `IntentClassifier` aby testy przeszły — `class IntentClassifier: QUESTION_WORDS = {'jak','czy','kiedy','gdzie','co','kto'}; def classify(self, sentence: str) → str: return 'QUESTION' if sentence.split()[0].lower() in self.QUESTION_WORDS else 'ASSERT'`; faza GREEN dla testu `assert clf.classify('Jak działa system') == 'QUESTION'`?
 - Pokaż przykład klasyfikacji intencji dla dokumentacji technicznej w Pythonie — `clf = IntentClassifier(); clf.classify('Wykonawca dostarczył SRS')` → `'ASSERT'`; `clf.classify('Czy SRS spełnia wymagania?')` → `'QUESTION'`; `clf.classify('Należy dostarczyć dokumentację')` → `'REQUIREMENT'` (rozszerzony klasyfikator z listą leksemów modalnych)?
 - Jakie są najczęstsze luki wykrywane przez KnowledgeGapTracker w tekstach — typ UNMATCHED_RULE (brak reguły DRL dla predykatu) dominuje (~60%), UNKNOWN_WORD/ign (~25% dla neologizmów i skrótów technicznych), UNKNOWN_STRUCTURE/brak root (~10% dla zdań eliptycznych), UNMATCHED_PREDICATE/brak synsetu (~5%); proporcje wskazują że priorytetem ML jest uzupełnianie reguł DRL?
+- Wdróżmy klasę `IntentClassifier` w Fazie Green — po napisaniu czerwonego testu `assert clf.classify('Jak działa system') == 'QUESTION'`, implementacja z `QUESTION_WORDS` przechodzi; następny krok: dodaj `MODAL_WORDS = {'musi','powinien','należy'}` i test `'Należy dostarczyć' → 'REQUIREMENT'` jako kolejna iteracja RED→GREEN?
 
 ### 4. Testowanie
 
