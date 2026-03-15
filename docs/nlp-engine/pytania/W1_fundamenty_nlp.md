@@ -343,6 +343,8 @@ Plik NKJP (XML/TEI P5)
 ### 5. Obsługa błędów
 
 - Co robi `get_lemma()` dla nieznanych form (OOV — Out of Vocabulary)?
+- Jak system obsłuży brakujące pojęcia OOV w W1 — token `ign` z Morfeusza → `KnowledgeGapTracker.capture_ign(token)` → wpis do kolejki aktywnego uczenia zamiast wyjątku?
+- Jak OOV token z W1 jest propagowany przez pipeline — `ign` tag w CoNLL-U oznacza low-confidence, InferenceEngine w W5 traktuje go jako UNKNOWN_WORD i nie emituje :CAUSES?
 - Jak obsługiwać synkretyzm form (słowo "dam" = 1sg futurum LUB G.pl. "dama") bez UDPipe?
 - Co zwrócić, gdy UDPipe nie może sparsować zdania (brak modelu, malformed input)?
 - Jak logować błędy parsowania NKJP XML (uszkodzone tagi TEI, brakujące atrybuty)?

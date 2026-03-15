@@ -177,6 +177,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak buforować wyniki SlowosiecAdapter w CausalChainBuilder — `@lru_cache(maxsize=512)` na metodzie `_get_synonym_set(predicate)` aby uniknąć powtórnych zapytań SQLite podczas analizy dokumentu?
 - Jak skonfigurować próg semantycznego soft matchingu w CausalChainBuilder — parametr `threshold: float = 0.5` w konstruktorze, porównanie jaccard@synsets między predykatem a wzorcem?
 - Jak przetestować integrację SlowosiecAdapter+CausalChainBuilder dla soft matchingu — asercja że dokument z 'przekazać' aktywuje regułę CONS-02 zdefiniowaną dla 'dostarczyć'?
+- Jak rozszerzyć `_soft_match` o relacje hiperonimii — oprócz synonimów sprawdzaj `_lexicon.get_hypernyms(predicate)` i porównaj hiperonim ze wzorcem reguły (np. 'przekazać' → 'dostarczyć' → 'działanie')?
+- Jak ustalić głębokość przeszukiwania hiperonimii w `_soft_match` — parametr `max_depth: int = 3` w konstruktorze, BFS po ścieżce hiperonimów do korzenia ontologii przez `get_hypernym_path()`?
 - Zaimplementujmy klasę KnowledgeGapTracker do logowania nieznanych zdarzeń i słów — jakie typy luk rozróżnia (UNKNOWN_PREDICATE, MISSING_SYNSET, UNMATCHED_RULE)?
 - Jak KnowledgeGapTracker rejestruje zdarzenie nierozpoznane przez żadną regułę DRL — hook after_rule_evaluation gdy activated_rules.is_empty()?
 - Jak KnowledgeGapTracker eksportuje dane do kolejki aktywnego uczenia — JSONL z polami predicate, context, doc_id, timestamp?
@@ -245,6 +247,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować to_html() — asercja że wynik zawiera `<div class="mermaid">flowchart LR` i wywołanie `mermaid.initialize()`?
 
 ### 4. Testowanie
+- Napiszmy test jednostkowy dla soft matchingu synonimów — `@pytest.mark.parametrize` z parami ('przekazać','dostarczyć'), ('wręczyć','dostarczyć') potwierdzającymi aktywację reguły CONS-02?
+- Jak przetestować próg soft matchingu — asercja że pary z jaccard@synsets < 0.5 NIE aktywują reguły, a pary z jaccard ≥ 0.5 aktywują?
+- Jak testować `_soft_match` w izolacji — mock SlowosiecAdapter zwracający zdefiniowane synsets dla konkretnych lematów bez zapytania do SQLite?
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?
 - Pokaż regułę Drools dla testu integracyjnego.
 - Stwórzmy czerwony test dla nowej klasy InferenceEngine.
@@ -264,6 +269,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak obsłużyć nieoczekiwany wyjątek Java w KieSession — izolacja sesji czy restart całego serwisu?
 - Jak logować każdą decyzję wnioskowania do celów audytu i traceability dla klienta?
 - Jak obsłużyć zbyt długi czas wnioskowania — czy jest zdefiniowany timeout per session?
+- Jak system obsłuży brakujące pojęcia OOV w InferenceEngine — gdy predykat EventFrame nie istnieje w Słowosieci: fallback do exact match, log KnowledgeGapTracker.capture_ign(token), kontynuacja pipeline zamiast wyjątku?
+- Jak propagować informację o OOV przez pipeline W1→W5 — token `ign` z Morfeusza staje się UNKNOWN_WORD w KGT, InferenceEngine traktuje go jako low-confidence event bez emisji :CAUSES?
 
 ### 6. Integracja z innymi warstwami
 - Jak zintegrować reguły Drools z wynikami parsera lxml?

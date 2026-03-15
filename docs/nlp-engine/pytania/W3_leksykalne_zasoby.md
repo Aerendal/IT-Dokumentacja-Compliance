@@ -161,6 +161,11 @@ _brak pytań źródłowych w tej kategorii_
 - Jak przetestować kompletność słownika terminologicznego dla branży LEGAL — `SELECT COUNT(*) FROM domain_lemma WHERE domain='LEGAL'` vs liczba terminów w glosariuszu źródłowym?
 - Jak uruchomić ETL dla Słowosieci jako pipeline trzech kroków — extract (parsuj LMF XML przez iterparse), transform (mapuj LexicalEntry→lemma, Synset→synset_id), load (batch INSERT z transakcjami)?
 - Jak zmierzyć wydajność wyszukiwania synsetów po ETL — `timeit get_synonyms('dostarczyć')` < 10 ms przy włączonym COVERING INDEX na `(lemma, synset_id)` jako kryterium akceptacji?
+- Jak zapewnić idempotentność skryptu compile_wordnet.py — `CREATE TABLE IF NOT EXISTS` i `INSERT OR REPLACE` aby wielokrotne uruchomienie nie duplikowało danych?
+- Jak logować postęp kompilacji plWordNet w compile_wordnet.py — `tqdm` progress bar wypisujący liczbę wstawionych synsetów co 1000 wierszy batch?
+- Jak stworzyć automatyczny ekstraktor terminologii branżowej — skrypt TF-IDF na korpusie prawnym: termin = leksem o TF-IDF > threshold, IDF z korpusu NKJP jako baseline?
+- Jak ekstraktor filtruje fałszywe pozytywy — lista wykluczeń POS: pomijaj VERB bez branżowego frame walencyjnego i PRON; zachowaj NOUN i ADJ z wysokim TF-IDF?
+- Jak zintegrować ekstraktor z `domain_overrides` — wyniki ekstraktora → CSV → `INSERT INTO domain_lemma(lemma, domain, synset_id)` w plwordnet.db jako wejście dla `SlowosiecAdapter(domain='LEGAL')`?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..
