@@ -113,6 +113,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zaprojektować tagi dla różnych stylów dokumentacji — enum: FORMAL (umowy), TECHNICAL (specyfikacje), REGULATORY (regulacje) jako wartości pola `doc_style` w YAML front matter?
 - Jak zaprojektować tagi dla różnych branż — pole `industry` w YAML front matter: CIVIL_LIABILITY, FINANCE, CONSTRUCTION, IT jako enum walidowany przez JSON Schema?
 - Jak zbudować system wielowymiarowych tagów — kombinacja `doc_style`, `industry`, `layer` pozwala filtrować raport audytu po wielu wymiarach jednocześnie?
+- Jak pole `industry` YAML łączy się z branżowymi słownikami terminologicznymi W3 — audyt dokumentu CIVIL_LIABILITY używa słownika prawniczego z `SlowosiecAdapter(domain='LEGAL')`?
+- Jak dodać nowe wartości enum industry bez przebudowy walidatora — JSON Schema `$defs/Industry` z `anyOf` zamiast sztywnego enum?
 - Uruchommy walidator Markdown jako dogfooding lintera — uruchom na plikach dokumentacji własnego projektu.
 - Jak skonfigurować walidator Markdown (markdownlint, pymarkdown) jako pre-commit hook w CI/CD?
 - Jak walidator W0 używa własnych reguł do weryfikacji plików W_x — przykład dogfooding z wynikiem audytu?

@@ -150,6 +150,8 @@ Tekst z NKJP (XML)
 - Pokaż przykład raportu prezentującego Wykryte Luki w Wiedzy Silnika — sekcja knowledge_gaps z polami: unknown_predicates, missing_synsets, unmatched_rules?
 - Jak GapAnalysisReport odróżnia luki compliance (brakujący wymóg z GoldenStandardProfile) od luk wiedzy silnika (nieznany predykat)?
 - Jak KnowledgeGapTracker dostarcza zagregowane dane do sekcji knowledge_gaps w GapAnalysisReport po zakończeniu sesji przetwarzania?
+- Jak zintegrować KnowledgeGapTracker z potokiem analizy zdarzeń w AuditEngine — `tracker.check(event_frame)` przed wywołaniem reguł DRL dla każdego zdarzenia?
+- Jak KnowledgeGapTracker wpływa na wynik GapAnalysisReport — zdarzenia bez dopasowania trafiają do sekcji `knowledge_gaps` a nie `violations`?
 - Stwórzmy wizualizację grafu zdarzeń w Mermaid.js dla raportu — jak AuditEngine generuje pole `mermaid_diagram` w AuditResponse z flowchart LR zawierającym :EventFrame naruszenia?
 - Jak filtrować węzły :EventFrame w wizualizacji raportu — pokazuj tylko zdarzenia severity CRITICAL/HIGH aby uniknąć przesłonięcia kluczowych naruszeń zbędnymi węzłami?
 - Przygotujmy metodę to_html() w GapAnalysisReport — serializuje raport jako kompletny plik HTML z tabelą naruszeń i osadzonym diagramem Mermaid.js w jednym pliku?

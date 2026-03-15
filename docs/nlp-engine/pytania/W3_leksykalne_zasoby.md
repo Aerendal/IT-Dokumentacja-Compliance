@@ -147,6 +147,12 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zaindeksować bazę SQLite plWordNet dla wydajności — indeks na kolumnach `lemma` i `synset_id` dla szybkich zapytań get_synonyms(lemma)?
 - Jak SlowosiecAdapter korzysta ze skompilowanej bazy SQLite zamiast pliku tekstowego — connection pool, parametryczne zapytania SELECT, LRU cache wyników?
 - Jak weryfikować kompletność skompilowanej bazy SQLite — SELECT COUNT(*) z każdej tabeli i porównanie z liczbą `<Synset>` w źródłowym LMF XML?
+- Jak wygląda główna funkcja compile_plwordnet.py — `if __name__ == '__main__': compile(src_xml, dest_db, batch_size=1000)` z argparse dla --src i --dest?
+- Jak obsłużyć błąd parsowania LMF XML podczas kompilacji — try/except na iterparse, logowanie elementu, rollback transakcji przez `conn.rollback()`?
+- Jak zdefiniować granice transakcji w compile_plwordnet.py — commit co batch_size wierszy, BEGIN TRANSACTION i COMMIT zawijają każdy blok batch INSERT?
+- Jak zaprojektować strukturę tagów dla branżowych słowników terminologicznych — dodatkowe pole `domain` w tabeli SQLite: LEGAL, CONSTRUCTION, IT, FINANCE mapowane na branżowy synset?
+- Jak tagi branżowe integrują się z SlowosiecAdapter — `get_synonyms(lemma, domain='LEGAL')` filtruje synonimy tylko z terminologii prawniczej danej branży?
+- Jak wersjonować branżowe słowniki terminologiczne — osobna tabela `domain_overrides` w plwordnet.db nadpisująca relacje dla konkretnej domeny?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..
@@ -206,6 +212,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak hiperonimia Słowosieci wspiera Soft Matching w CausalChainBuilder — predykat 'przekazać' dopasowuje regułę dla 'dostarczyć' przez wspólny hiperonim 'działanie'?
 - Jak SlowosiecAdapter.get_hypernym_path(lemma) zwraca ścieżkę do korzenia ontologii — używana przez Soft Matching do ustalenia semantycznej odległości?
 - Zintegrujmy Słowosieć z grafem, aby lepiej rozumieć synonimy — jak węzły :Synset w Neo4j rozszerzają dopasowanie predykatów w regułach DRL?
+- Zintegrujmy SlowosiecAdapter z CausalChainBuilder do łączenia zdarzeń — wywołanie `get_synonyms(predicate)` w logice `link_events()` CausalChainBuilder decyduje o emisji krawędzi :CAUSES?
+- Jak SlowosiecAdapter.get_synonym_set(lemma) zasila mapowanie predykatów w CausalChainBuilder.link_events() — sprawdzenie czy predykat zdarzenia należy do synsetu wzorca reguły?
 - Jak graf synsetów Słowosieci pozwala regule dopasować "wręczyć" gdy oczekuje "dostarczyć" — ścieżka przez wspólny hiperonim 'działanie transferu'?
 - Jak testować integrację Słowosieci z grafem dla synonimów — asercja MATCH(:Synset)-[:IS_SYNONYM]->(:Synset) dla pary 'dostarczyć'/'przekazać'?
 

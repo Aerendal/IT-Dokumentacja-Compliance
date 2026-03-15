@@ -169,6 +169,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak Soft Matching sprawdza czy :EventFrame.predicate należy do synsetu 'dostarczyć' (i synonimów) przed emisją krawędzi :CAUSES?
 - Jak zdefiniować próg Soft Matching — minimalne jaccard@synsets między predykatem a wzorcem reguły (threshold = 0.5)?
 - Jak testować Soft Matching — asercja że 'przekazać' pasuje do reguły zdefiniowanej dla 'dostarczyć' przez wspólny synset?
+- Zintegrujmy SlowosiecAdapter z CausalChainBuilder do łączenia zdarzeń — CausalChainBuilder.link_events(e1, e2) sprawdza SlowosiecAdapter.get_synonyms(e1.predicate) zanim emituje krawędź :CAUSES?
+- Jak CausalChainBuilder decyduje czy dwa EventFrame połączyć :CAUSES bazując na Słowosieci — e1.predicate ∈ get_synonym_set(rule.predicate) → MERGE (e1)-[:CAUSES]->(e2)?
 - Zaimplementujmy klasę KnowledgeGapTracker do logowania nieznanych zdarzeń i słów — jakie typy luk rozróżnia (UNKNOWN_PREDICATE, MISSING_SYNSET, UNMATCHED_RULE)?
 - Jak KnowledgeGapTracker rejestruje zdarzenie nierozpoznane przez żadną regułę DRL — hook after_rule_evaluation gdy activated_rules.is_empty()?
 - Jak KnowledgeGapTracker eksportuje dane do kolejki aktywnego uczenia — JSONL z polami predicate, context, doc_id, timestamp?
@@ -176,6 +178,8 @@ _brak pytań źródłowych w tej kategorii_
 - Zaimplementujmy KnowledgeGapTracker do logowania nieznanych struktur składniowych — jak tracker wykrywa zdanie bez parsowania dep_rel (brak węzła root w CoNLL-U z UDPipe)?
 - Jak KnowledgeGapTracker kategoryzuje typy luk — UNKNOWN_WORD (tag ign), UNKNOWN_STRUCTURE (brak root), UNMATCHED_PREDICATE (brak synsetu), UNMATCHED_RULE (brak reguły DRL)?
 - Jak tracker loguje nieznane struktury do bazy aktywnego uczenia — wpis UNKNOWN_STRUCTURE zawiera: raw_sentence, conllu_partial, doc_id, timestamp?
+- Jak zintegrować KnowledgeGapTracker z potokiem analizy zdarzeń — w EventFrame extraction loop: dla każdego EventFrame wywołaj `tracker.check_predicate(frame.predicate)` zanim trafi do InferenceEngine?
+- Jak KnowledgeGapTracker wchodzi w potok W2→W5 — po SemanticMapper.extract() `tracker.check(event)` przed przekazaniem EventFrame do InferenceEngine?
 - Jak wdrożyć Klasyfikator Kontekstu aby system rozumiał typ (jestestwo) dokumentu — umowa, SRS, raport, specyfikacja?
 - Jak KlasyfikatorKontekstu pobiera sygnały z W3 (leksyka), W2 (role) i W6 (koreferencja) do klasyfikacji dokumentu?
 - Jak zdefiniować enum klas dokumentów w KlasyfikatorKontekstu — UMOWA, SRS, RAPORT_AUDYTU, SPECYFIKACJA_TECHNICZNA?
