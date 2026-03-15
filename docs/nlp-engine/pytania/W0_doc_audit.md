@@ -128,6 +128,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zapisać pominięte reguły w raporcie audytu — pole `suppressed_rules` z polami: rule_id, reason, author?
 - Jak zapobiec nadużywaniu `ignore_rules` — limit ilości pominięć per dokument i wymaganie pola `reason`?
 - Jak zautomatyzować przypisanie klasy dokumentu na podstawie metadanych YAML — skrypt batch który klasyfikuje per plik po polach layer/tags?
+- Stwórzmy klasę DocumentClassifier do automatycznej kategoryzacji plików — jak DocumentClassifier.classify(file_path) → DocumentType?
+- Jak DocumentClassifier różni się od KlasyfikatorKontekstu — DocumentClassifier operuje na pliku/metadanych, KlasyfikatorKontekstu na zawartości semantycznej?
+- Jak DocumentClassifier integruje się z Linterem W0 — klasyfikacja przed audytem aby wybrać odpowiedni zestaw reguł?
 
 ### 4. Testowanie
 - Jak zaimplementować testy własnościowe dla reguł ARCH-01 i SEC-01?
@@ -176,6 +179,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak Linter W0 używa synsetów z W3 aby odróżnić synonim (ten sam sens) od homonimii (różny sens)?
 - Jak skonfigurować próg podobieństwa semantycznego (Jaccard na synsetach) dla detekcji duplikatów w Linterze?
 - Jak Linter W0 obsługuje przypadek gdy W3 (Słowosieć) jest niedostępne — fallback do detekcji leksykalnej?
+- Zaktualizujmy GapAnalysisGenerator o zapytania Cypher dla Neo4j — jak generator pobiera dane o lukach bezpośrednio z grafu?
+- Jak GapAnalysisGenerator buduje zapytanie Cypher MATCH (d:Document)-[:HAS_GAP]->(g:Gap) RETURN g per document_id?
+- Jak zdefiniować kontrakt między W0 (GapAnalysisGenerator) a W4 (Neo4j) — REST API vs. neo4j-driver Python?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

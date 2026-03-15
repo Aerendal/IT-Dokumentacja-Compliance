@@ -137,6 +137,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak parsować plik `synsety.txt` Słowosieci — jaki jest format rekordu synsetu (synset_id TAB lista lematów oddzielona przecinkami)?
 - Jak zaimplementować `SlowosiecAdapter._load_from_files(units_path, synsets_path)` — inicjalizacja słownika lematów i synsetów?
 - Jak walidować integralność pliku `jednostki.txt` — czy każde id jednostki z `synsety.txt` ma odpowiadający wpis w `jednostki.txt`?
+- Napiszmy SlowosiecAdapter do obsługi synonimów w grafie Neo4j — jak adapter zapisuje wyniki get_synonyms() jako węzły :Synset z krawędziami :SYNONYM?
+- Jak SlowosiecAdapter.enrich_graph(lemma, neo4j_session) dodaje węzeł :Synset i krawędzie :IS_SYNONYM do istniejącego :EventFrame?
+- Jak uniknąć duplikatów węzłów :Synset w grafie gdy wielu AGENT używa tego samego synonimów — MERGE zamiast CREATE?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..

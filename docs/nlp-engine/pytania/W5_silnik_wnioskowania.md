@@ -67,6 +67,8 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Jak wyglądają granice W5 — co dostarcza W4 (baza grafowa) a co W5 dodaje przed przekazaniem do W8?
 - Jaki wzorzec stosuje W5 dla rejestrowania reguł DRL — plugin, convention-over-configuration, czy explicit register?
 - Jak W5 obsługuje wiele aktywnych sesji KieSession równolegle — pool sesji, jedna sesja globalna, czy per-request?
+- Jak zdefiniować architekturę DocumentClassifier w W5 — oddzielna klasa czy metoda KlasyfikatorKontekstu.classify_by_metadata()?
+- Jak DocumentClassifier współpracuje z InferenceEngine — wynik klasyfikacji pliku filtruje zestaw reguł DRL przed wnioskowniem?
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
@@ -200,6 +202,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak linkować węzeł Mermaid.js z referencją do zdania źródłowego — click callback z document_id i sentence_id?
 - Wygeneruj przykładowy kompletny diagram Mermaid.js dla raportu audytu CONS-02 — flowchart LR z węzłami zdarzenia i krawędziami :CAUSES?
 - Jak wybrać poziom szczegółowości przykładu Mermaid.js — 3-węzłowy dla prezentacji vs. pełny dla eksportu technicznego?
+- Jak zaktualizować metodę to_mermaid() aby wyświetlała relacje semantyczne — :IS_A, :HAS_SYNSET obok :CAUSES w tym samym diagramie?
+- Jak kodować typ relacji w etykiecie krawędzi Mermaid.js — A -->|IS_A| B vs. A -->|CAUSES rule_id| B?
+- Jak filtrować które relacje semantyczne trafiają do to_mermaid() — parametr include_relations: List[str]?
+- Jak generować oddzielne sekcje `subgraph` w Mermaid.js dla każdego typu relacji (kauzalne vs. ontologiczne)?
 
 ### 4. Testowanie
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?

@@ -75,6 +75,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zdefiniować kontrakt dla roli OPTIONAL vs. REQUIRED w strukturze predykatu — null, absent, czy empty list?
 - Czy EventFrame posiada wersjonowanie schematu — jak obsłużyć nowe role bez łamania starych rekordów w grafie?
 - Jak wygląda przykładowy obiekt EventFrame dla zdania "Wykonawca dostarczył dokumentację z opóźnieniem" — pokaż JSON?
+- Jak stworzyć model danych dla relacji semantycznej w kontekście prawnym — EventFrame z polami AGENT="Wykonawca", ACTION="przekazać", PATIENT="dokumentacja"?
+- Jak reprezentować relację INSTRUMENT w modelu danych EventFrame — opcjonalne pole vs. osobna krawędź :HAS_ROLE(INSTRUMENT)?
+- Jak walidować kompletność modelu danych EventFrame — które role są obligatoryjne (AGENT, ACTION) a które opcjonalne (INSTRUMENT, LOCATION)?
 
 ### 3. Implementacja
 - Jak stworzyć formalną ontologię dla relacji agent-akcja-obiekt?
