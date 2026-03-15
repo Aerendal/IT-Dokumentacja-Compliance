@@ -85,6 +85,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jaki jest format plWordNet (LMF XML) — struktura pliku, elementy LexicalEntry, Sense, Synset, SynsetRelation?
 - Jak odróżnić plWordNet (format LMF XML) od API Słowosieci (REST/SOAP) — kiedy używać którego źródła?
 - Jak parsować plik plWordNet LMF XML w Pythonie — lxml, iterparse dla pliku 500 MB bez ładowania do RAM?
+- Jak mapować elementy plWordNet LMF (LexicalEntry→:Token, Synset→:Synset, SynsetRelation→:IS_A) w Neo4j?
+- Jak synchronizować wersję plWordNet (4.2→5.0) z grafem Neo4j — delta import i usuwanie przestarzałych węzłów?
+- Jak obsłużyć synsety plWordNet bez odpowiednika w angielskim WordNet — węzeł :Synset z flagą pl_only=true?
 
 ### 3. Implementacja
 - Jakie reguły ujednoznaczniania dodać do silnika disambiguation?
@@ -180,6 +183,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zintegrować plWordNet z grafem przyczynowym — synsety z plWordNet stają się węzłami :Synset w Neo4j?
 - Jak plWordNet definiuje relacje hiperonimii (hyperonymy) i jak mapują się na krawędź :IS_A w grafie?
 - Jak połączyć węzły :EventFrame z :Synset z plWordNet — zapytanie Cypher MATCH i MERGE relacji HAS_SYNSET?
+- Jak testować poprawność importu Słowosieci — asercja że węzeł :Synset('nóż') ma krawędź :IS_A do :Synset('narzędzie')?
+- Jak obsłużyć rozejście między relacjami Słowosieci (hiperonimia, meronimia) a krawędziami grafu (:IS_A, :PART_OF)?
+- Jak mierzyć pokrycie Wariantu C (subgraf prawny) — % lematów z NKJP-Legal z co najmniej jednym węzłem :Synset?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

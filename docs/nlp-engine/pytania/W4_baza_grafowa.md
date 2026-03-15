@@ -80,6 +80,10 @@ CoreferenceChain (z W6)
 - Jak wygląda ontologia zdarzeń w Neo4j — jakie typy węzłów i relacji są konieczne dla compliance dokumentów prawnych?
 - Jak odróżnić węzeł :EventFrame (konkretne zdarzenie z dokumentu) od :Concept (abstrakcyjna klasa) w grafie Neo4j?
 - Jak zdefiniować hierarchię ontologiczną zdarzeń — :EventFrame IS_A :Concept IS_A :OntologyClass?
+- Jak modelować proweniencję zdarzenia w ontologii — węzeł :Document połączony z :EventFrame przez krawędź :CONTAINS?
+- Jak obsłużyć zmiany wersji ontologii (v1→v2 nowy typ węzła) bez utraty istniejących krawędzi w Neo4j?
+- Jak modelować kauzalność dwukierunkową (A :CAUSES B i B :CAUSES A) — wykrycie cyklu i decyzja architektoniczna?
+- Jakie indeksy (INDEX) stworzyć w Neo4j dla wydajnych zapytań compliance — po source_doc_id i predicate?
 
 ### 2. Kontrakty danych
 - Jak zapisać węzeł pojęcia w formacie JSON dla grafu?
@@ -96,6 +100,9 @@ CoreferenceChain (z W6)
 - Jak zdefiniować schemat krawędzi :CAUSES — właściwości: rule_id, confidence, evidence_sentence?
 - Jak zdefiniować schemat węzła :Synset w grafie przyczynowym — id, name, pos, synset_id ze Słowosieci?
 - Jakie ograniczenia (CONSTRAINT) założyć na węzłach :EventFrame — UNIQUE na id, NOT NULL na predicate?
+- Jak zdefiniować schemat krawędzi :HAS_ROLE w Neo4j — właściwości: role_type (AGENT/PATIENT/INSTRUMENT), confidence?
+- Jak reprezentować wieloznaczność tokena w schemacie — węzeł :Token połączony z wieloma :Synset przez :HAS_CANDIDATE z wagą?
+- Jak zweryfikować schemat grafu przed importem — constraint validation przez APOC.meta.schema?
 
 ### 3. Implementacja
 - Pokaż dokładny model danych grafu dla przykładu z Janem..

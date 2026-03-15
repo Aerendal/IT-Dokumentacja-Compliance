@@ -171,6 +171,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zdefiniować próg pewności (confidence threshold) KlasyfikatorKontekstu — co zwrócić gdy wynik < 0.6?
 - Jak obsłużyć fallback KlasyfikatorKontekstu gdy dokument nie pasuje do żadnej klasy — UNKNOWN czy heurystyka?
 - Jak aktualizować model KlasyfikatorKontekstu bez restartu serwisu — hot reload reguł klasyfikacji?
+- Jak ekstrahować cechy z nagłówków i tytułów sekcji dokumentu dla KlasyfikatorKontekstu — regex + tf-idf?
+- Jak obsłużyć dokument wieloklasowy (jednocześnie UMOWA i SPECYFIKACJA_TECHNICZNA) — multi-label vs. priorytetyzacja?
+- Jak wyjaśnić decyzję klasyfikatora — które cechy zadecydowały o klasie UMOWA (SHAP lub lista feature importances)?
+- Jak walidować KlasyfikatorKontekstu na polskich dokumentach prawnych — stratified cross-validation, metryki F1 per klasa?
 - Jak InferenceEngine korzysta ze synsetów w Neo4j (Wariant A) do rozszerzenia reguł o synonimy?
 - Jak InferenceEngine odpytuje SlowosiecAdapter on-demand (Wariant B) w regule DRL bez blokowania sesji?
 - Jak porównać skuteczność Wariantu A vs. B dla reguły CONS-02 — F1 score na zbiorze testowym?
@@ -179,6 +183,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak obsłużyć łańcuchy z rozgałęzieniami (jeden :EventFrame powoduje dwa skutki) w formacie Mermaid.js?
 - Jak escapować znaki specjalne (cudzysłowy, polskie litery) w etykietach węzłów Mermaid.js?
 - Jak testować serializer Mermaid.js — golden file test z oczekiwanym outputem dla łańcucha A→B→C?
+- Jak ograniczyć głębokość wyświetlanego łańcucha kauzalnego parametrem MAX_DEPTH w to_mermaid()?
+- Jak kodować kolorem węzły Mermaid.js według ważności — CRITICAL: style fill:#f66, WARNING: style fill:#fa0?
+- Jak osadzić diagram Mermaid.js w raporcie PDF/HTML — inline w Markdown czy eksport do SVG przez mermaid CLI?
+- Jak linkować węzeł Mermaid.js z referencją do zdania źródłowego — click callback z document_id i sentence_id?
 
 ### 4. Testowanie
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?
