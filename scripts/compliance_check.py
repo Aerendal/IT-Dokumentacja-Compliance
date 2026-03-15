@@ -7,12 +7,14 @@ Subkomendy:
   coverage-report   Raport pokrycia standardów (compliance_coverage_report.py)
   backfill          Backfill confidence mapowań (backfill_mapping_confidence.py)
   full-audit        Wszystkie powyższe sekwencyjnie z podsumowaniem
+  doc-audit         Audyt dokumentacji: braki, duplikaty, relacje (NLP)
 
 Użycie:
   python3 compliance_check.py check-schema [--strict] [--db PATH]
   python3 compliance_check.py coverage-report [--format html|json|csv] [--db PATH]
   python3 compliance_check.py backfill [--apply] [--dry-run] [--db PATH]
   python3 compliance_check.py full-audit [--apply] [--db PATH] [--ci]
+  python3 compliance_check.py doc-audit --dir DOCS_DIR [--audit-db PATH] [--report]
 """
 
 import argparse
@@ -245,6 +247,45 @@ def run_full_audit(db_path: Path, apply_backfill: bool = False, ci_mode: bool = 
     return 0
 
 
+def _run_doc_audit(args) -> int:
+    """Obsługa subkomendy doc-audit."""
+    import sys as _sys
+    try:
+        from scripts.nlp.doc_auditor import DocAuditor
+    except ImportError as exc:
+        print(f"[doc-audit] Błąd importu modułu NLP: {exc}", file=_sys.stderr)
+        print(
+            "Upewnij się że scripts/nlp/ jest dostępne i Python path zawiera katalog projektu.",
+            file=_sys.stderr,
+        )
+        return 1
+
+    auditor = DocAuditor(db_path=args.audit_db, verbose=True)
+
+    if args.run_id:
+        # Tylko raport — bez skanowania
+        print(auditor.report(args.run_id))
+        return 0
+
+    from pathlib import Path as _Path
+
+    try:
+        run_id = auditor.scan(scan_dir=_Path(args.dir))
+        print(f"\n[doc-audit] Zakończono. Run ID: {run_id}")
+        if args.report:
+            print(auditor.report(run_id))
+        else:
+            print(
+                f"[doc-audit] Użyj: python3 compliance_check.py doc-audit "
+                f"--run-id {run_id} --audit-db {args.audit_db} "
+                f"aby wyświetlić raport."
+            )
+        return 0
+    except FileNotFoundError as exc:
+        print(f"[doc-audit] Błąd: {exc}", file=_sys.stderr)
+        return 1
+
+
 def main():
     parser = argparse.ArgumentParser(description="Compliance check CLI")
     sub = parser.add_subparsers(dest="command")
@@ -282,6 +323,37 @@ def main():
     )
     p_audit.add_argument("--db", default=str(DB_DEFAULT), help=_db_help)
 
+    # doc-audit subcommand (NLP documentation audit)
+    _audit_db_default = str(BASE_DIR / "reports" / "it_doc_audit.db")
+    p_doc = sub.add_parser(
+        "doc-audit",
+        help="Audyt dokumentacji: braki, duplikaty, relacje (NLP)",
+    )
+    p_doc.add_argument(
+        "--dir",
+        required=True,
+        metavar="DOCS_DIR",
+        help="Katalog z plikami dokumentacji do przeskanowania",
+    )
+    p_doc.add_argument(
+        "--audit-db",
+        default=_audit_db_default,
+        dest="audit_db",
+        metavar="PATH",
+        help=f"Ścieżka do bazy wyników audytu (domyślnie: {_audit_db_default})",
+    )
+    p_doc.add_argument(
+        "--report",
+        action="store_true",
+        help="Wyświetl raport po skanowaniu",
+    )
+    p_doc.add_argument(
+        "--run-id",
+        default=None,
+        dest="run_id",
+        help="Pokaż raport dla konkretnego run_id (zamiast skanowania)",
+    )
+
     args = parser.parse_args()
     if args.command is None:
         parser.print_help()
@@ -298,6 +370,8 @@ def main():
         sys.exit(result["exit_code"])
     elif args.command == "full-audit":
         sys.exit(run_full_audit(Path(args.db), apply_backfill=args.apply, ci_mode=args.ci))
+    elif args.command == "doc-audit":
+        sys.exit(_run_doc_audit(args))
 
 
 if __name__ == "__main__":
