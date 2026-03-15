@@ -346,6 +346,7 @@ _brak pytań źródłowych w tej kategorii_
 - Zrefaktoryzujmy `IntentClassifier` krok po kroku z tagami Morfeusza — Refactor phase po GREEN: 1) wydziel `_classify_by_mood()`, `_classify_by_tense()`, `_classify_by_aspect()`, `_classify_by_pos()` jako prywatne metody; 2) `_morph_classify()` wywołuje je w łańcuchu z `or`; 3) każda metoda zwraca `Optional[str]` — None gdy tag niedostępny; 4) `classify()` = `_morph_classify(tokens) or _lexical_fallback(sent)`?
 - Jak zintegrować `IntentClassifier` z głównym pipeline'em — `SemanticMapper.__init__(intent_clf: IntentClassifier)`, po `map_roles()` wywołaj `event.speech_act = intent_clf.classify(sentence)` zanim EventFrame trafi do InferenceEngine; klasyfikator operuje na surowym zdaniu przed parsowaniem dep_rel?
 - Jak KnowledgeGapTracker raportuje braki w Słowosieci — `dump_jsonl()` filtruje wpisy `type=='MISSING_SYNSET'` i eksportuje do `wordnet_gaps.jsonl`; format: `{predicate, pos, doc_id, sentence_fragment}`; plik stanowi wkład do procesu rozszerzania plWordNet o nowe leksemy techniczne?
+- Jak sformatować raport luk dla błędów `MISSING_SENSE` — różnica: `MISSING_SYNSET` = brak całego synsetu dla lematu; `MISSING_SENSE` = synset istnieje ale brakuje konkretnego sensu (znaczenia) w danym kontekście domenowym; format wpisu: `{predicate, synset_id, missing_sense_gloss, domain_hint, doc_id}`; wyeksportuj jako `sense_gaps.jsonl` osobno od `wordnet_gaps.jsonl`?
 
 ### 4. Testowanie
 
