@@ -92,8 +92,12 @@ Plik NKJP (XML/TEI P5)
 - Jakie są zalety integracji spaCy-pl z klasą DependencyParserAdapter — spaCy-pl oferuje szybszy inference niż UDPipe dla krótkich zdań prawnych; adapter ukrywa różnicę API za wspólnym interfejsem?
 - Jak zaimplementować `SpacyParser` jako backend DependencyParserAdapter — `nlp = spacy.load('pl_core_news_lg')`, token.dep_ → dep_rel, token.head.i → head, token.morph → feats?
 - Jak porównać `UDPipeParser` i `SpacyParser` dla zdań prawnych — testy parametryczne z tymi samymi zdaniami, asercja że dep_rel AGENT/PATIENT zgadzają się w ≥ 90% przypadków?
+- Czy spaCy-pl poradzi sobie ze swobodnym szykiem zdania w polskim — `pl_core_news_lg` trenowany na NKJP/PolEval; testuj inversję 'Dokumentację Wykonawca dostarczył' vs 'Wykonawca dostarczył dokumentację' i porównaj dep_rel?
+- Jak UDPipe vs spaCy-pl radzi sobie ze swobodnym szykiem — oba opierają się na feats.Case zamiast pozycji tokenu, ale UDPipe (UD-Polish-PDB) może dawać lepsze wyniki dla inversji zdań prawnych?
 - Jak NER (DeepER/poldeepner) uzupełnia pipeline W1 — rozpoznane encje OSOBA/ORGANIZACJA są kandydatami do roli AGENT/PATIENT w SemanticMapper W2 przed analizą dep_rel?
 - Jak zaimplementować `NERAdapter` jako wrapper dla DeepER — `recognize(sentence) → List[Entity]` gdzie Entity: `{form, label: OSOBA|ORGANIZACJA|LOKALIZACJA|DATA|UMOWA, start, end}`?
+- Jak zintegrować DeepER do rozpoznawania nazw własnych — załaduj model `poldeepner.load('pl-nkjp')`, przekaż tokenizowane zdanie z Morfeusza, zmapuj span offsets na pozycje DependencyNode?
+- Jak obsłużyć encje wielotokenowe w DeepER (np. 'Poczta Polska') — BIO tagi: B-ORG, I-ORG; scalaj tokeny z tym samym chunk_id do jednej Entity zanim przekażesz do SemanticMapper W2?
 - Jakie biblioteki Python ułatwią parsowanie formatów XML z NKJP?
 - Jakie są główne słabości modelu symbolicznego w porównaniu do LLM?
 - Jakie narzędzia w Pythonie pomogą mi zautomatyzować ekstrakcję z NKJP?

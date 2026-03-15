@@ -151,6 +151,8 @@ CoreferenceChain (z W6)
 - Pokaż skrypt Python mapujący synsety Słowosieci na krawędzie Cypher..
 - Pokaż implementację wyszukiwarki faktów w Cypherze..
 - Jak modelować wielowymiarowy kontekst zdarzenia w grafie Neo4j?
+- Jak zamodelować SituationalContext w Neo4j — właściwości `temporal`, `spatial`, `speech_act` bezpośrednio na węźle :EventFrame, lub osobny węzeł :Context z krawędzią :HAS_CONTEXT?
+- Jak zapytać Cypher o zdarzenia z temporal='BEFORE' i speech_act='ZOBOWIĄZANIE' — MATCH (e:EventFrame)-[:HAS_CONTEXT]->(c:Context {temporal:'BEFORE', speech_act:'ZOBOWIĄZANIE'}) RETURN e?
 - Pokaż implementację wyszukiwania w Neo4j dla pytań o lokalizację..
 - Jak zaimplementować wyszukiwanie wzorca z pytajnikiem w Neo4j?
 - Pokaż implementację wyszukiwarki Cypher dla intencji QUESTION..

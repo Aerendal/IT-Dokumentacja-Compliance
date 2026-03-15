@@ -127,6 +127,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak rozszerzyć EventFrame o wielowymiarowy kontekst sytuacyjny — pole `context: SituationalContext` z sub-polami temporal (BEFORE/AFTER/DURING), spatial (LOCATION/SOURCE/DESTINATION), causal (CAUSE/EFFECT)?
 - Jak wielowymiarowy kontekst sytuacyjny EventFrame wpływa na reguły DRL — reguła aktywuje się tylko gdy `context.temporal='BEFORE'` i `speech_act='ZOBOWIĄZANIE'` jednocześnie?
 - Jak SemanticMapper wydobywa wymiar temporal z zależności składniowych — przyimek 'przed' → temporal=BEFORE, 'po' → AFTER, 'podczas' → DURING mapowane z dep_rel nmod/obl?
+- Jak zmapować parę podmiot-orzeczenie na obiekt EventFrame — `create_event_frame(nsubj: Token, verb: Token) → EventFrame(predicate=verb.lemma, agent=nsubj.form, doc_id=doc_id, speech_act=DEFAULT)`?
+- Jak SemanticMapper tworzy EventFrame z drzewa zależności — wyodrębnia `root` jako predicate, `nsubj` jako AGENT, `obj` jako PATIENT, `obl` + feats.Case jako MANNER/INSTRUMENT/LOCATION?
+- Jak wpiąć DependencyParserAdapter do metody generującej EventFrame — `SemanticMapper.__init__(self, parser: DependencyParser)` dependency injection, `parser.parse(sentence)` zwraca `List[DependencyNode]` przetwarzane przez `map_roles()`?
+- Jak wpiąć NERAdapter do generowania EventFrame — przed `map_roles()` wywołaj `ner_adapter.recognize(sentence)`, scalaj wyniki z DependencyNode przez `token.ner_label = ner_result[token.start]`?
 
 ### 4. Testowanie
 - Zdefiniujmy test integracyjny dla relacji agent-patient w tym modelu..
