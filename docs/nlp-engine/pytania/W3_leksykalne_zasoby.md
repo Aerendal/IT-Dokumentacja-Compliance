@@ -234,6 +234,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak W4 (Neo4j) przechowuje hiperonimię ze Słowosieci — jako krawędzie `IS_A`?
 - Jak W5 (InferenceEngine) używa Słowosieci do wnioskowania o gatunkach ("wróbel IS_A ptak")?
 - Jak W3 integruje się z W6 (koreferencja) — czy WSD poprawia wykrywanie zaimków?
+- Jak W3 informuje W2 gdy znaleziony synonim zmienia interpretację roli semantycznej predykatu?
+- Jak weryfikować spójność między Słowosiecią a Walenty dla tego samego leksemu?
+- Jak W3 obsługuje żądania z W5 (silnik wnioskowania) o synonimach terminów w regułach DRL?
 
 ### 7. Pułapki i ryzyka
 

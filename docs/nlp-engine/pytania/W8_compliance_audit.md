@@ -140,6 +140,8 @@ Tekst z NKJP (XML)
 - Jakie błędy w BRIDGE_ERROR najczęściej pojawiają się w testach?
 - Jakie błędy w BRIDGE_ERROR pojawiają się najczęściej?
 - Jak obsłużyć elipsy w polskich tekstach, aby uniknąć BRIDGE_ERROR?
+- Co się dzieje gdy AuditEngine otrzyma EventFrame z brakującymi polami wymaganymi przez regułę compliance?
+- Jak obsłużyć timeout audytu gdy dokument ma setki EventFrame do przetworzenia — partial result czy błąd?
 
 ### 6. Integracja z innymi warstwami
 - Jak zintegrować NKJPAdapter z bezstanowym silnikiem InferenceEngine?
@@ -228,6 +230,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak GapAnalysisReport jest eksponowany przez W7 (FastAPI /audit)?
 - Jak W8 zapisuje wyniki audytu do Neo4j (W4) dla długoterminowego trackowania?
 - Jak W0 i W8 kooperują — co robi W0, czego W8 nie robi?
+- Jak W8 obsługuje przypadek gdy W5 (silnik wnioskowania) zwróci sprzeczne wnioski dla tej samej reguły?
+- Jak W8 raportuje luki identyfikowane przez W0 (doc audit) w kontekście oceny ryzyka compliance?
+- Jak weryfikować że raport compliance z W8 jest idempotentny dla tego samego zestawu EventFrame?
 
 ### 7. Pułapki i ryzyka
 

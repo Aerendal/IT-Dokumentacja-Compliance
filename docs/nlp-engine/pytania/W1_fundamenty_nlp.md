@@ -246,6 +246,9 @@ Plik NKJP (XML/TEI P5)
 - Jak obsłużyć błędy UDPipe w kaskadowym potoku?
 - Jak obsłużyć relację 'simultaneous' dla dwóch zdarzeń w grafie?
 - Jakie błędy w tagach MSD najczęściej generują fałszywe alarmy?
+- Co się dzieje gdy Morfeusz zwróci pustą listę form dla tokena (nieznany leksem spoza słownika NKJP)?
+- Jak obsłużyć błąd segmentacji zdania gdy UDPipe zwróci drzewo zależności z brakującym węzłem root?
+- Co zrobić gdy tokenizacja zwróci token o długości 0 lub token zawierający tylko znaki specjalne?
 
 ### 6. Integracja z innymi warstwami
 - Jak zintegrować Morfeusza z naszą strukturą modułów w Fazie 0?
@@ -338,6 +341,9 @@ Plik NKJP (XML/TEI P5)
 - Jak W0 (doc audit) skorzysta z lematyzacji W1 do poprawy wykrywania duplikatów?
 - Jak W4 (Neo4j) przyjmie tokeny z W1 — bezpośrednio z obiektu czy przez serializację JSONL?
 - Jak W1 powinno być wersjonowane, aby zmiana modelu UDPipe nie łamała testów W2?
+- Jak W1 obsługuje przypadek gdy W3 (zasoby leksykalne) zwróci uzupełnienie lematu po tokenizacji?
+- Jak weryfikować że format CoNLL-U wychodzący z W1 spełnia kontrakt wejściowy W2?
+- Jak W1 informuje W8 (compliance audit) o błędach tokenizacji które mogą wpłynąć na identyfikację naruszeń?
 
 ### 7. Pułapki i ryzyka
 

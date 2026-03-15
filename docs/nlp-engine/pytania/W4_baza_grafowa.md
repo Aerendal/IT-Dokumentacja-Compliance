@@ -236,6 +236,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak W5 (InferenceEngine) wykonuje zapytania Cypher do W4 — przez ten sam adapter?
 - Jak W6 (koreferencja) dostarcza zmergowane węzły do W4 — przed czy po `generate_cypher()`?
 - Jak W8 (AuditEngine) pobiera dane z W4 do generowania raportów luk?
+- Jak W4 informuje W5 (silnik wnioskowania) gdy nowy węzeł EventFrame jest dostępny w grafie?
+- Jak weryfikować spójność grafu po wsadowym imporcie wielu dokumentów jednocześnie?
+- Jak W4 obsługuje zapytania z W8 (compliance audit) o historię zmian węzła?
 
 ### 7. Pułapki i ryzyka
 

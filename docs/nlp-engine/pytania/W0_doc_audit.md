@@ -121,6 +121,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak logować błędy parsowania dokumentu bez ujawniania jego treści w logach systemowych?
 - Jak obsłużyć przekroczenie limitu czasu audytu dla bardzo długiego dokumentu (>100 MB)?
 - Co się dzieje gdy plik dokumentu jest uszkodzony (truncated) w połowie analizy?
+- Jak obsłużyć błąd kodowania znaków (nie-UTF8) w pliku dokumentu wejściowego?
 
 ### 6. Integracja z innymi warstwami
 - Pokaż jak zaimplementować AuditEngine do obsługi tych reguł..
@@ -206,6 +207,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak wyniki `relation_mapper.py` (relacje między dokumentami) zostaną przekazane do W4 (Neo4j)?
 - Jak `doc_auditor.py` będzie korzystać z W3 (Słowosieć) do lepszego wykrywania synonimicznych duplikatów?
 - Jak W8 (AuditEngine) rozszerza W0, nie duplikując jego funkcji?
+- Czy W0 (doc audit) może być uruchamiany niezależnie od innych warstw jako standalone narzędzie?
+- Jak W0 raportuje zidentyfikowane luki do W8 (compliance audit) — zdarzenie, callback, czy polling?
+- Jak aktualizacje W1 (nowe tokenizatory) wpływają na wyniki W0 — czy audyt musi być ponownie uruchomiony?
 
 ### 7. Pułapki i ryzyka
 

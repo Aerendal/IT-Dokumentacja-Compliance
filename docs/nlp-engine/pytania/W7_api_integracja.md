@@ -193,6 +193,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak W7 przekazuje wyniki pipeline do W8 (AuditEngine)?
 - Czy W7 ma własną bazę do przechowywania wyników zadań, czy używa Neo4j (W4)?
 - Jak W0 (doc audit CLI) integruje się z W7 API — czy obie ścieżki są niezależne?
+- Jak W7 obsługuje częściowe niepowodzenie pipeline — gdy W3 jest niedostępne a W1 i W2 działają?
+- Jak W7 wersjonuje kontrakt API przy jednoczesnym wsparciu v1 i v2 klientów?
+- Jak weryfikować że response W7 jest spójny z wynikami W8 (compliance audit)?
 
 ### 7. Pułapki i ryzyka
 

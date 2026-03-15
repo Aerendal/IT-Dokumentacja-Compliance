@@ -63,6 +63,10 @@ DependencyTree (CoNLL-U z W1)
 - Jak zaprojektować model danych grafu dla relacji agent-akcja-obiekt?
 - Jak zmapować relację AGENT na strukturę grafową?
 - Pokaż strukturę ontologii dla ról AGENT, PATIENT i INSTRUMENT.
+- Jaki wzorzec projektowy stosuje SemanticMapper — Strategy (różne strategie mapowania per typ predykatu)?
+- Jak wyglądają granice W2 — co dostarcza W1 (CoNLL-U z feats) a co W2 produkuje dla W4 (EventFrame)?
+- Jak W2 obsługuje predykaty złożone (czasowniki fazowe: zacząć dostarczać, przestać zobowiązywać)?
+- Jakie są wzorce fallback gdy rola semantyczna nie może być jednoznacznie przypisana?
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
@@ -142,6 +146,10 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż jak zintegrować SemanticMapper z głównym pipeline przetwarzania..
 - Jak zintegrować synsety Słowosieci z rolami AGENT i PATIENT?
 - Jak zintegrować słownik Walenty, aby poprawnie przypisywać role semantyczne?
+- Jakie konkretne pola CoNLL-U z W1 są wymagane przez SemanticMapper — feats, deprel, head, upos?
+- Jak W2 przekazuje EventFrame do W4 — bezpośrednie wywołanie, kolejka zdarzeń, czy shared memory?
+- Jak W2 współpracuje z W3 (Słowosieć) przy rozróżnianiu INSTRUMENT od LOCATION dla tego samego lematu?
+- Jak W6 (koreferencja) powiadamia W2 gdy antecedent roli AGENT zostaje zaktualizowany?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
@@ -218,6 +226,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak W3 (Słowosieć/Walenty) poprawia jakość mapowania ról w W2?
 - Jak W5 (InferenceEngine) używa ról z W2 do budowania reguł wnioskowania?
 - Jak W6 (koreferencja) wpływa na role — jeśli "on" → "Jan", czy W2 dostaje już rozwiązany zaimek?
+- Jak W2 obsługuje EventFrame który musi być zaktualizowany po rozwiązaniu koreferencji przez W6?
+- Jak weryfikować że EventFrame wychodzący z W2 spełnia kontrakt wejściowy W4 (baza grafowa)?
+- Jak W2 przekazuje informację o pewności (confidence) mapowania roli do W5 (silnik wnioskowania)?
 
 ### 7. Pułapki i ryzyka
 

@@ -103,6 +103,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak obsłużyć elipsę i brakujący podmiot w koreferencji?
 - Jak obsłużyć elipsę w CoreferenceResolverze dla języka polskiego?
 - Jak obsługiwać dokument gdzie ta sama osoba jest nazywana trzema różnymi sposóbami ("Jan", "Kowalski", "powód") — czy trzy odrębne łańcuchy czy jeden?
+- Jak obsłużyć cykl w grafie koreferencji — gdy A wskazuje na B a B wskazuje na A?
+- Co zwrócić gdy CoreferenceResolver nie znajdzie antecedenta dla zaimka — null, pusta lista, czy flaga unresolved?
+- Jak logować nierozwiązane anaforyki do późniejszej analizy bez ujawniania treści dokumentu?
 
 ### 6. Integracja z innymi warstwami
 - Pokaż jak zintegrować koreferencję z grafem wiedzy w Neo4j..
@@ -189,6 +192,9 @@ _brak pytań źródłowych w tej kategorii_
 - Kiedy W6 działa w pipeline — przed W2 (SemanticMapper) czy po?
 - Jak W4 (Neo4j) merguje węzły na podstawie `CoreferenceChain`?
 - Jak W5 (InferenceEngine) korzysta z rozwiązanych zaimków — czy dostaje już zaktualizowany `EventRoleDict`?
+- Jak W6 powiadamia W2 gdy łańcuch koreferencyjny zmienia przypisanie roli AGENT lub PATIENT?
+- Jak weryfikować że wynik W6 jest spójny z parse tree dostarczonym przez W1?
+- Jak W6 przekazuje nierozwiązane anaforyki do W8 jako potencjalne luki w dokumencie?
 
 ### 7. Pułapki i ryzyka
 
