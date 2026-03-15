@@ -166,6 +166,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak Soft Matching sprawdza czy :EventFrame.predicate należy do synsetu 'dostarczyć' (i synonimów) przed emisją krawędzi :CAUSES?
 - Jak zdefiniować próg Soft Matching — minimalne jaccard@synsets między predykatem a wzorcem reguły (threshold = 0.5)?
 - Jak testować Soft Matching — asercja że 'przekazać' pasuje do reguły zdefiniowanej dla 'dostarczyć' przez wspólny synset?
+- Zaimplementujmy klasę KnowledgeGapTracker do logowania nieznanych zdarzeń i słów — jakie typy luk rozróżnia (UNKNOWN_PREDICATE, MISSING_SYNSET, UNMATCHED_RULE)?
+- Jak KnowledgeGapTracker rejestruje zdarzenie nierozpoznane przez żadną regułę DRL — hook after_rule_evaluation gdy activated_rules.is_empty()?
+- Jak KnowledgeGapTracker eksportuje dane do kolejki aktywnego uczenia — JSONL z polami predicate, context, doc_id, timestamp?
+- Jak zintegrować KnowledgeGapTracker z InferenceEngine — rejestracja jako listener Drools WorkingMemoryEventListener?
 - Jak wdrożyć Klasyfikator Kontekstu aby system rozumiał typ (jestestwo) dokumentu — umowa, SRS, raport, specyfikacja?
 - Jak KlasyfikatorKontekstu pobiera sygnały z W3 (leksyka), W2 (role) i W6 (koreferencja) do klasyfikacji dokumentu?
 - Jak zdefiniować enum klas dokumentów w KlasyfikatorKontekstu — UMOWA, SRS, RAPORT_AUDYTU, SPECYFIKACJA_TECHNICZNA?

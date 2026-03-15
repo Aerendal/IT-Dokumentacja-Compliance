@@ -198,6 +198,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak Słowosieć rozszerza reguły inferencyjne — synonim 'wręczyć' do 'dostarczyć' aktywuje tę samą regułę CONS-02 w DRL?
 - Jak hiperonimia Słowosieci wspiera Soft Matching w CausalChainBuilder — predykat 'przekazać' dopasowuje regułę dla 'dostarczyć' przez wspólny hiperonim 'działanie'?
 - Jak SlowosiecAdapter.get_hypernym_path(lemma) zwraca ścieżkę do korzenia ontologii — używana przez Soft Matching do ustalenia semantycznej odległości?
+- Zintegrujmy Słowosieć z grafem, aby lepiej rozumieć synonimy — jak węzły :Synset w Neo4j rozszerzają dopasowanie predykatów w regułach DRL?
+- Jak graf synsetów Słowosieci pozwala regule dopasować "wręczyć" gdy oczekuje "dostarczyć" — ścieżka przez wspólny hiperonim 'działanie transferu'?
+- Jak testować integrację Słowosieci z grafem dla synonimów — asercja MATCH(:Synset)-[:IS_SYNONYM]->(:Synset) dla pary 'dostarczyć'/'przekazać'?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

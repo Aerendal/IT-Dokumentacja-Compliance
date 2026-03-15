@@ -71,6 +71,9 @@ Tekst z NKJP (XML)
 - Pokaż pełną implementację tej funkcji łączącej moduły audytu..
 - Pokaż strukturę danych EventNode dla 6 wymiarów analizy zdarzeń.
 - Pokaż strukturę Gap Analysis Report dla wykrytych luk..
+- Jakie profile Złotych Standardów przypiszemy do różnych typów dokumentów — UMOWA_TEMPLATE, SRS_TEMPLATE, RAPORT_AUDYTU_TEMPLATE?
+- Jak GoldenStandardProfile definiuje obowiązkowe sekcje per typ dokumentu używane przez AuditEngine do oceny kompletności?
+- Jak AuditEngine porównuje audytowany dokument z GoldenStandardProfile — diff wymaganych vs. obecnych sekcji jako lista luk?
 
 ### 2. Kontrakty danych
 - Jak zmapować tagi MSD z NKJP na relacje w grafie?
@@ -79,6 +82,8 @@ Tekst z NKJP (XML)
 - Jak zdefiniować kontrakt dla pola severity w naruszeniu compliance — enum (LOW/MEDIUM/HIGH/CRITICAL)?
 - Jakie pola są wymagane w EventFrame przekazywanym z W5 do W8 — id, predicate, roles, timestamp, source_doc_id?
 - Jak zdefiniować kontrakt dla wersjonowania raportów compliance — czy raport v2 jest kompatybilny wstecz z v1?
+- Jak zdefiniować kontrakt dla GoldenStandardProfile — pola: document_type, required_sections, required_rules, version?
+- Jak wersjonować GoldenStandardProfile — czy zmiana standardu UMOWA_TEMPLATE v1→v2 unieważnia historyczne raporty?
 
 ### 3. Implementacja
 - Pokaż jak zapisać zdarzenie „Wykonawca dostarczył dokumentację techniczną z opóźnieniem" w grafie..
@@ -136,6 +141,12 @@ Tekst z NKJP (XML)
 - Jak renderować Mermaid.js w raporcie Markdown — znacznik ```mermaid z zawartością flowchart LR?
 - Stwórzmy wizualizację grafu zdarzeń w Mermaid.js dla raportu audytu — jak sekcja raportu zawiera osadzony diagram z konkretnymi EventFrame?
 - Jak parametryzować wizualizację Mermaid.js w raporcie — tryb skrócony (top 5 węzłów) vs. pełny (cały łańcuch) zależnie od severity?
+- Jak zaimplementować klasę KnowledgeGapTracker do logowania nieznanych zdarzeń — predykat nie pasuje do żadnego synsetu w Słowosieci?
+- Jak KnowledgeGapTracker rejestruje zdarzenia bez dopasowanej reguły DRL — hook after_rule_evaluation gdy activated_rules jest puste?
+- Jak KnowledgeGapTracker eksportuje listę luk wiedzy do kolejki aktywnego uczenia — format JSONL z polami: predicate, context, doc_id, timestamp?
+- Pokaż przykład raportu prezentującego Wykryte Luki w Wiedzy Silnika — sekcja knowledge_gaps z polami: unknown_predicates, missing_synsets, unmatched_rules?
+- Jak GapAnalysisReport odróżnia luki compliance (brakujący wymóg z GoldenStandardProfile) od luk wiedzy silnika (nieznany predykat)?
+- Jak KnowledgeGapTracker dostarcza zagregowane dane do sekcji knowledge_gaps w GapAnalysisReport po zakończeniu sesji przetwarzania?
 
 ### 4. Testowanie
 - Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?
