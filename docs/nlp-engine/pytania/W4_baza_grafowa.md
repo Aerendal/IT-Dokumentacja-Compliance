@@ -268,6 +268,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zaimplementować `build_document(sentences)` — pętlę budującą pełny graf dokumentu?
 - Jak użyć APOC (`apoc.import.json`) do szybkiego importu wielu węzłów naraz?
 - Jak zoptymalizować import miliona relacji hiperonimii ze Słowosieci do Neo4j?
+- Jak modelować relację `MITIGATED_BY` w grafie dla modelu zagrożeń — `:ThreatModel {stride:['SPOOFING'], mitigated:False}` + `(:ThreatModel)-[:MITIGATED_BY]->(:Mitigation {control:'rate_limiting', status:'IMPLEMENTED'})`; krawędź `MITIGATED_BY` pozwala Cypherowi na `MATCH (tm)-[:MITIGATED_BY]->(m) WHERE m.status='IMPLEMENTED' RETURN tm` jako alternatywny warunek zaspokojenia SEC-01b bez pola `mitigated` na węźle?
 
 ### 4. Testowanie
 
