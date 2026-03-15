@@ -84,6 +84,9 @@ Tekst z NKJP (XML)
 - Jak zdefiniować kontrakt dla wersjonowania raportów compliance — czy raport v2 jest kompatybilny wstecz z v1?
 - Jak zdefiniować kontrakt dla GoldenStandardProfile — pola: document_type, required_sections, required_rules, version?
 - Jak wersjonować GoldenStandardProfile — czy zmiana standardu UMOWA_TEMPLATE v1→v2 unieważnia historyczne raporty?
+- Jak wdrożyć Klasyfikator Kontekstu i Złotych Standardów łącznie — KlasyfikatorKontekstu wybiera GoldenStandardProfile, AuditEngine waliduje dokument?
+- Jak zdefiniować kontrakt AuditResponse — pola: document_type (z KlasyfikatorKontekstu), violations, knowledge_gaps, applied_golden_standard?
+- Jak zintegrować document_profile z AuditResponse w FastAPI — KlasyfikatorKontekstu.classify() → document_profile → AuditEngine(profile) → AuditResponse?
 
 ### 3. Implementacja
 - Pokaż jak zapisać zdarzenie „Wykonawca dostarczył dokumentację techniczną z opóźnieniem" w grafie..

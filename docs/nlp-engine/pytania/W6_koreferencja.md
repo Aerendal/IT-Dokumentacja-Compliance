@@ -95,6 +95,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak obsłużyć czasowniki zwrotne (zobowiązał się, zastrzegł sobie) przy rekonstrukcji podmiotu domyślnego?
 - Jaki jest priorytet rekonstrukcji z końcówki vs. rozwiązania koreferencji gdy obie metody dają inny podmiot?
 - Jak mapować morfemy końcówek polskich czasowników na osobę i liczbę — pokaż tabelę: -m→1sg, -sz→2sg, -ł→3sg.m?
+- Jak zaimplementować moduł koreferencji dla domyślnych podmiotów w NKJPBridge — klasa ImplicitSubjectResolver integrująca W1 (feats) i W6 (coreference chain)?
+- Jak ImplicitSubjectResolver wybiera kandydata na podmiot domyślny — priorytet: koreferencja z W6 nad rekonstrukcją z końcówki?
+- Jak NKJPBridge przekazuje IMPLICIT_SUBJECT do EventFrame w W2 — pole agent z flagą inferred: true i source: coreference|morphology?
 
 ### 4. Testowanie
 - Stwórzmy czerwony test dla CoreferenceResolvera.

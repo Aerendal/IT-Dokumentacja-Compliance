@@ -191,6 +191,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak klasyfikować dokument bez YAML front matter — fallback na analizę nagłówków i pierwszych 200 tokenów?
 - Jak zaimplementować szablony walidacyjne per typ dokumentu — dataclass DocumentTemplate z listą wymaganych sekcji i reguł compliance?
 - Jak KlasyfikatorKontekstu generuje szablony walidacyjne — mapowanie UMOWA→[CONS-02, RISK-01], SRS→[ARCH-01, SEC-01]?
+- Jak wdrożyć Klasyfikator Kontekstu i Złotych Standardów łącznie — KlasyfikatorKontekstu.classify() → GoldenStandardProfile → DocumentTemplate z regułami?
+- Jak przekazać wynik KlasyfikatorKontekstu do GoldenStandardProfile.get_template(document_type) w AuditEngine?
+- Jak testować połączenie KlasyfikatorKontekstu z GoldenStandardProfile — mock document_type=UMOWA → oczekiwany template zawiera CONS-02?
 - Jak wykryć że dokument nie spełnia szablonu walidacyjnego — diff wymaganych sekcji vs. nagłówków wykrytych przez Linter?
 - Jak InferenceEngine korzysta ze synsetów w Neo4j (Wariant A) do rozszerzenia reguł o synonimy?
 - Jak InferenceEngine odpytuje SlowosiecAdapter on-demand (Wariant B) w regule DRL bez blokowania sesji?
@@ -210,6 +213,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak kodować typ relacji w etykiecie krawędzi Mermaid.js — A -->|IS_A| B vs. A -->|CAUSES rule_id| B?
 - Jak filtrować które relacje semantyczne trafiają do to_mermaid() — parametr include_relations: List[str]?
 - Jak generować oddzielne sekcje `subgraph` w Mermaid.js dla każdego typu relacji (kauzalne vs. ontologiczne)?
+- Zaktualizujmy logikę CausalChainBuilder o analizę intencji aktów mowy — jak rozpoznać czy :EventFrame jest ZOBOWIĄZANIEM, OSTRZEŻENIEM czy WYKONANIEM?
+- Jakie cechy morfosyntaktyczne i leksykalne wskazują na akt mowy ZOBOWIĄZANIE (shall, zobowiązuje się) vs. POTWIERDZENIE (oświadcza, potwierdza)?
+- Jak CausalChainBuilder tworzy krawędź :CAUSES gdy akt mowy ZOBOWIĄZANIE nie jest spełniony — link do EventFrame naruszenia?
 
 ### 4. Testowanie
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?

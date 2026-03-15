@@ -68,7 +68,11 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zdefiniować kontrakt SLA — maksymalny czas odpowiedzi w ms per typ żądania i per wielkość dokumentu?
 - Jak wygląda kompletna para request/response JSON dla endpointu /analyze z przykładowymi danymi?
 - Jak endpoint /analyze obsługuje dokumenty Markdown z YAML front matter — czy metadane są parsowane i przekazywane downstream?
+- Jak endpoint /analyze obsługuje dokumenty Markdown z YAML front matter — czy metadane są parsowane i przekazywane downstream?
 - Jak zdefiniować kontrakt dla opcjonalnego pola metadata w ciele żądania /analyze — JSON Schema nullable object?
+- Jak zdefiniować kontrakt AuditResponse w Pydantic — pola: document_type, violations, knowledge_gaps, applied_golden_standard, mermaid_diagram?
+- Jak zdefiniować document_profile w modelu Pydantic — document_type z KlasyfikatorKontekstu, golden_standard_version, classification_confidence?
+- Jak walidować że document_profile.document_type jest kompatybilny z dostępnymi GoldenStandardProfile w AuditEngine?
 
 ### 3. Implementacja
 - Czy Multiservice oferuje narzędzia do automatyzacji ekstrakcji danych?
@@ -91,6 +95,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zabezpieczyć /audit przed nieautoryzowanym dostępem — Bearer token, API Key, czy mTLS?
 - Jak wdrożyć /audit jako kontener Docker — Dockerfile, health check, uwicorn workers?
 - Jak skonfigurować reverse proxy (Nginx/Traefik) przed /audit — timeout, max body size, TLS termination?
+- Pokaż jak zintegrować document_profile z AuditResponse w FastAPI — endpoint /audit pobiera dokument, wywołuje KlasyfikatorKontekstu, konstruuje AuditResponse?
+- Jak endpoint /audit zwraca document_profile w odpowiedzi — pole `profile` z document_type, golden_standard i confidence?
 
 ### 4. Testowanie
 - Gdzie w procesie CI/CD uruchomić te testy?

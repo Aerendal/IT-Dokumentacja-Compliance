@@ -120,6 +120,8 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż implementację relacji czasowych przed i po zdarzeniu..
 - Jak zmapować przyimki 'z', 'do' na relacje source i destination?
 - Jak rozbudować ontologię o relacje czasowe i przestrzenne?
+- Zaktualizujmy logikę analizy intencji aktów mowy w SemanticMapper — jak rozróżnić ZOBOWIĄZANIE od WYKONANIA jako wymiar EventFrame?
+- Jak dodać pole speech_act do EventFrame — enum: ZOBOWIĄZANIE, POTWIERDZENIE, ZAPRZECZENIE, OSTRZEŻENIE, POLECENIE?
 
 ### 4. Testowanie
 - Zdefiniujmy test integracyjny dla relacji agent-patient w tym modelu..
