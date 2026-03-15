@@ -143,6 +143,10 @@ CoreferenceChain (z W6)
 ### 5. Obsługa błędów
 _brak pytań źródłowych w tej kategorii_
 - Jak obsługiwać konflikt MERGE gdy ten sam węzeł jest dodawany równolegle przez dwa procesy (race condition)?
+- Jak obsłużyć błąd zapisu do Neo4j — retry, dead letter queue, czy odrzucenie dokumentu?
+- Co zwrócić przy próbie odczytu węzła który nie istnieje w grafie — null, wyjątek, czy pusty wynik?
+- Jak logować failed transactions do bazy grafowej bez blokowania głównego pipeline?
+- Jak obsłużyć przekroczenie limitu pamięci heap Neo4j przy dużym zapytaniu APOC?
 
 ### 6. Integracja z innymi warstwami
 - Pokaż jak zintegrować Słowosieć z grafem wiedzy w Neo4j..
@@ -160,6 +164,14 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
+- Co się dzieje gdy baza grafowa jest niedostępna podczas zapisu EventFrame — czy dane są tracone czy buforowane?
+- Jak uniknąć duplikatów węzłów gdy ten sam podmiot (np. Wykonawca ABC sp. z o.o.) pojawia się w wielu dokumentach?
+- Jakie jest ryzyko nieaktywnych relacji (dangling edges) po usunięciu węzła bez kaskadowego usunięcia krawędzi?
+- Czy Cypher MERGE gwarantuje atomowość przy równoległych zapisach z wielu instancji serwisu?
+- Jak obsłużyć migrację schematu grafu gdy nowy EventFrame dodaje właściwość wymaganą dla istniejących węzłów?
+- Jaka jest konsekwencja wyboru ArangoDB zamiast Neo4j dla schematu i zapytań zdefiniowanych w Cypher?
+- Jak zapobiec nieograniczonemu wzrostowi grafu przy przetwarzaniu tysięcy dokumentów bez archiwizacji starych węzłów?
+
 ## Pytania uzupełniające
 - **Pułapka 4:** MERGE w Neo4j bez unikalnego indeksu tworzy duplikaty węzłów — `MERGE (n:Concept {id: x})` bez `CREATE INDEX FOR (n:Concept) ON (n.id)` jest O(n) i duplikuje dane.
 - **Pułapka 5:** Neo4j Community Edition nie ma replikacji ani automatycznego failover — awaria węzła podczas zapisu to utrata danych; Commercial/AuraDB wymagane dla projektu produkcyjnego.

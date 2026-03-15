@@ -63,9 +63,18 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 ### 1. Architektura
 - Jak załadować Słowosieć do modułu wnioskowania w Pythonie?
 - Jak połączyć GraphDatabaseAdapter z modułem wnioskowania Drools?
+- Jaki jest podział odpowiedzialności między InferenceEngine, Drools KieSession, i StateMatrix?
+- Jak wyglądają granice W5 — co dostarcza W4 (baza grafowa) a co W5 dodaje przed przekazaniem do W8?
+- Jaki wzorzec stosuje W5 dla rejestrowania reguł DRL — plugin, convention-over-configuration, czy explicit register?
+- Jak W5 obsługuje wiele aktywnych sesji KieSession równolegle — pool sesji, jedna sesja globalna, czy per-request?
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
+- Jaki jest format wejściowy reguły DRL — plik tekstowy, JSON z metadanymi reguły, czy DSL Drools?
+- Jak zdefiniować kontrakt dla wyniku wnioskowania — lista obiektów Inference z polami confidence, rule_id, evidence?
+- Jakie pola są wymagane w StateMatrix przekazywanej między sesjami Drools — id, version, facts_hash?
+- Jak wersjonować reguły DRL — SemVer (1.2.3), hash zawartości, czy timestamp modyfikacji?
+- Jak wygląda przykładowy JSON dla wyniku InferenceEngine dla naruszenia CONS-02 — pokaż schemat?
 
 ### 3. Implementacja
 - Jak w grafie wiedzy oznaczyć intencję działania aktora?
@@ -159,6 +168,10 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 5. Obsługa błędów
 - Jak obsłużyć zaprzeczenia w regule _rule_possession_transfer?
+- Co się dzieje gdy żadna reguła DRL nie pasuje do faktu — pusta lista Inference czy wyjątek NoRuleMatched?
+- Jak obsłużyć nieoczekiwany wyjątek Java w KieSession — izolacja sesji czy restart całego serwisu?
+- Jak logować każdą decyzję wnioskowania do celów audytu i traceability dla klienta?
+- Jak obsłużyć zbyt długi czas wnioskowania — czy jest zdefiniowany timeout per session?
 
 ### 6. Integracja z innymi warstwami
 - Jak zintegrować reguły Drools z wynikami parsera lxml?
@@ -169,6 +182,14 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
+- Jak uniknąć konfliktów reguł DRL gdy dwie reguły mają tę samą salience i sprzeczne akcje dla tego samego faktu?
+- Co się dzieje gdy InferenceEngine wchodzi w pętlę — cykl zależności reguła A aktywuje B aktywuje A?
+- Jak obsłużyć stare reguły DRL które nie pasują do nowego schematu EventFrame po migracji struktury danych?
+- Jaka jest konsekwencja gdy StateMatrix jest niespójna między dwiema instancjami serwisu za load balancerem?
+- Czy KieSession Drools jest thread-safe przy równoległym przetwarzaniu wielu dokumentów?
+- Jak ograniczyć czas wnioskowania gdy reguły prowadzą do rozległego forward chaining powyżej limitu czasowego?
+- Jakie jest ryzyko błędnej klasyfikacji CONS-02 gdy w dokumencie brakuje daty lub strony umowy?
+
 ## Pytania uzupełniające
 - **Pułapka 3:** Drools `KieSession` nie jest thread-safe — każdy wątek musi mieć własną sesję; reużycie sesji między wątkami powoduje `ConcurrentModificationException`.
 - **Pułapka 4:** Reguły DRL z `salience` (priorytet) — zmiana kolejności plików `.drl` może zmienić wyniki gdy dwie reguły mają ten sam salience; wyniki są niedeterministyczne bez jawnego salience.

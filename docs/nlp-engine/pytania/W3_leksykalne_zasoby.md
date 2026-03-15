@@ -67,9 +67,18 @@ SlowosiecAdapter           WalentyAdapter
 ### 1. Architektura
 - Pokaż jak zaprojektować model danych grafu dla wieloznaczności..
 - Pokaż strukturę węzła Concept uwzględniającą synset_id i rolę.
+- Jaki wzorzec projektowy stosuje W3 dla dostępu do zasobów zewnętrznych — Adapter, Proxy, czy Repository?
+- Jak wyglądają granice W3 — co dostarcza W2 (role semantyczne) a co W3 dodaje przed przekazaniem do W4?
+- Jak W3 obsługuje wiele zasobów leksykalnych jednocześnie (Słowosieć + Walenty) — czy są priorytetyzowane?
+- Jakie wzorce cache stosuje W3 dla wyników Słowosieci — LRU, TTL, czy trwały cache na dysku?
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
+- Jaki jest format odpowiedzi Słowosieci API — obiekt JSON z listą synonimów, hiperonimów i hiponimów?
+- Jak zdefiniować kontrakt dla brakującego wpisu leksykalnego — null, pusta lista, czy wyjątek NotFound?
+- Jakie pola zwraca PhraseologyDetector dla wykrytej frazy idiomatycznej — id, canonical_form, confidence?
+- Jak zdefiniować format przekazywania informacji leksykalnych z W3 do W2 (SemanticMapper)?
+- Jak wygląda schemat JSON dla wzbogaconego tokena po przejściu przez W3 — pokaż przykładowy obiekt?
 
 ### 3. Implementacja
 - Jakie reguły ujednoznaczniania dodać do silnika disambiguation?
@@ -128,6 +137,10 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 5. Obsługa błędów
 - Jak obsłużyć wieloznaczność słowa klucz w grafie?
+- Jak obsłużyć niedostępność Słowosieci API — fallback do lokalnego cache czy zwrócenie pustej listy synonimów?
+- Co się dzieje gdy Walenty nie zawiera wpisu dla danego lematu — wyjątek, null, czy domyślna struktura?
+- Jak logować brakujące wpisy leksykalne do późniejszego uzupełnienia zasobów?
+- Jak obsłużyć timeout przy odpytywaniu zewnętrznego zasobu leksykalnego?
 
 ### 6. Integracja z innymi warstwami
 - Jak zintegrować Słowosieć z grafem wiedzy w Fazie 2?
@@ -148,6 +161,14 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
+- Jaka jest konsekwencja gdy słowo nie istnieje w Słowosieci i brak jest fallbacku — czy pipeline zatrzymuje się?
+- Jak uniknąć eksplozji kombinatorycznej przy wyszukiwaniu synonimów w zdaniach wieloklausulowych?
+- Co się dzieje gdy Walenty i Słowosieć dają sprzeczne informacje o selekcji dla tego samego leksemu?
+- Jak obsłużyć neologizmy prawne (nowe pojęcia z ustaw) których brak w istniejących zasobach leksykalnych?
+- Jakie jest ryzyko błędnego WSD dla terminów wieloznacznych w prawie (np. "strona" = strona umowy vs. strona dokumentu)?
+- Czy Walenty zawiera pełne pokrycie dla czasowników prawnych: odstąpić, zobowiązać, naruszać, dostarczyć, odebrać?
+- Jak zidentyfikować czy fraza idiomatyczna pokrywa się z użyciem literalnym tego samego słowa w tej samej sekcji?
+
 ## Pytania uzupełniające
 - **Pułapka 3:** Słowosieć nie pokrywa neologizmów technicznych ("konteneryzacja", "mikroserwis") — `get_synsets("docker")` zwróci pusty wynik, a system milcząco pominie wzbogacenie semantyczne.
 - **Pułapka 4:** Walenty ma luki dla czasowników niekonwencjonalnych i frazeologizmów — `get_valency_frame("kłaść do głowy")` zwróci `None`, co może wywołać `NullPointerException` w `SemanticMapper`.

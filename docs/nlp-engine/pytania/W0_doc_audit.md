@@ -61,9 +61,19 @@ gap_detector  duplicate_detector  relation_mapper
 
 ### 1. Architektura
 - Pokaż jak zdefiniować twarde granice modułów używając import-linter..
+- Jakie są granice (boundaries) modułu doc_audit — co jest jego odpowiedzialnością a co leży poza nim?
+- Jaki wzorzec projektowy najlepiej opisuje doc_audit — Facade, Strategy, czy Visitor?
+- Jak doc_audit komunikuje się z pozostałymi warstwami — wywołania synchroniczne, zdarzenia, czy kolejki?
+- Jakie są zależności zewnętrzne doc_audit — czy zależy od W1 (tokenizacja) czy działa na surowym tekście?
+- Jak wygląda diagram komponentów doc_audit z podziałem na GapAnalyzer, DuplicateDetector, RelationMapper?
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
+- Jaki jest format wejściowy dokumentu do audytu — plik tekstowy, JSON z metadanymi, czy HTTP POST z body?
+- Jaki jest format wyjściowy raportu luk — JSON, Markdown, CSV, czy wszystkie trzy?
+- Jak zdefiniować kontrakt dla pola confidence w raporcie duplikatu — float 0.0–1.0 czy enum (low/medium/high)?
+- Jakie pola są obowiązkowe w metadanych dokumentu przekazywanego do audytu (id, tytuł, wersja, data)?
+- Jak wyglądają przykładowe dane wejściowe i wyjściowe audytu w formacie JSON — pokaż schemat z polami wymaganymi?
 
 ### 3. Implementacja
 - Jakie reguły ARCH-01 i SEC-01 sprawdzać w teście własnościowym?
@@ -107,6 +117,10 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 5. Obsługa błędów
 _brak pytań źródłowych w tej kategorii_
+- Co zwrócić gdy dokument wejściowy jest pusty lub zawiera tylko whitespace?
+- Jak logować błędy parsowania dokumentu bez ujawniania jego treści w logach systemowych?
+- Jak obsłużyć przekroczenie limitu czasu audytu dla bardzo długiego dokumentu (>100 MB)?
+- Co się dzieje gdy plik dokumentu jest uszkodzony (truncated) w połowie analizy?
 
 ### 6. Integracja z innymi warstwami
 - Pokaż jak zaimplementować AuditEngine do obsługi tych reguł..
@@ -117,6 +131,14 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
+- Jak uniknąć fałszywych duplikatów gdy dwa dokumenty opisują ten sam temat z różnych perspektyw (różny zakres, nie ten sam tekst)?
+- Co się dzieje gdy audyt wykryje lukę w dokumencie już zaakceptowanym przez klienta — jaka jest procedura powiadomienia?
+- Jak zdefiniować próg podobieństwa (threshold) shingle/Jaccard tak aby nie flagować parafrazy jako duplikatu?
+- Jakie są konsekwencje błędnego oznaczenia dokumentu jako kompletny gdy brakuje sekcji — kto ponosi odpowiedzialność?
+- Czy moduł audytu może operować na niespójnej wersji dokumentu przy równoległym edytowaniu (race condition)?
+- Jak obsłużyć dokument w formacie binarnym (PDF, DOCX) gdy audyt oczekuje płaskiego tekstu?
+- Co oznacza 0 luk dla dokumentu o złożoności 500+ zdań — czy to sygnał błędu czy rzeczywistego stanu kompletności?
+
 ## Pytania uzupełniające
 - **Pułapka 3:** `completeness_score` logarytmiczny może maskować wiele małych błędów — dokument z 20 ostrzeżeniami i 0 błędami krytycznych dostanie wynik ~0.60, co wygląda jak "akceptowalny", choć nie jest.
 - **Pułapka 4:** `duplicate_detector` porównuje dokumenty przez TF-IDF bez lematyzacji — "wymagania" i "wymaganie" to różne tokeny, więc duplikat może nie zostać wykryty.

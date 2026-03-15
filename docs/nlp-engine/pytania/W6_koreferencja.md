@@ -57,9 +57,18 @@ Sekwencja zdań (z W1) + DependencyTree
 
 ### 1. Architektura
 - Pokaż jak GraphDatabaseAdapter powinien obsługiwać zaimki po koreferencji..
+- Jaki jest podział odpowiedzialności między CoreferenceResolver a modułem anafory i elipsy?
+- Jak wyglądają granice W6 — co otrzymuje z W1 (parse tree) a co przekazuje do W5 (enriched facts)?
+- Jaki wzorzec stosuje W6 dla rozwiązywania łańcuchów koreferencyjnych — grafowy BFS/DFS czy sekwencyjny?
+- Jak W6 integruje się z W2 (role semantyczne) gdy antecedent posiada przypisaną rolę AGENT lub PATIENT?
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
+- Jaki jest format wyjściowy CoreferenceResolver — lista par (anaphor_id, antecedent_id) w JSON?
+- Jak zdefiniować kontrakt dla łańcucha koreferencyjnego (chain) gdy anaphor wskazuje na klaster podmiotów?
+- Jakie pola są wymagane w strukturze przekazywanej z W6 do W5 (silnik wnioskowania)?
+- Jak obsłużyć brak antecedenta w kontrakcie — null w polu antecedent_id, pusta lista, czy wyjątek ValidationError?
+- Jak wygląda przykładowy obiekt koreferencji dla "Wykonawca dostarczył dokumentację. On opóźnił dostawę" — pokaż JSON?
 
 ### 3. Implementacja
 - Jak wdrożyć resolver odniesień do grafu wiedzy?
@@ -107,6 +116,14 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
+- Jakie jest ryzyko gdy CoreferenceResolver tworzy fałszywe łańcuchy dla różnych osób o tym samym imieniu lub tytule?
+- Jak obsłużyć zaimek dzierżawczy (jego dokumentacja, jej oferta) gdy antecedent jest w poprzednim akapicie?
+- Co się dzieje gdy zdanie zawiera trzy anaforyczne pronominale bez jednoznacznego antecedenta?
+- Jak uniknąć propagacji błędów koreferencji z W6 do W5 (silnik wnioskowania operuje na błędnie złączonych podmiotach)?
+- Czy elipsa werbalna jest odróżnialna od opuszczonego czasownika bez głębokiej analizy kontekstu składniowego?
+- Jakie są konsekwencje błędu w koreferencji dla identyfikacji strony umowy — pomylenie Wykonawcy z Podwykonawcą?
+- Jak obsłużyć długi dokument (1000+ zdań) gdzie antecedent jest 50 zdań wcześniej niż anaphor?
+
 ## Pytania uzupełniające
 - **Pułapka 3:** `CoreferenceResolver` zakłada że antecedent jest w tym samym lub poprzednim zdaniu — w polskich tekstach prawnych antecedens może być 5+ zdań wcześniej (definicja na początku umowy).
 - **Pułapka 4:** Zaimki "jej" i "jego" są polisemiczne: "jej" to G.sg.f LUB D.sg.f — bez Morfeusza (W1) `gender_number_match` nie może rozróżnić płci antecedensa.

@@ -55,9 +55,18 @@ Klient (HTTP / Thrift)
 ### 1. Architektura
 - Jakie są zalety biblioteki Thrift w architekturze Multiservice?
 - Jakie są zalety Apache Thrift w architekturze Multiservice?
+- Jakie są granice W7 — co jest warstwą prezentacji/transportu a co logiką biznesową (należącą do W1–W6)?
+- Jaki wzorzec stosuje W7 dla orkiestracji wywołań do warstw wewnętrznych — Chain of Responsibility, Facade?
+- Jak W7 obsługuje asynchroniczne przetwarzanie długich dokumentów — polling, webhook, czy Server-Sent Events?
+- Jaki jest diagram sekwencji dla żądania /analyze od klienta do W8 (compliance audit) i z powrotem?
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
+- Jaki jest schemat OpenAPI (JSON Schema) dla endpointu /analyze — pokaż wymagane i opcjonalne pola?
+- Jak zdefiniować kontrakt dla nagłówka X-Request-ID — UUID v4 obowiązkowy czy opcjonalny?
+- Jaki jest format błędu HTTP przy walidacji schematu wejściowego — RFC 7807 Problem Details?
+- Jak zdefiniować kontrakt SLA — maksymalny czas odpowiedzi w ms per typ żądania i per wielkość dokumentu?
+- Jak wygląda kompletna para request/response JSON dla endpointu /analyze z przykładowymi danymi?
 
 ### 3. Implementacja
 - Czy Multiservice oferuje narzędzia do automatyzacji ekstrakcji danych?
@@ -67,14 +76,32 @@ _brak pytań źródłowych w tej kategorii_
 - Jak rozszerzyć IntentClassifier o rozpoznawanie aktów zaprzeczenia?
 - Jakie 6 komend diagnostycznych dodałeś do whitelisty SystemExecutor?
 - Jakie to 6 komend diagnostycznych w whiteliscie SystemExecutor?
+- Pokaż implementację FastAPI routera /analyze z walidacją Pydantic i przekazaniem do orchestratora?
+- Jak zaimplementować middleware do rate limitingu (np. slowapi) w FastAPI dla /analyze?
+- Jak zaimplementować circuit breaker dla wywołań do downstream W5 — biblioteka tenacity czy własna implementacja?
+- Jak skonfigurować Uvicorn z kilkoma workerami i współdzielonym dostępem do zasobów wewnętrznych?
+- Jak zaimplementować endpoint /health zwracający status każdej warstwy wewnętrznej (W1–W8)?
+- Jak zaimplementować obsługę Apache Thrift po stronie serwera — generowany stub czy ręczny handler?
+- Jak zaimplementować structured logging (JSON) w FastAPI z correlation ID per request?
 
 ### 4. Testowanie
 - Gdzie w procesie CI/CD uruchomić te testy?
 - Stwórzmy teraz czerwony test integracyjny dla endpointu API..
 - Pokaż przykład testu integracyjnego POST /analyze i statusu zadania..
+- Jak napisać test integracyjny dla /analyze który mockuje W5 (silnik wnioskowania) i weryfikuje kontrakt JSON?
+- Jak testować rate limiting — czy test powinien wysłać N+1 żądań i sprawdzić 429 Too Many Requests?
+- Jak napisać test dla circuit breaker — wymuś timeout downstream i sprawdź że API zwraca 503 a nie wiesza?
+- Jak testować wersjonowanie API — czy v1 i v2 endpointy zwracają różne schematy przy tym samym wejściu?
+- Jak zmierzyć czas odpowiedzi /analyze dla dokumentu 10 kB, 100 kB, 1 MB — pokaż benchmark test?
+- Jak napisać test smoke dla health endpoint po deployu — czy wszystkie warstwy raportują status OK?
 
 ### 5. Obsługa błędów
 _brak pytań źródłowych w tej kategorii_
+- Jak obsłużyć 503 Service Unavailable gdy downstream W5 (silnik wnioskowania) nie odpowiada?
+- Jaki HTTP status code zwrócić gdy dokument wejściowy przekracza maksymalny limit rozmiaru?
+- Jak logować błędy walidacji schematu wejściowego bez ujawniania treści dokumentu w logach HTTP?
+- Co zwrócić klientowi gdy pipeline przetwarza poprawnie ale zwraca 0 wyników — 200 z pustą listą czy inny status?
+- Jak obsłużyć błąd deserializacji JSON — RFC 7807 z informacją o konkretnym polu które nie pasuje do schematu?
 
 ### 6. Integracja z innymi warstwami
 - Jak zintegrować RapidMiner z Multiservice do analizy NKJP?
@@ -92,6 +119,14 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
+- Co się dzieje gdy klient wysyła żądanie z niepoprawnym Content-Type (nie application/json)?
+- Jak uniknąć desynchronizacji wersji API gdy klient używa v1 a serwer zaktualizował schemat do v2?
+- Jakie jest ryzyko wycieku danych wrażliwych (treść umów, dane osobowe) w logach HTTP przy debugowaniu?
+- Co się dzieje gdy Apache Thrift zgłosi TimeoutException przy wywołaniu W5 z W8 podczas audytu?
+- Jak obsłużyć partial response gdy pipeline przetwarza duży dokument i połączenie HTTP się urywa w trakcie?
+- Czy FastAPI automatycznie waliduje schemat wejściowy — co dzieje się przy polu null gdy schemat wymaga string?
+- Jak zapobiec przeciążeniu endpointu /analyze gdy jeden klient wysyła tysiące żądań bez rate limitingu?
+
 ## Pytania uzupełniające
 - **Pułapka 3:** FastAPI deserializuje request body do Pydantic model — błąd walidacji zwraca 422, nie 400; klienci API (np. systemy klientów) mogą nie obsługiwać 422 i traktować to jako sukces po stronie sieci.
 - **Pułapka 4:** Synchroniczne wywołanie pipeline NLP w handlerze HTTP — przy 30s timeout serwer HTTP zwróci 504, ale pipeline NLP nadal przetwarza w tle, blokując zasoby.

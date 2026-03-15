@@ -66,6 +66,11 @@ DependencyTree (CoNLL-U z W1)
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
+- Jaki jest format wyjściowy SemanticMapper — lista obiektów EventFrame w JSON?
+- Jakie pola są wymagane w strukturze EventFrame przekazywanej do W4 (baza grafowa)?
+- Jak zdefiniować kontrakt dla roli OPTIONAL vs. REQUIRED w strukturze predykatu — null, absent, czy empty list?
+- Czy EventFrame posiada wersjonowanie schematu — jak obsłużyć nowe role bez łamania starych rekordów w grafie?
+- Jak wygląda przykładowy obiekt EventFrame dla zdania "Wykonawca dostarczył dokumentację z opóźnieniem" — pokaż JSON?
 
 ### 3. Implementacja
 - Jak stworzyć formalną ontologię dla relacji agent-akcja-obiekt?
@@ -128,6 +133,10 @@ _brak pytań źródłowych w tej kategorii_
 ### 5. Obsługa błędów
 - Jak obsłużyć relacje czasowe before i after w SemanticMapperze?
 - Jak obsłużyć wieloznaczność ról semantycznych przy użyciu słownika Walenty?
+- Co zwrócić gdy zdanie wejściowe nie zawiera żadnego predykatu rozpoznawalnego przez SemanticMapper?
+- Jak logować błędy mapowania roli bez ujawniania treści umowy w logach?
+- Jak obsłużyć zdanie o długości przekraczającej limit tokenów modelu NLP?
+- Co się dzieje gdy CoNLL-U wejściowe jest niepoprawnie sformatowane — wyjątek czy partial parse?
 
 ### 6. Integracja z innymi warstwami
 - Pokaż jak zintegrować SemanticMapper z głównym pipeline przetwarzania..
@@ -136,6 +145,14 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
+- Jakie jest ryzyko gdy SemanticMapper błędnie przypisze AGENT zamiast PATIENT w zdaniu biernym?
+- Jak uniknąć synkretyzmu fleksyjnego (ta sama forma — różne przypadki) przy rozpoznawaniu roli INSTRUMENT?
+- Co się dzieje gdy zdanie zawiera dwa AGENT-y (podmiot współrzędny, np. "Wykonawca i Podwykonawca") — jak prioritizować?
+- Jak obsłużyć elipsę semantyczną gdy PATIENT jest domyślny i nie pojawia się explicite w zdaniu?
+- Jakie są konsekwencje błędnego mapowania roli semantycznej dla silnika wnioskowania w W5?
+- Czy istnieje ryzyko pętli referencyjnej gdy rola COREFERENCE_OF wskazuje na inny EventFrame tego samego dokumentu?
+- Jak walidować że przypisane role są spójne ze strukturą predykatu opisaną w słowniku Walenty?
+
 ## Pytania uzupełniające
 - **Pułapka 3:** Role semantyczne są przypisywane per-zdanie — `SemanticMapper` nie zna kontekstu poprzednich zdań; AGENT w zdaniu 2 może być tym samym bytem co PATIENT w zdaniu 1, ale `map_roles()` tego nie widzi.
 - **Pułapka 4:** Polskie zdania z czasownikami modalnymi ("może", "powinien") — `nsubj` jest przy modalnym, nie przy głównym predykacie; naiwne mapowanie `nsubj→AGENT` da błędną rolę.

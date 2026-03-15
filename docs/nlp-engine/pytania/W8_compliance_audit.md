@@ -74,6 +74,11 @@ Tekst z NKJP (XML)
 
 ### 2. Kontrakty danych
 - Jak zmapować tagi MSD z NKJP na relacje w grafie?
+- Jaki jest format wejściowy AuditEngine — surowy tekst dokumentu, EventFrame z W5, czy oba jednocześnie?
+- Jak wygląda schemat JSON dla raportu compliance z polami: naruszenia, pewność, uzasadnienie, identyfikator reguły?
+- Jak zdefiniować kontrakt dla pola severity w naruszeniu compliance — enum (LOW/MEDIUM/HIGH/CRITICAL)?
+- Jakie pola są wymagane w EventFrame przekazywanym z W5 do W8 — id, predicate, roles, timestamp, source_doc_id?
+- Jak zdefiniować kontrakt dla wersjonowania raportów compliance — czy raport v2 jest kompatybilny wstecz z v1?
 
 ### 3. Implementacja
 - Pokaż jak zapisać zdarzenie „Wykonawca dostarczył dokumentację techniczną z opóźnieniem" w grafie..
@@ -146,6 +151,14 @@ Tekst z NKJP (XML)
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
+- Co się dzieje gdy AuditEngine generuje sprzeczne wyniki dla tego samego dokumentu przy dwóch uruchomieniach?
+- Jak uniknąć false positive CONS-02 gdy opóźnienie dostawy jest explicite dozwolone w aneksie umowy?
+- Jakie jest ryzyko gdy NKJPBridge zwróci null dla terminu który istnieje w bazie ale pod inną formą fleksyjną?
+- Jak obsłużyć dokument gdzie ta sama klauzula jest opisana w dwóch sprzecznych paragrafach tego samego aktu?
+- Czy wynik audytu compliance jest legalnie wiążący — jak opisać ograniczenia narzędzia w raporcie dla klienta?
+- Jak zapewnić że EventFrame generowany przez W8 jest idempotentny przy powtórnym audycie tego samego dokumentu?
+- Co się dzieje gdy dokument używa niestandardowej terminologii branżowej której brak w NKJP ani Walenty?
+
 ## Pytania uzupełniające
 - **Pułapka 3:** `NKJPBridge` obsługuje tagi MSD ze standardu Morfeusz2 — starsze dane z NKJP używają tagów Pantery (inny standard); bridge musi rozróżniać oba formaty, bo milcząca nieprawidłowa konwersja generuje fałszywe BRIDGE_ERROR.
 - **Pułapka 4:** `StateMatrix` bez "zamrażania wniosków" pozwala na cofnięcie stanu — jeśli reguła R2 cofa wniosek R1 po dodaniu nowego faktu, starsze raporty audytu są retrospektywnie błędne (problem dla dokumentacji zarobkowej).
