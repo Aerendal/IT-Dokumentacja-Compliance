@@ -108,6 +108,7 @@ Plik NKJP (XML/TEI P5)
 - Jak zaimplementować logikę mapowania ról semantycznych w `DependencyParserAdapter` — metoda `map_roles(nodes: List[DependencyNode]) → Dict[str, str]` iteruje nodes: `dep_rel=='nsubj'` → AGENT, `dep_rel=='obj'` → PATIENT, `dep_rel=='obl' and feats.Case='Ins'` → INSTRUMENT, zwraca `{role: lemma}`?
 - Jak wygląda kompletny kod klasy `DependencyParserAdapter` z mapowaniem ról — `class DependencyParserAdapter: def __init__(self, backend: DependencyParser): self._p = backend` + `parse()` deleguje do `_p.parse()`, `map_roles()` buduje dict z `dep_rel` reguł?
 - Jak wdrożyć DeepER NER do rozpoznawania specyficznych technologii w tekście — zdefiniuj etykietę TECHNOLOGIA w `NERAdapter.LABELS` i dotrenuj `poldeepner` na przykładach z 'Docker', 'REST API', 'OAuth'; encje TECHNOLOGIA trafiają do EventFrame jako INSTRUMENT jeśli w zdaniu brak innego narzędnika?
+- Jak przejść do implementacji DeepER rozpoznawania nazw — kroki: (1) załaduj model `poldeepner.load('pl-nkjp')`, (2) tokenizuj przez Morfeusz, (3) uruchom `model.predict(tokens)`, (4) konwertuj BIO spans → `List[Entity]`, (5) scal wielotokenowe encje (B-X…I-X) do jednego Entity przed przekazaniem do SemanticMapper?
 - Czy spaCy-pl poprawnie rozpoznaje polskie idiomy w drzewie zależności — `IdiomDetector.detect()` musi wywołać się PRZED `SpacyParser.parse()` bo drzewo zbudowane na nie-scalonych idiomach da błędne dep_rel; weryfikuj test: 'Wykonawca wziął pod uwagę wymagania' z idiomem i bez?
 - Jak zintegrować DeepER NER ze Słowosiecią — po `ner_adapter.recognize(sentence)` dla każdej encji ORGANIZACJA wywołaj `SlowosiecAdapter.get_synset(entity.form)`, jeśli istnieje synset dodaj `entity.synset_id`; encje bez synsetu trafiają do `KGT.capture_ign(entity.form)` jako OOV?
 - Jakie biblioteki Python ułatwią parsowanie formatów XML z NKJP?
@@ -366,6 +367,7 @@ Plik NKJP (XML/TEI P5)
 - Stwórz snapshot test lematyzacji: 100 zdań + oczekiwane lematy zapisane jako golden file — alarm gdy Morfeusz2 zwróci inny lemat.
 - Jak przetestować W1 end-to-end na zdaniu wielozdaniowym (10 zdań) — sprawdzić że wszystkie tokeny mają `feats.Case` gdzie `upos=NOUN`?
 - Stwórzmy plik `test_dependency_parser.py` z testami TDD — struktura: `TestUDPipeParser` (parse+CoNLL-U schema), `TestSpacyParser` (parse+dep_rel), `TestParserSwap` (ten sam wynik po wymianie backendu) jako trzy klasy w pytest?
+- Dopiszmy testy dla idiomów takich jak 'wziąć pod uwagę' — `test_idiom_detection`: `IdiomDetector.detect(["wziął","pod","uwagę"])` zwraca `[{phrase:"wziąć pod uwagę", canonical:"uwzględnić", start:0}]`; następnie `SpacyParser.parse()` na scalonym tokenie daje poprawny dep_rel='obj' zamiast 'obl'?
 - Jak napisać czerwony test TDD dla DependencyParser — `assert parser.parse("Wykonawca złożył ofertę")[0].dep_rel == 'nsubj'` przed implementacją SpacyParser, wtedy GREEN po dodaniu `token.dep_`→`dep_rel` mapping?
 
 ### 5. Obsługa błędów

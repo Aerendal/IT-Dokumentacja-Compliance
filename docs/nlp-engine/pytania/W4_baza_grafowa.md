@@ -178,6 +178,7 @@ CoreferenceChain (z W6)
 - Jak obsłużyć pusty łańcuch kauzalny (brak krawędzi :CAUSES) w generatorze Mermaid — fallback: diagram z jednym węzłem i komentarzem "brak łańcucha przyczynowego"?
 - Jak zmapować wymiar intencji (speech_act: ZOBOWIĄZANIE) na krawędź Neo4j — :EventFrame -[:HAS_SPEECH_ACT]-> :SpeechAct {type: 'ZOBOWIĄZANIE'}?
 - Jak zmapować wymiar narzędzia (INSTRUMENT) na krawędź Neo4j — :EventFrame -[:HAS_ROLE {role: 'INSTRUMENT'}]-> :Token {lemma: ...}?
+- Jak modelować wymiary intencji i narzędzia łącznie w grafie zdarzeń — węzeł :EventFrame z krawędziami :HAS_SPEECH_ACT→:SpeechAct {type:'ZOBOWIĄZANIE'} i :HAS_ROLE {role:'INSTRUMENT'}→:Token; Cypher: `MATCH (e)-[:HAS_SPEECH_ACT]->(s), (e)-[:HAS_ROLE {role:'INSTRUMENT'}]->(t) WHERE s.type='ZOBOWIĄZANIE' RETURN e, t` dla audytu narzędzi zobowiązania?
 - Jak zapytać Cypher o wszystkie EventFrame z INSTRUMENT należącym do klasy 'narzędzie' — MATCH (e:EventFrame)-[:HAS_ROLE {role:'INSTRUMENT'}]->(t:Token)-[:HAS_SYNSET]->(:Synset)-[:IS_A*]->(:OntologyClass {name:'narzędzie'}) RETURN e?
 - Pokaż przykład zapytania Cypher do wykrywania węzłów-orfanów :EventFrame — MATCH (e:EventFrame) WHERE NOT (e)-[:CAUSES]->() AND NOT ()-[:CAUSES]->(e) RETURN e?
 - Jak wykryć orfany :Synset niepowiązane z żadnym :EventFrame — MATCH (s:Synset) WHERE NOT ()-[:HAS_SYNSET]->(s) AND NOT (s)-[:IS_A]->() RETURN s?

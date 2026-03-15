@@ -234,6 +234,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak graf synsetów Słowosieci pozwala regule dopasować "wręczyć" gdy oczekuje "dostarczyć" — ścieżka przez wspólny hiperonim 'działanie transferu'?
 - Jak testować integrację Słowosieci z grafem dla synonimów — asercja MATCH(:Synset)-[:IS_SYNONYM]->(:Synset) dla pary 'dostarczyć'/'przekazać'?
 - Jak zintegrować DeepER NER z lokalną bazą Słowosieci (SQLite wordnet.db) — dla każdej encji rozpoznanej przez NERAdapter: `SlowosiecAdapter.get_synsets(entity.lemma, pos='n')`, jeśli pusta lista → `KGT.capture_ign(entity.form)`, jeśli ≥1 → `entity.synset_id = synsets[0].id` i wzbogać EventFrame.PATIENT o synset?
+- Jak DeepER wykorzystuje Słowosieć do kategoryzacji bytów — etykieta NER (ORGANIZACJA) jest punktem wejścia do `SlowosiecAdapter.get_synsets(lemma, pos='n')`; synset zwęża semantyczną klasę encji (np. ORGANIZACJA + synset 'instytucja_finansowa' → kontekst audytu vs synset 'wykonawca_budowlany' → kontekst umowy budowlanej)?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
