@@ -104,6 +104,9 @@ Plik NKJP (XML/TEI P5)
 - Jak SpacyParser tokenizuje zdanie techniczne z identyfikatorem dokumentu (np. 'CONS-02') — token 'CONS-02' rozpoznawany jako PROPN, dep_rel='nmod' gdy odnosi się do rzeczownika lub 'obj' gdy jest bezpośrednim dopełnieniem czasownika?
 - Czy spaCy-pl poradzi sobie z idiomami (MWE) typu 'rzucić okiem' — model `pl_core_news_lg` nie rozkłada idiomów; 'okiem' dostanie dep_rel='obj' zamiast bycia częścią frazy; dodaj `IdiomDetector` jako pre-processing krok przed SpacyParser który zamienia znane idiomy na pojedynczy token?
 - Jak zbudować słownik idiomów dla IdiomDetector w domenie prawno-technicznej — plik `idioms.json` z kluczem jako fraza wielowyrazowa i wartością jako forma kanonalna (np. 'wziąć pod uwagę' → 'uwzględnić') ładowany przez SlowosiecAdapter?
+- Jak wdrożyć listę `POLISH_IDIOMS` do wykrywania idiomów — słownik `{trigger_token: [(pełna_fraza, forma_kanoniczna)]}` indeksowany pierwszym słowem frazy dla O(1) lookup; `IdiomDetector.detect(tokens)` iteruje tokeny i sprawdza czy kolejne tokeny tworzą znany idiom?
+- Jak zaimplementować logikę mapowania ról semantycznych w `DependencyParserAdapter` — metoda `map_roles(nodes: List[DependencyNode]) → Dict[str, str]` iteruje nodes: `dep_rel=='nsubj'` → AGENT, `dep_rel=='obj'` → PATIENT, `dep_rel=='obl' and feats.Case='Ins'` → INSTRUMENT, zwraca `{role: lemma}`?
+- Jak zintegrować DeepER NER ze Słowosiecią — po `ner_adapter.recognize(sentence)` dla każdej encji ORGANIZACJA wywołaj `SlowosiecAdapter.get_synset(entity.form)`, jeśli istnieje synset dodaj `entity.synset_id`; encje bez synsetu trafiają do `KGT.capture_ign(entity.form)` jako OOV?
 - Jakie biblioteki Python ułatwią parsowanie formatów XML z NKJP?
 - Jakie są główne słabości modelu symbolicznego w porównaniu do LLM?
 - Jakie narzędzia w Pythonie pomogą mi zautomatyzować ekstrakcję z NKJP?

@@ -133,6 +133,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak wpiąć NERAdapter do generowania EventFrame — przed `map_roles()` wywołaj `ner_adapter.recognize(sentence)`, scalaj wyniki z DependencyNode przez `token.ner_label = ner_result[token.start]`?
 - Zaktualizujmy klasę EventFrame o automatyczne mapowanie ról z parsera — metoda fabryczna `EventFrame.from_dep_tree(nodes: List[DependencyNode]) → EventFrame` wypełnia AGENT (nsubj), PATIENT (obj), INSTRUMENT (obl + feats.Case=Ins) bez potrzeby zewnętrznego SemanticMapper?
 - Jak `EventFrame.from_dep_tree()` obsługuje zdania bez nsubj — AGENT=None, `confidence=0.5`, flaga `roles_incomplete=True` zamiast ValueError; `KGT.capture_orphan(event)` gdy flaga ustawiona zanim trafi do InferenceEngine?
+- Jak wdrożyć `EventFrame.from_roles(roles: Dict[str, str], predicate: str, doc_id: str) → EventFrame` do grafu zdarzeń — przyjmuje gotowy słownik `{AGENT: 'Wykonawca', PATIENT: 'dokumentacja'}` z `DependencyParserAdapter.map_roles()` i buduje EventFrame bez ponownego parsowania?
 - Jak zmapować role AGENT/PATIENT na wymiary analizy kontekstowej — AGENT + `speech_act='ZOBOWIĄZANIE'` → wymiar `context.causal.responsible_party`, PATIENT + `context.temporal='BEFORE'` → `context.causal.affected_object` w SituationalContext?
 
 ### 4. Testowanie
@@ -141,6 +142,7 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż jak Hypothesis testuje relacje agent-akcja-obiekt..
 - Jak zaprojektować system testów dla relacji agent-akcja-obiekt — parametryczny pytest z listą zdań wzorcowych `[(zdanie, expected_agent, expected_action, expected_patient)]` pokrywający co najmniej 5 wariantów szyku?
 - Napiszmy test sprawdzający role semantyczne dla różnych szyków zdania — `@pytest.mark.parametrize` z parami `(zdanie_SVO, zdanie_OVS, zdanie_VSO)` i asercją że `frame.agent == expected_agent` niezależnie od kolejności tokenów?
+- Stwórz testy dla ról semantycznych w zdaniach OVS — `SemanticMapper.map("Dokumentację Wykonawca dostarczył")` → `frame.agent == 'Wykonawca'` i `frame.patient == 'dokumentacja'`; weryfikacja że spaCy-pl poprawnie identyfikuje nsubj w zdaniu z wyprzedzonym obiektem?
 - Stwórzmy testy jednostkowe dla klasy SemanticMapper w cyklu TDD..
 - Napiszmy czerwony test dla SemanticMapper mapujący AGENT i PATIENT.
 - Napiszmy testy dla klasy SemanticMapper.
