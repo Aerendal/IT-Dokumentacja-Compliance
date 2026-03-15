@@ -191,6 +191,8 @@ _brak pytań źródłowych w tej kategorii_
 - Napiszmy kod KnowledgeGapTracker — metoda `capture_ign(token)` gdy `token.tag == 'ign'`: `self._gaps.append({'type': 'UNKNOWN_WORD', 'form': token.form, 'doc_id': self._doc_id})`?
 - Jak KnowledgeGapTracker przechwytuje osierocone zdarzenia — metoda `capture_orphan(event: EventFrame)` gdy event nie ma żadnej krawędzi :CAUSES w grafie?
 - Jak eksportować zebrane luki do pliku JSONL — metoda `dump_jsonl(path)` iteruje `self._gaps` i zapisuje każdy wpis przez `json.dumps(gap, ensure_ascii=False)`?
+- Wdróżmy pętlę KnowledgeGapTracker w pipeline W2→W5 — `for event in event_frames: tracker.check_predicate(event.predicate); tracker.capture_orphan(event) if not graph.has_edges(event); inference_engine.run(event)`?
+- Jak pętla KnowledgeGapTracker obsługuje wyjątki na poziomie zdarzenia — try/except per event: wyjątek → `tracker.capture_error(event, exc)`, pipeline kontynuuje następne zdarzenie zamiast przerywać sesję?
 - Jak wdrożyć Klasyfikator Kontekstu aby system rozumiał typ (jestestwo) dokumentu — umowa, SRS, raport, specyfikacja?
 - Jak KlasyfikatorKontekstu pobiera sygnały z W3 (leksyka), W2 (role) i W6 (koreferencja) do klasyfikacji dokumentu?
 - Jak zdefiniować enum klas dokumentów w KlasyfikatorKontekstu — UMOWA, SRS, RAPORT_AUDYTU, SPECYFIKACJA_TECHNICZNA?

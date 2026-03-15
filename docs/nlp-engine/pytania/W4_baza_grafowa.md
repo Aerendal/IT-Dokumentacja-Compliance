@@ -183,6 +183,8 @@ CoreferenceChain (z W6)
 - Jak zintegrować wykrywanie orfanów jako krok CI/CD — po każdym imporcie uruchom Cypher orphan-check w skrypcie Python i zwróć exit 1 gdy `count(orphans) > 0`?
 - Jak monitorować orfany jako metrykę SLI — `MATCH (e:EventFrame) WHERE NOT (e)-[:CAUSES|HAS_SYNSET|HAS_ROLE]-() RETURN count(e)` eksportowany cyklicznie do Grafana/Prometheus?
 - Czy Neo4j pozwala na constraint zapobiegający tworzeniu orfanów :EventFrame — brak natywnych relacyjnych constraints w Neo4j; alternatywa to APOC trigger `apoc.trigger.add` wywołujący rollback gdy węzeł bez krawędzi?
+- Jak połączyć Słowosieć z grafem przyczynowym w Neo4j — MERGE (e:EventFrame {id: $id})-[:HAS_SYNSET]->(s:Synset {synset_id: $synset_id}) po imporcie każdego zdarzenia z SemanticMapper?
+- Jak weryfikować że :EventFrame.predicate ma zmapowany :Synset — MATCH (e:EventFrame) WHERE NOT (e)-[:HAS_SYNSET]->(:Synset) RETURN e jako raport brakujących mappingów predykatów?
 
 ### 4. Testowanie
 - Jak zapisać węzeł „Test jednostkowy” w formacie ontologii JSON?

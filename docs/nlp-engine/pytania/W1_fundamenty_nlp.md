@@ -65,6 +65,8 @@ Plik NKJP (XML/TEI P5)
 - Jak zaprojektować ontologię dla wielowymiarowej analizy zdarzenia „dostarczyć / odstąpić od umowy"?
 - Pokaż jak sfinalizować architekturę i podsumować ten etap..
 - Pokaż strukturę ontologii dla wielodomenowej klasyfikacji zdarzeń..
+- Wybieram Głębokie Rozpoznawanie Nazw (DeepER/poldeepner) jako moduł NER w W1 — jakie encje są rozpoznawane: OSOBA, ORGANIZACJA, LOKALIZACJA, DATA, NUMER_UMOWY jako wejście do SemanticMapper?
+- Jak NER jako krok W1.5 uzupełnia wyjście Morfeusza i UDPipe — rozpoznane encje nakładają się na tokeny CoNLL-U jako atrybut `ner_label` przekazywany do W2?
 
 ### 2. Kontrakty danych
 - Stwórz przykładowy JSON kontraktu danych między modułem morfologii a składni..
@@ -84,6 +86,14 @@ Plik NKJP (XML/TEI P5)
 - Przedstaw model danych grafu wiedzy dla przykładu z dokumentacją techniczną.
 - Wyszukaj źródła i skrypty do automatyzacji ekstrakcji danych z NKJP..
 - Skonfigurujmy UDPipe jako parser składni zależności w modules..
+- Jak zaimplementować DependencyParser jako interfejs `parse(sentence: str) → List[DependencyNode]` — klasa abstrakcyjna `DependencyParser` z implementacjami `UDPipeParser` i `SpacyParser`?
+- Jak DependencyParser buduje DependencyNode — każdy węzeł: `{id, form, lemma, upos, feats, head, dep_rel}` zgodnie ze schematem Universal Dependencies v2?
+- Jak zapewnić zgodność wyników DependencyParser z schematem CoNLL-U — walidacja że każdy DependencyNode ma niepuste `dep_rel` i `head` zanim trafi do SemanticMapper W2?
+- Jakie są zalety integracji spaCy-pl z klasą DependencyParserAdapter — spaCy-pl oferuje szybszy inference niż UDPipe dla krótkich zdań prawnych; adapter ukrywa różnicę API za wspólnym interfejsem?
+- Jak zaimplementować `SpacyParser` jako backend DependencyParserAdapter — `nlp = spacy.load('pl_core_news_lg')`, token.dep_ → dep_rel, token.head.i → head, token.morph → feats?
+- Jak porównać `UDPipeParser` i `SpacyParser` dla zdań prawnych — testy parametryczne z tymi samymi zdaniami, asercja że dep_rel AGENT/PATIENT zgadzają się w ≥ 90% przypadków?
+- Jak NER (DeepER/poldeepner) uzupełnia pipeline W1 — rozpoznane encje OSOBA/ORGANIZACJA są kandydatami do roli AGENT/PATIENT w SemanticMapper W2 przed analizą dep_rel?
+- Jak zaimplementować `NERAdapter` jako wrapper dla DeepER — `recognize(sentence) → List[Entity]` gdzie Entity: `{form, label: OSOBA|ORGANIZACJA|LOKALIZACJA|DATA|UMOWA, start, end}`?
 - Jakie biblioteki Python ułatwią parsowanie formatów XML z NKJP?
 - Jakie są główne słabości modelu symbolicznego w porównaniu do LLM?
 - Jakie narzędzia w Pythonie pomogą mi zautomatyzować ekstrakcję z NKJP?

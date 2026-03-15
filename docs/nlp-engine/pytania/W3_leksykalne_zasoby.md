@@ -229,6 +229,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak SlowosiecAdapter.get_synonym_set(lemma) zasila mapowanie predykatów w CausalChainBuilder.link_events() — sprawdzenie czy predykat zdarzenia należy do synsetu wzorca reguły?
 - Jak skonfigurować semantyczny soft matching w CausalChainBuilder od strony W3 — adapter zwraca `Set[str]` synonimów; builder porównuje ze zbiorem wzorców reguły przez `intersection / union ≥ threshold`?
 - Jak testować integrację SlowosiecAdapter+CausalChainBuilder od strony W3 — fixture z mock SQLite wypełnionym synsetnymi parami dla 'dostarczyć'↔'przekazać'?
+- Jak połączyć Słowosieć z grafem przyczynowym w Neo4j — po `SlowosiecAdapter.enrich_graph(lemma, session)` wywołaj MERGE (e:EventFrame)-[:HAS_SYNSET]->(s:Synset {synset_id: $id}) dla każdego dopasowanego synsetu?
+- Jak zoptymalizować łączenie Słowosieci z grafem przyczynowym — batch UNWIND zamiast pojedynczych MERGE: `UNWIND $synsets AS s MERGE (:Synset {id: s.id})` przy imporcie?
 - Jak graf synsetów Słowosieci pozwala regule dopasować "wręczyć" gdy oczekuje "dostarczyć" — ścieżka przez wspólny hiperonim 'działanie transferu'?
 - Jak testować integrację Słowosieci z grafem dla synonimów — asercja MATCH(:Synset)-[:IS_SYNONYM]->(:Synset) dla pary 'dostarczyć'/'przekazać'?
 
