@@ -132,6 +132,10 @@ _brak pytań źródłowych w tej kategorii_
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
+- **Pułapka 3:** Słowosieć nie pokrywa neologizmów technicznych ("konteneryzacja", "mikroserwis") — `get_synsets("docker")` zwróci pusty wynik, a system milcząco pominie wzbogacenie semantyczne.
+- **Pułapka 4:** Walenty ma luki dla czasowników niekonwencjonalnych i frazeologizmów — `get_valency_frame("kłaść do głowy")` zwróci `None`, co może wywołać `NullPointerException` w `SemanticMapper`.
+- **Pułapka 5:** Pełne ładowanie Słowosieci do RAM zajmuje ~2 GB — w środowiskach z limitem 1 GB (containers, serverless) `SlowosiecAdapter` uruchomi się, ale spowolni do nieużywalności przez swapping.
+- **Pułapka 6:** Homografy ("zamek" = budowla / mechanizm) — `get_synsets("zamek")` zwróci oba synsets bez wskazania który; bez WSD (W3) downstream W2 dostanie losowy synset.
 
 ### 1. Architektura
 
@@ -172,6 +176,8 @@ _brak pytań źródłowych w tej kategorii_
 - Co robi `PhraseologyDetector` gdy idiom jest częściowo rozgromiony przez wstawienie słowa?
 - Jak obsługiwać homonimię między kategorii (rzeczownik "zamek" vs przymiotnik "zamknięty")?
 - Jakie jest zachowanie WSD przy zdaniach bez kontekstu (jedno słowo)?
+- Co robi `SlowosiecAdapter` gdy plik Słowosieci jest w trakcie aktualizacji (partially written)?
+- Jak obsługiwać `get_valency_frame()` gdy Walenty zwraca ramę z nieznanym typem roli (nowy standard po aktualizacji)?
 
 ### 6. Integracja z innymi warstwami
 
@@ -185,6 +191,9 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 1:** Słowosieć 3.x ma nierówne pokrycie — czasowniki mają znacznie mniej synsetów niż rzeczowniki. Fallback MFS dla czasowników jest konieczny.
 - **Pułapka 2:** Eksplozja ontologii przy ładowaniu pełnej hiperonimii Słowosieci do Neo4j (>500k relacji) — konieczne selektywne ładowanie per domena.
 - **Pułapka 3:** Walenty nie pokrywa neologizmów ani anglicyzmów — brak ramy walencyjnej nie oznacza błędu, ale wymaga explicitnego fallbacku rule-based.
+- **Pułapka 4:** Słowosieć nie pokrywa neologizmów technicznych ("konteneryzacja", "mikroserwis") — `get_synsets()` milcząco zwróci pusty wynik zamiast sygnalizować brak.
+- **Pułapka 5:** Pełne ładowanie Słowosieci zajmuje ~2 GB RAM — w środowiskach z limitem 1 GB (containers) system uruchomi się ale spowolni przez swapping.
+- **Pułapka 6:** Homografy ("zamek" = budowla/mechanizm) — bez WSD downstream W2 dostaje losowy synset zamiast właściwego.
 
 ## Kryteria akceptacji
 

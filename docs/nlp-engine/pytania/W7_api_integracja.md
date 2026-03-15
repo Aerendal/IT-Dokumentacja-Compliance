@@ -77,6 +77,10 @@ _brak pytań źródłowych w tej kategorii_
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
+- **Pułapka 3:** FastAPI deserializuje request body do Pydantic model — błąd walidacji zwraca 422, nie 400; klienci API (np. systemy klientów) mogą nie obsługiwać 422 i traktować to jako sukces po stronie sieci.
+- **Pułapka 4:** Synchroniczne wywołanie pipeline NLP w handlerze HTTP — przy 30s timeout serwer HTTP zwróci 504, ale pipeline NLP nadal przetwarza w tle, blokując zasoby.
+- **Pułapka 5:** CORS bez jawnej listy dozwolonych origin — `allow_origins=["*"]` w FastAPI to luka bezpieczeństwa dla endpointów API płatnych serwisów.
+- **Pułapka 6:** Wersjonowanie API przez URL (`/v1/analyze`) vs header (`Accept-Version`) — zmiana konwencji łamie wszystkich klientów jednocześnie; decyzja musi być podjęta przed pierwszym publicznym deploymentem.
 
 ### 1. Architektura
 
@@ -117,6 +121,8 @@ _brak pytań źródłowych w tej kategorii_
 - Co zwrócić gdy Neo4j jest niedostępny — 503 czy degraded response?
 - Jak logować błędy pipeline per request_id dla debugowania?
 - Jak obsługiwać równoczesne żądania bez race condition w StateMatrix (W5)?
+- Jak API obsługuje request z `Content-Type: application/json` ale ciałem które nie jest validnym JSON?
+- Co zwrócić gdy downstream serwis (W1–W6) zwraca 500 — propagować błąd czy zwrócić częściowy wynik z ostrzeżeniem?
 
 ### 6. Integracja z innymi warstwami
 
@@ -130,6 +136,10 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 1:** Synchroniczne przetwarzanie NLP w handlerze FastAPI blokuje event loop — zawsze używać background_tasks lub Celery.
 - **Pułapka 2:** Brak rate limitingu = jeden klient może zapchać cały pipeline. Wdrożyć slowapi lub Nginx rate limit.
 - **Pułapka 3:** Thrift i FastAPI mają różne modele błędów — ujednolicenie error handling jest konieczne zanim wdrożysz oba.
+- **Pułapka 3:** FastAPI zwraca 422 (nie 400) dla błędów walidacji — klienci nieobsługujący 422 mogą traktować to jako sukces po stronie sieci.
+- **Pułapka 4:** Synchroniczne wywołanie pipeline NLP w handlerze HTTP — przy timeoucie 30s serwer zwraca 504, ale pipeline nadal przetwarza w tle blokując zasoby.
+- **Pułapka 5:** `allow_origins=["*"]` w FastAPI to luka CORS dla płatnych endpointów API.
+- **Pułapka 6:** Wersjonowanie API przez URL (`/v1/`) vs header — decyzja musi być podjęta przed pierwszym publicznym deploymentem; zmiana konwencji łamie wszystkich klientów.
 
 ## Kryteria akceptacji
 

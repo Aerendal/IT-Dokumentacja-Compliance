@@ -256,6 +256,9 @@ Plik NKJP (XML/TEI P5)
 - Jakie są 3 fundamentalne bariery, które zatrzymują projekty tego typu?
 - Jakie są 3 fundamentalne bariery w budowie systemów symbolicznych?
 ## Pytania uzupełniające
+- **Pułapka 4:** Morfeusz2 jest biblioteką C++ z bindings Python — wersja bindings musi być skompilowana dla tej samej wersji Morfeusz2 co słownik; niezgodność wersji powoduje segfault, nie wyjątek.
+- **Pułapka 5:** UDPipe model PDB-UD jest trenowany na prasie i literaturze — dla tekstów prawnych/technicznych (dokumentacja projektowa) LAS spada do ~78%, co jest poniżej kryterium akceptacji ≥88%.
+- **Pułapka 6:** CoNLL-U numeruje tokeny od 1, Python od 0 — błąd off-by-one w `head` wskazującym na parent jest najczęstszym błędem implementacji dekodera drzewa.
 
 ### 1. Architektura
 
@@ -296,6 +299,8 @@ Plik NKJP (XML/TEI P5)
 - Co zwrócić, gdy UDPipe nie może sparsować zdania (brak modelu, malformed input)?
 - Jak logować błędy parsowania NKJP XML (uszkodzone tagi TEI, brakujące atrybuty)?
 - Jak zachowuje się system przy polskich znakach diakrytycznych błędnie zakodowanych (ISO-8859-2)?
+- Jak W1 obsługuje zdania z emotjami lub hashtagami (`#python`, `😀`) których Morfeusz nie rozpoznaje?
+- Co zwrócić gdy plik NKJP XML jest niekompletny (urwany w połowie tagu TEI) — częściowy wynik czy błąd krytyczny?
 
 ### 6. Integracja z innymi warstwami
 
@@ -309,6 +314,9 @@ Plik NKJP (XML/TEI P5)
 - **Pułapka 1:** Morfeusz zwraca listę interpretacji dla formy — błędny wybór = błędna lematyzacja = propagacja błędu do W2 (AGENT zamiast PATIENT). Konieczny WSD (W3) już w W1.
 - **Pułapka 2:** NKJP XML (TEI P5) ma nieregularne warianty tagowania między podkorpusami — parser musi obsługiwać `ann_morphosyntax.xml` w różnych wersjach schematu.
 - **Pułapka 3:** UDPipe model PDB-UD ma coverage ~92% dla współczesnej polszczyzny — pozostałe 8% trafia jako błędy do W2; potrzebny fallback (Concraft lub rule-based).
+- **Pułapka 4:** Morfeusz2 to biblioteka C++ z bindings Python — niezgodność wersji bindings ze słownikiem powoduje segfault, nie wyjątek Pythona.
+- **Pułapka 5:** UDPipe PDB-UD trenowany na prasie — dla tekstów prawnych/technicznych LAS spada do ~78%, poniżej kryterium ≥88%.
+- **Pułapka 6:** CoNLL-U numeruje tokeny od 1, Python od 0 — off-by-one w polu `head` to najczęstszy błąd dekodera drzewa.
 
 ## Kryteria akceptacji
 

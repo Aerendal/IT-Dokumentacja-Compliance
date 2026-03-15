@@ -125,6 +125,7 @@ CoreferenceChain (z W6)
 
 ### 5. Obsługa błędów
 _brak pytań źródłowych w tej kategorii_
+- Jak obsługiwać konflikt MERGE gdy ten sam węzeł jest dodawany równolegle przez dwa procesy (race condition)?
 
 ### 6. Integracja z innymi warstwami
 - Pokaż jak zintegrować Słowosieć z grafem wiedzy w Neo4j..
@@ -143,6 +144,9 @@ _brak pytań źródłowych w tej kategorii_
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
+- **Pułapka 4:** MERGE w Neo4j bez unikalnego indeksu tworzy duplikaty węzłów — `MERGE (n:Concept {id: x})` bez `CREATE INDEX FOR (n:Concept) ON (n.id)` jest O(n) i duplikuje dane.
+- **Pułapka 5:** Neo4j Community Edition nie ma replikacji ani automatycznego failover — awaria węzła podczas zapisu to utrata danych; Commercial/AuraDB wymagane dla projektu produkcyjnego.
+- **Pułapka 6:** Zapytania Cypher bez `LIMIT` na grafach >1M węzłów mogą zwrócić GB danych — `MATCH (n:Concept)-[:IS_A*]->(m)` bez limitu głębokości to pełny obchód grafu.
 
 ### 1. Architektura
 
@@ -183,6 +187,8 @@ _brak pytań źródłowych w tej kategorii_
 - Co zwrócić gdy zapytanie Cypher jest malformed (syntax error)?
 - Jak rollbackować częściowy import gdy część węzłów się zapisała a reszta nie?
 - Jak logować błędy imporcie (które zdania zakończono, które nie)?
+- Co robi system gdy Neo4j jest w trybie read-only (np. po awarii, przed recovery)?
+- Jak obsługiwać race condition: ten sam węzeł MERGE-owany równolegle przez dwa procesy?
 
 ### 6. Integracja z innymi warstwami
 
@@ -196,6 +202,9 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 1:** MERGE w Neo4j bez indeksu na `synset_id` jest O(n) — baza nie skaluje się przy >100k węzłów. Indeksy muszą być założone PRZED importem.
 - **Pułapka 2:** ArangoDB ma inny model zapytań niż Cypher — migracja między nimi wymaga przepisania wszystkich zapytań W5. Decyzja wyboru DB musi być ostateczna.
 - **Pułapka 3:** Brak transakcji ACID przy batch imporcie = niespójny stan grafu po przerwaniu. Zawsze używać `BEGIN TRANSACTION` lub APOC periodic commit.
+- **Pułapka 4:** MERGE w Neo4j bez unikalnego indeksu tworzy duplikaty węzłów — `MERGE (n:Concept {id: x})` bez `CREATE INDEX` jest O(n) i duplikuje dane.
+- **Pułapka 5:** Neo4j Community Edition nie ma replikacji — awaria węzła podczas zapisu to utrata danych; wymagana edycja Enterprise dla projektu produkcyjnego.
+- **Pułapka 6:** Zapytania Cypher bez `LIMIT` na grafach >1M węzłów — `MATCH (n)-[:IS_A*]->(m)` bez limitu głębokości to pełny obchód grafu.
 
 ## Kryteria akceptacji
 

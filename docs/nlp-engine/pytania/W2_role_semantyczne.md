@@ -120,6 +120,10 @@ _brak pytań źródłowych w tej kategorii_
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
+- **Pułapka 3:** Role semantyczne są przypisywane per-zdanie — `SemanticMapper` nie zna kontekstu poprzednich zdań; AGENT w zdaniu 2 może być tym samym bytem co PATIENT w zdaniu 1, ale `map_roles()` tego nie widzi.
+- **Pułapka 4:** Polskie zdania z czasownikami modalnymi ("może", "powinien") — `nsubj` jest przy modalnym, nie przy głównym predykacie; naiwne mapowanie `nsubj→AGENT` da błędną rolę.
+- **Pułapka 5:** Imiesłowy przymiotnikowe bierne ("złamany kij") mają `nsubj:pass` — mapowanie `nsubj→AGENT` bez sprawdzenia `Voice=Pass` przypisuje błędną rolę do pacjensa.
+- **Pułapka 6:** Reguły mapowania zakodowane w słowniku `deprel→role` są kruche — dla 5% zdań w NKJP relacja `obl` może oznaczać 3 różne role (INSTRUMENT, LOCATION, TIME) bez dodatkowego WSD.
 
 ### 1. Architektura
 
@@ -160,6 +164,8 @@ _brak pytań źródłowych w tej kategorii_
 - Co robić, gdy `SlowosiecAdapter` zwraca brak synsetów dla słowa?
 - Jak logować nierozwiązane przypisania ról (tokeny bez roli)?
 - Jak obsługiwać zdania eliptyczne (brak podmiotu wyrażonego — domyślny podmiot)?
+- Jak `map_roles()` zachowuje się dla zdań z dwoma predykatami (zdanie złożone współrzędnie) — jedna mapa czy dwie?
+- Co zwrócić gdy W1 przekazał `DependencyTree` z `head=None` dla korzenia (uszkodzone CoNLL-U)?
 
 ### 6. Integracja z innymi warstwami
 
@@ -173,6 +179,9 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 1:** Polska fleksja powoduje, że ta sama forma może być narzędnikiem (INSTRUMENT) lub nomen (AGENT) — bez `Case=Ins` z Morfeusza błąd propaguje się do W4.
 - **Pułapka 2:** Mapowanie wyłącznie przez `nsubj/obj` pomija ~15% zdań z niestandardową kolejnością — konieczna analiza `feats` z W1.
 - **Pułapka 3:** Walenty ma niepełne pokrycie dla nowych czasowników (neologizmy, slang techniczny) — potrzebny fallback MFS (Most Frequent Sense).
+- **Pułapka 4:** Polskie zdania z czasownikami modalnymi ("może", "powinien") — `nsubj` jest przy modalnym, nie przy predykacie głównym; naiwne `nsubj→AGENT` daje błędną rolę.
+- **Pułapka 5:** Imiesłowy bierne (`nsubj:pass`) — mapowanie `nsubj→AGENT` bez sprawdzenia `Voice=Pass` przypisuje błędną rolę pacjensowi.
+- **Pułapka 6:** Reguły `deprel→role` są kruche — dla ~5% zdań `obl` może oznaczać INSTRUMENT, LOCATION lub TIME bez dodatkowego WSD.
 
 ## Kryteria akceptacji
 

@@ -130,6 +130,10 @@ Tekst z NKJP (XML)
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
+- **Pułapka 3:** `NKJPBridge` obsługuje tagi MSD ze standardu Morfeusz2 — starsze dane z NKJP używają tagów Pantery (inny standard); bridge musi rozróżniać oba formaty, bo milcząca nieprawidłowa konwersja generuje fałszywe BRIDGE_ERROR.
+- **Pułapka 4:** `StateMatrix` bez "zamrażania wniosków" pozwala na cofnięcie stanu — jeśli reguła R2 cofa wniosek R1 po dodaniu nowego faktu, starsze raporty audytu są retrospektywnie błędne (problem dla dokumentacji zarobkowej).
+- **Pułapka 5:** `AuditReportGenerator` produkuje raport w momencie wywołania — jeśli ten sam dokument jest analizowany dwukrotnie (np. po aktualizacji reguł), dwa raporty mogą mieć różne wyniki bez zmiany dokumentu.
+- **Pułapka 6:** GDPR — jeśli analizowane dokumenty projektowe zawierają dane osobowe (imię/nazwisko autora, PESEL w przykładach), wyniki audytu w SQLite są RODO-objęte; brak mechanizmu anonimizacji przed zapisem to ryzyko prawne.
 
 ### 1. Architektura
 
@@ -172,6 +176,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak obsłużyć elipsę podmiotu w polskich tekstach bez fałszywych alarmów RISK-01?
 - Co zwrócić gdy stress_test.py wykryje >10% BRIDGE_ERROR rate?
 - Jak StateMatrix zapobiega fałszywym alarmom przy wielodomenowej analizie?
+- Co robi `run_end_to_end_audit()` gdy jeden etap pipeline zwróci `None` zamiast wyjątku (cichy błąd)?
+- Jak obsługiwać dokument który zmienił się między startem a końcem audytu (audit race condition)?
 
 ### 6. Integracja z innymi warstwami
 
@@ -186,6 +192,9 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 1:** NKJPBridge bez obsługi elipsy flaguje ~30% polskich zdań jako BRIDGE_ERROR (brak AGENT) — konieczna integracja z W6 (ellipsis_recovery).
 - **Pułapka 2:** StateMatrix bez "zamrażania wniosków" powoduje wielokrotne alarmy RISK-01 dla tego samego komponentu — każde nowe zdanie re-triggeruje audyt.
 - **Pułapka 3:** CONS-02 (sprzeczności) wymaga porównania semantycznego między dokumentami — bez W3 (Słowosieć) false positive rate >20%.
+- **Pułapka 4:** Starsze dane NKJP używają tagów Pantery (inny standard niż Morfeusz2) — bridge musi rozróżniać oba formaty; milcząca zła konwersja generuje fałszywe BRIDGE_ERROR.
+- **Pułapka 5:** `StateMatrix` bez "zamrażania wniosków" — reguła może cofnąć wcześniejszy wniosek po dodaniu nowego faktu; starsze raporty audytu stają się retrospektywnie błędne.
+- **Pułapka 6:** GDPR — jeśli dokumenty projektowe zawierają dane osobowe (PESEL w przykładach), wyniki audytu w SQLite są RODO-objęte; brak anonimizacji to ryzyko prawne w projekcie zarobkowym.
 
 ## Kryteria akceptacji
 

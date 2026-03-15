@@ -102,6 +102,10 @@ _brak pytań źródłowych w tej kategorii_
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
+- **Pułapka 3:** `completeness_score` logarytmiczny może maskować wiele małych błędów — dokument z 20 ostrzeżeniami i 0 błędami krytycznych dostanie wynik ~0.60, co wygląda jak "akceptowalny", choć nie jest.
+- **Pułapka 4:** `duplicate_detector` porównuje dokumenty przez TF-IDF bez lematyzacji — "wymagania" i "wymaganie" to różne tokeny, więc duplikat może nie zostać wykryty.
+- **Pułapka 5:** SQLite jako backend audytu jest single-writer — równoległe uruchomienia `doc_auditor.py` na tym samym pliku `.db` mogą prowadzić do `database is locked`.
+- **Pułapka 6:** Reguły ARCH-01, SEC-01 są zdefiniowane per-projekt — bez wersjonowania zbioru reguł wyniki audytu dla tego samego dokumentu mogą być różne w różnych datach.
 
 ### 1. Architektura
 
@@ -145,6 +149,8 @@ _brak pytań źródłowych w tej kategorii_
 - Co zwraca `gap_detector.py` dla pustego dokumentu (0 słów)?
 - Jak logować błędy parsowania bez przerywania całego skanu?
 - Jakie są progi błędów, po których przekroczeniu `completeness_score = 0`?
+- Jak `relation_mapper.py` obsługuje cykl w grafie relacji dokumentów (A wymaga B, B wymaga A)?
+- Co się dzieje gdy plik Markdown ma niepoprawny YAML front matter (np. brakujący cudzysłów) — czy cały audyt pada czy plik jest skipowany?
 
 ### 6. Integracja z innymi warstwami
 
@@ -158,6 +164,9 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 1:** TF-IDF bez lematyzacji W1 daje fałszywe duplikaty dla fleksji polskiej (np. "testy" vs "testów") — do naprawy w W1.
 - **Pułapka 2:** Progi podobieństwa (0.85/0.65/0.40) są stałe — zmiana w jednym projekcie łamie audyt innego; rozwiązanie: konfigurowalne progi per projekt.
 - **Pułapka 3:** SQLite audit.db commitowany do repo ujawnia historię dokumentów — decyzja: `.gitignore` vs `audit.db` jako artefakt CI.
+- **Pułapka 4:** `duplicate_detector` porównuje dokumenty przez TF-IDF bez lematyzacji — "wymagania" i "wymaganie" to różne tokeny; duplikat może nie zostać wykryty.
+- **Pułapka 5:** SQLite jako backend audytu jest single-writer — równoległe uruchomienia `doc_auditor.py` na tym samym `.db` powodują `database is locked`.
+- **Pułapka 6:** Reguły ARCH-01, SEC-01 są zdefiniowane per-projekt — bez wersjonowania zbioru reguł wyniki audytu dla tego samego dokumentu różnią się między datami.
 
 ## Kryteria akceptacji
 

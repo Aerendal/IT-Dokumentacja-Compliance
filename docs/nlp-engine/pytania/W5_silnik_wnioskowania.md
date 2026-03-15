@@ -154,6 +154,10 @@ _brak pytań źródłowych w tej kategorii_
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
+- **Pułapka 3:** Drools `KieSession` nie jest thread-safe — każdy wątek musi mieć własną sesję; reużycie sesji między wątkami powoduje `ConcurrentModificationException`.
+- **Pułapka 4:** Reguły DRL z `salience` (priorytet) — zmiana kolejności plików `.drl` może zmienić wyniki gdy dwie reguły mają ten sam salience; wyniki są niedeterministyczne bez jawnego salience.
+- **Pułapka 5:** Drools `Working Memory` akumuluje wszystkie facts — bez `retract(fact)` po przetworzeniu zdania sesja rośnie w pamięci bez ograniczeń przy batch processingu.
+- **Pułapka 6:** IntentClassifier wytrenowany na jednej domenie (np. prawna) nie generalizuje na inną (wojskowa, medyczna) — F1 może spaść z 0.90 do 0.45 bez domeny-specyficznego fine-tuningu.
 
 ### 1. Architektura
 
@@ -194,6 +198,8 @@ _brak pytań źródłowych w tej kategorii_
 - Co gdy Drools nie może załadować pliku `.drl` (syntax error)?
 - Jak obsługiwać nieskończoną pętlę dedukcji (A → B → A)?
 - Jak logować, które reguły zostały aktywowane i w jakiej kolejności?
+- Co robi `InferenceEngine` gdy plik `.drl` ma błąd składni Drools — pada całe ładowanie czy tylko zepsuta reguła jest pomijana?
+- Jak obsługiwać nieskończoną pętlę reguł (reguła A aktywuje B, B aktywuje A)?
 
 ### 6. Integracja z innymi warstwami
 
@@ -208,6 +214,10 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 1:** Drools wymaga JVM — niekompatybilność z czystym Python stackiem. Alternatywa: Python rule engine (experta, nools-py) lub własny IF-THEN runner.
 - **Pułapka 2:** Eksplozja reguł DRL przy >500 regułach powoduje czas kompilacji >30s. Konieczne: agenda groups, rule salience, partial evaluation.
 - **Pułapka 3:** StateMatrix bez "zamrażania wniosków" powoduje wielokrotne re-inferowanie tych samych faktów — każde nowe zdanie re-triggeruje wszystkie reguły.
+- **Pułapka 3:** Drools `KieSession` nie jest thread-safe — każdy wątek musi mieć własną sesję; reużycie sesji między wątkami powoduje `ConcurrentModificationException`.
+- **Pułapka 4:** Reguły DRL bez jawnego `salience` — gdy dwie reguły mają ten sam priorytet, kolejność aktywacji zależy od kolejności ładowania plików `.drl`; wyniki mogą być niedeterministyczne.
+- **Pułapka 5:** `Working Memory` akumuluje fakty bez `retract()` — przy batch processingu sesja rośnie w pamięci bez ograniczeń.
+- **Pułapka 6:** IntentClassifier wytrenowany na jednej domenie — F1 może spaść z 0.90 do 0.45 przy zmianie domeny bez fine-tuningu.
 
 ## Kryteria akceptacji
 

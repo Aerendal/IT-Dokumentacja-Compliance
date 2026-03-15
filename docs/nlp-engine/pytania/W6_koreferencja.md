@@ -77,6 +77,7 @@ _brak pytań źródłowych w tej kategorii_
 ### 5. Obsługa błędów
 - Jak obsłużyć elipsę i brakujący podmiot w koreferencji?
 - Jak obsłużyć elipsę w CoreferenceResolverze dla języka polskiego?
+- Jak obsługiwać dokument gdzie ta sama osoba jest nazywana trzema różnymi sposóbami ("Jan", "Kowalski", "powód") — czy trzy odrębne łańcuchy czy jeden?
 
 ### 6. Integracja z innymi warstwami
 - Pokaż jak zintegrować koreferencję z grafem wiedzy w Neo4j..
@@ -91,6 +92,10 @@ _brak pytań źródłowych w tej kategorii_
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
+- **Pułapka 3:** `CoreferenceResolver` zakłada że antecedent jest w tym samym lub poprzednim zdaniu — w polskich tekstach prawnych antecedens może być 5+ zdań wcześniej (definicja na początku umowy).
+- **Pułapka 4:** Zaimki "jej" i "jego" są polisemiczne: "jej" to G.sg.f LUB D.sg.f — bez Morfeusza (W1) `gender_number_match` nie może rozróżnić płci antecedensa.
+- **Pułapka 5:** Elipsa podmiotu w ~30% polskich zdań — `IMPLICIT_SUBJECT` jest normą, ale błędna rekonstrukcja podmiotu z końcówki czasownika przy nieregularnych formach (np. "bywał") może dać błędną osobę.
+- **Pułapka 6:** Merge węzłów koreferencyjnych w Neo4j (W4) jest nieodwracalny — jeśli `CoreferenceResolver` błędnie połączy dwie różne osoby "Jan Kowalski" i "Jan Nowak", błąd propaguje się do wszystkich zapytań.
 
 ### 1. Architektura
 
@@ -132,6 +137,8 @@ _brak pytań źródłowych w tej kategorii_
 - Co gdy Morfeusz zwraca wiele interpretacji rodzaju dla kandydata?
 - Jak obsługiwać długie łańcuchy koreferencji (>10 zaimków odnoszących się do tego samego bytu)?
 - Co się dzieje przy sprzecznych wskaźnikach rodzaju ("Jan" ale zaimek "ona")?
+- Co robi `CoreferenceResolver` gdy W1 zwróci zdanie z zerową liczbą tokenów (puste zdanie)?
+- Jak obsługiwać osobę nazwaną trzema sposobami ("Jan", "Kowalski", "powód") — trzy łańcuchy czy jeden?
 
 ### 6. Integracja z innymi warstwami
 
@@ -145,6 +152,10 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 1:** Polska fleksja daje wiele form dla tego samego rodzaju — "on" może wskazywać na rzeczownik M1, M2 lub M3 (osobowy/nieosobowy). Bez Morfeusza błędne zmergowanie.
 - **Pułapka 2:** Elipsa podmiotu jest normą w polskim (~30% zdań) — ignorowanie ellipsis_recovery = brak AGENT w 30% eventów w W5.
 - **Pułapka 3:** Recency Heuristic daje ~65% accuracy — dla tekstów prawnych (gdzie precyzja ma znaczenie) potrzebne rule-based rozszerzenie (np. rola semantyczna kandydata).
+- **Pułapka 3:** `CoreferenceResolver` zakłada antecedens w bliskim oknie — w dokumentach prawnych definicja może być 10+ zdań wcześniej.
+- **Pułapka 4:** "jej" i "jego" są polisemiczne (G.sg.f / D.sg.f) — bez Morfeusza (W1) `gender_number_match` nie rozróżnia płci antecedensa.
+- **Pułapka 5:** Elipsa podmiotu w ~30% polskich zdań — błędna rekonstrukcja przy nieregularnych formach czasownika może dać błędną osobę.
+- **Pułapka 6:** Merge węzłów koreferencyjnych w Neo4j jest nieodwracalny — błędne połączenie "Jan Kowalski" z "Jan Nowak" propaguje się do wszystkich zapytań grafu.
 
 ## Kryteria akceptacji
 
