@@ -242,9 +242,6 @@ Plik NKJP (XML/TEI P5)
 - Jak rozszerzyć linter o wykrywanie sprzeczności logicznych w dokumentacji?
 - Pokaż przykład analizy przyczynowo-kontekstowej dla wymiaru intencji.
 - Jakie błędy w tagach MSD najczęściej generują fałszywe alarmy?
-- Dodajmy tagi YAML do dokumentacji Markdown projektu.
-- dodatkowe od godziny 8:43.
-- Jak dodać tagi YAML do moich plików Markdown?
 
 ## Pytania uzupełniające
 

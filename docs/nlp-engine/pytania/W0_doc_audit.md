@@ -114,6 +114,9 @@ gap_detector  duplicate_detector  relation_mapper
 - Jak zaimplementować regułę ARCH-01 i SEC-01 jako formalne predykaty w `doc_auditor.py`?
 - Jak dodać obsługę reguły API-01 i DEP-01 do istniejącego schematu SQLite?
 - Jak rozbudować `relation_mapper.py` o relację `contradicts` (wykrywanie sprzeczności)?
+- Jak dodać tagi YAML front matter do plików Markdown projektu (format: `layer`, `title`, `status`, `tags`)?
+- Jak `doc_auditor.py` waliduje obecność i poprawność YAML front matter w plikach dokumentacji?
+- Jak zintegrować tagowanie YAML z `GapAnalysisGenerator` — czy YAML tagi trafiają do raportu luk?
 
 ### 4. Testowanie
 

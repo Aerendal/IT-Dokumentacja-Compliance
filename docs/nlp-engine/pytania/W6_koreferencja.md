@@ -101,6 +101,7 @@ Sekwencja zdań (z W1) + DependencyTree
 - Jak zaimplementować `ellipsis_recovery` — odczytaj osobę z końcówki czasownika (`-m → 1sg`, `-ł → 3sg.m`)?
 - Jak zbudować `mention_detector` — lista NP z drzewa zależności + lista zaimków?
 - Jak zaimplementować `merge_coreferences(chain, graph)` scalający węzły Neo4j?
+- Jak wdrożyć regułę rekonstrukcji podmiotu domyślnego w `NKJPBridge` — wykrywanie elipsy podmiotowej z końcówki fleksyjnej czasownika?
 
 ### 4. Testowanie
 

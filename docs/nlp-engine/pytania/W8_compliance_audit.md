@@ -143,6 +143,7 @@ Tekst z NKJP (XML)
 - Jak zaimplementować regułę RISK-01 (brak szyfrowania w API komponentu sieciowego)?
 - Jak zaimplementować regułę CONS-02 (sprzeczne opisy komponentu w dwóch dokumentach)?
 - Jak zaimplementować run_end_to_end_audit() łącząc NKJPBridge + EventFrame + AuditEngine?
+- Jak zintegrować tagowanie YAML front matter (layer, status, tags) z `GapAnalysisGenerator` — czy metadane YAML trafiają do raportu luk?
 
 ### 4. Testowanie
 
@@ -151,6 +152,7 @@ Tekst z NKJP (XML)
 - Jak zbudować NKJPErrorLogger zbierający błędy mapowania dla analizy regresyjnej?
 - Jak pisać testy regresyjne z logów stress testu — każdy BRIDGE_ERROR = nowy test?
 - Jak testować EventFrame.missing_dimensions() dla zdania bez LOCATION?
+- Jak napisać skrypt testowy dla reguły CONSTRAINT_VIOLATION na danych NKJP — jakie zdania powinny tę regułę wyzwalać, a jakie nie?
 
 ### 5. Obsługa błędów
 
