@@ -99,6 +99,31 @@ Tematy zidentyfikowane jako słabo pokryte na podstawie przeglądu wszystkich pl
 
 ---
 
+## 6a. Luki w pytaniach źródłowych — wynik klasyfikacji
+
+Każde źródłowe pytanie sklasyfikowane do jednej z 7 kategorii. Poniżej: liczba pytań źródłowych per warstwa/kategoria.
+Wartości **pogrubione** = luka (<5 pytań, wymaga uzupełnienia w "Pytania uzupełniające").
+
+| Kategoria | W0 | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | Suma |
+|-----------|----|----|----|----|----|----|----|----|-----|------|
+| 1. Architektura | **1** | 9 | **3** | **2** | 10 | **2** | **1** | **2** | 5 | 35 |
+| 2. Kontrakty danych | **0** | 12 | **0** | **0** | 7 | **0** | **0** | **0** | **1** | 20 |
+| 3. Implementacja | 17 | 103 | 40 | 39 | 43 | 79 | 17 | 7 | 39 | 384 |
+| 4. Testowanie | 19 | 48 | 14 | 12 | 7 | 7 | 8 | **3** | 12 | 130 |
+| 5. Obsługa błędów | **0** | **3** | **2** | **1** | **0** | **1** | **2** | **0** | **4** | 13 |
+| 6. Integracja | 5 | 16 | **3** | 15 | 12 | 5 | 8 | 12 | 6 | 82 |
+| 7. Pułapki i ryzyka | **0** | 12 | **0** | **0** | **0** | **0** | **0** | **0** | **0** | 12 |
+| **Suma** | 42 | 203 | 62 | 69 | 79 | 94 | 36 | 24 | 67 | **676** |
+
+> Sekcja "Pytania uzupełniające" w każdym pliku ma już pełne 7 podsekcji.
+> Powyższe luki dotyczą **pytań źródłowych** — wskazują gdzie sesje pracy skupiały się tylko na implementacji.
+
+**Wnioski:**
+- Kategoria 3 (Implementacja) dominuje wszędzie — ~57% wszystkich pytań źródłowych to "Pokaż/Zaimplementuj X"
+- Kategoria 5 (Obsługa błędów) jest systematycznie pominięta — tylko 13 pytań w całym zbiorze
+- Kategoria 7 (Pułapki) — 12 z nich jest tylko w W1; inne warstwy nie pytały o ryzyka
+- Kategoria 2 (Kontrakty danych) — tylko W1 i W4 mają pytania kontraktowe w źródłach
+
 ## 6. Jak używać tej macierzy
 
 1. **Przed implementacją warstwy** — sprawdź sekcję 4 (ADR) czy blokujące decyzje są podjęte

@@ -47,34 +47,29 @@ SlowosiecAdapter           WalentyAdapter
 
 ## Pytania źródłowe — sklasyfikowane
 
-- Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..
-- Pokaż jak rozbudować testy o przypadki synkretyzmu i wieloznaczności..
-- Dopiszmy test synkretyzmu gramatycznego dla słowa „dam”..
-- Zaimplementujmy logikę ujednoznaczniania w Fazie GREEN przy użyciu UDPipe..
-- Zdefiniujmy testy dla synkretyzmu gramatycznego słowa dam..
-- Jakie reguły ujednoznaczniania dodać do silnika disambiguation?
-- Jak zintegrować Słowosieć z grafem wiedzy w Fazie 2?
-- Jak wdrożyć parser zależności UDPipe do testowania synkretyzmu?
+### 1. Architektura
 - Pokaż jak zaprojektować model danych grafu dla wieloznaczności..
-- Jakie są różnice między homonimią a polisemią w testach?
-- Pokaż jak zintegrować Słowosieć z ontologią grafu..
+- Pokaż strukturę węzła Concept uwzględniającą synset_id i rolę.
+
+### 2. Kontrakty danych
+_brak pytań źródłowych w tej kategorii_
+
+### 3. Implementacja
+- Zaimplementujmy logikę ujednoznaczniania w Fazie GREEN przy użyciu UDPipe..
+- Jakie reguły ujednoznaczniania dodać do silnika disambiguation?
 - Pokaż słownik kolokacji ułatwiający ujednoznacznianie..
 - Jak wdrożyć silnik ujednoznaczniający dla polisemicznych pojęć?
 - Jak uniknąć problemu eksplozji ontologii w takim systemie?
 - Zbudujmy słownik kolokacji ułatwiający ujednoznacznianie..
-- Czy możemy dodać warstwę ujednoznaczniania sensów (WSD) do modułu?
 - Jak wdrożyć disambiguation engine dla synkretyzmu i wieloznaczności?
 - Pokaż jak zbudować słownik kolokacji wspierający ujednoznacznianie..
 - Jak stworzyć słownik kolokacji wspierający ujednoznacznianie wieloznaczności?
 - Zbudujmy słownik kolokacji ułatwiający ujednoznacznianie semantyczne..
 - Chcę zobaczyć, jak zaimplementować ten mechanizm ujednoznaczniania..
-- Pokaż jak zintegrować Słowosieć z grafem w Pythonie..
 - Jak algorytmicznie wybierać właściwe znaczenie wieloznacznych słów?
 - Pokaż przykład kodu integrującego Słowosieć do wyboru znaczenia słowa..
-- Jak zintegrować Słowosieć z grafem w Pythonie?
 - W jaki sposób optymalnie ograniczyć zakres mojego systemu?
 - Jak algorytmicznie wybrać właściwy synset przy wieloznaczności słowa?
-- Jak zintegrować Słowosieć z tym potokiem w Fazie 2?
 - Omów 3 bariery: eksplozję reguł, ontologii i brak kontekstu..
 - Jakie są ryzyka związane z eksplozją ontologii w grafie?
 - Jakie są największe trudności przy tworzeniu grafowej ontologii polszczyzny?
@@ -85,38 +80,57 @@ SlowosiecAdapter           WalentyAdapter
 - Jakie są największe wyzwania przy tworzeniu reguł eliminacji polisemii?
 - W jaki sposób silnik ujednoznaczniający zarządza subgrafami wariantowymi?
 - Pokaż jak Słowosieć definiuje relacje derywacyjne dla grafu..
-- Jak obsłużyć wieloznaczność słowa klucz w grafie?
-- Jak zaimplementować mechanizm WSD dla słowa „testy jednostkowe” w grafie?
-- Pokaż jak zintegrować Słowosieć w celu ujednoznaczniania pojęć..
-- Jak zintegrować Słowosieć do ujednoznaczniania pojęć w grafie?
 - Jak zaimplementować ujednoznacznianie pojęć dla słowa zamek?
 - Jak wdrożyć prostą heurystykę szukającą przecięć kontekstu z hiperonimami?
 - Zastosujmy Baseline: Najczęstszy sens (MFS) ze Słowosieci dla zamka..
-- Napiszmy czerwony test dla synsetu słowa zamek.
-- Stwórzmy czerwony test dla detektora idiomów w Fazie 3..
-- Stwórzmy test jednostkowy dla PhraseologyDetector w Fazie 3..
-- Pokaż logikę detekcji idiomów zapalającą test na zielono..
-- Pokaż strukturę węzła Concept uwzględniającą synset_id i rolę.
 - Jak uniknąć eksplozji ontologii przy tysiącach reguł?
-- Jak zintegrować Słowosieć z naszym modelem ontologii?
-- Które polskie słowniki najlepiej zintegrować z ontologią?
-- Jak zintegrować Słowosieć z ontologią, by system rozumiał hiperonimy?
 - Jak powiązać węzły :Concept z konkretnymi synsetami Słowosieci?
 - Pokaż regułę dla Słowosieci obsługującą synonimy 'dać'..
-- Jak zintegrować Słowosieć, by reguła obsługiwała synonim wręczyć?
-- Jak zintegrować Słowosieć do obsługi synonimów w regułach?
 - Jak rozszerzyć wyszukiwanie o synonimy ze Słowosieci?
-- Jak zintegrować Słowosieć, aby obsłużyć synonimy czasownika 'dać'?
-- Pokaż jak zintegrować Słowosieć do obsługi synonimów.
 - Stwórzmy detektor dla idiomów i jednostek wielowyrazowych..
 - Jak zaimplementować detekcję idiomów takich jak 'rzucić okiem'?
 - Pokaż implementację detektora idiomów i jednostek wielowyrazowych..
 - Jak zaimplementować detektor idiomów jako jednostek wielowyrazowych?
-- Pokaż test dla idiomu 'odnieść sukces' w zdaniu..
 - Jak rozbudować mwe_dict o idiomy?
 - Czy detektor idiomów powinien działać przed lematyzacją?
 - Pokaż jak dodać detektor jednostek wielowyrazowych i idiomów.
 
+### 4. Testowanie
+- Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..
+- Pokaż jak rozbudować testy o przypadki synkretyzmu i wieloznaczności..
+- Dopiszmy test synkretyzmu gramatycznego dla słowa „dam”..
+- Zdefiniujmy testy dla synkretyzmu gramatycznego słowa dam..
+- Jak wdrożyć parser zależności UDPipe do testowania synkretyzmu?
+- Jakie są różnice między homonimią a polisemią w testach?
+- Jak zaimplementować mechanizm WSD dla słowa „testy jednostkowe” w grafie?
+- Napiszmy czerwony test dla synsetu słowa zamek.
+- Stwórzmy czerwony test dla detektora idiomów w Fazie 3..
+- Stwórzmy test jednostkowy dla PhraseologyDetector w Fazie 3..
+- Pokaż logikę detekcji idiomów zapalającą test na zielono..
+- Pokaż test dla idiomu 'odnieść sukces' w zdaniu..
+
+### 5. Obsługa błędów
+- Jak obsłużyć wieloznaczność słowa klucz w grafie?
+
+### 6. Integracja z innymi warstwami
+- Jak zintegrować Słowosieć z grafem wiedzy w Fazie 2?
+- Pokaż jak zintegrować Słowosieć z ontologią grafu..
+- Czy możemy dodać warstwę ujednoznaczniania sensów (WSD) do modułu?
+- Pokaż jak zintegrować Słowosieć z grafem w Pythonie..
+- Jak zintegrować Słowosieć z grafem w Pythonie?
+- Jak zintegrować Słowosieć z tym potokiem w Fazie 2?
+- Pokaż jak zintegrować Słowosieć w celu ujednoznaczniania pojęć..
+- Jak zintegrować Słowosieć do ujednoznaczniania pojęć w grafie?
+- Jak zintegrować Słowosieć z naszym modelem ontologii?
+- Które polskie słowniki najlepiej zintegrować z ontologią?
+- Jak zintegrować Słowosieć z ontologią, by system rozumiał hiperonimy?
+- Jak zintegrować Słowosieć, by reguła obsługiwała synonim wręczyć?
+- Jak zintegrować Słowosieć do obsługi synonimów w regułach?
+- Jak zintegrować Słowosieć, aby obsłużyć synonimy czasownika 'dać'?
+- Pokaż jak zintegrować Słowosieć do obsługi synonimów.
+
+### 7. Pułapki i ryzyka
+_brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
 
 ### 1. Architektura

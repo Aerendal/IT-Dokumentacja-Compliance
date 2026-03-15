@@ -44,6 +44,14 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 
 ## Pytania źródłowe — sklasyfikowane
 
+### 1. Architektura
+- Jak załadować Słowosieć do modułu wnioskowania w Pythonie?
+- Jak połączyć GraphDatabaseAdapter z modułem wnioskowania Drools?
+
+### 2. Kontrakty danych
+_brak pytań źródłowych w tej kategorii_
+
+### 3. Implementacja
 - Jak w grafie wiedzy oznaczyć intencję działania aktora?
 - Jakie reguły logiczne w Drools obsłużą synkretyzm form?
 - Wyjaśnij różnicę między modelem lingwistycznym a modelem zdarzenia..
@@ -57,7 +65,6 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Wyjaśnij barierę eksplozji reguł i ontologii w projektach symbolicznych..
 - Jakie reguły w silniku Drools obsłużą relacje agent-patient?
 - Pokaż przykład wnioskowania logicznego w systemie symbolicznym..
-- Jak załadować Słowosieć do modułu wnioskowania w Pythonie?
 - Jak wdrożyć walidację reguł w Drools dla relacji nsubj i obj?
 - Pokaż przykład wnioskowania na grafie zdarzeń w Neo4j..
 - Jakie reguły Drools najlepiej obsłużą synkretyzm w DRL?
@@ -68,20 +75,14 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Jak stworzyć reguły Drools klasyfikujące zdarzenie prawne?
 - Jak połączyć ontologię z analizą intencji (speech acts)?
 - Jak w Drools zgłosić lukę w dokumentacji?
-- Jak zintegrować reguły Drools z wynikami parsera lxml?
 - Pokaż przykład reguły Drools rozwiązującej synkretyzm..
 - Pokaż przykład reguły Drools mapującej składnię na rolę agent..
 - Pokaż przykład reguły Drools dla relacji AGENT i PATIENT..
 - Jak połączyć relację HAS_TRIGGER z wnioskowaniem w silniku Drools?
-- Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?
-- Pokaż regułę Drools dla testu integracyjnego.
 - Jak zmapować relacje przyczynowe w grafie zdarzeń?
-- Jak połączyć GraphDatabaseAdapter z modułem wnioskowania Drools?
 - Jak rozszerzyć ontologię o relacje przyczynowe w Neo4j?
-- Stwórzmy czerwony test dla nowej klasy InferenceEngine.
 - Jak zdefiniować regułę dedukcji dla lokalizacji w grafie?
 - Czy Drools to dobry wybór dla polskiego silnika wnioskowania?
-- Pokaż pętlę dedukcji, która zapali test na zielono..
 - Jakie jeszcze reguły poza lokalizacją warto teraz zaimplementować?
 - Czy do wnioskowania semantycznego lepiej użyć Drools czy Pythona?
 - Jakie reguły dedukcji przestrzennej dodać do InferenceEngine?
@@ -94,24 +95,17 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Jak połączyć wnioski z Drools z bazą grafową Neo4j?
 - Pokaż implementację logiki wnioskowania dla lokalizacji.
 - Jak zdefiniować regułę dla wnioskowania o intencjach?
-- Czy Drools wymaga osobnego modułu w pipeline?
 - Jak zapisać regułę w pliku .drl dla Drools?
-- Stwórzmy test dla reguły skutku akcji 'zabić' w InferenceEngine.
 - Jak zapisać regułę lokalizacji w natywnym formacie Drools .drl?
-- Pokaż jak zintegrować Słowosieć z regułami wnioskowania o gatunkach.
 - Pokaż logikę pętli w natywnym pliku .drl dla Drools.
-- Jak zintegrować Słowosieć z regułami wnioskowania o lokalizacji?
-- Jak zintegrować Słowosieć z ontologią pojęć w silniku wnioskowania?
 - Jakie reguły wnioskowania dodać dla domeny prawnej i medycznej?
 - Pokaż przykład pliku .drl dla reguły lokalizacji.
 - Jak połączyć Walentego z naszym modelem zdarzeń i ról?
 - Jakie reguły wnioskowania najlepiej obsłużą hierarchię gatunków ze Słowosieci?
 - Jak zaimplementować wykrywanie ramy subkategoryzacyjnej dla czasownika 'zabić'?
-- Przetestujmy ramy walencyjne dla nowych czasowników..
 - Pokaż regułę wnioskowania o posiadaniu dla Jana i Marii.
 - Jakie są najtrudniejsze ramy walencyjne w języku polskim?
 - Pokaż przykład złożonej ramy walencyjnej dla nowej domeny..
-- Napiszmy czerwony test dla nowej reguły posiadania w InferenceEngine..
 - Jak rozbudować model zdarzenia o wymiar narzędzia i intencji?
 - Pokaż jak zaimplementować regułę _rule_possession_transfer w kodzie..
 - Pokaż logikę wstrzymania zapisu dla intencji QUESTION w InferenceEngine..
@@ -121,7 +115,6 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Pokaż kod metody _rule_possession_transfer dla silnika..
 - Jak wykryć negację dla reguły _rule_possession_transfer?
 - Czy możemy rozbudować tę regułę o wymiar intencji?
-- Jak obsłużyć zaprzeczenia w regule _rule_possession_transfer?
 - Jak wdrożyć logikę odpytywania grafu dla pytań o lokalizację?
 - Pokaż implementację reguły _rule_possession_transfer z obsługą negacji..
 - Jak dodać wymiar konsekwencji dla akcji sprzedaży w InferenceEngine?
@@ -139,6 +132,27 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Jak silnik powinien wnioskować na podstawie przyczyn i skutków?
 - Pokaż przykładowe reguły logiczne dla domeny prawnej i medycznej..
 
+### 4. Testowanie
+- Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?
+- Pokaż regułę Drools dla testu integracyjnego.
+- Stwórzmy czerwony test dla nowej klasy InferenceEngine.
+- Pokaż pętlę dedukcji, która zapali test na zielono..
+- Stwórzmy test dla reguły skutku akcji 'zabić' w InferenceEngine.
+- Przetestujmy ramy walencyjne dla nowych czasowników..
+- Napiszmy czerwony test dla nowej reguły posiadania w InferenceEngine..
+
+### 5. Obsługa błędów
+- Jak obsłużyć zaprzeczenia w regule _rule_possession_transfer?
+
+### 6. Integracja z innymi warstwami
+- Jak zintegrować reguły Drools z wynikami parsera lxml?
+- Czy Drools wymaga osobnego modułu w pipeline?
+- Pokaż jak zintegrować Słowosieć z regułami wnioskowania o gatunkach.
+- Jak zintegrować Słowosieć z regułami wnioskowania o lokalizacji?
+- Jak zintegrować Słowosieć z ontologią pojęć w silniku wnioskowania?
+
+### 7. Pułapki i ryzyka
+_brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
 
 ### 1. Architektura

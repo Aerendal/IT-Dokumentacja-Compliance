@@ -48,73 +48,60 @@ CoreferenceChain (z W6)
 
 ## Pytania źródłowe — sklasyfikowane
 
-- Pokaż dokładny model danych grafu dla przykładu z Janem..
-- Pokaż jak zintegrować Słowosieć z grafem wiedzy w Neo4j..
-- Jakie są 40-60 relacji semantycznych do grafu wiedzy?
-- Jakie są 40-60 relacji semantycznych kluczowych dla grafu wiedzy?
-- Jak zapisać węzeł pojęcia w formacie JSON dla grafu?
-- Jak zapisać węzeł „Test jednostkowy” w formacie ontologii JSON?
-- Przejdźmy do Fazy 2: Jak zamienić drzewo składniowe w graf relacji?
-- Jak zapisać węzeł „Test jednostkowy” w formacie JSON?
-- Jak zapisać model danych grafu dla zdania o Janie w JSON?
-- Przejdźmy do Fazy 2: budowa grafu relacji semantycznych..
+### 1. Architektura
 - Pokaż jak zaprojektować wewnętrzny format reprezentacji znaczenia zdania.
 - Pokaż jak zaprojektować wewnętrzny format reprezentacji znaczenia dla grafu..
 - Jak zaprojektować ten wewnętrzny format reprezentacji znaczenia zdania?
 - Jak zaprojektować wewnętrzny format reprezentacji znaczenia dla grafu?
 - Jak zaprojektować format reprezentacji znaczenia, by uniknąć tych barier?
-- Jak zapisać relacje agent-pacjent w bazie Neo4j?
 - Przejdźmy do Fazy 2: zaprojektuj strukturę węzłów Grafu Wiedzy..
-- Pokaż schemat fizycznej bazy danych dla relacji semantycznych..
-- Jak zarządzać eksplozją ontologii przy modelowaniu 50 relacji?
 - Jak zaprojektować wewnętrzny format reprezentacji znaczenia zdania?
+- Pokaż strukturę tabel i indeksów dla inżynierskiej bazy grafowej..
+- Przejdźmy do zamiany słownika ról na strukturę grafową..
+- Jak zapisać wielowymiarowy graf zdarzenia w strukturze bazy Neo4j?
+
+### 2. Kontrakty danych
+- Jak zapisać węzeł pojęcia w formacie JSON dla grafu?
+- Jak zapisać model danych grafu dla zdania o Janie w JSON?
+- Pokaż schemat fizycznej bazy danych dla relacji semantycznych..
+- Jak załadować takie pliki JSON bezpośrednio do bazy Neo4j?
+- Jak zintegrować bibliotekę jsonschema z bazą grafową Neo4j?
+- Pokaż jak zintegrować format TEI P5 z bazą Neo4j..
+- Jak APOC przyspiesza import JSON do bazy Neo4j?
+
+### 3. Implementacja
+- Pokaż dokładny model danych grafu dla przykładu z Janem..
+- Jakie są 40-60 relacji semantycznych do grafu wiedzy?
+- Jakie są 40-60 relacji semantycznych kluczowych dla grafu wiedzy?
+- Przejdźmy do Fazy 2: Jak zamienić drzewo składniowe w graf relacji?
+- Przejdźmy do Fazy 2: budowa grafu relacji semantycznych..
+- Jak zapisać relacje agent-pacjent w bazie Neo4j?
+- Jak zarządzać eksplozją ontologii przy modelowaniu 50 relacji?
 - Pokaż jak napisać regułę w Cypher do ujednoznaczniania synsetów..
 - Pokaż jak zaimplementować wielowymiarowy węzeł zdarzenia w Neo4j..
 - Pokaż przykład reguły ujednoznaczniającej synset w Neo4j..
 - Jak zapisać regułę ujednoznaczniania synsetów w Cypher?
 - Pokaż jak napisać regułę Cypher odrzucającą niepasujące synsety..
-- Pokaż strukturę tabel i indeksów dla inżynierskiej bazy grafowej..
 - Pokaż przykład reguły w Neo4j odrzucającej niepasujące znaczenia..
 - Jakie są najczęstsze błędy przy budowie ontologii w Neo4j?
-- Jak zintegrować Słowosieć z ontologią zdarzeń w Neo4j?
-- Jak zintegrować wyniki z BeautifulSoup bezpośrednio z bazą Neo4j?
-- Jak załadować takie pliki JSON bezpośrednio do bazy Neo4j?
 - Pokaż model relacji dla grafu wiedzy w formacie Cypher..
-- Jak zintegrować bibliotekę jsonschema z bazą grafową Neo4j?
-- Pokaż jak zintegrować format TEI P5 z bazą Neo4j..
 - Pokaż listę 50 podstawowych relacji semantycznych dla grafu..
 - Jak zmapować relacje z NKJP do bazy Neo4j?
 - Pokaż listę 50 relacji semantycznych dla grafu wiedzy..
 - Pokaż listę 50 relacji semantycznych dla grafu zdarzeń..
 - Pokaż jak zapisać ten graf semantyczny w bazie Neo4j..
 - Pokaż 50 podstawowych relacji semantycznych dla grafu wiedzy..
-- Jak APOC przyspiesza import JSON do bazy Neo4j?
 - Przejdźmy do Fazy 2 - Jak zamienić drzewo składniowe w graf relacji.
 - Jak zapisać ujednoznaczniony synset Słowosieci w bazie Neo4j?
-- Przejdźmy do zamiany słownika ról na strukturę grafową..
-- Zintegrujmy bazę Neo4j jako fundament grafu wiedzy Fazy 4..
-- Napiszmy test dla adaptera bazy grafowej w Fazie 4..
-- Jak zintegrować PhraseologyDetector z istniejącym GraphBuilderem?
-- Stwórzmy teraz testy dla Fazy 4: Baza grafowa..
 - Ustalmy czy lepszym silnikiem dla grafu będzie Neo4j czy ArangoDB.
-- Stwórzmy czerwony test dla GraphDatabaseAdaptera w Cypher.
-- Jak zintegrować Słowosieć z GraphDatabaseAdapterem?
-- Napiszmy czerwony test dla Neo4jAdapter w Fazie 4..
-- Jak zintegrować ArangoDB jako alternatywną bazę grafową?
 - Pokaż model relacji w Cypher dla AGENT i PATIENT..
-- Stwórzmy teraz czerwony test dla metody generate_cypher().
 - Jak połączyć WSD ze Słowosieci z modelem bazy Neo4j?
 - Jak zaimplementować pętlę generującą węzły i krawędzie w Cypher?
-- Pokaż jak zintegrować GraphDatabaseAdapter z resztą pipeline'u..
 - Jakie są różnice między Neo4j a ArangoDB w tym projekcie?
 - Jak stworzyć generator zapytań Cypher dla relacji semantycznych?
 - Jakie reguły MERGE zastosować w Neo4j dla synsetów?
 - Zaimplementujmy metodę build_document w GraphBuilderze.
-- Jak zintegrować Słowosieć z naszym grafem w Neo4j?
-- Jak zapisać wielowymiarowy graf zdarzenia w strukturze bazy Neo4j?
-- Jak zintegrować Słowosieć z naszym grafem wiedzy w Neo4j?
 - Pokaż skrypt integrujący Słowosieć z Neo4j..
-- Jak zintegrować Słowosieć z grafem Neo4j w Fazie 8?
 - Pokaż skrypt Python importujący synsety Słowosieci do Neo4j..
 - Jak wczytać hiperonimię ze Słowosieci do grafu Neo4j?
 - Jak wczytać pliki relacji semantycznych do bazy Neo4j?
@@ -123,11 +110,38 @@ CoreferenceChain (z W6)
 - Pokaż skrypt Python mapujący synsety Słowosieci na krawędzie Cypher..
 - Pokaż implementację wyszukiwarki faktów w Cypherze..
 - Jak modelować wielowymiarowy kontekst zdarzenia w grafie Neo4j?
-- Jak zintegrować regułę posiadania z grafem Neo4j?
 - Pokaż implementację wyszukiwania w Neo4j dla pytań o lokalizację..
 - Jak zaimplementować wyszukiwanie wzorca z pytajnikiem w Neo4j?
 - Pokaż implementację wyszukiwarki Cypher dla intencji QUESTION..
 
+### 4. Testowanie
+- Jak zapisać węzeł „Test jednostkowy” w formacie ontologii JSON?
+- Jak zapisać węzeł „Test jednostkowy” w formacie JSON?
+- Napiszmy test dla adaptera bazy grafowej w Fazie 4..
+- Stwórzmy teraz testy dla Fazy 4: Baza grafowa..
+- Stwórzmy czerwony test dla GraphDatabaseAdaptera w Cypher.
+- Napiszmy czerwony test dla Neo4jAdapter w Fazie 4..
+- Stwórzmy teraz czerwony test dla metody generate_cypher().
+
+### 5. Obsługa błędów
+_brak pytań źródłowych w tej kategorii_
+
+### 6. Integracja z innymi warstwami
+- Pokaż jak zintegrować Słowosieć z grafem wiedzy w Neo4j..
+- Jak zintegrować Słowosieć z ontologią zdarzeń w Neo4j?
+- Jak zintegrować wyniki z BeautifulSoup bezpośrednio z bazą Neo4j?
+- Zintegrujmy bazę Neo4j jako fundament grafu wiedzy Fazy 4..
+- Jak zintegrować PhraseologyDetector z istniejącym GraphBuilderem?
+- Jak zintegrować Słowosieć z GraphDatabaseAdapterem?
+- Jak zintegrować ArangoDB jako alternatywną bazę grafową?
+- Pokaż jak zintegrować GraphDatabaseAdapter z resztą pipeline'u..
+- Jak zintegrować Słowosieć z naszym grafem w Neo4j?
+- Jak zintegrować Słowosieć z naszym grafem wiedzy w Neo4j?
+- Jak zintegrować Słowosieć z grafem Neo4j w Fazie 8?
+- Jak zintegrować regułę posiadania z grafem Neo4j?
+
+### 7. Pułapki i ryzyka
+_brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
 
 ### 1. Architektura

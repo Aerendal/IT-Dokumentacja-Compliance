@@ -42,10 +42,16 @@ DependencyTree (CoNLL-U z W1)
 
 ## Pytania źródłowe — sklasyfikowane
 
-- Zdefiniujmy test integracyjny dla relacji agent-patient w tym modelu..
-- Jak stworzyć formalną ontologię dla relacji agent-akcja-obiekt?
+### 1. Architektura
 - Jak zaprojektować model danych grafu dla relacji agent-akcja-obiekt?
-- Jak rozbudować test o relacje instrument i location?
+- Jak zmapować relację AGENT na strukturę grafową?
+- Pokaż strukturę ontologii dla ról AGENT, PATIENT i INSTRUMENT.
+
+### 2. Kontrakty danych
+_brak pytań źródłowych w tej kategorii_
+
+### 3. Implementacja
+- Jak stworzyć formalną ontologię dla relacji agent-akcja-obiekt?
 - Pokaż implementację mapowania ról semantycznych na graf..
 - Jak mapować etykiety Universal Dependencies na role semantyczne?
 - Jak zaimplementować mapowanie etykiet nsubj i obj na role Agent i Patient?
@@ -56,48 +62,29 @@ DependencyTree (CoNLL-U z W1)
 - Jak algorytmicznie mapować tagi UDPipe na role Agent i Patient?
 - Jak algorytmicznie mapować tagi nsubj i obj na role Agent i Patient?
 - Jakie narzędzia polecasz do wizualizacji ról semantycznych w grafie?
-- Pokaż jak Hypothesis testuje relacje agent-akcja-obiekt..
 - Jak UDPipe pomaga w mapowaniu ról agent-akcja-obiekt?
-- Jak zmapować relację AGENT na strukturę grafową?
 - Jak algorytmicznie rozwiązać konflikt między relacjami LOCATION a TIME?
 - Jakie są najczęstsze błędy parsera UDPipe przy relacji INSTRUMENT?
 - Stwórzmy klasę SemanticMapper dla mapowania ról AGENT i PATIENT..
 - Jak rozszerzyć ontologię o relacje czasowe i przestrzenne?
 - Jak dodać relacje INSTRUMENT i LOCATION do SemanticMapper?
-- Stwórzmy testy jednostkowe dla klasy SemanticMapper w cyklu TDD..
-- Pokaż jak zintegrować SemanticMapper z głównym pipeline przetwarzania..
-- Napiszmy czerwony test dla SemanticMapper mapujący AGENT i PATIENT.
 - Jakie reguły zastosować dla relacji czasowych przed i po?
-- Pokaż strukturę ontologii dla ról AGENT, PATIENT i INSTRUMENT.
-- Napiszmy testy dla klasy SemanticMapper.
 - Jak stworzyć słownik mapujący nsubj na AGENT?
 - Pokaż przykład logiki mapowania przyimka na relację LOCATION..
 - Czy do mapowania ról semantycznych wystarczą tylko etykiety dep?
 - Pokaż kod implementacji SemanticMapper dla agenta i pacjenta..
 - Jak dodać do mappera regułę dla instrumentu (np. młotkiem)?
-- Czy do testu dodać też walidację relacji czasowych i lokalizacji?
 - Jak zmapować przyimki na relacje czasowe w SemanticMapper?
 - Dodajmy reguły dla relacji INSTRUMENT i LOCATION..
-- Pokaż testy dla roli INSTRUMENT z użyciem obl i narzędnika..
 - Zaimplementujmy model danych grafu dla relacji AGENT-ACTION-PATIENT..
-- Jak obsłużyć relacje czasowe before i after w SemanticMapperze?
-- Wdróżmy ten kod i sprawdźmy testy AGENT/PATIENT.
 - Jak rozbudować mapowanie o relacje czasowe before i after?
 - Pokaż jak zaimplementować wykrywanie relacji LOCATION na podstawie przyimków.
 - Rozbudujmy metodę map_roles o analizę przyimków case dla okoliczników.
 - Pokaż przykład implementacji relacji INSTRUMENT i LOCATION w kodzie.
-- Stwórzmy teraz czerwony test dla SlowosiecAdaptera..
-- Jak zintegrować synsety Słowosieci z rolami AGENT i PATIENT?
 - Pokaż jak zmapować nsubj:pass na rolę PATIENT.
 - Stwórzmy listę 20 przyimków dla SemanticMapper.
-- Jak zaprojektować testy integracyjne łączące Słowosieć z SemanticMapperem?
-- Pokaż test integracyjny dla SemanticMapper i PhraseologyDetector..
-- Zaprojektujmy test integracyjny łączący SemanticMapper i SlowosiecAdapter..
 - Pokaż pythonową logikę dla LOCATION i PART_OF.
-- Jak zintegrować słownik Walenty, aby poprawnie przypisywać role semantyczne?
-- Pokaż kod testu dla SemanticMapper z regułami Walentego..
 - Czy Walenty obsługuje role semantyczne dla gatunków chronionych?
-- Jak obsłużyć wieloznaczność ról semantycznych przy użyciu słownika Walenty?
 - Pokaż jak zamodelować relacje TIME i LOCATION w ontologii..
 - Pokaż jak dodać relacje czasowe i przestrzenne do grafu..
 - Jak rozbudować relacje czasowe i przestrzenne w grafie?
@@ -105,6 +92,33 @@ DependencyTree (CoNLL-U z W1)
 - Jak zmapować przyimki 'z', 'do' na relacje source i destination?
 - Jak rozbudować ontologię o relacje czasowe i przestrzenne?
 
+### 4. Testowanie
+- Zdefiniujmy test integracyjny dla relacji agent-patient w tym modelu..
+- Jak rozbudować test o relacje instrument i location?
+- Pokaż jak Hypothesis testuje relacje agent-akcja-obiekt..
+- Stwórzmy testy jednostkowe dla klasy SemanticMapper w cyklu TDD..
+- Napiszmy czerwony test dla SemanticMapper mapujący AGENT i PATIENT.
+- Napiszmy testy dla klasy SemanticMapper.
+- Czy do testu dodać też walidację relacji czasowych i lokalizacji?
+- Pokaż testy dla roli INSTRUMENT z użyciem obl i narzędnika..
+- Wdróżmy ten kod i sprawdźmy testy AGENT/PATIENT.
+- Stwórzmy teraz czerwony test dla SlowosiecAdaptera..
+- Jak zaprojektować testy integracyjne łączące Słowosieć z SemanticMapperem?
+- Pokaż test integracyjny dla SemanticMapper i PhraseologyDetector..
+- Zaprojektujmy test integracyjny łączący SemanticMapper i SlowosiecAdapter..
+- Pokaż kod testu dla SemanticMapper z regułami Walentego..
+
+### 5. Obsługa błędów
+- Jak obsłużyć relacje czasowe before i after w SemanticMapperze?
+- Jak obsłużyć wieloznaczność ról semantycznych przy użyciu słownika Walenty?
+
+### 6. Integracja z innymi warstwami
+- Pokaż jak zintegrować SemanticMapper z głównym pipeline przetwarzania..
+- Jak zintegrować synsety Słowosieci z rolami AGENT i PATIENT?
+- Jak zintegrować słownik Walenty, aby poprawnie przypisywać role semantyczne?
+
+### 7. Pułapki i ryzyka
+_brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
 
 ### 1. Architektura

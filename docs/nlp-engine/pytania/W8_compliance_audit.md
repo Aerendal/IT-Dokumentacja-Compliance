@@ -48,10 +48,19 @@ Tekst z NKJP (XML)
 
 ## Pytania źródłowe — sklasyfikowane
 
+### 1. Architektura
+- Stwórzmy moduł do wykrywania luk w analizie ryzyka (RISK-01).
+- Zaimplementujmy strukturę klasy EventNode z 6 wymiarami analizy..
+- Pokaż pełną implementację tej funkcji łączącej moduły audytu..
+- Pokaż strukturę danych EventNode dla 6 wymiarów analizy zdarzeń.
+- Pokaż strukturę Gap Analysis Report dla wykrytych luk..
 
+### 2. Kontrakty danych
+- Jak zmapować tagi MSD z NKJP na relacje w grafie?
+
+### 3. Implementacja
 - Pokaż jak zapisać zdarzenie „Jan zabił zwierzę” w grafie..
 - Jak wygenerować Raport Luk w formacie tabeli pokrycia?
-- Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?
 - Pokaż model danych dla zdarzenia Jan zabił zwierzę..
 - Jak zaimplementować wymiar kłusownictwa w regułach wnioskowania?
 - Stwórzmy model danych dla zdarzenia 'Jan zabił zwierzę'..
@@ -63,61 +72,63 @@ Tekst z NKJP (XML)
 - Zaimplementujmy regułę klasyfikacji prawnej dla kłusownictwa..
 - Pokaż kod reguły klasyfikacji prawnej na podstawie kłusownictwa.
 - Pokaż przykład analizy incydentu w 6 wymiarach event reasoning..
-- Jak zmapować tagi MSD z NKJP na relacje w grafie?
-- Zbudujmy loger błędów dla stress testu na danych NKJP..
 - Zaimplementujmy regułę RISK-01 dla analizy ryzyka w API..
-- Napiszmy test integracyjny sprawdzający wykrywanie luk w CONS-02..
 - Zaimplementujmy regułę CONS-02 sprawdzającą opisy komponentów w grafie.
-- Jak zintegrować NKJPAdapter z bezstanowym silnikiem InferenceEngine?
 - Pokaż jak zmapować tagi NKJP na relacje w grafie.
 - Zaimplementujmy 6 wymiarów analizy zdarzeń dla zdania o zwierzęciu.
-- Stwórzmy moduł do wykrywania luk w analizie ryzyka (RISK-01).
 - Zaimplementujmy Data Bridge do mapowania tagów NKJP na graf..
 - Jakie jest 6 wymiarów wielowymiarowego modelu zdarzeń?
-- Pokaż jak zintegrować Słowosieć z analizą 6 wymiarów zdarzenia..
 - Napiszmy Data Bridge do mapowania tagów NKJP na graf..
 - Jak mapować tagi morfosyntaktyczne NKJP na relacje w grafie?
 - Pokaż jak wdrożyć 6-wymiarowy Model Zdarzeń w ontologii..
-- Zaimplementujmy strukturę klasy EventNode z 6 wymiarami analizy..
 - Zaktualizujmy NKJPBridge o automatyczne mapowanie ról z przypadków gramatycznych..
 - Pokaż jak zamodelować 6 wymiarów zdarzenia w ontologii grafowej..
 - Jak wdrożyć mechanizm 'zamrażania wniosków' w State Matrix dla NKJP?
-- Uruchommy stress_test.py na 10 000 zdań z korpusu NKJP..
-- Jakie błędy w BRIDGE_ERROR zdarzają się najczęściej?
 - Jak NKJPErrorLogger pomaga w wykrywaniu luk w ontologii?
-- Zróbmy Stress Test na NKJP i wykryjmy błędy..
 - Wygenerujmy finalny raport luk dla dokumentacji technicznej..
 - Jak EventFrame wykrywa brakujące wymiary w incydentach?
-- Pokaż pełną implementację tej funkcji łączącej moduły audytu..
 - Zaprojektujmy szablon tekstowy Raportu Luk dla inżyniera..
-- Jak zintegrować EventFrame z wynikami StateMatrix w raporcie?
-- Pokaż skrypt stress_test.py dla tysiąca zdań z NKJP..
 - Jakie błędy najczęściej loguje NKJPErrorLogger w polskich tekstach?
-- Jak zintegrować wyniki stress testu z poprawkami w NKJPBridge?
-- Zaimplementujmy NKJPErrorLogger i skrypt stress_test.py dla 1000 zdań.
-- Jakie błędy w BRIDGE_ERROR najczęściej pojawiają się w testach?
-- Pokaż strukturę danych EventNode dla 6 wymiarów analizy zdarzeń.
 - Czy dodajemy relację INSTRUMENT dla tagu inst w NKJPBridge?
 - Jak StateMatrix deduplikuje błędy przy wielodomenowej analizie zdarzeń?
-- Stwórzmy skrypt stress_test.py i uruchommy go na danych NKJP.
-- Pokaż jak zintegrować EventFrame.missing_dimensions() z AuditReportGenerator.
-- Uruchommy stress_test.py na 1000 zdań z NKJP..
-- Jakie błędy w BRIDGE_ERROR pojawiają się najczęściej?
-- Pokaż strukturę Gap Analysis Report dla wykrytych luk..
 - Pokaż kod odtwarzania podmiotu z końcówki czasownika w NKJPBridge..
 - Zaimplementujmy Gap Analysis Report dla brakujących wymiarów zdarzeń..
-- Jak obsłużyć elipsy w polskich tekstach, aby uniknąć BRIDGE_ERROR?
 - Zaimplementujmy funkcję run_end_to_end_audit() i raport luk..
 - Jak rozszerzyć EventFrame o wymiary prawne i wojskowe?
-- Uruchommy skrypt stress_test.py na próbce 1000 zdań..
 - Zastosujmy regułę odtwarzania podmiotu z końcówki czasownika..
 - Zaimplementujmy Gap Analysis Report dla wykrytych luk..
 - Jak rozbudować łańcuchy przyczynowe o osie czasu?
+
+### 4. Testowanie
+- Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?
+- Zbudujmy loger błędów dla stress testu na danych NKJP..
+- Napiszmy test integracyjny sprawdzający wykrywanie luk w CONS-02..
+- Uruchommy stress_test.py na 10 000 zdań z korpusu NKJP..
+- Zróbmy Stress Test na NKJP i wykryjmy błędy..
+- Pokaż skrypt stress_test.py dla tysiąca zdań z NKJP..
+- Jak zintegrować wyniki stress testu z poprawkami w NKJPBridge?
+- Zaimplementujmy NKJPErrorLogger i skrypt stress_test.py dla 1000 zdań.
+- Stwórzmy skrypt stress_test.py i uruchommy go na danych NKJP.
+- Uruchommy stress_test.py na 1000 zdań z NKJP..
+- Uruchommy skrypt stress_test.py na próbce 1000 zdań..
 - Jak wykorzystać logi jako testy regresyjne i dodać regułę rekonstruującą domyślny podmiot z końcówki czasownika..
+
+### 5. Obsługa błędów
+- Jakie błędy w BRIDGE_ERROR zdarzają się najczęściej?
+- Jakie błędy w BRIDGE_ERROR najczęściej pojawiają się w testach?
+- Jakie błędy w BRIDGE_ERROR pojawiają się najczęściej?
+- Jak obsłużyć elipsy w polskich tekstach, aby uniknąć BRIDGE_ERROR?
+
+### 6. Integracja z innymi warstwami
+- Jak zintegrować NKJPAdapter z bezstanowym silnikiem InferenceEngine?
+- Pokaż jak zintegrować Słowosieć z analizą 6 wymiarów zdarzenia..
+- Jak zintegrować EventFrame z wynikami StateMatrix w raporcie?
+- Pokaż jak zintegrować EventFrame.missing_dimensions() z AuditReportGenerator.
 - Wystawmy GapAnalysisGenerator jako REST API w FastAPI.
 - Zintegrujmy pełny pipeline NKJP z GapAnalysisReport.
 
-
+### 7. Pułapki i ryzyka
+_brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
 
 ### 1. Architektura

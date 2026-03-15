@@ -39,43 +39,57 @@ Sekwencja zdań (z W1) + DependencyTree
 
 ## Pytania źródłowe — sklasyfikowane
 
+### 1. Architektura
+- Pokaż jak GraphDatabaseAdapter powinien obsługiwać zaimki po koreferencji..
+
+### 2. Kontrakty danych
+_brak pytań źródłowych w tej kategorii_
+
+### 3. Implementacja
 - Jak wdrożyć resolver odniesień do grafu wiedzy?
 - Omówmy problem koreferencji między zdaniami w Fazie 2..
-- Pokaż jak zintegrować koreferencję z grafem wiedzy w Neo4j..
-- Jak zintegrować koreferencję z grafem wiedzy w Neo4j?
-- Stwórzmy czerwony test dla CoreferenceResolvera.
 - Jak połączyć CoreferenceResolver z grafem w Neo4j?
 - Czy detekcja zaimków wymaga integracji z NKJP?
 - Napiszmy logikę dopasowania rodzaju gramatycznego dla anafor..
-- Jak zintegrować CoreferenceResolver z Grafem Wiedzy Neo4j?
-- Stwórzmy teraz czerwony test integracyjny dla scalania węzłów grafu..
 - Jak zaimplementować mechanizm Recency Heuristic w CoreferenceResolver?
-- Pokaż jak GraphDatabaseAdapter powinien obsługiwać zaimki po koreferencji..
-- Jak obsłużyć elipsę i brakujący podmiot w koreferencji?
 - Czy system wykryje koreferencję dla imion o różnych rodzajach?
-- Jak obsłużyć elipsę w CoreferenceResolverze dla języka polskiego?
 - Zaimplementujmy funkcję merge_coreferences i sprawdźmy wynik w Neo4j..
 - Jakie są zalety Recency Heuristic w polskim?
-- Czy zintegrować CoreferenceResolver z GraphDatabaseAdapter?
-- Jak testować łączenie faktów między zdaniami?
-- Jak połączyć CoreferenceResolver z bazą Neo4j w pipeline?
 - Pokaż implementację logiki łączenia zaimka z podmiotem..
 - Jak system rozróżnia podmioty przy wielu osobach w tekście?
-- Napiszmy czerwony test dla modułu koreferencji..
-- Jak zintegrować moduł koreferencji w celu łączenia wątków?
 - Jak zaimplementować śledzenie koreferencji między wieloma zdaniami w grafie?
-- Zintegrujmy to z modułem koreferencji dla dłuższego tekstu..
 - Zaimplementujmy mechanizm koreferencji dla zaimków w grafie.
 - Jak wdrożyć koreferencję dla zaimków 'on' i 'ten'?
 - Przejdźmy do koreferencji – jak system ma rozpoznać zaimki?
-- Napiszmy test dla sekwencji zdarzeń z Janem i autem.
-- Pokaż jak zintegrować Słowosieć dla synonimów w koreferencji.
 - Jak wdrożyć mechanizm koreferencji dla zaimków w grafie?
+- Pokaż przykład logu błędu dla zdania z elipsą podmiotu..
+
+### 4. Testowanie
+- Stwórzmy czerwony test dla CoreferenceResolvera.
+- Stwórzmy teraz czerwony test integracyjny dla scalania węzłów grafu..
+- Jak testować łączenie faktów między zdaniami?
+- Napiszmy czerwony test dla modułu koreferencji..
+- Napiszmy test dla sekwencji zdarzeń z Janem i autem.
 - Zaimplementujmy test sekwencji zdarzeń dla mechanizmu koreferencji..
 - Jak przetestować koreferencję na przykładzie Jana i auta?
 - Pokaż test integracyjny sekwencji zdarzeń dla Jana.
-- Pokaż przykład logu błędu dla zdania z elipsą podmiotu..
 
+### 5. Obsługa błędów
+- Jak obsłużyć elipsę i brakujący podmiot w koreferencji?
+- Jak obsłużyć elipsę w CoreferenceResolverze dla języka polskiego?
+
+### 6. Integracja z innymi warstwami
+- Pokaż jak zintegrować koreferencję z grafem wiedzy w Neo4j..
+- Jak zintegrować koreferencję z grafem wiedzy w Neo4j?
+- Jak zintegrować CoreferenceResolver z Grafem Wiedzy Neo4j?
+- Czy zintegrować CoreferenceResolver z GraphDatabaseAdapter?
+- Jak połączyć CoreferenceResolver z bazą Neo4j w pipeline?
+- Jak zintegrować moduł koreferencji w celu łączenia wątków?
+- Zintegrujmy to z modułem koreferencji dla dłuższego tekstu..
+- Pokaż jak zintegrować Słowosieć dla synonimów w koreferencji.
+
+### 7. Pułapki i ryzyka
+_brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
 
 ### 1. Architektura

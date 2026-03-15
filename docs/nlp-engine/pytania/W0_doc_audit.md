@@ -43,41 +43,21 @@ gap_detector  duplicate_detector  relation_mapper
 
 ## Pytania źródłowe — sklasyfikowane
 
+### 1. Architektura
+- Pokaż jak zdefiniować twarde granice modułów używając import-linter..
 
-### Architektura, reguły i integracja (z tur 1–4)
+### 2. Kontrakty danych
+_brak pytań źródłowych w tej kategorii_
 
-- Jak zaimplementować testy własnościowe dla reguł ARCH-01 i SEC-01?
-- Jak zdefiniować testy własnościowe dla reguł ARCH-01?
+### 3. Implementacja
 - Jakie reguły ARCH-01 i SEC-01 sprawdzać w teście własnościowym?
 - Jakie konkretne relacje semantyczne uwzględnić w grafie dla ARCH-01?
-- Jak zaimplementować testy własnościowe dla reguły ARCH-01?
-- Pokaż przykład tabeli decyzyjnej dla testowania reguł SEC-01..
-- Pokaż konkretny przykład testu własnościowego dla reguły ARCH-01..
 - Jak połączyć ontologię z regułami audytowymi dla dokumentacji?
-- Tak, przygotuj kod testu w Hypothesis dla reguły ARCH-01..
-- Stwórzmy szkielet testu hypothesis dla reguł ARCH-01 w grafie..
-- Pokaż szkielet testu hypothesis dla reguł ARCH-01 i SEC-01..
-- Pokaż kod testu z użyciem biblioteki hypothesis dla ARCH-01.
 - Jak zdefiniować twarde niezmienniki dla reguły SEC-01?
-- Zaimplementujmy AuditEngine, aby testy ARCH-01 i SEC-01 przeszły..
-- Zdefiniujmy testy dla reguł API-01 oraz DEP-01..
-- Pokaż jak zaimplementować AuditEngine do obsługi tych reguł..
 - Jak zapisać relacje przyczynowe w grafie dla reguły SEC-01?
 - Jakie są najczęstsze błędy przy budowaniu ontologii dla ARCH-01?
-- Pokaż szkielet testu własnościowego ARCH-01 w bibliotece hypothesis..
-- Pokaż szkielet testu ARCH-01 w bibliotece hypothesis..
-- Pokaż przykład reguły w silniku AuditEngine dla ARCH-01.
-- Jak napisać regułę w AuditEngine, aby zaliczyć test ARCH-01?
-- Jakie reguły audytowe ARCH-01 dodać, by testy własnościowe przeszły?
-- Pokaż przykład reguły w silniku AuditEngine..
 - Zaprojektuj minimalną ontologię dla dokumentacji..
-- Pokaż przykład reguły w silniku AuditEngine dla weryfikacji ARCH-01..
 - Zaprojektuj minimalną ontologię dla analizatora dokumentacji technicznej..
-- Pokaż jak zaimplementować testy architektury za pomocą import-linter..
-- Pokaż przykład reguły wyłapującej brak testów integracyjnych w API..
-- Jak wdrożyć regułę luki dla brakującego testu integracyjnego?
-- Pokaż jak zdefiniować twarde granice modułów używając import-linter..
-- Pokaż zapytanie Cypher wykrywające brak testów dla komponentów zewnętrznych..
 - Pokaż regułę Drools dla luki w dokumentacji..
 - Pokaż przykład raportu luk dla audytu dokumentacji..
 - Jak zaimplementować regułę wykrywającą brak dowodów wykonania w raporcie?
@@ -87,8 +67,40 @@ gap_detector  duplicate_detector  relation_mapper
 - Jak system rozpozna brak protokołu bezpieczeństwa w grafie komponentu sieciowego?
 - Jak zmapować pojęcia techniczne na klasę komponent_sieciowy?
 - Czy system obsłuży audyt warunków typu 'Jeśli API, to SSL'?
+
+### 4. Testowanie
+- Jak zaimplementować testy własnościowe dla reguł ARCH-01 i SEC-01?
+- Jak zdefiniować testy własnościowe dla reguł ARCH-01?
+- Jak zaimplementować testy własnościowe dla reguły ARCH-01?
+- Pokaż przykład tabeli decyzyjnej dla testowania reguł SEC-01..
+- Pokaż konkretny przykład testu własnościowego dla reguły ARCH-01..
+- Tak, przygotuj kod testu w Hypothesis dla reguły ARCH-01..
+- Stwórzmy szkielet testu hypothesis dla reguł ARCH-01 w grafie..
+- Pokaż szkielet testu hypothesis dla reguł ARCH-01 i SEC-01..
+- Pokaż kod testu z użyciem biblioteki hypothesis dla ARCH-01.
+- Zaimplementujmy AuditEngine, aby testy ARCH-01 i SEC-01 przeszły..
+- Zdefiniujmy testy dla reguł API-01 oraz DEP-01..
+- Pokaż szkielet testu własnościowego ARCH-01 w bibliotece hypothesis..
+- Pokaż szkielet testu ARCH-01 w bibliotece hypothesis..
+- Jak napisać regułę w AuditEngine, aby zaliczyć test ARCH-01?
+- Jakie reguły audytowe ARCH-01 dodać, by testy własnościowe przeszły?
+- Pokaż jak zaimplementować testy architektury za pomocą import-linter..
+- Pokaż przykład reguły wyłapującej brak testów integracyjnych w API..
+- Jak wdrożyć regułę luki dla brakującego testu integracyjnego?
+- Pokaż zapytanie Cypher wykrywające brak testów dla komponentów zewnętrznych..
+
+### 5. Obsługa błędów
+_brak pytań źródłowych w tej kategorii_
+
+### 6. Integracja z innymi warstwami
+- Pokaż jak zaimplementować AuditEngine do obsługi tych reguł..
+- Pokaż przykład reguły w silniku AuditEngine dla ARCH-01.
+- Pokaż przykład reguły w silniku AuditEngine..
+- Pokaż przykład reguły w silniku AuditEngine dla weryfikacji ARCH-01..
 - Zintegrujmy pełny pipeline: od XML NKJP do raportu luk.
 
+### 7. Pułapki i ryzyka
+_brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
 
 ### 1. Architektura

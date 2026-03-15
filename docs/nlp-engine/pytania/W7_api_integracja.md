@@ -36,31 +36,46 @@ Klient (HTTP / Thrift)
 
 ## Pytania źródłowe — sklasyfikowane
 
-- Jak zintegrować RapidMiner z Multiservice do analizy NKJP?
-- Czy Multiservice oferuje narzędzia do automatyzacji ekstrakcji danych?
+### 1. Architektura
 - Jakie są zalety biblioteki Thrift w architekturze Multiservice?
 - Jakie są zalety Apache Thrift w architekturze Multiservice?
-- Jak zintegrować RapidMiner z Multiservice do analizy korpusu?
-- Gdzie w procesie CI/CD uruchomić te testy?
-- Jak zintegrować wyniki z Multiservice z bazą Neo4j?
+
+### 2. Kontrakty danych
+_brak pytań źródłowych w tej kategorii_
+
+### 3. Implementacja
+- Czy Multiservice oferuje narzędzia do automatyzacji ekstrakcji danych?
 - Przejdźmy do Fazy 7 i zaprojektujmy API dla grafu.
-- Stwórzmy teraz czerwony test integracyjny dla endpointu API..
-- Jak zaprojektować FastAPI do obsługi asynchronicznych zadań NLP?
 - Czy warto użyć Apache Thrift do komunikacji między mikroserwisami?
-- Przejdźmy do Fazy 7 i stwórzmy API w FastAPI..
-- Pokaż jak zdefiniować interfejs Apache Thrift dla potoku NLP..
-- Pokaż przykład testu integracyjnego POST /analyze i statusu zadania..
-- Stwórzmy endpoint FastAPI i połączmy go z naszym pipeline..
-- Stwórzmy teraz endpoint /analyze w FastAPI łączący wszystkie moduły..
 - Pokaż implementację IntentClassifier dla aktów mowy w spaCy..
-- Pokaż jak zintegrować akcję COMMAND z systemem operacyjnym..
-- Jak zintegrować akcję COMMAND z endpointem FastAPI?
-- Zintegrujmy endpoint FastAPI z pełnym potokiem analizy intencji..
 - Jak rozszerzyć IntentClassifier o rozpoznawanie aktów zaprzeczenia?
 - Jakie 6 komend diagnostycznych dodałeś do whitelisty SystemExecutor?
 - Jakie to 6 komend diagnostycznych w whiteliscie SystemExecutor?
+
+### 4. Testowanie
+- Gdzie w procesie CI/CD uruchomić te testy?
+- Stwórzmy teraz czerwony test integracyjny dla endpointu API..
+- Pokaż przykład testu integracyjnego POST /analyze i statusu zadania..
+
+### 5. Obsługa błędów
+_brak pytań źródłowych w tej kategorii_
+
+### 6. Integracja z innymi warstwami
+- Jak zintegrować RapidMiner z Multiservice do analizy NKJP?
+- Jak zintegrować RapidMiner z Multiservice do analizy korpusu?
+- Jak zintegrować wyniki z Multiservice z bazą Neo4j?
+- Jak zaprojektować FastAPI do obsługi asynchronicznych zadań NLP?
+- Przejdźmy do Fazy 7 i stwórzmy API w FastAPI..
+- Pokaż jak zdefiniować interfejs Apache Thrift dla potoku NLP..
+- Stwórzmy endpoint FastAPI i połączmy go z naszym pipeline..
+- Stwórzmy teraz endpoint /analyze w FastAPI łączący wszystkie moduły..
+- Pokaż jak zintegrować akcję COMMAND z systemem operacyjnym..
+- Jak zintegrować akcję COMMAND z endpointem FastAPI?
+- Zintegrujmy endpoint FastAPI z pełnym potokiem analizy intencji..
 - Pokaż kod api.py z endpointem /audit dla FastAPI.
 
+### 7. Pułapki i ryzyka
+_brak pytań źródłowych w tej kategorii_
 ## Pytania uzupełniające
 
 ### 1. Architektura
