@@ -131,6 +131,14 @@ Tur 4 (po Tur 3):   W8 (wymaga W5) + W7 (wymaga W1-W6)
 
 **Łącznie: 679 unikalnych pytań** (z 714 źródłowych, po deduplikacji)
 
+## Dokumenty dodatkowe
+
+| Plik | Opis |
+|------|------|
+| [TRACEABILITY_PATHS.md](TRACEABILITY_PATHS.md) | **Ścieżki prześledzenia end-to-end** — 3 kompletne przykłady z łańcuchem przyczynowym W0→W8; mapa "co produkuje co dla kogo i dlaczego" |
+| [COVERAGE_MATRIX.md](COVERAGE_MATRIX.md) | Matryca pokrycia 9×9 sekcji, liczby pytań, luki, statusy ADR |
+| [RULES_CATALOGUE.md](RULES_CATALOGUE.md) | Formalne definicje reguł ARCH-01a/b, ARCH-06, API-01, SEC-01, DEP-01, RISK-01, CONS-02 |
+
 ---
 
 ## Kryteria ukończenia per warstwa

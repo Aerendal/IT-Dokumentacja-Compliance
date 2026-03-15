@@ -17,6 +17,22 @@ buduje łańcuchy przyczynowe i inferencje (stan obiektu, posiadanie, lokalizacj
 
 Kluczowe klasy: `InferenceEngine`, `StateMatrix`, `IntentClassifier`.
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W5 istnieje bo compliance wymaga logiki warunkowej która kaskaduje — zdarzenie A może triggerować wniosek B który triggeruje regułę C. Tego nie da się wyrazić prostym filtrowaniem. Drools DRL pozwala deklaratywnie zapisać "IF agent EXISTS AND instrument IS_A narzędzie_ostre AND NOT policy(bezpieczeństwo) THEN flag RISK-01" — i ta reguła działa dla każdego przyszłego przypadku bez zmiany kodu. `StateMatrix` deduplicuje wnioski (ten sam fakt nie może być flagowany dwukrotnie) i "zamraża" stan po każdym przebiegu (idempotentność — krytyczna dla projektu zarobkowego).
+
+**Co się sypie bez tej warstwy:**
+- Reguły compliance muszą być zakodowane jako if-else w Pythonie — każda zmiana wymaga deploymentu nowego kodu; klient nie może edytować reguł bez programisty
+- Brak kaskadowania: "RISK-01 + CONS-02 jednocześnie" nie może triggerować eskalacji severity
+- Brak `StateMatrix`: ten sam dokument audytowany dwukrotnie daje zduplikowane wyniki — raport compliance jest nieaudytowalny
+
+**Zależności:**
+- Wchodzi z W4: graf wiedzy (Cypher zapytania, zwracające fakty)
+- Wchodzi z W2: `EventRoleDict` (bezpośrednio lub przez W4)
+- Wychodzi do W7: `List[AuditFinding]` przez REST API
+- Wychodzi do W8: te same fakty jako wejście dla `AuditEngine` i `GapAnalysisReport`
+
 ## Diagram przepływu danych
 
 ```

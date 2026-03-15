@@ -17,6 +17,23 @@ i zapisuje je jako węzły i krawędzie w Neo4j (lub ArangoDB jako alternatywa).
 
 Kluczowa klasa: `GraphDatabaseAdapter` z metodą `generate_cypher()`.
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W4 istnieje bo wnioskowanie W5 wymaga łączenia faktów z WIELU zdań i WIELU dokumentów. Relacyjna baza danych (SQL) nie obsługuje wydajnie zapytań o ścieżki: "znajdź wszystkich AGENT którzy wykonali akcję należącą do kategorii `działanie_niebezpieczne` z INSTRUMENT należącym do `narzędzie_ostre` w dowolnej liczbie zdań w dokumencie". Graf Neo4j wyraża to jednym zapytaniem Cypher. Ponadto W4 scala węzły z W6 (koreferencja) — "Jan" i "on" w różnych zdaniach to jeden węzeł, nie dwa.
+
+**Co się sypie bez tej warstwy:**
+- W5 musi trzymać całą historię zdarzeń w pamięci — brak persystencji między sesjami; duże dokumenty (1000+ zdań) powodują OOM
+- Scalanie koreferencji: "Jan" w zdaniu 1 i "on" w zdaniu 15 to dwa osobne byty — W5 nie może połączyć zdarzeń tej samej osoby
+- W8 nie może odpytać historii: "ile razy Jan był AGENT działania niebezpiecznego w tym dokumencie?"
+
+**Zależności:**
+- Wchodzi z W2: `EventRoleDict` — węzły zdarzeń i krawędzie semantyczne
+- Wchodzi z W3: `EnrichedToken.hypernyms` — krawędzie ontologiczne `IS_A`, `HAS_SYNSET`
+- Wchodzi z W6: `CoreferenceChain` — scalanie węzłów per osoba/byt
+- Wychodzi do W5: grafowalny model wiedzy, odpytywalny Cypher
+- Wychodzi do W8: persystentna historia zdarzeń dla `AuditEngine`
+
 ## Diagram przepływu danych
 
 ```

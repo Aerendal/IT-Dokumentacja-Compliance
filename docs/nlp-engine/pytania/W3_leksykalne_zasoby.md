@@ -17,6 +17,23 @@ Warstwa 3 integruje polskie zasoby leksykalne:
 - **WSD** — Word Sense Disambiguation (ujednoznacznianie sensów)
 - **PhraseologyDetector** — detekcja idiomów i jednostek wielowyrazowych (MWE)
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W3 istnieje bo W2 przypisuje role bez wiedzy o znaczeniu słów — mapuje strukturę na role, ale nie wie że "nóż" jest narzędziem niebezpiecznym, albo że "wróbel" to ptak, albo że "zwinąć" w kontekście kradzieży znaczy "ukraść" a nie "zwinąć rulon". Słowosieć dostarcza hiperonimię (`nóż IS_A narzędzie_ostre IS_A narzędzie`), Walenty dostarcza ramy walencyjne (które argumenty są obowiązkowe dla danego czasownika), WSD rozstrzyga polisemię. Bez W3 reguły W5 muszą wymieniać każde słowo z osobna zamiast operować na klasach semantycznych.
+
+**Co się sypie bez tej warstwy:**
+- W5 ma reguły "IF instrument == 'nóż' OR instrument == 'pistolet' OR instrument == 'miecz' ..." — lista musi być ręcznie utrzymywana; neologizmy nigdy nie są wykrywane
+- WSD nie działa: "zamek" może być LOCATION (budowla) lub INSTRUMENT (mechanizm zamykający) — bez synsetu W2 przypisuje losowo
+- Idiomy: "wziąć nogi za pas" → W2 widzi INSTRUMENT(pas) i LOCATION(nogi) zamiast całości = "uciec"
+
+**Zależności:**
+- Wchodzi z W1: `lemma` każdego tokenu
+- Dostęp do: Słowosieć API, Walenty DB, WSD model
+- Wychodzi do W2 (lub równolegle): `EnrichedToken[synsets, hypernyms, valency_frame, is_mwe]`
+- Wychodzi do W4: krawędzie `IS_A`, `HAS_SYNSET`, `HAS_HYPONYM` w grafie ontologicznym
+- Wychodzi do W5: klasy semantyczne jako warunki reguł DRL
+
 ## Diagram przepływu danych
 
 ```

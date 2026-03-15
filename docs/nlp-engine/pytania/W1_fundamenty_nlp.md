@@ -16,6 +16,22 @@ tokenizację, lematyzację (Morfeusz), tagowanie POS, parsowanie zależności sk
 oraz przetwarzanie zasobów NKJP (format TEI P5, CoNLL-U).
 Jest fundamentem dla wszystkich warstw W2–W8.
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W1 istnieje bo język polski jest silnie fleksyjny — "zabił/zabije/zabijał/zabiłem/zabiłaś" to formy tego samego lematu `zabić`. Bez W1 żadna wyższa warstwa nie wie że te słowa znaczą "to samo". Morfeusz dostarcza lemat + morfologię (fleksja, przypadek, rodzaj), UDPipe buduje drzewo zależności składniowych (`nsubj`, `obj`, `obl`). Te dwie informacje razem są warunkiem koniecznym dla W2 żeby przypisać role semantyczne: bez `dep_rel` W2 nie wie że Jan jest podmiotem, bez `feats.Case` W2 nie odróżnia INSTRUMENT (narzędnik) od LOCATION (miejscownik).
+
+**Co się sypie bez tej warstwy:**
+- W2 dostaje surowy tekst — próba mapowania ról bez fleksji to ~20-30% precision dla polskiego
+- W3 szuka w Słowosieci form fleksyjnych zamiast lematów → 60-70% miss rate dla czasowników nieregularnych
+- Cichy błąd: brak `feats.Case` → W2 przypisuje LOCATION zamiast INSTRUMENT → W5 nie odpala reguł RISK-01 → audyt compliance fałszywie negatywny
+
+**Zależności:**
+- Wchodzi: surowy tekst UTF-8
+- Wychodzi do W2: `DependencyNode[lemma, upos, feats, dep_rel, head]` per token
+- Wychodzi do W3: `lemma` jako klucz do słownika Słowosieci
+- Wychodzi do W4: `TokenNode` jako baza węzłów w StateMatrix
+
 ## Diagram przepływu danych
 
 ```

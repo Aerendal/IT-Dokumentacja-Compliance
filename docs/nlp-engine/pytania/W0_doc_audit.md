@@ -16,6 +16,22 @@ Pełni rolę narzędzia audytującego dokumentację projektową: wykrywa luki, d
 
 Szczegółowa dokumentacja implementacji: [`DOC_AUDIT_MODULE.md`](../DOC_AUDIT_MODULE.md)
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W0 istnieje bo dokumentacja projektowa degraduje się wraz z rozwojem systemu — pojawiają się luki (brakujące sekcje), duplikaty (ta sama informacja w dwóch dokumentach, czasem sprzeczna) i zerwane relacje (dokument A powołuje się na B, ale B nie istnieje lub nie spełnia już kontraktu). Bez automatycznego audytu te defekty są wykrywane dopiero gdy deweloper implementuje coś na podstawie niekompletnej specyfikacji — co w projekcie zarobkowym przekłada się bezpośrednio na kary umowne.
+
+W0 musi działać PRZED każdą warstwą implementacyjną (W1–W8) **po to żeby** deweloper wiedział czy spec jest kompletna przed napisaniem linii kodu. Działa też jako warstwa monitoringu ciągłego — każda zmiana dokumentu triggeruje re-audit.
+
+**Co się sypie bez tej warstwy:**
+- Luki w specyfikacji wychodzą na jaw podczas code review lub produkcji zamiast na etapie planowania
+- Duplikaty powodują rozbieżność między dokumentami bez żadnego alarmu — implementacja może podążać za złą wersją
+
+**Zależności:**
+- Wchodzi: pliki `.md`, `.txt`, `.pdf` — struktura dokumentacyjna projektu
+- Wychodzi do W8: `{doc_class, validation_mode}` — tryb walidacji dla `AuditEngine`
+- Wychodzi do dewelopera: `GapReport`, `DuplicateReport`, `RelationGraph`
+
 ## Diagram przepływu danych
 
 ```

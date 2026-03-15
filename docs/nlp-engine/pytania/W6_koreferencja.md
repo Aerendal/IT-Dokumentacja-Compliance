@@ -17,6 +17,22 @@ Warstwa 6 rozwiązuje problem koreferencji w polskich tekstach wielozdaniowych:
 - Scala węzły grafu reprezentujące ten sam byt
 - Dostarcza `CoreferenceChain` do W4 (Neo4j) i W5 (InferenceEngine)
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W6 istnieje bo dokumenty prawne, umowy i raporty techniczne używają intensywnie zaimków i elipsy — "Jan zawarł umowę. Jej przedmiotem jest..." — "Jej" odnosi się do "umowy". Bez W6 W2 przypisuje role zaimkom bez antecedensów; W4 zapisuje "jej_nierozwiązana" jako osobny węzeł; W5 wnioskuje o "jej_nierozwiązana" zamiast o "umowa". W przypadku dokumentów prawnych (które są głównym targetem projektu zarobkowego) — 30-50% zdań zawiera zaimki lub elipsę podmiotu (polskie czasowniki nie wymagają jawnego podmiotu: "zawarł umowę" = podmiot wynika z końcówki).
+
+**Co się sypie bez tej warstwy:**
+- Każde zdanie z zaimkiem ma AGENT/PATIENT "nieznany" lub błędny — precyzja W2 spada o 15-30% dla dokumentów wielozdaniowych
+- W4 ma N osobnych węzłów dla tej samej osoby zamiast jednego — zapytania Cypher zwracają fragmentaryczne wyniki
+- W5 nie może budować historii działań osoby/podmiotu — traci kontekst między zdaniami
+
+**Zależności:**
+- Wchodzi z W1: `DependencyNode[upos, feats, dep_rel]` dla detekcji zaimków i końcówek osobowych
+- Wchodzi z W4 (poprzednie zdania): istniejące węzły w grafie jako kandydaci na antecedens
+- Wychodzi do W2 (ADR-02): `CoreferenceChain` — rozwiązane zaimki przed mapowaniem ról
+- Wychodzi do W4: instrukcje scalenia węzłów (MERGE zamiast CREATE dla znanych bytów)
+
 ## Diagram przepływu danych
 
 ```

@@ -17,6 +17,23 @@ AGENT, PATIENT, INSTRUMENT, LOCATION, TIME, CAUSE, GOAL.
 
 Kluczowe klasy: `SemanticMapper`, `SlowosiecAdapter` (WSD dla ról).
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W2 istnieje bo drzewo zależności składniowych z W1 mówi o strukturze zdania, nie o znaczeniu. `nsubj` to "podmiot gramatyczny" — ale w stronie biernej podmiot gramatyczny jest PATIENT, nie AGENT ("Zwierzę zostało zabite" → `nsubj(zwierzę)` = PATIENT). W2 tłumaczy strukturę składniową na semantykę zdarzenia: kto (AGENT) zrobił co (ACTION) z czym (INSTRUMENT) komu (PATIENT) gdzie (LOCATION) kiedy (TIME). Ta struktura jest tym czego potrzebuje W5 (Drools) do wnioskowania i W4 (Neo4j) do budowania grafu semantycznego.
+
+**Co się sypie bez tej warstwy:**
+- W5 musi samodzielnie dekodować fleksję polską żeby pisać reguły DRL — logika biznesowa miesza się z lingwistyką; zmiana modelu UDPipe łamie wszystkie reguły
+- W4 zapisuje strukturę składniową zamiast semantycznej — Cypher nie może pytać "kto był AGENT zabiecia" tylko musi dekodować `nsubj` + strona + rodzaj
+- Polisemia ról jest nierozstrzygalna bez W3 (WSD): `obl` bez Case może być INSTRUMENT lub LOCATION
+
+**Zależności:**
+- Wchodzi z W1: `DependencyNode[dep_rel, feats, lemma, upos]`
+- Wchodzi z W3 (opcjonalnie/równolegle, ADR-01): `EnrichedToken[synsets]` do WSD
+- Wchodzi z W6 (opcjonalnie/równolegle, ADR-02): `CoreferenceChain` do rozwiązania zaimków przed mapowaniem ról
+- Wychodzi do W4: `EventRoleDict[AGENT, PATIENT, INSTRUMENT, LOCATION, TIME, action]`
+- Wychodzi do W5: ta sama struktura jako wejście dla reguł DRL
+
 ## Diagram przepływu danych
 
 ```

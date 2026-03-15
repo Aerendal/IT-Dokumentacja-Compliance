@@ -19,6 +19,23 @@ Rozszerza W0 (doc audit) o:
 - **AuditEngine** — silnik reguł RISK-01, CONS-02 + generowanie raportów luk
 - **GapAnalysisGenerator** — eksport raportów luk jako REST API (W7)
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W8 istnieje bo lista `AuditFinding` z W5 to surowe wyniki — klient zarobkowy potrzebuje audytowalnego raportu: który przepis/wymóg/reguła był sprawdzany, z którym konkretnym zdaniem dokumentu to naruszenie jest związane, kto i kiedy przeprowadził audyt, jak wynik zmienił się między rewizjami dokumentu. W8 łączy `AuditFinding` z `EventFrame` (6-wymiarowy model zdarzenia), `NKJPBridge` (mapowanie na standardy NKJP) i `StateMatrix` (historia zmian stanu). Bez W8 mamy listę błędów bez kontekstu, bez historii, bez powiązania ze źródłem — nieużyteczne w sądzie lub przy roszczeniu kontraktowym.
+
+**Co się sypie bez tej warstwy:**
+- Brak audit trail: nie wiadomo "na podstawie czego" system sflagował naruszenie — klient może podważyć wynik w sporze cywilnym
+- Brak historii: nie można wykazać że dokument był niezgodny PRZED poprawką i zgodny PO — traceability wymagana przez normy audytowe
+- `StateMatrix` nie istnieje: ten sam dokument audytowany dwukrotnie daje zduplikowane wyniki; raport nieidempotentny = nieaudytowalny
+
+**Zależności:**
+- Wchodzi z W5: `List[AuditFinding]`
+- Wchodzi z W1: morfologiczne dane zdania (przez W4) dla `NKJPBridge`
+- Wchodzi z W0: `{doc_class, validation_mode}` — tryb walidacji
+- Wychodzi do W7: `GapAnalysisReport` jako JSON przez REST API
+- Wychodzi do klienta: `TraceabilityMatrix` — każde naruszenie powiązane z regułą, zdaniem i timestampem audytu
+
 ## Diagram przepływu danych
 
 ```

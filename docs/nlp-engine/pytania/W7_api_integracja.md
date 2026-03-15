@@ -14,6 +14,22 @@ tags: [fastapi, thrift, endpoint, CI-CD, async, REST, mikroserwisy, integracja]
 Warstwa 7 eksponuje cały pipeline NLP (W1-W6) jako REST API i/lub interfejs Apache Thrift.
 Zarządza asynchronicznym przetwarzaniem zadań NLP i integracją z systemami zewnętrznymi.
 
+## Uzasadnienie istnienia warstwy
+
+**Dlaczego ta warstwa jest potrzebna:**
+W7 istnieje bo klienci systemu (systemy zewnętrzne, interfejsy użytkownika, inne mikroserwisy) nie mogą bezpośrednio importować kodu Python. API stanowi granicę systemową: wersjonowanie kontraktu REST (`/v1/`, `/v2/`) jest niezależne od wewnętrznej implementacji — W1 może zmienić model UDPipe bez zmiany kontraktu API. Asynchroniczność jest konieczna bo pełne przetwarzanie dokumentu przez W1–W6 może trwać 2-10 sekund; synchroniczny endpoint zwróciłby timeout dla dużych dokumentów.
+
+**Co się sypie bez tej warstwy:**
+- Klient musi uruchamiać skrypty Python bezpośrednio — niemożliwa integracja z zewnętrznymi systemami klienta (ERP, DMS, systemy prawne)
+- Brak versioningu API: każda zmiana wewnętrzna może zepsuć integrację klienta bez ostrzeżenia
+- Brak async: duże dokumenty (50+ stron) blokują wątek — HTTP timeout; klient nie wie czy przetwarzanie trwa czy się zawiesiło
+
+**Zależności:**
+- Wchodzi: żądania HTTP `POST /nlp/audit` z dokumentem
+- Orchestruje: W1 → W6 → W5 → W8 pipeline
+- Wychodzi do klienta: `{findings: AuditFinding[], summary: {risk_count, completeness_score}}`
+- Wychodzi do W8: triggeruje `AuditEngine` per dokument
+
 ## Diagram przepływu danych
 
 ```
