@@ -67,6 +67,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jaki jest format błędu HTTP przy walidacji schematu wejściowego — RFC 7807 Problem Details?
 - Jak zdefiniować kontrakt SLA — maksymalny czas odpowiedzi w ms per typ żądania i per wielkość dokumentu?
 - Jak wygląda kompletna para request/response JSON dla endpointu /analyze z przykładowymi danymi?
+- Jak endpoint /analyze obsługuje dokumenty Markdown z YAML front matter — czy metadane są parsowane i przekazywane downstream?
+- Jak zdefiniować kontrakt dla opcjonalnego pola metadata w ciele żądania /analyze — JSON Schema nullable object?
 
 ### 3. Implementacja
 - Czy Multiservice oferuje narzędzia do automatyzacji ekstrakcji danych?

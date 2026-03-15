@@ -88,6 +88,10 @@ _brak pytań źródłowych w tej kategorii_
 - Przejdźmy do koreferencji – jak system ma rozpoznać zaimki?
 - Jak wdrożyć mechanizm koreferencji dla zaimków w grafie?
 - Pokaż przykład logu błędu dla zdania z elipsą podmiotu..
+- Jak zaimplementować detektor elipsy podmiotowej bazując na feats.Person i feats.Number z końcówki czasownika?
+- Jak weryfikować rekonstrukcję IMPLICIT_SUBJECT gdy czasownik ma formę 1. vs. 3. osoby liczby pojedynczej?
+- Pokaż kod testu jednostkowego dla IMPLICIT_SUBJECT przy zdaniu "Dostarczono dokumentację techniczną."
+- Jak obsłużyć nieregularne formy czasownikowe (bywał, rzekł) gdzie rekonstrukcja osoby jest niejednoznaczna?
 
 ### 4. Testowanie
 - Stwórzmy czerwony test dla CoreferenceResolvera.

@@ -122,6 +122,9 @@ Tekst z NKJP (XML)
 - Jak rozbudować łańcuchy przyczynowe o osie czasu?
 - Jak endpoint /audit w W7 wywołuje W8 (AuditEngine) — synchronicznie w request czy asynchronicznie z kolejką?
 - Jak W8 serializuje wynik audytu do formatu akceptowanego przez endpoint /audit (JSON z listą naruszeń)?
+- Jak reguła rekonstrukcji IMPLICIT_SUBJECT w NKJPBridge integruje się z EventFrame — podmiot staje się AGENT?
+- Jak testować regułę rekonstrukcji podmiotu domyślnego na zbiorze NKJP — pokaż minimalny zestaw zdań referencyjnych?
+- Jak logować każdą rekonstrukcję IMPLICIT_SUBJECT do celów audytu — co zapisać w EventFrame.metadata?
 
 ### 4. Testowanie
 - Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?
@@ -136,6 +139,8 @@ Tekst z NKJP (XML)
 - Uruchommy stress_test.py na 1000 zdań z NKJP..
 - Uruchommy skrypt stress_test.py na próbce 1000 zdań..
 - Jak wykorzystać logi jako testy regresyjne i dodać regułę rekonstruującą domyślny podmiot z końcówki czasownika..
+- Jak uruchomić skrypt testowy CONSTRAINT_VIOLATION na pełnym zbiorze NKJP i zapisać wyniki do raportu CSV?
+- Jak zweryfikować że reguła CONSTRAINT_VIOLATION nie generuje false positive dla klauzul dozwolonych w aneksie?
 
 ### 5. Obsługa błędów
 - Jakie błędy w BRIDGE_ERROR zdarzają się najczęściej?

@@ -165,6 +165,10 @@ _brak pytań źródłowych w tej kategorii_
 - Przetestujmy ramy walencyjne dla nowych czasowników..
 - Napiszmy czerwony test dla nowej reguły posiadania w InferenceEngine..
 - Napiszmy funkcję build_event_graph w Fazie GREEN..
+- Jak zbudować dataset testowy dla reguły CONSTRAINT_VIOLATION — 10 zdań triggering i 10 non-triggering?
+- Jak napisać test własnościowy (Hypothesis) dla CONSTRAINT_VIOLATION sprawdzający że kolejność słów nie zmienia wyniku?
+- Jak mierzyć Precision i Recall reguły CONSTRAINT_VIOLATION na zbiorze zdań z korpusu NKJP?
+- Pokaż strukturę pliku JSONL z danymi testowymi dla CONSTRAINT_VIOLATION — pola: sentence, expected_fired, rule_id?
 
 ### 5. Obsługa błędów
 - Jak obsłużyć zaprzeczenia w regule _rule_possession_transfer?

@@ -99,6 +99,17 @@ _brak pytań źródłowych w tej kategorii_
 - Czy system obsłuży audyt warunków typu 'Jeśli API, to SSL'?
 - Jak zaimplementować parser YAML front matter który toleruje brakujące pola opcjonalne bez rzucania wyjątku?
 - Jak zbudować walidator schema YAML front matter oparty o jsonschema lub pydantic?
+- Jak otagować pliki Markdown metadanymi YAML — pokaż przykład kompletnego front matter z polami layer, title, status, tags, version?
+- Jaki parser YAML front matter wybrać dla W0 — PyYAML, ruamel.yaml, czy biblioteka python-frontmatter?
+- Jak automatycznie dodać brakujące YAML metadane do istniejących plików Markdown bez nadpisywania treści?
+- Jak walidować obecność obowiązkowych kluczy YAML front matter w doc_auditor.py przed przetwarzaniem dokumentu?
+- Jak zaimplementować metodę GapAnalysisGenerator.add_tag_metadata(yaml_tags) — które pola YAML trafiają do sekcji metadata raportu?
+- Jak filtrować raport GapAnalysisGenerator po tagach YAML — np. pokaż tylko luki w dokumentach oznaczonych [ARCH-01]?
+- Jak zbudować indeks dokumentów po tagach YAML dla szybkiego filtrowania w GapAnalysisGenerator?
+- Dodajmy tagi [Component:] i [ARCH-01] do plików Markdown — pokaż skrypt automatycznego dodawania tagów do YAML front matter?
+- Jak zdefiniować enum dozwolonych wartości dla tagu [Component:] w schemacie JSON — skąd pobierać listę komponentów?
+- Jak zautomatyzować dodawanie tagu [ARCH-01] do dokumentów warstwy W_x które opisują architekturę komponentu?
+- Jak walidować że tagi [Component:] w plikach Markdown są spójne z listą komponentów w ARCHITECTURE.md?
 
 ### 4. Testowanie
 - Jak zaimplementować testy własnościowe dla reguł ARCH-01 i SEC-01?
@@ -139,6 +150,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak pipeline NKJP → GapAnalysisReport obsługuje przypadek gdy plik XML NKJP jest niekompletny lub uszkodzony?
 - Jak serializować GapAnalysisReport do JSON i Markdown jednocześnie z jednej klasy modelu?
 - Jak NKJPPipeline przekazuje przetworzone tokeny do GapAnalyzer który buduje instancję GapAnalysisReport?
+- Jak GapAnalysisGenerator przekazuje YAML tagi do W4 (baza grafowa) jako właściwości węzłów dokumentów?
+- Jak weryfikować spójność tagów YAML między dokumentami — np. czy wszystkie W_x pliki mają tag `layer`?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
