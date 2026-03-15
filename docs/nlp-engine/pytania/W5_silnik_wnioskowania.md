@@ -356,6 +356,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować negację: `"Wykonawca nie dostarczył dokumentacji"` → `dostawa=NOT_OCCURRED`?
 - Jak testować łańcuch: zdanie 1 = "Wykonawca złożył ofertę", zdanie 2 = "Wykonawca dostarczył dokumentację z opóźnieniem" → wnioskowanie o naruszeniu?
 - Uruchommy testy integracyjne dla całego pipeline'u z klasyfikatorem — `def test_full_pipeline_with_intent_classifier(): clf = IntentClassifier(MorphClassifier(morph_stub), LexicalClassifier()); mapper = SemanticMapper(intent_clf=clf); frame = mapper.process('Wykonawca musi dostarczyć SRS'); assert frame.speech_act == 'REQUIREMENT'`; test integracyjny łączy Morfeusz→IntentClassifier→SemanticMapper→EventFrame w jednym call?
+- Uruchommy testy integracyjne dla warstwy pragmatycznej — `@pytest.mark.integration def test_pragmatic_layer_pipeline(): clf = IntentClassifier(MorphClassifier(morph_real), LexicalClassifier()); speech_acts = [clf.classify(s) for s in PRAGMATIC_CORPUS]; assert speech_acts.count('REQUIREMENT') >= 3; assert speech_acts.count('QUESTION') >= 2`; `PRAGMATIC_CORPUS` = 10 zdań kontraktowych + pytań; walidacja rozkładu intencji jako test własnościowy warstwy pragmatycznej; RED bo `morph_real` wymaga uruchomionego Morfeusza?
 - Jak testować zapytania o lokalizację: `"Gdzie jest dokumentacja?"` → przeszukanie grafu → odpowiedź?
 #### Kompletna hierarchia TDD
 - Zaimplementuj Fazę GREEN dla `InferenceEngine` — minimalna reguła: IF AGENT=Wykonawca AND action=dostarczyć AND MANNER=opóźnienie THEN AuditFinding(CONS-02).
