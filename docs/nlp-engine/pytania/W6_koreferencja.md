@@ -77,6 +77,9 @@ _brak pytań źródłowych w tej kategorii_
 - Zaprojektujmy szkielet klasy CoreferenceResolver — `class CoreferenceResolver: def __init__(self, window: int = 5): self._window = window; self._candidates: deque = deque(maxlen=window)` + metody `register(noun_phrase)`, `resolve(pronoun) → Optional[str]`, `clear()`?
 - Jak stworzyć lekki CoreferenceResolver oparty na regułach i oknie LIFO — `_candidates` jako `deque(maxlen=N)` przechowuje ostatnie N fraz rzeczownikowych; `resolve(pronoun)` dopasowuje rodzaj gramatyczny `pronoun.feats.Gender` do ostatniej frazy z pasującym Gender; LIFO bo ostatni antecedent jest najbardziej prawdopodobny (Recency Heuristic)?
 - Jak CoreferenceResolver łączy zdarzenia w grafie wiedzy — po `resolve(pronoun)` ustala antecedent, aktualizuje EventFrame.agent jeśli zaimek był nsubj, następnie `session.run("MERGE (a:Entity {id:$ant})<-[:REFERS_TO]-(p:Pronoun {id:$pro})", ant=antecedent_id, pro=pronoun_id)` w Neo4j?
+- Jak EntityMemory śledzi płeć i liczbę dla zaimków — `EntityMemory` jako `dataclass(form: str, gender: str, number: str, entity_id: str)` przechowywana w deque; `register(noun)` dodaje `EntityMemory(form=noun.lemma, gender=noun.feats.Gender, number=noun.feats.Number, entity_id=noun.id)`; `resolve(pronoun)` iteruje LIFO i zwraca pierwszy `EntityMemory` z `em.gender == pronoun.feats.Gender and em.number == pronoun.feats.Number`?
+- Jak zaimplementować `_estimate_gender()` dla polskich rzeczowników i zaimków — `feats.Gender` z Morfeusza: 'm1/m2/m3'→Masc, 'f'→Fem, 'n'→Neut; dla zaimków bez feats fallback do tabeli: 'on'→Masc, 'ona'→Fem, 'ono'→Neut, 'oni'→Masc.pl, 'one'→NonMasc.pl; zwraca `(gender: str, number: str)` tuple?
+- Jak okno pamięci LIFO w CoreferenceResolver zapobiega starym antecedentom — `deque(maxlen=5)` automatycznie usuwa najstarszy EntityMemory gdy dodawany jest 6. wpis; parametr `window` konfigurowalny w konstruktorze; dla dokumentów prawnych window=3 wystarczy bo antecedent rzadko przekracza 2 zdania wstecz?
 - Czy detekcja zaimków wymaga integracji z NKJP?
 - Napiszmy logikę dopasowania rodzaju gramatycznego dla anafor..
 - Jak zaimplementować mechanizm Recency Heuristic w CoreferenceResolver?
@@ -105,6 +108,8 @@ _brak pytań źródłowych w tej kategorii_
 ### 4. Testowanie
 - Stwórzmy czerwony test dla CoreferenceResolvera.
 - Jak napisać test sprawdzający przypisanie zaimka do rzeczownika w dwóch zdaniach — `resolver.register('Wykonawca'); resolver.resolve(Token(form='on', feats={Gender:'Masc'}))` → `'Wykonawca'`; scenariusz: zdanie 1 rejestruje antecedent, zdanie 2 resolver zwraca jego formę bez ponownego parsowania?
+- Napisz test jednostkowy dla koreferencji zaimkowej w dwóch zdaniach — `def test_pronoun_resolved_to_noun(): r = CoreferenceResolver(); r.register(EntityMemory('Zamawiający','Masc','Sg','e1')); result = r.resolve(Token(form='on',feats={'Gender':'Masc','Number':'Sg'})); assert result.form == 'Zamawiający'`?
+- Pokaż kod testu dla zaimka 'on' w zdaniach połączonych — test z dwoma antecedentami różnej płci: `r.register(EntityMemory('dokumentacja','Fem','Sg','e1')); r.register(EntityMemory('Wykonawca','Masc','Sg','e2')); assert r.resolve(Token('on',{'Gender':'Masc'})).form == 'Wykonawca'` — LIFO zwraca Wykonawca (Masc) a nie dokumentacja (Fem)?
 - Stwórzmy teraz czerwony test integracyjny dla scalania węzłów grafu..
 - Jak testować łączenie faktów między zdaniami?
 - Napiszmy czerwony test dla modułu koreferencji..
