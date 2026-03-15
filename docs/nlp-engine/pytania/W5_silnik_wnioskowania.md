@@ -193,6 +193,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zintegrować KnowledgeGapTracker z potokiem analizy zdarzeń — w EventFrame extraction loop: dla każdego EventFrame wywołaj `tracker.check_predicate(frame.predicate)` zanim trafi do InferenceEngine?
 - Jak KnowledgeGapTracker wchodzi w potok W2→W5 — po SemanticMapper.extract() `tracker.check(event)` przed przekazaniem EventFrame do InferenceEngine?
 - Napiszmy kod KnowledgeGapTracker — metoda `capture_ign(token)` gdy `token.tag == 'ign'`: `self._gaps.append({'type': 'UNKNOWN_WORD', 'form': token.form, 'doc_id': self._doc_id})`?
+- Jak KnowledgeGapTracker loguje nieznane lematy z tagiem ign — pełny wpis: `{'type':'UNKNOWN_WORD', 'form': token.form, 'context': [prev.form, next.form], 'pos_in_sentence': token.id, 'doc_id': self._doc_id, 'timestamp': datetime.utcnow().isoformat()}`; kontekst sąsiednich tokenów ułatwia ręczne etykietowanie w kolejce aktywnego uczenia?
 - Jak KnowledgeGapTracker przechwytuje osierocone zdarzenia — metoda `capture_orphan(event: EventFrame)` gdy event nie ma żadnej krawędzi :CAUSES w grafie?
 - Jak eksportować zebrane luki do pliku JSONL — metoda `dump_jsonl(path)` iteruje `self._gaps` i zapisuje każdy wpis przez `json.dumps(gap, ensure_ascii=False)`?
 - Wdróżmy pętlę KnowledgeGapTracker w pipeline W2→W5 — `for event in event_frames: tracker.check_predicate(event.predicate); tracker.capture_orphan(event) if not graph.has_edges(event); inference_engine.run(event)`?

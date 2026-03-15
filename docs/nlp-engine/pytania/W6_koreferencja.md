@@ -74,6 +74,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak wdrożyć resolver odniesień do grafu wiedzy?
 - Omówmy problem koreferencji między zdaniami w Fazie 2..
 - Jak połączyć CoreferenceResolver z grafem w Neo4j?
+- Zaprojektujmy szkielet klasy CoreferenceResolver — `class CoreferenceResolver: def __init__(self, window: int = 5): self._window = window; self._candidates: deque = deque(maxlen=window)` + metody `register(noun_phrase)`, `resolve(pronoun) → Optional[str]`, `clear()`?
+- Jak stworzyć lekki CoreferenceResolver oparty na regułach i oknie LIFO — `_candidates` jako `deque(maxlen=N)` przechowuje ostatnie N fraz rzeczownikowych; `resolve(pronoun)` dopasowuje rodzaj gramatyczny `pronoun.feats.Gender` do ostatniej frazy z pasującym Gender; LIFO bo ostatni antecedent jest najbardziej prawdopodobny (Recency Heuristic)?
+- Jak CoreferenceResolver łączy zdarzenia w grafie wiedzy — po `resolve(pronoun)` ustala antecedent, aktualizuje EventFrame.agent jeśli zaimek był nsubj, następnie `session.run("MERGE (a:Entity {id:$ant})<-[:REFERS_TO]-(p:Pronoun {id:$pro})", ant=antecedent_id, pro=pronoun_id)` w Neo4j?
 - Czy detekcja zaimków wymaga integracji z NKJP?
 - Napiszmy logikę dopasowania rodzaju gramatycznego dla anafor..
 - Jak zaimplementować mechanizm Recency Heuristic w CoreferenceResolver?
@@ -101,6 +104,7 @@ _brak pytań źródłowych w tej kategorii_
 
 ### 4. Testowanie
 - Stwórzmy czerwony test dla CoreferenceResolvera.
+- Jak napisać test sprawdzający przypisanie zaimka do rzeczownika w dwóch zdaniach — `resolver.register('Wykonawca'); resolver.resolve(Token(form='on', feats={Gender:'Masc'}))` → `'Wykonawca'`; scenariusz: zdanie 1 rejestruje antecedent, zdanie 2 resolver zwraca jego formę bez ponownego parsowania?
 - Stwórzmy teraz czerwony test integracyjny dla scalania węzłów grafu..
 - Jak testować łączenie faktów między zdaniami?
 - Napiszmy czerwony test dla modułu koreferencji..
