@@ -1,0 +1,145 @@
+---
+layer: W7
+title: "Warstwa 7 — API i Integracja (FastAPI / Apache Thrift)"
+phase: 7
+status: planned
+docs_version: 1.0.0
+tags: [fastapi, thrift, endpoint, CI-CD, async, REST, mikroserwisy, integracja]
+---
+
+# Warstwa 7 — API i Integracja (FastAPI / Apache Thrift)
+
+## Przegląd
+
+Warstwa 7 eksponuje cały pipeline NLP (W1-W6) jako REST API i/lub interfejs Apache Thrift.
+Zarządza asynchronicznym przetwarzaniem zadań NLP i integracją z systemami zewnętrznymi.
+
+## Diagram przepływu danych
+
+```
+Klient (HTTP / Thrift)
+       |
+       v
+  FastAPI Router
+  +----------------------------------------------+
+  |  POST /analyze   -> AsyncTask -> W1-W6        |
+  |  GET  /status    -> status zadania            |
+  |  POST /audit     -> W0 doc audit              |
+  |  GET  /graph     -> Neo4j query W4            |
+  +----------------------------------------------+
+       |
+  Background Worker (asyncio / Celery)
+       |
+       v
+  Pipeline: W1 -> W6 -> W4 (Neo4j)
+```
+
+## Pytania zrodlowe — sklasyfikowane
+
+- Jak zintegrować RapidMiner z Multiservice do analizy NKJP?
+- Czy Multiservice oferuje narzędzia do automatyzacji ekstrakcji danych?
+- Jakie są zalety biblioteki Thrift w architekturze Multiservice?
+- Jakie są zalety Apache Thrift w architekturze Multiservice?
+- Jak zintegrować RapidMiner z Multiservice do analizy korpusu?
+- Gdzie w procesie CI/CD uruchomić te testy?
+- Jak zintegrować wyniki z Multiservice z bazą Neo4j?
+- Przejdźmy do Fazy 7 i zaprojektujmy API dla grafu.
+- Stwórzmy teraz czerwony test integracyjny dla endpointu API..
+- Jak zaprojektować FastAPI do obsługi asynchronicznych zadań NLP?
+- Czy warto użyć Apache Thrift do komunikacji między mikroserwisami?
+- Przejdźmy do Fazy 7 i stwórzmy API w FastAPI..
+- Pokaż jak zdefiniować interfejs Apache Thrift dla potoku NLP..
+- Pokaż przykład testu integracyjnego POST /analyze i statusu zadania..
+- Stwórzmy endpoint FastAPI i połączmy go z naszym pipeline..
+- Stwórzmy teraz endpoint /analyze w FastAPI łączący wszystkie moduły..
+- Pokaż implementację IntentClassifier dla aktów mowy w spaCy..
+- Pokaż jak zintegrować akcję COMMAND z systemem operacyjnym..
+- Jak zintegrować akcję COMMAND z endpointem FastAPI?
+- Zintegrujmy endpoint FastAPI z pełnym potokiem analizy intencji..
+- Jak rozszerzyć IntentClassifier o rozpoznawanie aktów zaprzeczenia?
+- Jakie 6 komend diagnostycznych dodałeś do whitelisty SystemExecutor?
+- Jakie to 6 komend diagnostycznych w whiteliscie SystemExecutor?
+- Pokaż kod api.py z endpointem /audit dla FastAPI.
+
+## Pytania uzupelniajace
+
+### 1. Architektura
+
+- Jak podzielić odpowiedzialność między FastAPI router a pipeline orchestrator?
+- Czy używać Celery do kolejkowania zadań czy asyncio background tasks?
+- Jak zdefiniować interfejs Apache Thrift .thrift dla potoku NLP?
+- Jakie są trade-offs między FastAPI (REST) a Thrift (RPC) dla tego projektu?
+- Jak zaprojektować graceful degradation gdy Neo4j jest niedostępny?
+
+### 2. Kontrakty danych
+
+- Jaki jest schemat request body dla POST /analyze — pola: text, language, options?
+- Jaki jest schemat response dla POST /analyze — task_id, status, result?
+- Jak walidować wejście — max długość tekstu, obsługiwane języki, wymagane pola?
+- Jaki jest schemat błędu (error response) — fields: code, message, detail?
+- Jak wersjonować API — /v1/analyze vs /v2/analyze?
+
+### 3. Implementacja
+
+- Jak zaimplementować POST /analyze endpoint z async przetwarzaniem?
+- Jak zaimplementować GET /status sprawdzający postęp zadania?
+- Jak połączyć endpoint /analyze z pełnym potokiem W1-W6?
+- Jak zdefiniować interfejs .thrift dla operacji analyze(text) -> AnalysisResult?
+- Jak zaimplementować endpoint /audit wywołujący W0 (doc_auditor)?
+
+### 4. Testowanie
+
+- Jak napisać test integracyjny POST /analyze — sprawdzić status 200 i strukturę odpowiedzi?
+- Jak testować asynchroniczne zadania — mock background worker?
+- Jak pisać testy kontraktowe dla API (OpenAPI schema validation)?
+- Jak testować endpoint pod obciążeniem — 100 równoległych żądań?
+- Gdzie w CI/CD uruchomić testy integracyjne API?
+
+### 5. Obsługa błędów
+
+- Co zwrócić gdy tekst wejściowy jest pusty lub za długi (>10000 znaków)?
+- Jak obsługiwać timeout przetwarzania (pipeline trwa >30s)?
+- Co zwrócić gdy Neo4j jest niedostępny — 503 czy degraded response?
+- Jak logować błędy pipeline per request_id dla debugowania?
+- Jak obsługiwać równoczesne żądania bez race condition w StateMatrix (W5)?
+
+### 6. Integracja z innymi warstwami
+
+- Jak W7 wywołuje W1 — bezpośrednio czy przez dependency injection?
+- Jak W7 przekazuje wyniki pipeline do W8 (AuditEngine)?
+- Czy W7 ma własną bazę do przechowywania wyników zadań, czy używa Neo4j (W4)?
+- Jak W0 (doc audit CLI) integruje się z W7 API — czy obie ścieżki są niezależne?
+
+### 7. Pułapki i ryzyka
+
+- **Pułapka 1:** Synchroniczne przetwarzanie NLP w handlerze FastAPI blokuje event loop — zawsze używać background_tasks lub Celery.
+- **Pułapka 2:** Brak rate limitingu = jeden klient może zapchać cały pipeline. Wdrożyć slowapi lub Nginx rate limit.
+- **Pułapka 3:** Thrift i FastAPI mają różne modele błędów — ujednolicenie error handling jest konieczne zanim wdrożysz oba.
+
+## Kryteria akceptacji
+
+| Metryka | Minimum |
+|---|---|
+| Czas odpowiedzi POST /analyze (< 1000 znaków) | < 5 s |
+| Throughput przy 10 równoległych żądaniach | >= 5 req/s |
+| HTTP 200 dla prawidłowych żądań | 100% |
+| Pokrycie testów integracyjnych endpointów | >= 80% |
+| Czas uruchomienia serwisu (cold start) | < 10 s |
+
+## Pytania o idempotentność i deterministyczność
+
+- Czy dwa identyczne POST /analyze z tym samym tekstem dają identyczne wyniki?
+- Czy task_id jest unikalny i niemutowalny po utworzeniu?
+- Jak zapewnić, że retry żądania nie tworzy duplikatów w Neo4j?
+
+## Pytania o migrację i wersjonowanie
+
+- Jak wersjonować API endpoint bez łamania istniejących klientów?
+- Jak migrować .thrift IDL gdy dodajemy nowe pola do AnalysisResult?
+- Jak obsłużyć deprecation starego endpointu z odpowiednim wyprzedzeniem?
+
+## Pytania o audytowalność
+
+- Jak każde żądanie do API jest logowane z request_id, user_id, timestamp?
+- Jak przechowywać pełny ślad żądanie -> pipeline steps -> wynik dla celów dowodowych?
+- Jak wygenerować raport "co system zwrócił klientowi X dla tekstu Y w dacie Z"?
