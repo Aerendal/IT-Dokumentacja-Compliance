@@ -177,6 +177,7 @@ CoreferenceChain (z W6)
 - Pokaż jak wygenerować graf łańcuchów kauzalnych w Mermaid.js — Python skrypt pobiera wyniki Cypher MATCH path=(:EventFrame)-[:CAUSES*]->(:EventFrame) i serializuje jako flowchart LR?
 - Jak obsłużyć pusty łańcuch kauzalny (brak krawędzi :CAUSES) w generatorze Mermaid — fallback: diagram z jednym węzłem i komentarzem "brak łańcucha przyczynowego"?
 - Jak zmapować wymiar intencji (speech_act: ZOBOWIĄZANIE) na krawędź Neo4j — :EventFrame -[:HAS_SPEECH_ACT]-> :SpeechAct {type: 'ZOBOWIĄZANIE'}?
+- Jak zintegrować `IntentClassifier` z warstwą grafu Neo4j — po `clf.classify(sentence)` wynik trafia jako `speech_act_type` do `Neo4jAdapter.save_event(frame)`; adapter tworzy `MERGE (:SpeechAct {type: $speech_act}) WITH s MERGE (e)-[:HAS_SPEECH_ACT]->(s)`; spajanie IntentClassifier→EventFrame.speech_act→Neo4j `:HAS_SPEECH_ACT` zamyka pętlę pipeline→graf?
 - Jak zmapować wymiar narzędzia (INSTRUMENT) na krawędź Neo4j — :EventFrame -[:HAS_ROLE {role: 'INSTRUMENT'}]-> :Token {lemma: ...}?
 - Jak modelować wymiary intencji i narzędzia łącznie w grafie zdarzeń — węzeł :EventFrame z krawędziami :HAS_SPEECH_ACT→:SpeechAct {type:'ZOBOWIĄZANIE'} i :HAS_ROLE {role:'INSTRUMENT'}→:Token; Cypher: `MATCH (e)-[:HAS_SPEECH_ACT]->(s), (e)-[:HAS_ROLE {role:'INSTRUMENT'}]->(t) WHERE s.type='ZOBOWIĄZANIE' RETURN e, t` dla audytu narzędzi zobowiązania?
 - Jak modelować wymiary przyczyny i narzędzia łącznie w grafie Neo4j — węzeł :EventFrame z krawędziami :CAUSES→:EventFrame (relacja kauzalna) i :HAS_ROLE {role:'INSTRUMENT'}→:Token; Cypher: `MATCH (cause:EventFrame)-[:CAUSES]->(effect:EventFrame), (cause)-[:HAS_ROLE {role:'INSTRUMENT'}]->(t:Token) RETURN cause.predicate, t.lemma, effect.predicate` dla analizy jakim narzędziem wywołano skutek?
@@ -274,6 +275,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować `generate_cypher()` — sprawdzić, czy wygenerowany Cypher jest poprawny składniowo?
 - Jak napisać test integracyjny dla scalania węzłów (`MERGE`) na embedded Neo4j?
 - Jak testować `build_document()` dla zdania "Wykonawca dostarczył dokumentację techniczną z opóźnieniem" — sprawdzić węzły i krawędzie?
+- Zdefiniuj testy dla intencji CONDITION i jej skutków — `def test_condition_blocks_effect(): mock_session.run.return_value = [{'eff': {'id':'e2'}}]; violations = LinterRuleEngine([CONDITION_RULE], mock_session).run_all(); assert violations[0].rule_id == 'CONDITION-01'`; reguła `CONDITION-01`: `MATCH (e)-[:CAUSES]->(eff) WHERE NOT (e)-[:REQUIRES_CONDITION]->(:Condition {satisfied:True}) RETURN eff`?
 - Jak testować wykrywanie sprzecznych relacji w modelu zdarzenia?
 - Pokaż jak testować wykrywanie osieroconych węzłów w Neo4j — `def test_orphan_detection(): mock_session.run.return_value = [{'e': {'id':'orphan1'}}]; engine = LinterRuleEngine([ORPHAN_RULE], mock_session); violations = engine.run_all(); assert violations[0].rule_id == 'ORPHAN-01' and violations[0].node_id == 'orphan1'`?
 #### Kompletna hierarchia TDD
