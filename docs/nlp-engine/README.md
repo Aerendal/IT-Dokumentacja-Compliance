@@ -86,6 +86,15 @@ Obecny engine sprawdza czy słowo kluczowe **istnieje** w dokumencie. NLP Engine
 |---|---|
 | Specyfikacja (ten dokument) | ✅ Gotowa |
 | Architektura | ✅ Zaprojektowana |
+| **Moduł audytu dokumentacji** (`scripts/nlp/`) | ✅ Zaimplementowany |
+| — `text_utils.py` — normalizacja polskiego tekstu | ✅ |
+| — `similarity_engine.py` — TF-IDF + cosine (pure stdlib) | ✅ |
+| — `gap_detector.py` — wykrywanie luk kompletności | ✅ |
+| — `duplicate_detector.py` — exact/extending/thematic/partial | ✅ |
+| — `relation_mapper.py` — mapowanie powiązań między docs | ✅ |
+| — `doc_auditor.py` — orkiestrator + SQLite + CLI | ✅ |
+| — 89 testów jednostkowych i integracyjnych | ✅ |
+| — `compliance_check.py doc-audit` subkomenda | ✅ |
 | Faza 1 — ContextClassifier + NLPCore | ⬜ Do implementacji |
 | Faza 2 — SemanticRoleLabeler | ⬜ Do implementacji |
 | Faza 3 — Compliance Plugins | ⬜ Do implementacji |
