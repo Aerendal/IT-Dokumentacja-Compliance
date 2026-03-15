@@ -125,6 +125,8 @@ Tekst z NKJP (XML)
 - Jak reguła rekonstrukcji IMPLICIT_SUBJECT w NKJPBridge integruje się z EventFrame — podmiot staje się AGENT?
 - Jak testować regułę rekonstrukcji podmiotu domyślnego na zbiorze NKJP — pokaż minimalny zestaw zdań referencyjnych?
 - Jak logować każdą rekonstrukcję IMPLICIT_SUBJECT do celów audytu — co zapisać w EventFrame.metadata?
+- Jak AuditEngine korzysta z KlasyfikatorKontekstu do wyboru zestawu reguł compliance per typ dokumentu?
+- Jak wynik KlasyfikatorKontekstu trafia do nagłówka GapAnalysisReport — pole document_type: enum?
 
 ### 4. Testowanie
 - Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?

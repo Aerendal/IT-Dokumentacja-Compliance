@@ -79,6 +79,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jakie pola zwraca PhraseologyDetector dla wykrytej frazy idiomatycznej — id, canonical_form, confidence?
 - Jak zdefiniować format przekazywania informacji leksykalnych z W3 do W2 (SemanticMapper)?
 - Jak wygląda schemat JSON dla wzbogaconego tokena po przejściu przez W3 — pokaż przykładowy obiekt?
+- Pokaż model danych dla relacji bazujących na synsetach — Synset(id, name, pos, lemmas) i SynsetRelation(source_id, type, target_id)?
+- Jak zdefiniować kontrakt dla relacji IS_A, HAS_SYNSET, SIMILAR_TO w formacie JSON — pokaż przykładowy obiekt?
+- Jak EnrichedToken z W3 reprezentuje listę synsetów — pole synsets: List[SynsetRef] z id, confidence, pos?
 
 ### 3. Implementacja
 - Jakie reguły ujednoznaczniania dodać do silnika disambiguation?
@@ -119,6 +122,11 @@ _brak pytań źródłowych w tej kategorii_
 - Jak rozbudować mwe_dict o idiomy?
 - Czy detektor idiomów powinien działać przed lematyzacją?
 - Pokaż jak dodać detektor jednostek wielowyrazowych i idiomów.
+- Napiszmy SlowosiecAdapter dla synonimów i hiperonimów — pokaż kod klasy z get_synonyms(lemma) i get_hypernyms(lemma)?
+- Jak SlowosiecAdapter obsługuje polisemię — zwraca wszystkie synsety dla lematu czy tylko najbardziej prawdopodobny?
+- Jak zaimplementować lazy loading w SlowosiecAdapter aby uniknąć ładowania 2 GB Słowosieci przy starcie serwisu?
+- Jak testować SlowosiecAdapter — test używa prawdziwej Słowosieci czy mocka z kilkoma synsetami testowymi?
+- Jak SlowosiecAdapter cachuje wyniki zapytań — LRU cache per sesja czy trwały cache na dysku?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..
@@ -158,6 +166,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zintegrować Słowosieć do obsługi synonimów w regułach?
 - Jak zintegrować Słowosieć, aby obsłużyć synonimy czasownika 'dać'?
 - Pokaż jak zintegrować Słowosieć do obsługi synonimów.
+- Jak W3 obsługuje żądania z W0 (Linter) o synonimy terminu — synchroniczne wywołanie czy pre-loaded cache?
+- Jak W3 informuje W0 gdy wykryty "synonim" jest faktycznie hiperonimem — relacja generalizacji, nie równoznaczność?
+- Jak W3 eksponuje API dla W0 do sprawdzenia czy dwa terminy należą do tego samego synsetu?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

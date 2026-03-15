@@ -155,6 +155,15 @@ _brak pytań źródłowych w tej kategorii_
 - Jak wdrożyć State Matrix, by uniknąć fałszywych alarmów w audycie?
 - Jak silnik powinien wnioskować na podstawie przyczyn i skutków?
 - Pokaż przykładowe reguły logiczne dla domeny prawnej i medycznej..
+- Jak rozszerzyć CausalChainBuilder o wnioskowanie semantyczne z użyciem synsetów z W3 (Słowosieć)?
+- Jak CausalChainBuilder buduje łańcuch przyczynowy — które EventFrame stają się węzłami a które krawędziami?
+- Jak wzbogacić CausalChainBuilder o synonimy — np. "dostarczyć" i "przekazać" traktowane jako ta sama akcja?
+- Jakie reguły DRL sterują CausalChainBuilder przy wykrywaniu związku przyczyna→skutek w dokumentach prawnych?
+- Jak CausalChainBuilder obsługuje łańcuchy wielopoziomowe — A→B→C gdy B jest pośrednim warunkiem?
+- Jak wdrożyć Klasyfikator Kontekstu aby system rozumiał typ (jestestwo) dokumentu — umowa, SRS, raport, specyfikacja?
+- Jak KlasyfikatorKontekstu pobiera sygnały z W3 (leksyka), W2 (role) i W6 (koreferencja) do klasyfikacji dokumentu?
+- Jak zdefiniować enum klas dokumentów w KlasyfikatorKontekstu — UMOWA, SRS, RAPORT_AUDYTU, SPECYFIKACJA_TECHNICZNA?
+- Jak KlasyfikatorKontekstu wpływa na InferenceEngine — czy aktywowane reguły DRL są filtrowane per typ dokumentu?
 
 ### 4. Testowanie
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?

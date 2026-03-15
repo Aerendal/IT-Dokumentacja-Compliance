@@ -85,6 +85,9 @@ CoreferenceChain (z W6)
 - Jak zintegrować bibliotekę jsonschema z bazą grafową Neo4j?
 - Pokaż jak zintegrować format TEI P5 z bazą Neo4j..
 - Jak APOC przyspiesza import JSON do bazy Neo4j?
+- Jak reprezentować relację synsetową IS_A jako krawędź w grafie Neo4j — węzeł :Concept i krawędź :IS_A z właściwościami?
+- Jak zdefiniować schemat węzła :Synset w Neo4j — właściwości id, name, pos, definition, source (Słowosieć/WordNet)?
+- Jak zapobiec eksplozji grafu gdy każdy token importuje pełne drzewo hiperonimii (setki węzłów per token)?
 
 ### 3. Implementacja
 - Pokaż dokładny model danych grafu dla przykładu z Janem..

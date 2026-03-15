@@ -167,6 +167,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak NKJPPipeline przekazuje przetworzone tokeny do GapAnalyzer który buduje instancję GapAnalysisReport?
 - Jak GapAnalysisGenerator przekazuje YAML tagi do W4 (baza grafowa) jako właściwości węzłów dokumentów?
 - Jak weryfikować spójność tagów YAML między dokumentami — np. czy wszystkie W_x pliki mają tag `layer`?
+- Pokaż jak zintegrować Słowosieć z Linterem W0 — W0 odpytuje W3 o synonimy terminu przed flagowaniem duplikatu.
+- Jak Linter W0 używa synsetów z W3 aby odróżnić synonim (ten sam sens) od homonimii (różny sens)?
+- Jak skonfigurować próg podobieństwa semantycznego (Jaccard na synsetach) dla detekcji duplikatów w Linterze?
+- Jak Linter W0 obsługuje przypadek gdy W3 (Słowosieć) jest niedostępne — fallback do detekcji leksykalnej?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
