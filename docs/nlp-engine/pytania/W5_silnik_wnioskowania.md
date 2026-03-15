@@ -329,10 +329,13 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż przykład klasyfikacji intencji dla dokumentacji technicznej w Pythonie — `clf = IntentClassifier(); clf.classify('Wykonawca dostarczył SRS')` → `'ASSERT'`; `clf.classify('Czy SRS spełnia wymagania?')` → `'QUESTION'`; `clf.classify('Należy dostarczyć dokumentację')` → `'REQUIREMENT'` (rozszerzony klasyfikator z listą leksemów modalnych)?
 - Jakie są najczęstsze luki wykrywane przez KnowledgeGapTracker w tekstach — typ UNMATCHED_RULE (brak reguły DRL dla predykatu) dominuje (~60%), UNKNOWN_WORD/ign (~25% dla neologizmów i skrótów technicznych), UNKNOWN_STRUCTURE/brak root (~10% dla zdań eliptycznych), UNMATCHED_PREDICATE/brak synsetu (~5%); proporcje wskazują że priorytetem ML jest uzupełnianie reguł DRL?
 - Wdróżmy klasę `IntentClassifier` w Fazie Green — po napisaniu czerwonego testu `assert clf.classify('Jak działa system') == 'QUESTION'`, implementacja z `QUESTION_WORDS` przechodzi; następny krok: dodaj `MODAL_WORDS = {'musi','powinien','należy'}` i test `'Należy dostarczyć' → 'REQUIREMENT'` jako kolejna iteracja RED→GREEN?
+- Jak zintegrować `IntentClassifier` z głównym pipeline'em — `SemanticMapper.__init__(intent_clf: IntentClassifier)`, po `map_roles()` wywołaj `event.speech_act = intent_clf.classify(sentence)` zanim EventFrame trafi do InferenceEngine; klasyfikator operuje na surowym zdaniu przed parsowaniem dep_rel?
+- Jak KnowledgeGapTracker raportuje braki w Słowosieci — `dump_jsonl()` filtruje wpisy `type=='MISSING_SYNSET'` i eksportuje do `wordnet_gaps.jsonl`; format: `{predicate, pos, doc_id, sentence_fragment}`; plik stanowi wkład do procesu rozszerzania plWordNet o nowe leksemy techniczne?
 
 ### 4. Testowanie
 
 - Jak napisać czerwony test TDD dla `InferenceEngine` — `"Wykonawca dostarczył dokumentację z opóźnieniem"` → `{cons: CONS-02, rule: naruszenie_terminu}`?
+- Zdefiniujmy testy RED dla Klasyfikatora Intencji — `def test_question_detected(): assert IntentClassifier().classify('Jak działa system?') == 'QUESTION'`; `def test_requirement_detected(): assert IntentClassifier().classify('Należy dostarczyć SRS') == 'REQUIREMENT'`; `def test_fact_detected(): assert IntentClassifier().classify('Wykonawca dostarczył dokumentację') == 'ASSERT'`; wszystkie RED przed implementacją MODAL_WORDS?
 - Jak testować wielowymiarowy model zdarzenia: AGENT + ACTION + PATIENT + INSTRUMENT + LOCATION + TIME?
 - Jak testować negację: `"Wykonawca nie dostarczył dokumentacji"` → `dostawa=NOT_OCCURRED`?
 - Jak testować łańcuch: zdanie 1 = "Wykonawca złożył ofertę", zdanie 2 = "Wykonawca dostarczył dokumentację z opóźnieniem" → wnioskowanie o naruszeniu?

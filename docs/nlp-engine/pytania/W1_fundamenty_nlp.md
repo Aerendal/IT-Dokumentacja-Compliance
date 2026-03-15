@@ -111,6 +111,7 @@ Plik NKJP (XML/TEI P5)
 - Jak przejść do implementacji DeepER rozpoznawania nazw — kroki: (1) załaduj model `poldeepner.load('pl-nkjp')`, (2) tokenizuj przez Morfeusz, (3) uruchom `model.predict(tokens)`, (4) konwertuj BIO spans → `List[Entity]`, (5) scal wielotokenowe encje (B-X…I-X) do jednego Entity przed przekazaniem do SemanticMapper?
 - Czy spaCy-pl poprawnie rozpoznaje polskie idiomy w drzewie zależności — `IdiomDetector.detect()` musi wywołać się PRZED `SpacyParser.parse()` bo drzewo zbudowane na nie-scalonych idiomach da błędne dep_rel; weryfikuj test: 'Wykonawca wziął pod uwagę wymagania' z idiomem i bez?
 - Jak zintegrować DeepER NER ze Słowosiecią — po `ner_adapter.recognize(sentence)` dla każdej encji ORGANIZACJA wywołaj `SlowosiecAdapter.get_synset(entity.form)`, jeśli istnieje synset dodaj `entity.synset_id`; encje bez synsetu trafiają do `KGT.capture_ign(entity.form)` jako OOV?
+- Jak rozróżnić fakt od wymagania za pomocą tagów Morfeusza — tag MSD `praet` (czas przeszły) lub `fin` (czas teraźniejszy) + brak leksemów modalnych → FACT; obecność leksemu 'musi/powinien/należy' z tagiem `fin` lub forma imperatywna (`impt`) → REQUIREMENT; Morfeusz zwraca pełny MSD string który SemanticMapper parsuje przez `feats['Mood']`?
 - Jakie biblioteki Python ułatwią parsowanie formatów XML z NKJP?
 - Jakie są główne słabości modelu symbolicznego w porównaniu do LLM?
 - Jakie narzędzia w Pythonie pomogą mi zautomatyzować ekstrakcję z NKJP?
