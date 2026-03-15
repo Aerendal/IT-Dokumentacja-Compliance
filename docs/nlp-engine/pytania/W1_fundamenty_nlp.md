@@ -102,6 +102,8 @@ Plik NKJP (XML/TEI P5)
 - Jak obsłużyć encje wielotokenowe w DeepER (np. 'Poczta Polska') — BIO tagi: B-ORG, I-ORG; scalaj tokeny z tym samym chunk_id do jednej Entity zanim przekażesz do SemanticMapper W2?
 - Pokaż przykład analizy zdania technicznego przez SpacyParser — `parser.parse("Wykonawca dostarczył dokumentację projektową")` zwraca: node[0] `{form:'Wykonawca', dep_rel:'nsubj', head:1}`, node[1] `{form:'dostarczył', dep_rel:'root'}`, node[2] `{form:'dokumentację', dep_rel:'obj', head:1}`, node[3] `{form:'projektową', dep_rel:'amod', head:2}`?
 - Jak SpacyParser tokenizuje zdanie techniczne z identyfikatorem dokumentu (np. 'CONS-02') — token 'CONS-02' rozpoznawany jako PROPN, dep_rel='nmod' gdy odnosi się do rzeczownika lub 'obj' gdy jest bezpośrednim dopełnieniem czasownika?
+- Czy spaCy-pl poradzi sobie z idiomami (MWE) typu 'rzucić okiem' — model `pl_core_news_lg` nie rozkłada idiomów; 'okiem' dostanie dep_rel='obj' zamiast bycia częścią frazy; dodaj `IdiomDetector` jako pre-processing krok przed SpacyParser który zamienia znane idiomy na pojedynczy token?
+- Jak zbudować słownik idiomów dla IdiomDetector w domenie prawno-technicznej — plik `idioms.json` z kluczem jako fraza wielowyrazowa i wartością jako forma kanonalna (np. 'wziąć pod uwagę' → 'uwzględnić') ładowany przez SlowosiecAdapter?
 - Jakie biblioteki Python ułatwią parsowanie formatów XML z NKJP?
 - Jakie są główne słabości modelu symbolicznego w porównaniu do LLM?
 - Jakie narzędzia w Pythonie pomogą mi zautomatyzować ekstrakcję z NKJP?
@@ -357,6 +359,8 @@ Plik NKJP (XML/TEI P5)
 - Jak wykryć że aktualizacja modelu UDPipe (v2→v3) regresuje quality metryki — co zautomatyzować w CI?
 - Stwórz snapshot test lematyzacji: 100 zdań + oczekiwane lematy zapisane jako golden file — alarm gdy Morfeusz2 zwróci inny lemat.
 - Jak przetestować W1 end-to-end na zdaniu wielozdaniowym (10 zdań) — sprawdzić że wszystkie tokeny mają `feats.Case` gdzie `upos=NOUN`?
+- Stwórzmy plik `test_dependency_parser.py` z testami TDD — struktura: `TestUDPipeParser` (parse+CoNLL-U schema), `TestSpacyParser` (parse+dep_rel), `TestParserSwap` (ten sam wynik po wymianie backendu) jako trzy klasy w pytest?
+- Jak napisać czerwony test TDD dla DependencyParser — `assert parser.parse("Wykonawca złożył ofertę")[0].dep_rel == 'nsubj'` przed implementacją SpacyParser, wtedy GREEN po dodaniu `token.dep_`→`dep_rel` mapping?
 
 ### 5. Obsługa błędów
 
