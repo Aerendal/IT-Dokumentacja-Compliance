@@ -180,6 +180,9 @@ CoreferenceChain (z W6)
 - Pokaż przykład zapytania Cypher do wykrywania węzłów-orfanów :EventFrame — MATCH (e:EventFrame) WHERE NOT (e)-[:CAUSES]->() AND NOT ()-[:CAUSES]->(e) RETURN e?
 - Jak wykryć orfany :Synset niepowiązane z żadnym :EventFrame — MATCH (s:Synset) WHERE NOT ()-[:HAS_SYNSET]->(s) AND NOT (s)-[:IS_A]->() RETURN s?
 - Jak zaplanować cykliczne oczyszczanie orfanów w Neo4j przez APOC — `CALL apoc.periodic.iterate('MATCH (e:EventFrame) WHERE NOT (e)-[:CAUSES|HAS_SYNSET|HAS_ROLE]-() RETURN e', 'DELETE e', {batchSize:100})`?
+- Jak zintegrować wykrywanie orfanów jako krok CI/CD — po każdym imporcie uruchom Cypher orphan-check w skrypcie Python i zwróć exit 1 gdy `count(orphans) > 0`?
+- Jak monitorować orfany jako metrykę SLI — `MATCH (e:EventFrame) WHERE NOT (e)-[:CAUSES|HAS_SYNSET|HAS_ROLE]-() RETURN count(e)` eksportowany cyklicznie do Grafana/Prometheus?
+- Czy Neo4j pozwala na constraint zapobiegający tworzeniu orfanów :EventFrame — brak natywnych relacyjnych constraints w Neo4j; alternatywa to APOC trigger `apoc.trigger.add` wywołujący rollback gdy węzeł bez krawędzi?
 
 ### 4. Testowanie
 - Jak zapisać węzeł „Test jednostkowy” w formacie ontologii JSON?

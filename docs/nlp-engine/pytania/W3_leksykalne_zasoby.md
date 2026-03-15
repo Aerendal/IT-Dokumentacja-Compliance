@@ -159,6 +159,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak stworzyć słownik terminologiczny dla branży CONSTRUCTION — tabele: `domain_lemma(lemma, domain, synset_id)` + `domain_relation(synset_id, relation_type, target_synset_id, domain)`?
 - Jak zasilić `domain_overrides` terminami z zewnętrznego glosariusza branżowego — import CSV: `parse(glossary.csv)` → `INSERT INTO domain_overrides(lemma, synset_id, domain)` z rollbackiem przy konflikcie?
 - Jak przetestować kompletność słownika terminologicznego dla branży LEGAL — `SELECT COUNT(*) FROM domain_lemma WHERE domain='LEGAL'` vs liczba terminów w glosariuszu źródłowym?
+- Jak uruchomić ETL dla Słowosieci jako pipeline trzech kroków — extract (parsuj LMF XML przez iterparse), transform (mapuj LexicalEntry→lemma, Synset→synset_id), load (batch INSERT z transakcjami)?
+- Jak zmierzyć wydajność wyszukiwania synsetów po ETL — `timeit get_synonyms('dostarczyć')` < 10 ms przy włączonym COVERING INDEX na `(lemma, synset_id)` jako kryterium akceptacji?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..
@@ -220,6 +222,8 @@ _brak pytań źródłowych w tej kategorii_
 - Zintegrujmy Słowosieć z grafem, aby lepiej rozumieć synonimy — jak węzły :Synset w Neo4j rozszerzają dopasowanie predykatów w regułach DRL?
 - Zintegrujmy SlowosiecAdapter z CausalChainBuilder do łączenia zdarzeń — wywołanie `get_synonyms(predicate)` w logice `link_events()` CausalChainBuilder decyduje o emisji krawędzi :CAUSES?
 - Jak SlowosiecAdapter.get_synonym_set(lemma) zasila mapowanie predykatów w CausalChainBuilder.link_events() — sprawdzenie czy predykat zdarzenia należy do synsetu wzorca reguły?
+- Jak skonfigurować semantyczny soft matching w CausalChainBuilder od strony W3 — adapter zwraca `Set[str]` synonimów; builder porównuje ze zbiorem wzorców reguły przez `intersection / union ≥ threshold`?
+- Jak testować integrację SlowosiecAdapter+CausalChainBuilder od strony W3 — fixture z mock SQLite wypełnionym synsetnymi parami dla 'dostarczyć'↔'przekazać'?
 - Jak graf synsetów Słowosieci pozwala regule dopasować "wręczyć" gdy oczekuje "dostarczyć" — ścieżka przez wspólny hiperonim 'działanie transferu'?
 - Jak testować integrację Słowosieci z grafem dla synonimów — asercja MATCH(:Synset)-[:IS_SYNONYM]->(:Synset) dla pary 'dostarczyć'/'przekazać'?
 

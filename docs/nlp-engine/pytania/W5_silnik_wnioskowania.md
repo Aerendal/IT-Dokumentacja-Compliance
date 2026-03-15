@@ -173,6 +173,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak CausalChainBuilder decyduje czy dwa EventFrame połączyć :CAUSES bazując na Słowosieci — e1.predicate ∈ get_synonym_set(rule.predicate) → MERGE (e1)-[:CAUSES]->(e2)?
 - Jak wywołać SlowosiecAdapter wewnątrz CausalChainBuilder — inicjalizacja `self._lexicon = SlowosiecAdapter(db_path)` w konstruktorze, wywołanie `self._lexicon.get_synonyms(predicate)` w metodzie `link_events()`?
 - Jak obsłużyć wyjątek LookupError gdy predykat nie istnieje w Słowosieci — fallback do dopasowania leksykalnego (exact match) zamiast semantycznego?
+- Jak zaktualizować CausalChainBuilder._infer() o wnioskowanie semantyczne — dla każdej pary EventFrame sprawdź `_lexicon.get_synonyms(e.predicate)` i dopasuj do synsetów wzorca reguły przed emisją :CAUSES?
+- Jak buforować wyniki SlowosiecAdapter w CausalChainBuilder — `@lru_cache(maxsize=512)` na metodzie `_get_synonym_set(predicate)` aby uniknąć powtórnych zapytań SQLite podczas analizy dokumentu?
+- Jak skonfigurować próg semantycznego soft matchingu w CausalChainBuilder — parametr `threshold: float = 0.5` w konstruktorze, porównanie jaccard@synsets między predykatem a wzorcem?
+- Jak przetestować integrację SlowosiecAdapter+CausalChainBuilder dla soft matchingu — asercja że dokument z 'przekazać' aktywuje regułę CONS-02 zdefiniowaną dla 'dostarczyć'?
 - Zaimplementujmy klasę KnowledgeGapTracker do logowania nieznanych zdarzeń i słów — jakie typy luk rozróżnia (UNKNOWN_PREDICATE, MISSING_SYNSET, UNMATCHED_RULE)?
 - Jak KnowledgeGapTracker rejestruje zdarzenie nierozpoznane przez żadną regułę DRL — hook after_rule_evaluation gdy activated_rules.is_empty()?
 - Jak KnowledgeGapTracker eksportuje dane do kolejki aktywnego uczenia — JSONL z polami predicate, context, doc_id, timestamp?

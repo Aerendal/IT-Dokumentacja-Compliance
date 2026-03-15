@@ -124,6 +124,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak dodać pole speech_act do EventFrame — enum: ZOBOWIĄZANIE, POTWIERDZENIE, ZAPRZECZENIE, OSTRZEŻENIE, POLECENIE?
 - Jak wymiar intencji łączy się z rolami semantycznymi — AGENT+ZOBOWIĄZANIE = osoba zobowiązana, AGENT+POLECENIE = zleceniodawca w kontrakcie?
 - Jak wymiar narzędzia (INSTRUMENT) z SemanticMapper mapuje się do Neo4j — tag `inst` (narzędnik) z Morfeusza → INSTRUMENT → :HAS_ROLE {role:'INSTRUMENT'} w W4?
+- Jak rozszerzyć EventFrame o wielowymiarowy kontekst sytuacyjny — pole `context: SituationalContext` z sub-polami temporal (BEFORE/AFTER/DURING), spatial (LOCATION/SOURCE/DESTINATION), causal (CAUSE/EFFECT)?
+- Jak wielowymiarowy kontekst sytuacyjny EventFrame wpływa na reguły DRL — reguła aktywuje się tylko gdy `context.temporal='BEFORE'` i `speech_act='ZOBOWIĄZANIE'` jednocześnie?
+- Jak SemanticMapper wydobywa wymiar temporal z zależności składniowych — przyimek 'przed' → temporal=BEFORE, 'po' → AFTER, 'podczas' → DURING mapowane z dep_rel nmod/obl?
 
 ### 4. Testowanie
 - Zdefiniujmy test integracyjny dla relacji agent-patient w tym modelu..
