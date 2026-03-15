@@ -135,6 +135,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak DocumentClassifier integruje się z Linterem W0 — klasyfikacja przed audytem aby wybrać odpowiedni zestaw reguł?
 - Jak DocumentClassifier jako Krok 0 zwiększa trafność audytu W0 — klasyfikacja dokumentu przed Linterem umożliwia użycie właściwego zestawu reguł per typ dokumentu?
 - Jak sequencjonować Krok 0 w run_dogfooding.py — wywołaj DocumentClassifier.classify(file) przed LinterEngine.audit(file) dla każdego pliku?
+- Jak zdefiniować regułę Lintera sprawdzającą autoryzację w grafie Neo4j — `LinterRule(id='AUTH-01', query="MATCH (u:User)-[:PERFORMED]->(e:EventFrame) WHERE NOT (u)-[:HAS_ROLE]->(:Role {name:'authorized'}) RETURN e")` wywoływana przez `LinterEngine.run_cypher_rule(rule, session)` i zgłaszana jako naruszenie gdy Cypher zwraca wyniki?
 - Uruchommy skrypt run_dogfooding.py na oznaczonych plikach Markdown — jakie argumenty przyjmuje: --input docs/ --filter-tags [Component:W0] --output report.json?
 - Jak run_dogfooding.py filtruje pliki po tagach YAML — parsuje front matter każdego *.md i sprawdza pole tags przed audytem?
 - Jak run_dogfooding.py raportuje wyniki per plik — tabela: ścieżka, status (PASS/FAIL), liczba naruszeń, lista rule_id?

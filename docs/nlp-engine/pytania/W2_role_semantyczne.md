@@ -125,6 +125,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak wymiar intencji łączy się z rolami semantycznymi — AGENT+ZOBOWIĄZANIE = osoba zobowiązana, AGENT+POLECENIE = zleceniodawca w kontrakcie?
 - Jak wymiar narzędzia (INSTRUMENT) z SemanticMapper mapuje się do Neo4j — tag `inst` (narzędnik) z Morfeusza → INSTRUMENT → :HAS_ROLE {role:'INSTRUMENT'} w W4?
 - Jak mapować rolę ENVIRONMENT z tagu locative — `dep_rel='obl'` + `feats.Case='Loc'` + przyimek 'w/na/przy' → rola LOCATION (środowisko zdarzenia) w `map_roles()`; przykład: 'Wykonawca pracował w środowisku produkcyjnym' → `LOCATION='środowisko_produkcyjne'` zamiast obl bez roli?
+- Jakie reguły gramatyczne odróżniają FACT od REQUIREMENT w polskim — FACT: czasownik w czasie przeszłym/teraźniejszym trybu oznajmującego ('dostarczył', 'jest') → `speech_act=POTWIERDZENIE`; REQUIREMENT: czasownik modalny ('musi', 'powinien', 'należy') lub tryb rozkazujący → `speech_act=ZOBOWIĄZANIE`; wykrywane przez SemanticMapper na podstawie `feats.Mood` i listy leksemów modalnych?
 - Jak rozszerzyć EventFrame o wielowymiarowy kontekst sytuacyjny — pole `context: SituationalContext` z sub-polami temporal (BEFORE/AFTER/DURING), spatial (LOCATION/SOURCE/DESTINATION), causal (CAUSE/EFFECT)?
 - Jak wielowymiarowy kontekst sytuacyjny EventFrame wpływa na reguły DRL — reguła aktywuje się tylko gdy `context.temporal='BEFORE'` i `speech_act='ZOBOWIĄZANIE'` jednocześnie?
 - Jak SemanticMapper wydobywa wymiar temporal z zależności składniowych — przyimek 'przed' → temporal=BEFORE, 'po' → AFTER, 'podczas' → DURING mapowane z dep_rel nmod/obl?
