@@ -186,6 +186,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować poprawność importu Słowosieci — asercja że węzeł :Synset('nóż') ma krawędź :IS_A do :Synset('narzędzie')?
 - Jak obsłużyć rozejście między relacjami Słowosieci (hiperonimia, meronimia) a krawędziami grafu (:IS_A, :PART_OF)?
 - Jak mierzyć pokrycie Wariantu C (subgraf prawny) — % lematów z NKJP-Legal z co najmniej jednym węzłem :Synset?
+- Jak zintegrować Słowosieć z istniejącym grafem przyczynowo-skutkowym — węzły :Synset wzbogacają :EventFrame o semantykę predykatu?
+- Jak zapytanie Cypher łączy :EventFrame z :Synset Słowosieci — MATCH (e:EventFrame)-[:HAS_SYNSET]->(s:Synset) WHERE s.hypernym = 'działanie'?
+- Jak Słowosieć rozszerza reguły inferencyjne — synonim 'wręczyć' do 'dostarczyć' aktywuje tę samą regułę CONS-02 w DRL?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

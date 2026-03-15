@@ -158,6 +158,8 @@ CoreferenceChain (z W6)
 - Jak zweryfikować kompletność importu Słowosieci — porównaj liczbę synsetów w Neo4j z liczbą w źródle?
 - Jak napisać zapytanie Cypher które zwraca łańcuch :CAUSES jako listę par (source, target) do Mermaid serializacji?
 - Jak zbudować Mermaid.js diagram z wyników Cypher — Python f-string template dla `flowchart LR`?
+- Wygeneruj przykładowy diagram Mermaid.js dla łańcucha compliance: 'dostarcza towar' :CAUSES 'potwierdza odbiór' :CAUSES 'wystawia fakturę'?
+- Jak reprezentować w Mermaid.js węzeł :EventFrame z atrybutem rule_id — etykieta węzła jako "EventFrame.id [CONS-02]"?
 - Jak zaimportować plik plWordNet LMF XML do Neo4j — skrypt Python z iterparse + UNWIND + MERGE Cypher?
 - Jak zmapować elementy LMF XML na węzły Neo4j — LexicalEntry→:Lemma, Synset→:Synset, SynsetRelation→:IS_A?
 - Jak zweryfikować poprawność importu plWordNet — sprawdź że liczba węzłów :Synset = liczba <Synset> w XML?
@@ -192,6 +194,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zintegrować Słowosieć z naszym grafem wiedzy w Neo4j?
 - Jak zintegrować Słowosieć z grafem Neo4j w Fazie 8?
 - Jak zintegrować regułę posiadania z grafem Neo4j?
+- Pokaż jak zintegrować Neo4j jako nową warstwę grafu wiedzy — jak W4 odbiera EventFrame z W2/W3 i zapisuje jako węzeł?
+- Jak zdefiniować granicę odpowiedzialności W4 (persystencja) vs. W5 (wnioskowanie) — co zapisuje W4, co czyta W5?
+- Jak W4 eksponuje API dla W5 — REST HTTP czy neo4j-driver Python z protokołem Bolt?
+- Jak testować integrację W4 z W5 bez uruchomionej instancji Neo4j — neo4j-driver mock czy testcontainers?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

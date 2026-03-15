@@ -175,6 +175,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak obsłużyć dokument wieloklasowy (jednocześnie UMOWA i SPECYFIKACJA_TECHNICZNA) — multi-label vs. priorytetyzacja?
 - Jak wyjaśnić decyzję klasyfikatora — które cechy zadecydowały o klasie UMOWA (SHAP lub lista feature importances)?
 - Jak walidować KlasyfikatorKontekstu na polskich dokumentach prawnych — stratified cross-validation, metryki F1 per klasa?
+- Jak zautomatyzować klasyfikację dokumentów na podstawie YAML front matter — pola title, tags, layer jako sygnały KlasyfikatorKontekstu?
+- Jak wyekstrahować cechy z tytułów sekcji (## nagłówki) dla KlasyfikatorKontekstu — TF-IDF na słowach kluczowych nagłówków?
+- Jak połączyć sygnały YAML metadata (layer: W_x, tags: [ARCH-01]) z sygnałami leksykalnymi w jednym wektorze cech klasyfikatora?
+- Jak klasyfikować dokument bez YAML front matter — fallback na analizę nagłówków i pierwszych 200 tokenów?
 - Jak InferenceEngine korzysta ze synsetów w Neo4j (Wariant A) do rozszerzenia reguł o synonimy?
 - Jak InferenceEngine odpytuje SlowosiecAdapter on-demand (Wariant B) w regule DRL bez blokowania sesji?
 - Jak porównać skuteczność Wariantu A vs. B dla reguły CONS-02 — F1 score na zbiorze testowym?
@@ -187,6 +191,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak kodować kolorem węzły Mermaid.js według ważności — CRITICAL: style fill:#f66, WARNING: style fill:#fa0?
 - Jak osadzić diagram Mermaid.js w raporcie PDF/HTML — inline w Markdown czy eksport do SVG przez mermaid CLI?
 - Jak linkować węzeł Mermaid.js z referencją do zdania źródłowego — click callback z document_id i sentence_id?
+- Wygeneruj przykładowy kompletny diagram Mermaid.js dla raportu audytu CONS-02 — flowchart LR z węzłami zdarzenia i krawędziami :CAUSES?
+- Jak wybrać poziom szczegółowości przykładu Mermaid.js — 3-węzłowy dla prezentacji vs. pełny dla eksportu technicznego?
 
 ### 4. Testowanie
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?
