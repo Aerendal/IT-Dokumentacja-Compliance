@@ -260,6 +260,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jaki format ma `CypherBatch` — lista zapytań MERGE czy jeden bulkowy UNWIND?
 - Jak walidować `EventRoleDict` przed zapisem do Neo4j (JSON Schema)?
 - Jak kodować pewność krawędzi (confidence) jako właściwość relacji?
+- Jaki jest model danych grafu dla relacji `MITIGATED_BY` — pełny schemat: węzły `:ThreatModel {id:str, stride:List[str], mitigated:bool=False}` i `:Mitigation {id:str, control:str, status:'PLANNED'|'IMPLEMENTED'|'VERIFIED', owner:str}`; krawędź `[:MITIGATED_BY {applied_at:date, verified_by:str}]`; constraint: `CREATE CONSTRAINT ON (m:Mitigation) ASSERT m.id IS UNIQUE`; `ThreatModel.mitigated` to cache-flag dla wydajności — aktualizowany triggerem gdy wszystkie powiązane Mitigation mają `status='VERIFIED'`?
 
 ### 3. Implementacja
 
@@ -272,6 +273,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zdefiniować relację `MITIGATED_BY` w Cypher dla SEC-01 — pełny przepis: `MERGE (tm:ThreatModel {id:'tm_api'}) MERGE (m:Mitigation {id:'mit_rate', control:'rate_limiting', status:'IMPLEMENTED', owner:'DevOps'}) MERGE (tm)-[r:MITIGATED_BY]->(m) SET r.applied_at='2026-03-01'`; SEC-01b query: `MATCH (e)-[:HAS_THREAT_MODEL]->(tm) WHERE NOT (tm)-[:MITIGATED_BY]->(:Mitigation {status:'IMPLEMENTED'}) RETURN e, tm`; różnica względem `tm.mitigated=True`: właściwość `owner` i `applied_at` na krawędzi dają pełną historię remediacji?
 - Jak stworzyć graf przyczynowy dla zdarzenia z wymiarem 6 (TIME) — `:EventFrame {id:'e_dostawa', predicate:'dostarczyć'}` z krawędziami: `:HAS_ROLE {role:'TIME'}→:Token {lemma:'2026-01-15', type:'DATE'}`; Cypher kauzalny: `MATCH (e1:EventFrame)-[:HAS_ROLE {role:'TIME'}]->(t:Token), (e1)-[:CAUSES]->(e2:EventFrame) WHERE t.lemma < date() RETURN e1, e2` wykrywa przeterminowane przyczyny aktywnych zobowiązań; wymiar TIME jako predykat warunkowy w grafie kauzalnym?
 - Pokaż formalny model grafu dla zdania — zdanie `"Wykonawca dostarczył SRS dnia 2026-01-15"` → formalizacja: `(e:EventFrame {id:'e1', predicate:'dostarczyć', speech_act:'ASSERT'})-[:HAS_ROLE {role:'AGENT'}]→(:Token {lemma:'Wykonawca'}), -[:HAS_ROLE {role:'PATIENT'}]→(:Token {lemma:'SRS'}), -[:HAS_ROLE {role:'TIME'}]→(:Token {lemma:'2026-01-15', type:'DATE'}), -[:HAS_SYNSET]→(:Synset {id:'dostarczyć.1', domain:'LOGISTICS'})`; 6-wymiarowy model zamknięty przez synset domeny?
+- Pokaż jak modelować relację `MITIGATED_BY` w Cypher dla SEC-01 — rozszerzony przykład: `MATCH (e:EventFrame {domain:'API'})-[:HAS_THREAT_MODEL]->(tm:ThreatModel) WHERE NOT (tm)-[:MITIGATED_BY {verified_by: $auditor}]->(:Mitigation {status:'VERIFIED'}) RETURN e, tm`; parametr `$auditor` pozwala filtrować po osobie weryfikującej; `SET tm.mitigated = (size([(tm)-[:MITIGATED_BY]->(m:Mitigation {status:'VERIFIED'}) | m]) > 0)` aktualizuje cache-flagę po każdej weryfikacji?
+- Jak wdrożyć regułę `OPS-04` w grafie Neo4j jako schemat — węzeł `:BackupProcedure {id:str, frequency:'DAILY'|'WEEKLY'|'MONTHLY', tested:bool, last_test_date:date, rto_hours:int, rpo_hours:int}`; `rto_hours` (Recovery Time Objective) i `rpo_hours` (Recovery Point Objective) jako pola obowiązkowe dla compliance DORA; krawędź `:HAS_BACKUP_PROCEDURE`; OPS-04 dodatkowo może sprawdzać `rto_hours <= 4` dla systemów krytycznych?
 
 ### 4. Testowanie
 
