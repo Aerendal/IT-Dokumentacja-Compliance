@@ -140,6 +140,9 @@ _brak pytań źródłowych w tej kategorii_
 - Napiszmy SlowosiecAdapter do obsługi synonimów w grafie Neo4j — jak adapter zapisuje wyniki get_synonyms() jako węzły :Synset z krawędziami :SYNONYM?
 - Jak SlowosiecAdapter.enrich_graph(lemma, neo4j_session) dodaje węzeł :Synset i krawędzie :IS_SYNONYM do istniejącego :EventFrame?
 - Jak uniknąć duplikatów węzłów :Synset w grafie gdy wielu AGENT używa tego samego synonimów — MERGE zamiast CREATE?
+- Napiszmy kod SlowosiecAdapter do obsługi synonimów — metoda get_synonyms(lemma) → List[str] przeszukuje słownik synsetów i zwraca wszystkie lematy ze wspólnego synsetu?
+- Jak SlowosiecAdapter obsługuje relacje pojęć — metody get_hypernyms(lemma) i get_hyponyms(lemma) traversując graf IS_A w Słowosieci?
+- Jak SlowosiecAdapter.get_related_concepts(lemma, relation_type) zwraca powiązane pojęcia — parametr relation_type: Literal['synonym', 'hypernym', 'hyponym', 'meronym']?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..

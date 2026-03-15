@@ -170,6 +170,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak KnowledgeGapTracker rejestruje zdarzenie nierozpoznane przez żadną regułę DRL — hook after_rule_evaluation gdy activated_rules.is_empty()?
 - Jak KnowledgeGapTracker eksportuje dane do kolejki aktywnego uczenia — JSONL z polami predicate, context, doc_id, timestamp?
 - Jak zintegrować KnowledgeGapTracker z InferenceEngine — rejestracja jako listener Drools WorkingMemoryEventListener?
+- Zaimplementujmy KnowledgeGapTracker do logowania nieznanych struktur składniowych — jak tracker wykrywa zdanie bez parsowania dep_rel (brak węzła root w CoNLL-U z UDPipe)?
+- Jak KnowledgeGapTracker kategoryzuje typy luk — UNKNOWN_WORD (tag ign), UNKNOWN_STRUCTURE (brak root), UNMATCHED_PREDICATE (brak synsetu), UNMATCHED_RULE (brak reguły DRL)?
+- Jak tracker loguje nieznane struktury do bazy aktywnego uczenia — wpis UNKNOWN_STRUCTURE zawiera: raw_sentence, conllu_partial, doc_id, timestamp?
 - Jak wdrożyć Klasyfikator Kontekstu aby system rozumiał typ (jestestwo) dokumentu — umowa, SRS, raport, specyfikacja?
 - Jak KlasyfikatorKontekstu pobiera sygnały z W3 (leksyka), W2 (role) i W6 (koreferencja) do klasyfikacji dokumentu?
 - Jak zdefiniować enum klas dokumentów w KlasyfikatorKontekstu — UMOWA, SRS, RAPORT_AUDYTU, SPECYFIKACJA_TECHNICZNA?

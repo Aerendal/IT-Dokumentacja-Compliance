@@ -110,6 +110,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zdefiniować enum dozwolonych wartości dla tagu [Component:] w schemacie JSON — skąd pobierać listę komponentów?
 - Jak zautomatyzować dodawanie tagu [ARCH-01] do dokumentów warstwy W_x które opisują architekturę komponentu?
 - Jak walidować że tagi [Component:] w plikach Markdown są spójne z listą komponentów w ARCHITECTURE.md?
+- Jak zaprojektować tagi dla różnych stylów dokumentacji — enum: FORMAL (umowy), TECHNICAL (specyfikacje), REGULATORY (regulacje) jako wartości pola `doc_style` w YAML front matter?
+- Jak zaprojektować tagi dla różnych branż — pole `industry` w YAML front matter: CIVIL_LIABILITY, FINANCE, CONSTRUCTION, IT jako enum walidowany przez JSON Schema?
+- Jak zbudować system wielowymiarowych tagów — kombinacja `doc_style`, `industry`, `layer` pozwala filtrować raport audytu po wielu wymiarach jednocześnie?
 - Uruchommy walidator Markdown jako dogfooding lintera — uruchom na plikach dokumentacji własnego projektu.
 - Jak skonfigurować walidator Markdown (markdownlint, pymarkdown) jako pre-commit hook w CI/CD?
 - Jak walidator W0 używa własnych reguł do weryfikacji plików W_x — przykład dogfooding z wynikiem audytu?

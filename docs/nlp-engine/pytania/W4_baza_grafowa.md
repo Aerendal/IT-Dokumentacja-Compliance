@@ -87,6 +87,9 @@ CoreferenceChain (z W6)
 - Jak ograniczyć wykładniczy wzrost kombinacji węzłów ontologii — strategia flat hierarchy zamiast pełnego drzewa hiperonimii?
 - Jak wybrać głębokość drzewa hiperonimii do importu — MAX_DEPTH=3 zamiast pełnego WordNet hierarchy?
 - Podaj kompletny przykład ontologii 3-poziomowej: :OntologyClass('działanie')→:Concept('dostarczyć')→:EventFrame(id='e01')?
+- Jak modelować ontologię zdarzeń by uniknąć wykładniczego wzrostu kombinacji — stosuj Event Type Hierarchy zamiast ad-hoc relacji: :EventType('naruszenie') jako nadklasa dla :EventType('niedostarczenie')?
+- Jak ograniczyć liczbę typów ról per :EventFrame do stałego zestawu 6 ról (AGENT/PATIENT/INSTRUMENT/LOCATION/TIME/MANNER) zamiast nieskończonej listy relacji ad-hoc?
+- Jak walidować że nowy :EventFrame nie przekracza dozwolonej liczby węzłów per zdanie — APOC constraint max_roles_per_event = 6 zamiast dowolnej liczby?
 
 ### 2. Kontrakty danych
 - Jak zapisać węzeł pojęcia w formacie JSON dla grafu?
