@@ -199,3 +199,48 @@ SlowosiecAdapter           WalentyAdapter
 - Jak logować "dlaczego synset X został wybrany" — ścieżka: MFS / kontekst / Walenty?
 - Jak przechowywać confidence WSD dla każdego tokenu w raporcie?
 - Jak śledzić wersję Słowosieci użytą w danym przebiegu (hash pliku relacji)?
+
+---
+
+## Rozszerzalność i skalowanie (kluczowe dla projektu zarobkowego)
+
+### Stopniowe dodawanie słów i zbitek wyrazowych
+
+- Jak dodać nowy leksem do systemu (neologizm, termin branżowy) bez przeładowania całej Słowosieci?
+- Jak hot-add nowy synset do `SlowosiecAdapter` w czasie działania serwisu?
+- Jak system wykryje, że słowo pojawia się wystarczająco często w korpusie, żeby zasłużyć na nowy synset?
+- Jak dodać nową kolokację (zbitkę wyrazową) do `PhraseologyDetector.mwe_dict` bez restartu?
+- Jak mierzyć siłę kolokacji (Pointwise Mutual Information, t-score) dla nowo dodanych par słów?
+- Jak zaimplementować `add_lemma(form, synset_id, pos)` — inkrementalne rozszerzenie słownika?
+- Jakie testy regresyjne uruchomić po każdym dodaniu nowego leksemu?
+- Jak walidować, że nowy leksem nie łamie istniejących reguł WSD?
+
+### Stopniowe skalowanie zasobu
+
+- Jakie jest zachowanie `SlowosiecAdapter` przy 10k / 100k / 1M synsetów — gdzie jest punkt krytyczny?
+- Jak cachować wyniki `get_synsets()` żeby unikać powtarzanych lookupów przy 1000 zdań?
+- Jak lazy-load domeny tematyczne Słowosieci (załaduj prawnicze tylko gdy domena=prawna)?
+- Jak wersjonować przyrostowe dodawanie słów — git tag per "stan słownika" danego projektu?
+- Jak zaimplementować `diff_lexicon(v1, v2)` pokazujący co się zmieniło między wersjami słownika?
+
+### Stopniowe rozszerzanie MWE i idiomów
+
+- Jak zaimplementować `learn_mwe(corpus)` — automatyczne wykrywanie nowych MWE z korpusu?
+- Jak mierzyć pokrycie idiomów: ile % zdań w korpusie testowym zawiera przynajmniej 1 MWE?
+- Jak stopniowo rozszerzać `mwe_dict` od najprostszych (bigrams) do złożonych (trigrams, idiomy)?
+- Jak testować regresję po dodaniu nowego idiom — czy stare zdania nadal są poprawnie parseowane?
+- Jak PhraseologyDetector obsługuje nakładające się MWE ("wziąć pod uwagę wzgląd" — 2 idiomy jednocześnie)?
+
+### Inkrementalne aktualizacje bez restartu
+
+- Jak Walenty obsługuje nowe czasowniki — czy reload ramy walencyjnej wymaga restartu silnika?
+- Jak zaimplementować `register_verb_frame(verb, roles)` — dynamiczne dodawanie ram walencyjnych?
+- Jak powiadomić W5 (InferenceEngine) o nowych synsetach bez recompilacji reguł Drools?
+- Jak inkrementalnie aktualizować graf synonimów w Neo4j (W4) po dodaniu nowego synset?
+
+### Obsługa złożoności zdań (skalowanie lingwistyczne)
+
+- Jak WSD zachowuje się dla zdań złożonych podrzędnie — czy kontekst z zdania podrzędnego liczy się?
+- Jak PhraseologyDetector radzi sobie ze zdaniami o długości >50 tokenów (nested MWE)?
+- Jak `SlowosiecAdapter` obsługuje sfrazeologizowane całości ("pies ogrodnika") w kontekście całego akapitu?
+- Czy Lesk WSD działa lepiej przy akapicie (więcej kontekstu) niż przy jednym zdaniu?

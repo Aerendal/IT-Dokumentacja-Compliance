@@ -210,3 +210,36 @@ CoreferenceChain (z W6)
 - Jak każdy węzeł w Neo4j przechowuje metadane: źródłowy dokument, zdanie, data importu?
 - Jak wygenerować raport "skąd pochodzi ta krawędź AGENT" — tracking do oryginalnego zdania?
 - Jak Neo4j loguje zapytania Cypher dla celów debugowania i audytu compliance?
+
+---
+
+## Rozszerzalność i skalowanie
+
+### Stopniowe skalowanie grafu
+
+- Jak Neo4j zachowuje się przy 10k / 100k / 1M / 10M węzłów — gdzie są progi degradacji?
+- Jakie indeksy są obowiązkowe przy każdym progu skali (pełnotekstowy, composite, point)?
+- Jak zaimplementować pagination dla zapytań Cypher zwracających >10k wyników?
+- Jak monitorować fragment heap Neo4j (Page Cache Hit Ratio) i kiedy zwiększyć pamięć?
+- Jak testować wydajność `build_document()` dla dokumentu 10 zdań / 100 zdań / 1000 zdań?
+
+### Inkrementalne dodawanie wiedzy
+
+- Jak dodać nową domenę (np. medyczna) do grafu bez przebudowywania istniejącej (prawna)?
+- Jak zaimplementować `add_domain(name, ontology_path)` — dodanie nowej ontologii domenowej?
+- Jak wykrywać konflikty po dodaniu nowej ontologii (nowe węzły IS_A naruszające istniejącą hierarchię)?
+- Jak inkrementalnie importować nowe hiperonimie ze Słowosieci po aktualizacji do nowej wersji?
+- Jak zaimplementować `diff_graph(snapshot_1, snapshot_2)` — porównanie stanu grafu między wersjami?
+
+### Skalowanie importu i batch operations
+
+- Jak zoptymalizować import 1M relacji — APOC periodic.commit vs UNWIND batch vs CSV bulk import?
+- Jak obsłużyć import równoległy (4 workerów) bez race condition na MERGE?
+- Jak zaimplementować idempotentny import — uruchomienie dwa razy daje ten sam stan grafu?
+- Jak testować skalowalność: `stress_test_neo4j(nodes=10k, rels=50k)` — czas + błędy?
+
+### Rozszerzanie schematu grafu
+
+- Jak dodać nową właściwość do istniejącego węzła `:Event` bez migracji wszystkich węzłów?
+- Jak wersjonować schemat grafu — gdy `:Concept` dostaje nowe pole `domain`, co ze starymi węzłami?
+- Jak zaimplementować schema migrations dla Neo4j (analogicznie do Alembic dla SQL)?

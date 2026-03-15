@@ -197,3 +197,29 @@ ZANIM warstwa zostanie uznana za gotową do integracji:
 | `MFS` | Most Frequent Sense — baseline WSD | W3 |
 | `LAS` | Labeled Attachment Score — metryka parsera | W1 |
 | `UAS` | Unlabeled Attachment Score — metryka parsera | W1 |
+
+---
+
+## Strategia stopniowego rozszerzania systemu
+
+Poniżej zestawienie kluczowych osi ekspansji i gdzie szukać pytań:
+
+| Oś rozszerzania | Gdzie pytania | Kluczowe pytania |
+|----------------|---------------|-----------------|
+| **Nowe słowa / leksemy** | W3 §Rozszerzalność | `add_lemma()`, OOV detection, hot-add synset |
+| **Nowe zbitki wyrazowe (MWE/kolokacje)** | W3 §Rozszerzalność | `learn_mwe(corpus)`, MI score, bigrams → trigrams |
+| **Stopniowa kompleksja zdań** | W1 §Rozszerzalność | proste → złożone → prawne, `sentence_complexity_score` |
+| **Nowe role semantyczne** | W2 §Rozszerzalność | `register_role()`, BENEFICIARY, MANNER, CAUSE |
+| **Nowe domeny (prawna → medyczna → wojskowa)** | W5, W8 §Rozszerzalność | `load_domain()`, konflikty reguł domenowych |
+| **Skalowanie grafu (10k → 10M węzłów)** | W4 §Rozszerzalność | progi Neo4j, indeksy, APOC bulk import |
+| **Skalowanie API (10 → 1000 req/s)** | W7 §Rozszerzalność | horizontal scaling, circuit breaker, canary deploy |
+| **Inkrementalne reguły wnioskowania** | W5 §Rozszerzalność | hot-reload DRL, rule salience, eksplozja reguł |
+| **Przyrostowy audyt compliance** | W8 §Rozszerzalność | `incremental_audit()`, diff raportów, historia audytów |
+
+### Zasada: nie burzyć, tylko rozszerzać
+
+> Każda operacja dodania nowego słowa, reguły, domeny lub endpointu MUSI:
+> 1. Nie łamać istniejących testów (non-breaking)
+> 2. Być pokryta testem regresyjnym przed wdrożeniem
+> 3. Być wersjonowana z opisem zmiany (changelog)
+> 4. Nie zmieniać istniejących kontraktów danych (backwards-compatible schema)

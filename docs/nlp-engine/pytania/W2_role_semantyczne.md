@@ -187,3 +187,29 @@ DependencyTree (CoNLL-U z W1)
 - Jak logować "dlaczego Jan=AGENT" — ścieżka decyzji: `nsubj → Case=Nom → brak nsubj:pass → AGENT`?
 - Jak przechowywać confidence score przypisania roli dla raportu do klienta?
 - Jak śledzić, który model UDPipe + która wersja Morfeusza wygenerowały dane role?
+
+---
+
+## Rozszerzalność i skalowanie
+
+### Stopniowe dodawanie nowych ról semantycznych
+
+- Jak dodać nową rolę (np. BENEFICIARY, MANNER, CAUSE) do `SemanticMapper` bez łamania istniejących testów?
+- Jak zaimplementować `register_role(name, dep_labels, case_features)` — dynamiczne role?
+- Jak testować regresję po dodaniu nowej roli — czy stare zdania nadal mają poprawne AGENT/PATIENT?
+- Jakie są kryteria decydujące, że rola wymaga nowego pola w `EventRoleDict` vs nowej krawędzi w grafie?
+- Jak stopniowo rozszerzać mapowanie: najpierw AGENT/PATIENT → potem INSTRUMENT/LOCATION → potem TIME/CAUSE?
+
+### Skalowanie na złożone struktury zdań
+
+- Jak `SemanticMapper` obsługuje zdania z wieloma AGENT (podmiot zbiorowy: "Jan i Maria zabili")?
+- Jak mapować role dla nominalizacji ("zabójstwo Jana" — kto jest AGENT?)?
+- Jak obsługiwać strony bierne wielokrotne ("Zwierzę zostało zabite i zjedzone")?
+- Jak testować W2 na zdaniach prawnych (zdania wieloklauzowe, pasywne, z nominalnym orzecznikiem)?
+- Jak stopniowo rozszerzać słownik przyimków z 20 do 100 (kolejne domeny: medyczna, wojskowa, prawna)?
+
+### Inkrementalne reguły mapowania
+
+- Jak hot-add nową regułę przyimkową do `SemanticMapper` bez restartu pipeline?
+- Jak wersjonować zestaw reguł mapowania osobno od kodu (YAML/JSON reguły vs Python logika)?
+- Jak mierzyć coverage reguł — ile % zdań jest pokrytych przez aktualne reguły przyimkowe?

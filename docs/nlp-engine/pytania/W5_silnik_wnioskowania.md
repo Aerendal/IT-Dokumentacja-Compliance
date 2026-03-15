@@ -222,3 +222,37 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Jak logować pełny ślad wnioskowania: "reguła X aktywowana bo warunek Y spełniony przez fakt Z"?
 - Jak przechowywać activation trace per zdanie dla celów dowodowych (odpowiedzialność cywilna)?
 - Jak wygenerować raport "dlaczego system sklasyfikował zdarzenie jako kłusownictwo"?
+
+---
+
+## Rozszerzalność i skalowanie
+
+### Stopniowe dodawanie reguł wnioskowania
+
+- Jak dodać nową regułę dedukcji bez recompilacji całego zbioru reguł?
+- Jak hot-reload reguł Drools bez restartu serwisu (KieScanner, incremental update)?
+- Jak zaimplementować `register_rule(name, condition, action)` — dynamiczne reguły Python?
+- Jak testować nową regułę w izolacji, nie uruchamiając wszystkich pozostałych?
+- Jak mierzyć coverage reguł — ile % zdarzeń z testowego korpusu aktywuje przynajmniej 1 regułę?
+
+### Stopniowe dodawanie domen (prawna → medyczna → wojskowa)
+
+- Jak zorganizować reguły DRL per domena — osobne pliki `.drl` czy jeden globalny?
+- Jak zaimplementować `load_domain(name)` — lazy loading reguł domenowych?
+- Jak wykrywać konflikty między regułami z różnych domen (reguła prawna vs medyczna dają sprzeczne klasyfikacje)?
+- Jak testować, że dodanie domeny medycznej nie zmienia wyników dla domeny prawnej?
+- Jak stopniowo rozszerzać `StateMatrix` o nowe typy stanów domenowych?
+
+### Skalowanie liczby reguł
+
+- Jakie są progi wydajności Drools dla 100 / 1000 / 10000 reguł — czas kompilacji i czas ewaluacji?
+- Jak zarządzać eksplozją reguł przez Agenda Groups (partycjonowanie per domena)?
+- Jak zaimplementować rule salience — priorytetowanie reguł bezpieczeństwa nad regułami informacyjnymi?
+- Jak testować, że nowe reguły nie powodują nieskończonej pętli dedukcji?
+- Jak profilować, które reguły są najczęściej aktywowane (reguła → liczba aktywacji)?
+
+### Inkrementalne uczenie się
+
+- Jak system uczy się nowych wzorców z corpus feedback — semi-supervised rule induction?
+- Jak zaimplementować `suggest_rule(false_negative_examples)` — propozycja nowej reguły?
+- Jak weryfikować automatycznie wygenerowane reguły przed wdrożeniem (human-in-the-loop)?

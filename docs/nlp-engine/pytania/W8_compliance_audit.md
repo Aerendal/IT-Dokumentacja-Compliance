@@ -201,3 +201,37 @@ Tekst z NKJP (XML)
 - Jak każdy alarm compliance (RISK-01, CONS-02) jest powiązany z konkretnym dokumentem, zdaniem, regułą?
 - Jak przechowywać historię audytów per projekt dla celów dowodowych (odpowiedzialność cywilna)?
 - Jak wygenerować raport "co system wykrył w projekcie X, kiedy, przez kogo zatwierdzony"?
+
+---
+
+## Rozszerzalność i skalowanie
+
+### Stopniowe rozszerzanie reguł audytu
+
+- Jak dodać nową regułę compliance (RISK-02, RISK-03) bez modyfikowania istniejących reguł?
+- Jak zaimplementować `register_compliance_rule(id, condition, severity)` — dynamiczne reguły?
+- Jak testować nową regułę compliance na historycznych danych bez re-audytowania wszystkiego?
+- Jak stopniowo rozszerzać NKJPBridge o nowe mapowania tagów MSD bez naruszania istniejących?
+- Jak wersjonować reguły audytu — changelog per projekt z opisem co reguła sprawdza i dlaczego?
+
+### Skalowanie na duże korpusy
+
+- Jak stress_test.py zachowuje się dla 1k / 10k / 100k zdań — czas, BRIDGE_ERROR rate, zużycie RAM?
+- Jak zaimplementować streaming audit — przetwarzanie zdań po jednym bez ładowania całego korpusu?
+- Jak EventFrame radzi sobie ze zdaniami wielokrotnie złożonymi (>5 klauzul)?
+- Jak StateMatrix skaluje się przy tysiącach równoległych wniosków (thread-safe deduplikacja)?
+- Jak zaimplementować incremental audit — audytuj tylko nowe dokumenty, nie cały projekt?
+
+### Stopniowe rozszerzanie na nowe domeny
+
+- Jak NKJPBridge obsługuje dokumenty z nowej domeny (np. medycznej) — czy wymaga nowych mapowań?
+- Jak dodać nowy słownik domenowy do AuditEngine (np. terminy prawne → nowe reguły RISK)?
+- Jak wykrywać, że nowa domena wymaga nowych reguł — analiza BRIDGE_ERROR rate per domena?
+- Jak testować, że reguły compliance dla domeny prawnej nie generują false positive w medycznej?
+- Jak zaimplementować `audit_domain(documents, domain='legal')` — audyt z filtrowaniem domenowym?
+
+### Audyt przyrostowy (incremental audit trail)
+
+- Jak śledzić zmiany w projekcie między audytami — "w wersji v2 pojawiły się 3 nowe luki vs v1"?
+- Jak zaimplementować diff raportów luk między dwoma datami?
+- Jak przechowywać pełną historię audytów (100 audytów × 1000 dokumentów) efektywnie?

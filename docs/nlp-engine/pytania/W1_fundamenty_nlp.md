@@ -329,3 +329,38 @@ Plik NKJP (XML/TEI P5)
 - Jak logować, który model UDPipe (wersja, hash pliku) wygenerował dany wynik?
 - Jak zachować lad dowodowniczy: dla każdego tokenu — z jakiego zdania pochodzi, z jakiego dokumentu?
 - Jak wygenerować raport "dlaczego lemat X zamiast Y" dla procesu wyjaśniającego klientowi?
+
+---
+
+## Rozszerzalność i skalowanie
+
+### Stopniowe komplikowanie zdań (progressive sentence complexity)
+
+- Jak W1 obsługuje sekwencję: zdanie proste → zdanie złożone → zdanie wielokrotnie złożone?
+- Jak UDPipe radzi sobie ze zdaniem 80-tokenowym (typowe w dokumentach prawnych)?
+- Jak testować W1 dla każdego poziomu kompleksji osobno — test suite per typ zdania?
+- Jak zaimplementować `sentence_complexity_score(tree)` — metryka złożoności drzewa składniowego?
+- Jak wykrywać zdania z eliptyczną strukturą (bez czasownika, bez podmiotu) w drzewie UDPipe?
+- Jak stopniowo budować oracle dataset: najpierw 50 prostych zdań → 50 złożonych → 50 prawnych?
+
+### Stopniowe rozszerzanie słownictwa (pipeline NKJP)
+
+- Jak inkrementalnie dodawać nowe zdania z NKJP bez przetwarzania całego korpusu od nowa?
+- Jak wykrywać nowe OOV (Out-of-Vocabulary) formy w nowych dokumentach i logować je?
+- Jak zaimplementować `enrich_morfeusz(form, lemma, msd)` — dynamiczne dodawanie form?
+- Jak pipeline NKJP radzi sobie z plikami XML o rozmiarach 1 MB / 100 MB / 1 GB?
+- Jakie są techniki streamowego parsowania TEI XML (SAX zamiast DOM) dla dużych plików?
+
+### Skalowanie batch processingu
+
+- Jak przetworzyć 100k zdań z NKJP w trybie batch — równolegle czy sekwencyjnie?
+- Jak zaimplementować `batch_lemmatize(sentences, workers=4)` z progress bar?
+- Jakie są bottlenecks pipeline W1 przy 1000 zdań/s — Morfeusz, UDPipe czy I/O?
+- Jak testować wydajność W1 dla różnych rozmiarów batch (1, 10, 100, 1000 zdań)?
+- Jak zaimplementować checkpoint — zapis stanu przetwarzania co 1000 zdań (resume po crash)?
+
+### Inkrementalne aktualizacje modeli
+
+- Jak aktualizować model UDPipe bez przerywania działającego serwisu?
+- Jak zachować backwards-compatibility testów gdy model lematyzacji jest ulepszony?
+- Jak wersjonować pliki modeli (morfeusz.dict, udpipe.model) — hash SHA + git LFS?

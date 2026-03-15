@@ -143,3 +143,30 @@ Klient (HTTP / Thrift)
 - Jak każde żądanie do API jest logowane z request_id, user_id, timestamp?
 - Jak przechowywać pełny ślad żądanie -> pipeline steps -> wynik dla celów dowodowych?
 - Jak wygenerować raport "co system zwrócił klientowi X dla tekstu Y w dacie Z"?
+
+---
+
+## Rozszerzalność i skalowanie
+
+### Skalowanie throughput API
+
+- Jak API zachowuje się przy 10 / 100 / 1000 równoległych żądaniach — gdzie jest punkt nasycenia?
+- Jak zaimplementować horizontal scaling — kilka instancji FastAPI za load balancerem?
+- Jak Neo4j (W4) zachowuje się przy 1000 równoległych read queries z W7?
+- Jak zaimplementować circuit breaker dla W7 → W4 (Neo4j) przy przeciążeniu?
+- Jak testować API pod obciążeniem — locust, k6, czy pytest-benchmark?
+
+### Stopniowe rozszerzanie API (nie łamiące)
+
+- Jak dodać nowy endpoint `/v2/analyze-deep` bez deprecacji `/v1/analyze`?
+- Jak zaimplementować feature flags — włączanie nowych funkcji pipeline bez nowego deploy?
+- Jak wersjonować `.thrift` IDL — backward-compatible zmiany vs breaking changes?
+- Jak zaimplementować `OPTIONS /analyze` zwracający capabilities aktualnej wersji?
+- Jak stopniowo włączać nowe warstwy (W2, W3, W4) do odpowiedzi API bez łamania klientów?
+
+### Inkrementalne wdrożenia
+
+- Jak zaimplementować canary deployment — 10% ruchu na nową wersję pipeline?
+- Jak monitorować regresję po wdrożeniu — automatyczny A/B test wyników W1 v1 vs v2?
+- Jak rollbackować do poprzedniej wersji pipeline bez utraty wyników zbuforowanych w Neo4j?
+- Jak obsługiwać graceful shutdown — nie przerywać przetwarzania w toku przy restarcie?
