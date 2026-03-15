@@ -192,6 +192,8 @@ Plik NKJP (XML/TEI P5)
 - Co oznacza znacznik `ign` w tagach MSD Morfeusza — token nieanalizowany, spoza słownika, potencjalny neologizm prawny lub techniczny?
 - Jak technicznie powiązać znacznik `ign` z modułem aktywnego uczenia — tokeny z tagiem `ign` eksportowane do JSONL jako kandydaci do etykietowania przez eksperta?
 - Jak zaimplementować KnowledgeGapTracker w warstwie W1 — każdy token z tagiem `ign` rejestrowany jako potencjalna luka wiedzy morfosyntaktycznej?
+- Jak KnowledgeGapTracker przechwytuje token ign w W1 — hook po `morfeusz.analyse(token)` gdy wynik zawiera tag MSD 'ign': `tracker.capture_ign(token)`?
+- Jak KnowledgeGapTracker łączy token ign z kontekstem zdaniowym — wpis UNKNOWN_WORD zawiera pozycję w zdaniu, sąsiednie tokeny i doc_id dla dalszego etykietowania?
 
 ### 4. Testowanie
 - Jakie konkretne dane z NKJP pobrać do testów lematyzacji?

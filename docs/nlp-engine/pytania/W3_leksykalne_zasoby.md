@@ -145,6 +145,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak SlowosiecAdapter.get_related_concepts(lemma, relation_type) zwraca powiązane pojęcia — parametr relation_type: Literal['synonym', 'hypernym', 'hyponym', 'meronym']?
 - Stwórzmy skrypt kompilujący plWordNet do zoptymalizowanej bazy SQLite — skrypt parsuje plik LMF XML i wstawia synsets, lemmas i relations do plwordnet.db przez iterparse + batch INSERT?
 - Jak zaindeksować bazę SQLite plWordNet dla wydajności — indeks na kolumnach `lemma` i `synset_id` dla szybkich zapytań get_synonyms(lemma)?
+- Jakie złożone indeksy SQLite przyspieszą zapytania relacji semantycznych — `CREATE INDEX idx_rel_compound ON relation(synset_id, relation_type, target_id)` dla get_hyponyms()?
+- Jak użyć COVERING INDEX w SQLite dla get_synonyms(lemma) — indeks na `(lemma, synset_id)` pokrywa zapytanie SELECT bez odczytu tabeli głównej?
+- Jak sprawdzić plan zapytania w SQLite — `EXPLAIN QUERY PLAN SELECT ... FROM relation WHERE synset_id=?` aby zweryfikować czy indeks jest używany?
 - Jak SlowosiecAdapter korzysta ze skompilowanej bazy SQLite zamiast pliku tekstowego — connection pool, parametryczne zapytania SELECT, LRU cache wyników?
 - Jak weryfikować kompletność skompilowanej bazy SQLite — SELECT COUNT(*) z każdej tabeli i porównanie z liczbą `<Synset>` w źródłowym LMF XML?
 - Jak wygląda główna funkcja compile_plwordnet.py — `if __name__ == '__main__': compile(src_xml, dest_db, batch_size=1000)` z argparse dla --src i --dest?
@@ -153,6 +156,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zaprojektować strukturę tagów dla branżowych słowników terminologicznych — dodatkowe pole `domain` w tabeli SQLite: LEGAL, CONSTRUCTION, IT, FINANCE mapowane na branżowy synset?
 - Jak tagi branżowe integrują się z SlowosiecAdapter — `get_synonyms(lemma, domain='LEGAL')` filtruje synonimy tylko z terminologii prawniczej danej branży?
 - Jak wersjonować branżowe słowniki terminologiczne — osobna tabela `domain_overrides` w plwordnet.db nadpisująca relacje dla konkretnej domeny?
+- Jak stworzyć słownik terminologiczny dla branży CONSTRUCTION — tabele: `domain_lemma(lemma, domain, synset_id)` + `domain_relation(synset_id, relation_type, target_synset_id, domain)`?
+- Jak zasilić `domain_overrides` terminami z zewnętrznego glosariusza branżowego — import CSV: `parse(glossary.csv)` → `INSERT INTO domain_overrides(lemma, synset_id, domain)` z rollbackiem przy konflikcie?
+- Jak przetestować kompletność słownika terminologicznego dla branży LEGAL — `SELECT COUNT(*) FROM domain_lemma WHERE domain='LEGAL'` vs liczba terminów w glosariuszu źródłowym?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..
@@ -231,6 +237,9 @@ _brak pytań źródłowych w tej kategorii_
 - **Pułapka 3:** Słowosieć nie pokrywa neologizmów technicznych ("konteneryzacja", "mikroserwis") — `get_synsets("docker")` zwróci pusty wynik, a system milcząco pominie wzbogacenie semantyczne.
 - **Pułapka 4:** Walenty ma luki dla czasowników niekonwencjonalnych i frazeologizmów — `get_valency_frame("kłaść do głowy")` zwróci `None`, co może wywołać `NullPointerException` w `SemanticMapper`.
 - **Pułapka 5:** Pełne ładowanie Słowosieci do RAM zajmuje ~2 GB — w środowiskach z limitem 1 GB (containers, serverless) `SlowosiecAdapter` uruchomi się, ale spowolni do nieużywalności przez swapping.
+- Jaki jest faktyczny rozmiar plwordnet.db — plik SQLite ~200 MB, z page cache OS ~500 MB; ładowanie do słownika Python to ~2 GB; na maszynach ≥4 GB RAM SQLite z lazy load wystarcza?
+- Kiedy SQLite wystarczy zamiast Neo4j dla plWordNet — jeśli zapytania to tylko get_synonyms/get_hypernyms bez grafowych przeszukiwań transytywnych, SQLite jest szybszym i prostszym wyborem?
+- Jak uruchomić SlowosiecAdapter w trybie lazy przez SQLite mmap — `PRAGMA mmap_size=536870912` zamiast pełnego ładowania do pamięci Python?
 - **Pułapka 6:** Homografy ("zamek" = budowla / mechanizm) — `get_synsets("zamek")` zwróci oba synsets bez wskazania który; bez WSD (W3) downstream W2 dostanie losowy synset.
 
 ### 1. Architektura

@@ -171,6 +171,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak testować Soft Matching — asercja że 'przekazać' pasuje do reguły zdefiniowanej dla 'dostarczyć' przez wspólny synset?
 - Zintegrujmy SlowosiecAdapter z CausalChainBuilder do łączenia zdarzeń — CausalChainBuilder.link_events(e1, e2) sprawdza SlowosiecAdapter.get_synonyms(e1.predicate) zanim emituje krawędź :CAUSES?
 - Jak CausalChainBuilder decyduje czy dwa EventFrame połączyć :CAUSES bazując na Słowosieci — e1.predicate ∈ get_synonym_set(rule.predicate) → MERGE (e1)-[:CAUSES]->(e2)?
+- Jak wywołać SlowosiecAdapter wewnątrz CausalChainBuilder — inicjalizacja `self._lexicon = SlowosiecAdapter(db_path)` w konstruktorze, wywołanie `self._lexicon.get_synonyms(predicate)` w metodzie `link_events()`?
+- Jak obsłużyć wyjątek LookupError gdy predykat nie istnieje w Słowosieci — fallback do dopasowania leksykalnego (exact match) zamiast semantycznego?
 - Zaimplementujmy klasę KnowledgeGapTracker do logowania nieznanych zdarzeń i słów — jakie typy luk rozróżnia (UNKNOWN_PREDICATE, MISSING_SYNSET, UNMATCHED_RULE)?
 - Jak KnowledgeGapTracker rejestruje zdarzenie nierozpoznane przez żadną regułę DRL — hook after_rule_evaluation gdy activated_rules.is_empty()?
 - Jak KnowledgeGapTracker eksportuje dane do kolejki aktywnego uczenia — JSONL z polami predicate, context, doc_id, timestamp?
@@ -180,6 +182,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak tracker loguje nieznane struktury do bazy aktywnego uczenia — wpis UNKNOWN_STRUCTURE zawiera: raw_sentence, conllu_partial, doc_id, timestamp?
 - Jak zintegrować KnowledgeGapTracker z potokiem analizy zdarzeń — w EventFrame extraction loop: dla każdego EventFrame wywołaj `tracker.check_predicate(frame.predicate)` zanim trafi do InferenceEngine?
 - Jak KnowledgeGapTracker wchodzi w potok W2→W5 — po SemanticMapper.extract() `tracker.check(event)` przed przekazaniem EventFrame do InferenceEngine?
+- Napiszmy kod KnowledgeGapTracker — metoda `capture_ign(token)` gdy `token.tag == 'ign'`: `self._gaps.append({'type': 'UNKNOWN_WORD', 'form': token.form, 'doc_id': self._doc_id})`?
+- Jak KnowledgeGapTracker przechwytuje osierocone zdarzenia — metoda `capture_orphan(event: EventFrame)` gdy event nie ma żadnej krawędzi :CAUSES w grafie?
+- Jak eksportować zebrane luki do pliku JSONL — metoda `dump_jsonl(path)` iteruje `self._gaps` i zapisuje każdy wpis przez `json.dumps(gap, ensure_ascii=False)`?
 - Jak wdrożyć Klasyfikator Kontekstu aby system rozumiał typ (jestestwo) dokumentu — umowa, SRS, raport, specyfikacja?
 - Jak KlasyfikatorKontekstu pobiera sygnały z W3 (leksyka), W2 (role) i W6 (koreferencja) do klasyfikacji dokumentu?
 - Jak zdefiniować enum klas dokumentów w KlasyfikatorKontekstu — UMOWA, SRS, RAPORT_AUDYTU, SPECYFIKACJA_TECHNICZNA?
