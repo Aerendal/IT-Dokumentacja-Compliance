@@ -84,6 +84,9 @@ CoreferenceChain (z W6)
 - Jak obsłużyć zmiany wersji ontologii (v1→v2 nowy typ węzła) bez utraty istniejących krawędzi w Neo4j?
 - Jak modelować kauzalność dwukierunkową (A :CAUSES B i B :CAUSES A) — wykrycie cyklu i decyzja architektoniczna?
 - Jakie indeksy (INDEX) stworzyć w Neo4j dla wydajnych zapytań compliance — po source_doc_id i predicate?
+- Jak ograniczyć wykładniczy wzrost kombinacji węzłów ontologii — strategia flat hierarchy zamiast pełnego drzewa hiperonimii?
+- Jak wybrać głębokość drzewa hiperonimii do importu — MAX_DEPTH=3 zamiast pełnego WordNet hierarchy?
+- Podaj kompletny przykład ontologii 3-poziomowej: :OntologyClass('działanie')→:Concept('dostarczyć')→:EventFrame(id='e01')?
 
 ### 2. Kontrakty danych
 - Jak zapisać węzeł pojęcia w formacie JSON dla grafu?
@@ -208,6 +211,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak obsłużyć migrację schematu grafu gdy nowy EventFrame dodaje właściwość wymaganą dla istniejących węzłów?
 - Jaka jest konsekwencja wyboru ArangoDB zamiast Neo4j dla schematu i zapytań zdefiniowanych w Cypher?
 - Jak zapobiec nieograniczonemu wzrostowi grafu przy przetwarzaniu tysięcy dokumentów bez archiwizacji starych węzłów?
+- Jaka jest pułapka wykładniczego wzrostu kombinacji w ontologii — każde :EventFrame z 6 rolami × N synsetów = 6N węzłów per zdanie?
+- Jak ograniczyć kombinatoryczną eksplozję relacji hiperonimii — import tylko pierwszego poziomu hiperonimu zamiast pełnego drzewa?
 
 ## Pytania uzupełniające
 - **Pułapka 4:** MERGE w Neo4j bez unikalnego indeksu tworzy duplikaty węzłów — `MERGE (n:Concept {id: x})` bez `CREATE INDEX FOR (n:Concept) ON (n.id)` jest O(n) i duplikuje dane.

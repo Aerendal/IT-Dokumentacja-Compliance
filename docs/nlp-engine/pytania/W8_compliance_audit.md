@@ -130,8 +130,12 @@ Tekst z NKJP (XML)
 - Jak AuditEngine mapuje typ dokumentu z KlasyfikatorKontekstu na zestaw reguł compliance — słownik type→ruleset?
 - Jak obsłużyć dokument z typem UNKNOWN w AuditEngine — zastosuj zestaw reguł bazowych czy odrzuć?
 - Jak logować decyzję KlasyfikatorKontekstu w raporcie audytu dla celów traceability?
+- Jak zaimplementować szablony walidacyjne per typ dokumentu w AuditEngine — klasa DocumentTemplate z listą obligatoryjnych reguł?
+- Jak AuditEngine weryfikuje że audytowany dokument spełnia szablon walidacyjny — missing sections vs. required sections diff?
 - Jak raport audytu compliance osadza diagram Mermaid.js łańcucha przyczynowego naruszenia CONS-02?
 - Jak renderować Mermaid.js w raporcie Markdown — znacznik ```mermaid z zawartością flowchart LR?
+- Stwórzmy wizualizację grafu zdarzeń w Mermaid.js dla raportu audytu — jak sekcja raportu zawiera osadzony diagram z konkretnymi EventFrame?
+- Jak parametryzować wizualizację Mermaid.js w raporcie — tryb skrócony (top 5 węzłów) vs. pełny (cały łańcuch) zależnie od severity?
 
 ### 4. Testowanie
 - Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?

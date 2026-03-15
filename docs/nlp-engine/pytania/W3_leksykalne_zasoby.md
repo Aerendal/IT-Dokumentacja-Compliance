@@ -133,6 +133,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zaimplementować lazy loading w SlowosiecAdapter aby uniknąć ładowania 2 GB Słowosieci przy starcie serwisu?
 - Jak testować SlowosiecAdapter — test używa prawdziwej Słowosieci czy mocka z kilkoma synsetami testowymi?
 - Jak SlowosiecAdapter cachuje wyniki zapytań — LRU cache per sesja czy trwały cache na dysku?
+- Jak stworzyć SlowosiecAdapter do wczytywania pliku `jednostki.txt` — jaki jest format linii (id TAB lemma TAB pos)?
+- Jak parsować plik `synsety.txt` Słowosieci — jaki jest format rekordu synsetu (synset_id TAB lista lematów oddzielona przecinkami)?
+- Jak zaimplementować `SlowosiecAdapter._load_from_files(units_path, synsets_path)` — inicjalizacja słownika lematów i synsetów?
+- Jak walidować integralność pliku `jednostki.txt` — czy każde id jednostki z `synsety.txt` ma odpowiadający wpis w `jednostki.txt`?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..
@@ -189,6 +193,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zintegrować Słowosieć z istniejącym grafem przyczynowo-skutkowym — węzły :Synset wzbogacają :EventFrame o semantykę predykatu?
 - Jak zapytanie Cypher łączy :EventFrame z :Synset Słowosieci — MATCH (e:EventFrame)-[:HAS_SYNSET]->(s:Synset) WHERE s.hypernym = 'działanie'?
 - Jak Słowosieć rozszerza reguły inferencyjne — synonim 'wręczyć' do 'dostarczyć' aktywuje tę samą regułę CONS-02 w DRL?
+- Jak hiperonimia Słowosieci wspiera Soft Matching w CausalChainBuilder — predykat 'przekazać' dopasowuje regułę dla 'dostarczyć' przez wspólny hiperonim 'działanie'?
+- Jak SlowosiecAdapter.get_hypernym_path(lemma) zwraca ścieżkę do korzenia ontologii — używana przez Soft Matching do ustalenia semantycznej odległości?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

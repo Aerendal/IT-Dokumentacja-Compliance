@@ -160,6 +160,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak wzbogacić CausalChainBuilder o synonimy — np. "dostarczyć" i "przekazać" traktowane jako ta sama akcja?
 - Jakie reguły DRL sterują CausalChainBuilder przy wykrywaniu związku przyczyna→skutek w dokumentach prawnych?
 - Jak CausalChainBuilder obsługuje łańcuchy wielopoziomowe — A→B→C gdy B jest pośrednim warunkiem?
+- Pokaż implementację Soft Matching w CausalChainBuilder z użyciem hiperonimii — predykaty są dopasowywane semantycznie nie leksykalnie?
+- Jak Soft Matching sprawdza czy :EventFrame.predicate należy do synsetu 'dostarczyć' (i synonimów) przed emisją krawędzi :CAUSES?
+- Jak zdefiniować próg Soft Matching — minimalne jaccard@synsets między predykatem a wzorcem reguły (threshold = 0.5)?
+- Jak testować Soft Matching — asercja że 'przekazać' pasuje do reguły zdefiniowanej dla 'dostarczyć' przez wspólny synset?
 - Jak wdrożyć Klasyfikator Kontekstu aby system rozumiał typ (jestestwo) dokumentu — umowa, SRS, raport, specyfikacja?
 - Jak KlasyfikatorKontekstu pobiera sygnały z W3 (leksyka), W2 (role) i W6 (koreferencja) do klasyfikacji dokumentu?
 - Jak zdefiniować enum klas dokumentów w KlasyfikatorKontekstu — UMOWA, SRS, RAPORT_AUDYTU, SPECYFIKACJA_TECHNICZNA?
@@ -179,6 +183,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak wyekstrahować cechy z tytułów sekcji (## nagłówki) dla KlasyfikatorKontekstu — TF-IDF na słowach kluczowych nagłówków?
 - Jak połączyć sygnały YAML metadata (layer: W_x, tags: [ARCH-01]) z sygnałami leksykalnymi w jednym wektorze cech klasyfikatora?
 - Jak klasyfikować dokument bez YAML front matter — fallback na analizę nagłówków i pierwszych 200 tokenów?
+- Jak zaimplementować szablony walidacyjne per typ dokumentu — dataclass DocumentTemplate z listą wymaganych sekcji i reguł compliance?
+- Jak KlasyfikatorKontekstu generuje szablony walidacyjne — mapowanie UMOWA→[CONS-02, RISK-01], SRS→[ARCH-01, SEC-01]?
+- Jak wykryć że dokument nie spełnia szablonu walidacyjnego — diff wymaganych sekcji vs. nagłówków wykrytych przez Linter?
 - Jak InferenceEngine korzysta ze synsetów w Neo4j (Wariant A) do rozszerzenia reguł o synonimy?
 - Jak InferenceEngine odpytuje SlowosiecAdapter on-demand (Wariant B) w regule DRL bez blokowania sesji?
 - Jak porównać skuteczność Wariantu A vs. B dla reguły CONS-02 — F1 score na zbiorze testowym?
