@@ -138,6 +138,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zdefiniować regułę Lintera sprawdzającą autoryzację w grafie Neo4j — `LinterRule(id='AUTH-01', query="MATCH (u:User)-[:PERFORMED]->(e:EventFrame) WHERE NOT (u)-[:HAS_ROLE]->(:Role {name:'authorized'}) RETURN e")` wywoływana przez `LinterEngine.run_cypher_rule(rule, session)` i zgłaszana jako naruszenie gdy Cypher zwraca wyniki?
 - Pokaż przykład reguły Lintera dla wymiaru 'Przyczyna i intencja' — `LinterRule(id='CAUSAL-INTENT-01', query="MATCH (e:EventFrame)-[:CAUSES]->(effect) WHERE NOT (e)-[:HAS_SPEECH_ACT]->(:SpeechAct) RETURN e")` wykrywa zdarzenia kauzalne bez przypisanej intencji (brak speech_act); naruszenie wskazuje że SemanticMapper nie wydobył aktu mowy dla przyczyny?
 - Jakie reguły Lintera można nałożyć na graf Neo4j — katalog: AUTH-01 (brak autoryzacji aktora), CAUSAL-INTENT-01 (przyczyna bez speech_act), ORPHAN-01 (EventFrame bez krawędzi), SYNSET-01 (predykat bez :HAS_SYNSET), ROLE-01 (EventFrame bez AGENT); każda reguła to Cypher MATCH zwracający węzły naruszające warunek?
+- Zaimplementujmy Silnik Reguł Lintera jako moduł — `class LinterRuleEngine: def __init__(self, rules: List[LinterRule], session): self._rules = rules; self._session = session` + metoda `run_all() → List[Violation]` iteruje `self._rules`, wywołuje `run_cypher_rule(rule)` dla każdej i zbiera naruszenia do jednej listy `[Violation(rule_id, node_id) for row in result]`?
 - Jak zintegrować KnowledgeGapTracker z modułem Lintera — `LinterEngine.audit(file)` po wykryciu naruszenia wywołuje `tracker.capture_unmatched_rule(rule_id=rule.id, event=frame, doc_id=file.path)`; reguły bez dopasowania w grafie trafiają do kolejki UNMATCHED_RULE w KGT jako kandydaci do nowych reguł DRL?
 - Uruchommy skrypt run_dogfooding.py na oznaczonych plikach Markdown — jakie argumenty przyjmuje: --input docs/ --filter-tags [Component:W0] --output report.json?
 - Jak run_dogfooding.py filtruje pliki po tagach YAML — parsuje front matter każdego *.md i sprawdza pole tags przed audytem?
@@ -160,6 +161,7 @@ _brak pytań źródłowych w tej kategorii_
 - Zdefiniujmy testy dla reguł API-01 oraz DEP-01..
 - Pokaż szkielet testu własnościowego ARCH-01 w bibliotece hypothesis..
 - Napiszmy test RED dla `ApiAuthorizationRule` w Neo4j — `def test_auth_rule_raises_on_unauthorized(): mock_session.run.return_value = [{'e': EventFrame(id='e1')}]; result = LinterEngine([LinterRule('AUTH-01', QUERY)]).audit(mock_session); assert result.violations[0].rule_id == 'AUTH-01'`; test RED bo `LinterEngine.audit()` jeszcze nie implementuje Cypher rules?
+- Napiszmy test RED dla Silnika Reguł Lintera jako całości — `def test_rule_engine_runs_all_rules(): engine = LinterRuleEngine([ORPHAN_RULE, AUTH_RULE], mock_session); violations = engine.run_all(); assert len(violations) == 2 and {v.rule_id for v in violations} == {'ORPHAN-01','AUTH-01'}`; test RED bo `run_all()` niezaimplementowane?
 - Pokaż szkielet testu ARCH-01 w bibliotece hypothesis..
 - Jak napisać regułę w AuditEngine, aby zaliczyć test ARCH-01?
 - Jakie reguły audytowe ARCH-01 dodać, by testy własnościowe przeszły?

@@ -273,6 +273,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak napisać test integracyjny dla scalania węzłów (`MERGE`) na embedded Neo4j?
 - Jak testować `build_document()` dla zdania "Wykonawca dostarczył dokumentację techniczną z opóźnieniem" — sprawdzić węzły i krawędzie?
 - Jak testować wykrywanie sprzecznych relacji w modelu zdarzenia?
+- Pokaż jak testować wykrywanie osieroconych węzłów w Neo4j — `def test_orphan_detection(): mock_session.run.return_value = [{'e': {'id':'orphan1'}}]; engine = LinterRuleEngine([ORPHAN_RULE], mock_session); violations = engine.run_all(); assert violations[0].rule_id == 'ORPHAN-01' and violations[0].node_id == 'orphan1'`?
 #### Kompletna hierarchia TDD
 - Zaimplementuj Fazę GREEN dla `Neo4jAdapter.save_event()` — minimalna implementacja: stwórz węzeł Event i krawędź AGENT bez walidacji typów.
 - Jak zrefaktoryzować `GraphDatabaseAdapter` po GREEN — oddzielić `CypherBuilder` od `Neo4jClient` żeby można było testować generowanie Cypher bez połączenia z bazą?
