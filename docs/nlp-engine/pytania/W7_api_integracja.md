@@ -132,6 +132,8 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż kod api.py z endpointem /audit dla FastAPI.
 - Jak endpoint /analyze przekazuje pole document_type (wynik KlasyfikatorKontekstu) do warstw W5 i W8?
 - Czy klient API może explicite podać document_type w żądaniu i pominąć KlasyfikatorKontekstu?
+- Jak zintegrować audit_cli.py z FastAPI — endpoint POST /audit/batch który uruchamia ten sam pipeline co CLI i zwraca identyczny JSON?
+- Jak skonfigurować krok w audit.yml do smoke testu endpointu /audit po deploymencie — curl POST z przykładowym dokumentem i weryfikacja exit code?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

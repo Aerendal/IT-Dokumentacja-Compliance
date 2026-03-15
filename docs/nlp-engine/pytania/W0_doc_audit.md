@@ -127,6 +127,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak Linter W0 czyta listę reguł do pominięcia z pola `ignore_rules` w YAML front matter — parsowanie i filtrowanie wyników?
 - Jak zapisać pominięte reguły w raporcie audytu — pole `suppressed_rules` z polami: rule_id, reason, author?
 - Jak zapobiec nadużywaniu `ignore_rules` — limit ilości pominięć per dokument i wymaganie pola `reason`?
+- Jak zaimplementować moduł ignorowania ostrzeżeń — klasa WarningSuppressor która parsuje `ignore_rules` z YAML i filtruje wyniki Lintera przed raportem?
+- Jak WarningSuppressor rozróżnia BLOCKER (nigdy nie ignoruj), WARNING (można ignorować z `reason`) i INFO (można ignorować bez uzasadnienia)?
+- Jak testować WarningSuppressor — asercja że Linter z `ignore_rules: [ARCH-01]` nie zwraca naruszenia ARCH-01 ale nadal zwraca BLOCKER?
 - Jak zautomatyzować przypisanie klasy dokumentu na podstawie metadanych YAML — skrypt batch który klasyfikuje per plik po polach layer/tags?
 - Stwórzmy klasę DocumentClassifier do automatycznej kategoryzacji plików — jak DocumentClassifier.classify(file_path) → DocumentType?
 - Jak DocumentClassifier różni się od KlasyfikatorKontekstu — DocumentClassifier operuje na pliku/metadanych, KlasyfikatorKontekstu na zawartości semantycznej?
@@ -185,6 +188,12 @@ _brak pytań źródłowych w tej kategorii_
 - Zaktualizujmy GapAnalysisGenerator o zapytania Cypher dla Neo4j — jak generator pobiera dane o lukach bezpośrednio z grafu?
 - Jak GapAnalysisGenerator buduje zapytanie Cypher MATCH (d:Document)-[:HAS_GAP]->(g:Gap) RETURN g per document_id?
 - Jak zdefiniować kontrakt między W0 (GapAnalysisGenerator) a W4 (Neo4j) — REST API vs. neo4j-driver Python?
+- Zintegrujmy audit_cli.py z automatyzacją GitHub Actions — jakie flagi CLI obsługuje: --exit-code-on-failure, --output-format json, --input docs/?
+- Jak audit_cli.py przekazuje exit code do GitHub Actions — exit(1) gdy są naruszenia BLOCKER, exit(0) gdy tylko WARNING/INFO?
+- Jak przechowywać raport audit_cli.py jako artefakt GitHub Actions — krok `uses: actions/upload-artifact@v4` z plikiem report.json?
+- Stwórzmy gotowy plik .github/workflows/audit.yml — jakie kroki zawiera: checkout, setup-python, pip install, run audit_cli.py --exit-code-on-failure 1?
+- Jak skonfigurować wyzwalacze w audit.yml — on: push (branches: [main, fresh-main]) + on: pull_request do dowolnej gałęzi?
+- Jak dodać komentarz do PR z podsumowaniem raportu audit_cli.py — GitHub Actions step z `gh pr comment` parsujący wygenerowany report.json?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

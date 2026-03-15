@@ -166,6 +166,9 @@ CoreferenceChain (z W6)
 - Jak zaimportować plik plWordNet LMF XML do Neo4j — skrypt Python z iterparse + UNWIND + MERGE Cypher?
 - Jak zmapować elementy LMF XML na węzły Neo4j — LexicalEntry→:Lemma, Synset→:Synset, SynsetRelation→:IS_A?
 - Jak zweryfikować poprawność importu plWordNet — sprawdź że liczba węzłów :Synset = liczba <Synset> w XML?
+- Pokaż przykład łańcucha przyczynowego w Neo4j dla zdarzenia krytycznego CONS-02 — węzły :EventFrame(predicate:'nie dostarczyć', severity:'CRITICAL') powiązane krawędziami :CAUSES?
+- Jak zwizualizować pełny łańcuch przyczynowy dla zdarzenia krytycznego — Cypher: MATCH path=(e:EventFrame)-[:CAUSES*1..5]->(:EventFrame) WHERE e.severity='CRITICAL' RETURN path?
+- Jak reprezentować zdarzenie krytyczne w grafie — atrybut severity:'CRITICAL' na węźle :EventFrame czy osobna etykieta :CriticalEvent?
 
 ### 4. Testowanie
 - Jak zapisać węzeł „Test jednostkowy” w formacie ontologii JSON?

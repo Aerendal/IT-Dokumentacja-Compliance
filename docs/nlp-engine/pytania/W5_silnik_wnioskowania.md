@@ -216,6 +216,8 @@ _brak pytań źródłowych w tej kategorii_
 - Zaktualizujmy logikę CausalChainBuilder o analizę intencji aktów mowy — jak rozpoznać czy :EventFrame jest ZOBOWIĄZANIEM, OSTRZEŻENIEM czy WYKONANIEM?
 - Jakie cechy morfosyntaktyczne i leksykalne wskazują na akt mowy ZOBOWIĄZANIE (shall, zobowiązuje się) vs. POTWIERDZENIE (oświadcza, potwierdza)?
 - Jak CausalChainBuilder tworzy krawędź :CAUSES gdy akt mowy ZOBOWIĄZANIE nie jest spełniony — link do EventFrame naruszenia?
+- Stwórzmy wizualizację grafu łańcuchów przyczynowych w Mermaid.js — flowchart LR: niedostarczenie→brak_odbioru→naruszenie_CONS02→kara_umowna z etykietami severity?
+- Jak dodać etykiety identyfikatorów reguł compliance na krawędziach Mermaid.js — `A -->|CAUSES:CONS-02| B` z linkiem do definicji reguły?
 
 ### 4. Testowanie
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?
