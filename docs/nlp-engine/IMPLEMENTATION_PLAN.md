@@ -15,10 +15,28 @@ related_docs:
   - "ARCHITECTURE.md"
   - "MODULES.md"
   - "TESTING.md"
+  - "DOC_AUDIT_MODULE.md"
   - "../Jak pisać testy.md"
 ---
 
 # NLP Engine — Plan Implementacji
+
+## Stan bieżący (przed Fazą 1)
+
+> **✅ Zaimplementowany: Moduł Audytu Dokumentacji** (`scripts/nlp/`)
+>
+> Przed uruchomieniem Faz 1–5 powstał działający moduł audytujący dokumentację projektową.
+> Jest to oddzielny podsystem, który **nie blokuje** i **nie zastępuje** planowanego silnika
+> semantycznego. Szczegóły → `DOC_AUDIT_MODULE.md`.
+>
+> **Co już istnieje w `scripts/nlp/`:**
+> - `text_utils.py` — preprocessing polskiego tekstu (używany też przez przyszły silnik)
+> - `similarity_engine.py` — TF-IDF + cosine (używany też przez przyszły silnik)
+> - `gap_detector.py`, `duplicate_detector.py`, `relation_mapper.py` — analiza struktury docs
+> - `doc_auditor.py` — orkiestrator + CLI + SQLite (`reports/it_doc_audit.db`)
+> - 89 testów w `tests/test_nlp_doc_auditor.py` — wszystkie green
+>
+> **Wyniki live audit:** 10 dokumentów, 179 luk, 8 duplikatów, 83 relacje.
 
 ## Zasada budowy
 
@@ -46,10 +64,12 @@ python -m spacy download pl_core_news_sm
 
 ### Zadania
 
-- [ ] Stworzyć `scripts/nlp/` z `__init__.py`
+- [x] ~~Stworzyć `scripts/nlp/` z `__init__.py`~~ ✅ Istnieje (doc audit module)
+- [x] ~~`text_utils.py` — tokenize, normalize~~ ✅ Istnieje (rozbudowana wersja)
 - [ ] Zaimplementować `state_matrix.py` — modele Pydantic: `TokenNode`, `SentenceGraph`, `StateMatrix`
 - [ ] Zaimplementować `context_classifier.py` — `DocumentClass` + `ValidationMode` + klasyfikacja przez frontmatter/sygnały
-- [ ] Zaimplementować `nlp_core.py` — `tokenize()`, `morph_analyze()` (Morfeusz), `dep_parse()` (UDPipe)
+- [ ] Zaimplementować `nlp_core.py` — `morph_analyze()` (Morfeusz), `dep_parse()` (UDPipe)
+  - *Uwaga:* `tokenize()` już istnieje w `text_utils.py` — `nlp_core.py` będzie go importować
 - [ ] Zaimplementować `TenseModeAnalyzer` — mapowanie tagów morfologicznych → `tense`, `mood`
 - [ ] Zaimplementować `NegationDetector` — szukanie relacji `neg` w drzewie UDPipe
 - [ ] Napisać `tests/fixtures/nlp_oracle.jsonl` — min. 30 zdań z oczekiwanymi wynikami

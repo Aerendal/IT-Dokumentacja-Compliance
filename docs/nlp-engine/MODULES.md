@@ -15,16 +15,57 @@ audit_rules:
 related_docs:
   - "ARCHITECTURE.md"
   - "INTEGRATION.md"
+  - "DOC_AUDIT_MODULE.md"
 ---
 
 # NLP Engine — Definicje Modułów
 
-## Struktura katalogów (docelowa)
+> **Uwaga o stanie bieżącym:** Katalog `scripts/nlp/` już istnieje i zawiera działający
+> **Moduł Audytu Dokumentacji**. Szczegóły → `DOC_AUDIT_MODULE.md`.
+> Ten dokument opisuje docelową strukturę pełnego silnika semantycznego (Fazy 1–5).
+> Nowe pliki będą **dodawane** do istniejącego katalogu — nie zastępować istniejących.
+
+## Struktura katalogów (stan bieżący + docelowy)
+
+```
+scripts/nlp/                         ← KATALOG ISTNIEJE
+│
+│  ── Istniejący Moduł Audytu Dokumentacji (✅ ZAIMPLEMENTOWANY) ──
+├── __init__.py                      ✅ istnieje
+├── text_utils.py                    ✅ preprocessing polskiego tekstu
+├── similarity_engine.py             ✅ TF-IDF + cosine (stdlib)
+├── gap_detector.py                  ✅ wykrywanie luk kompletności
+├── duplicate_detector.py            ✅ klasyfikacja duplikatów
+├── relation_mapper.py               ✅ mapowanie relacji między docs
+├── doc_auditor.py                   ✅ orkiestrator + SQLite + CLI
+├── ddl_audit.sql                    ✅ schemat bazy danych
+│
+│  ── Planowany Silnik Semantyczny (⬜ Fazy 1–5) ──
+├── nlp_engine.py                    ⬜ główny punkt wejścia (Faza 5)
+├── context_classifier.py            ⬜ klasyfikacja doc + tryb (Faza 1)
+├── nlp_core.py                      ⬜ tokenize→morph→syntax (Faza 1)
+├── state_matrix.py                  ⬜ modele Pydantic (Faza 1)
+├── cross_reference.py               ⬜ kaskady, dedukcja, freezing (Faza 4)
+├── audit_report.py                  ⬜ TraceabilityMatrix + GAP list (Faza 4)
+└── plugins/                         ⬜ CompliancePlugins (Faza 3)
+    ├── __init__.py
+    ├── base.py
+    ├── access_control.py
+    ├── encryption.py
+    ├── logging_audit.py
+    ├── data_privacy.py
+    └── backup.py
+```
+
+**Zasada koegzystencji:** `text_utils.py` i `similarity_engine.py` z istniejącego modułu audytu
+będą importowane przez planowany silnik semantyczny — nie ma duplikowania kodu.
+
+## Struktura katalogów (tylko docelowa — pełny obraz po Fazie 5)
 
 ```
 dokumentacja/
 └── scripts/
-    └── nlp/                         ← NOWY KATALOG
+    └── nlp/                         ← Docelowy stan
         ├── __init__.py
         ├── nlp_engine.py            ← główny punkt wejścia
         ├── context_classifier.py

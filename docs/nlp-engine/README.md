@@ -18,6 +18,7 @@ related_docs:
   - "IMPLEMENTATION_PLAN.md"
   - "INTEGRATION.md"
   - "TESTING.md"
+  - "DOC_AUDIT_MODULE.md"
 ---
 
 # NLP Engine — Mikroserwis Analizy Semantycznej
@@ -101,7 +102,29 @@ Obecny engine sprawdza czy słowo kluczowe **istnieje** w dokumencie. NLP Engine
 | Faza 4 — CrossReference + Raport | ⬜ Do implementacji |
 | Faza 5 — Integracja z FastAPI/CLI | ⬜ Do implementacji |
 
-## Szybki start (po implementacji)
+## Szybki start
+
+### Moduł Audytu Dokumentacji (✅ działa teraz)
+
+```bash
+# Skan dokumentów — wykryj luki, duplikaty, relacje
+python scripts/nlp/doc_auditor.py scan --dir dokumentacja/docs/
+
+# Raport z ostatniego przebiegu
+python scripts/nlp/doc_auditor.py report --run-id <UUID>
+
+# Lista wszystkich przebiegów
+python scripts/nlp/doc_auditor.py list-runs
+
+# Przez centralny compliance script
+python scripts/compliance_check.py doc-audit --dir dokumentacja/docs/
+
+# Testy
+python -m pytest tests/test_nlp_doc_auditor.py -v
+# 89 passed in 0.47s
+```
+
+### Silnik Semantyczny (⬜ po Fazach 1–5)
 
 ```bash
 # Nowe CLI command

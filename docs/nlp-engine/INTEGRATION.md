@@ -17,11 +17,39 @@ audit_rules:
 related_docs:
   - "ARCHITECTURE.md"
   - "IMPLEMENTATION_PLAN.md"
+  - "DOC_AUDIT_MODULE.md"
 ---
 
 # NLP Engine — Integracja z Istniejącym Projektem
 
-## Zasada integracji
+## Stan bieżący — istniejące punkty integracji (✅ Zaimplementowane)
+
+Przed uruchomieniem Faz 1–5 powstał **Moduł Audytu Dokumentacji**, który już jest
+zintegrowany z projektem w następujący sposób:
+
+### `scripts/compliance_check.py` — subkomenda `doc-audit`
+
+```bash
+python scripts/compliance_check.py doc-audit --dir dokumentacja/docs/
+```
+
+Wywołuje `DocAuditor.scan()` z modułu `scripts.nlp.doc_auditor`. Wyniki trafiają
+do `reports/it_doc_audit.db` (osobna baza — nie `it_doc_matrix.db`).
+
+### `reports/it_doc_audit.db` — baza wyników audytu docs
+
+5 tabel (schemat w `scripts/nlp/ddl_audit.sql`):
+- `doc_audit_runs` — przebiegi
+- `doc_completeness` — score per dokument
+- `doc_audit_findings` — luki (ERROR/WARNING/INFO)
+- `doc_duplicates` — pary duplikatów
+- `doc_relations` — graf powiązań
+
+**Dlaczego osobna baza?** Audyt dokumentacji to oddzielna domena od matrycy zgodności (`it_doc_matrix.db`). Wyniki doc-audit są wejściem diagnostycznym, nie częścią pipeline compliance.
+
+---
+
+## Zasada integracji (dla Faz 1–5)
 
 NLP Engine **nie zastępuje** żadnego istniejącego kodu. Działa jako **addytywna warstwa**:
 - dodaje nowe tabele do SQLite
