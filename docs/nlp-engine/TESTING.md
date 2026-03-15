@@ -248,3 +248,119 @@ tests/fixtures/
     └── db/
         └── test_nlp.db               ← pre-populated SQLite dla testów API
 ```
+
+---
+
+## Model matematyczny testowania (IEEE 829 / T = P × O × S × C)
+
+*Sekcja bazuje na `matematyka_testow_fundamenty.md`, `model_matematyczny_testu.md`, `metodologia_myslenia_o_testach.md`.*
+
+### Formuła przestrzeni testu
+
+```
+T = P × O × S × C
+```
+
+| Wymiar | Symbol | Znaczenie | Przykład dla NLP Engine |
+|---|---|---|---|
+| Właściwość | **P** | Co system ma gwarantować | Precyzja ekstrakcji ról semantycznych ≥ 90% |
+| Wyrocznia | **O** | Jak ocenić pass/fail | Porównanie z `nlp_oracle.jsonl` |
+| Zakres | **S** | Ile systemu obejmuje | Jeden predykat vs pełny pipeline |
+| Koszt | **C** | Czas pisania + egzekucji | Oracle fixture: 2h; unit: 5 min |
+
+**Właściwości (P) dla NLP Engine:**
+- Funkcjonalna: poprawność — `assert finding.action == expected_action`
+- Strukturalna: spójność — `assert all(f.severity in VALID_SEVERITIES for f in findings)`
+- Własnościowa (invariant): `assert len(run_nlp_audit([])) == 0` (zawsze prawdziwe)
+- Wydajnościowa: `assert audit_time < 30s` dla dokumentu 10 stron
+
+---
+
+### Taksonomia wyroczni (Oracle Problem) — 6 typów
+
+| Typ wyroczni | Jak działa | Kiedy użyć w NLP | Ograniczenie |
+|---|---|---|---|
+| **Specyfikacja** | `assert output == expected_from_docs` | Unit tests dla predykatów modalnych | Wymaga pełnej specyfikacji |
+| **Referencja** | `assert new_impl(x) == old_impl(x)` | Refaktor MorphologicalAnalyzer | Stara impl. musi być poprawna |
+| **Własnościowy** | `assert invariant(output) == True` | Property-based: puste wejście → puste findings | Nie wykrywa błędów logiki domenowej |
+| **Metamorficzny** | `assert f(transform(x)) == relation(f(x))` | NLP: zmiana szyku zdania → te same role semantyczne | Trudny do definiowania |
+| **Statystyczny** | `assert abs(output - expected) < ε` | Precision/Recall ≥ 90% na korpusie | Wymaga dużego zbioru danych |
+| **Brak wyroczni** | Test zawsze przechodzi | Smoke: `test_morfeusz_available()` | Wykrywa tylko crashe, nie błędy |
+
+> **Kluczowa pułapka:** Testy NLP bez wyroczni (`nlp_oracle.jsonl`) wykryją tylko wyjątki, nie błędy semantyczne. Każdy test IntentClassifier i SRL **musi** mieć wyrocznię specyfikacyjną lub referencyjną.
+
+---
+
+### Metodologia 4-krokowa (P1 → P2 → P3 → P4)
+
+Przed napisaniem każdego testu przejdź przez 4 pytania:
+
+```
+P1: Co testuję?
+    → Jednostka pracy, granice, zależności zewnętrzne
+    → Czy to: funkcja czysta / moduł / kontrakt API / właściwość systemu?
+
+P2: Jaką właściwość weryfikuję?
+    → Poprawność / Idempotentność / Deterministyczność / Wydajność / Bezpieczeństwo
+    → To pytanie WYBIERA klasę testu i typ wyroczni
+
+P3: Ile testów?
+    → V(G) = E - N + 2P  (złożoność cyklomatyczna → liczba ścieżek)
+    → BVA: 4n+1  (wartości graniczne)
+    → EP: liczba klas równoważności
+    → Pairwise: k² × log(n)  (dla kombinatorycznych wejść)
+
+P4: Jaki typ i jak zaprojektować?
+    → Wynik P1+P2+P3 deterministycznie wskazuje typ
+    → Kolejność: zaprojektuj oracle → dane wejściowe → izolację → asercję
+```
+
+**Przykład dla `test_negation_detection`:**
+- P1: funkcja `detect_negation(sentence: str) -> bool` — czysta, bez I/O
+- P2: poprawność + deterministyczność
+- P3: V(G) ≈ 3 (negacja obecna / nieobecna / zagnieżdżona) → minimum 3 testy
+- P4: Unit test, wyrocznia specyfikacyjna, dane: frazy z `nlp_oracle.jsonl`
+
+---
+
+### Słownik triggerów — język dokumentacji → typ testu
+
+*Źródło: `Myślenie inżynieryjne o pisaniu testów.md`. To ten sam mechanizm co `trigger_vocabulary` w CompliancePlugins.*
+
+#### R-01: Logika i algorytmy
+
+| Fraza w dokumentacji | Typ testu | Kod |
+|---|---|---|
+| „Oblicza", „Zwraca wynik dla...", „Transformuje" | Unit test | T-01 |
+| „Dla każdego przypadku z...", „W zależności od flag..." | Testy parametryczne / tablice decyzyjne | T-02 |
+| „**Zawsze**", „**Nigdy**", „Niezależnie od..." | Testy własnościowe (property-based) | T-03 |
+
+#### R-02: Granice, integracja, architektura
+
+| Fraza | Typ testu | Kod |
+|---|---|---|
+| „Komunikuje się z...", „Zapisuje do bazy", „Odczytuje z pliku" | Testy integracyjne | T-04 |
+| „Format payloadu", „Struktura JSON", „Zgodnie z OpenAPI" | Testy kontraktowe | T-05 |
+| „Nie może zależeć od...", „Zabrania się importowania..." | Testy architektury | T-06 |
+
+#### R-03: Czas, stan, środowisko
+
+| Fraza | Typ testu | Kod |
+|---|---|---|
+| „Nawet jeśli uruchomione wielokrotnie...", „Bezpieczne przy ponowieniu" | Testy idempotentności | T-07 |
+| „Równocześnie", „W wielu wątkach", „Przez wielu agentów" | Testy współbieżności | T-08 |
+| „Po migracji...", „Stara wersja danych..." | Testy migracji / wstecznej kompatybilności | T-09 |
+
+#### R-04: Awaryjność i bezpieczeństwo
+
+| Fraza | Typ testu | Kod |
+|---|---|---|
+| „Co jeśli padnie...", „Przy braku sieci...", „Zapewnia fallback" | Testy chaosu / Recovery | T-10 |
+| „Tylko dla admina", „Uprawnienia", „Zabezpieczone przed..." | Testy autoryzacji / SAST/DAST | T-11 |
+| „Gdy użytkownik wprowadzi błędne...", „Odrzuca niepoprawne..." | Testy negatywne | T-12 |
+
+> **Zastosowanie w NLP Engine:** Uruchom parser triggerów na tekście nowego wymagania systemowego → automatyczne zaproponowanie klasy testu. To jest implementacja `CompliancePlugin.trigger_vocabulary` na wyższym poziomie.
+
+---
+
+*Źródła: `matematyka_testow_fundamenty.md`, `model_matematyczny_testu.md`, `metodologia_myslenia_o_testach.md`, `Myślenie inżynieryjne o pisaniu testów.md`*
