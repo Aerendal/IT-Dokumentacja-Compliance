@@ -21,8 +21,10 @@ w których warstwach. Plik W_x pozostają **dokumentami projektowymi** (nie task
 | Pytania o migrację i wersjonowanie | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
 | Pytania o audytowalność | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
 | **Rozszerzalność i skalowanie** | ✓* | ✓ | ✓ | ✓ | ✓ | ✓ | ✓* | ✓ | ✓ | ✓ wszystkie (*dodane 2026-03) |
+| **Uzasadnienie istnienia warstwy** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie (dodano 2026-03) |
 | **Luki cross-warstwowe** | — | ✓ | ✓ | — | — | ✓ | — | — | — | Tylko gdzie znaleziono luki |
 | **7 podsekcji technicznych** (Arch/Kontrakty/…/Pułapki) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| **Hierarchia TDD sec.4** (RED→GREEN→REFACTOR→E2E) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie (dodano 2026-03) |
 
 _* — sekcja dodana ręcznie w tej sesji, wcześniej brakowało_
 
@@ -30,20 +32,21 @@ _* — sekcja dodana ręcznie w tej sesji, wcześniej brakowało_
 
 ## 2. Liczba pytań per warstwa
 
-| Warstwa | Pytania (?) | Linie ogółem | Proporcja pytań |
-|---------|-------------|--------------|-----------------|
-| W0 — doc audit | 54 | ~179 | 30% |
-| W1 — fundamenty NLP | 185 | ~393 | 47% |
-| W2 — role semantyczne | 91 | ~234 | 39% |
-| W3 — zasoby leksykalne | 102 | ~246 | 41% |
-| W4 — baza grafowa | 95 | ~245 | 39% |
-| W5 — silnik wnioskowania | 124 | ~275 | 45% |
-| W6 — koreferencja | 58 | ~166 | 35% |
-| W7 — API/integracja | 65 | ~172 | 38% |
-| W8 — compliance/audit | 81 | ~237 | 34% |
-| **SUMA** | **855** | **~2147** | **~40%** |
+| Warstwa | Pytania (?) | Polecenia | Łącznie | Proporcja pytań |
+|---------|-------------|-----------|---------|-----------------|
+| W0 — doc audit | 71 | 44 | 115 | 62% |
+| W1 — fundamenty NLP | 190 | 108 | 298 | 64% |
+| W2 — role semantyczne | 100 | 52 | 152 | 66% |
+| W3 — zasoby leksykalne | 111 | 56 | 167 | 66% |
+| W4 — baza grafowa | 106 | 58 | 164 | 65% |
+| W5 — silnik wnioskowania | 134 | 55 | 189 | 71% |
+| W6 — koreferencja | 74 | 41 | 115 | 64% |
+| W7 — API/integracja | 74 | 33 | 107 | 69% |
+| W8 — compliance/audit | 92 | 70 | 162 | 57% |
+| **SUMA** | **952** | **517** | **1469** | **~65%** |
 
-> W6 i W7 mają relatywnie mało pytań — kandydaci do uzupełnienia gdy dojdziemy do implementacji tych warstw.
+> Liczby aktualne po: dodaniu sekcji Uzasadnienie, hiearchii TDD w sec.4, przesunięciu GREEN commands, wymianie przykładów off-domain (commit 6a538a9, 2026-03-15).
+> W7 i W6 mają 107/115 pozycji — kandydaci do uzupełnienia przy implementacji tych warstw.
 
 ---
 
