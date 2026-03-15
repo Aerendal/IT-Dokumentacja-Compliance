@@ -174,6 +174,9 @@ CoreferenceChain (z W6)
 - Jak reprezentować zdarzenie krytyczne w grafie — atrybut severity:'CRITICAL' na węźle :EventFrame czy osobna etykieta :CriticalEvent?
 - Pokaż jak wygenerować graf łańcuchów kauzalnych w Mermaid.js — Python skrypt pobiera wyniki Cypher MATCH path=(:EventFrame)-[:CAUSES*]->(:EventFrame) i serializuje jako flowchart LR?
 - Jak obsłużyć pusty łańcuch kauzalny (brak krawędzi :CAUSES) w generatorze Mermaid — fallback: diagram z jednym węzłem i komentarzem "brak łańcucha przyczynowego"?
+- Jak zmapować wymiar intencji (speech_act: ZOBOWIĄZANIE) na krawędź Neo4j — :EventFrame -[:HAS_SPEECH_ACT]-> :SpeechAct {type: 'ZOBOWIĄZANIE'}?
+- Jak zmapować wymiar narzędzia (INSTRUMENT) na krawędź Neo4j — :EventFrame -[:HAS_ROLE {role: 'INSTRUMENT'}]-> :Token {lemma: ...}?
+- Jak zapytać Cypher o wszystkie EventFrame z INSTRUMENT należącym do klasy 'narzędzie' — MATCH (e:EventFrame)-[:HAS_ROLE {role:'INSTRUMENT'}]->(t:Token)-[:HAS_SYNSET]->(:Synset)-[:IS_A*]->(:OntologyClass {name:'narzędzie'}) RETURN e?
 
 ### 4. Testowanie
 - Jak zapisać węzeł „Test jednostkowy” w formacie ontologii JSON?

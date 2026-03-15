@@ -69,6 +69,9 @@ Graf Neo4j (W4) + EventRoleDict (W2)
 - Jak W5 obsługuje wiele aktywnych sesji KieSession równolegle — pool sesji, jedna sesja globalna, czy per-request?
 - Jak zdefiniować architekturę DocumentClassifier w W5 — oddzielna klasa czy metoda KlasyfikatorKontekstu.classify_by_metadata()?
 - Jak DocumentClassifier współpracuje z InferenceEngine — wynik klasyfikacji pliku filtruje zestaw reguł DRL przed wnioskowniem?
+- Zaimplementujmy klasę DocumentClassifier jako Krok 0 pipeline — wywołanie DocumentClassifier.classify(file_path) przed W1→W8 wybiera zestaw reguł DRL dla danego typu dokumentu?
+- Jak DocumentClassifier.classify(file_path) → DocumentType z confidence — następnie InferenceEngine.set_active_ruleset(document_type) aktywuje właściwe reguły?
+- Jak wyeksponować wynik DocumentClassifier w logach pipeline'u — linia "Krok 0: UMOWA (confidence=0.92)" przed przetwarzaniem W1→W8?
 
 ### 2. Kontrakty danych
 _brak pytań źródłowych w tej kategorii_
@@ -224,6 +227,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak CausalChainBuilder tworzy krawędź :CAUSES gdy akt mowy ZOBOWIĄZANIE nie jest spełniony — link do EventFrame naruszenia?
 - Stwórzmy wizualizację grafu łańcuchów przyczynowych w Mermaid.js — flowchart LR: niedostarczenie→brak_odbioru→naruszenie_CONS02→kara_umowna z etykietami severity?
 - Jak dodać etykiety identyfikatorów reguł compliance na krawędziach Mermaid.js — `A -->|CAUSES:CONS-02| B` z linkiem do definicji reguły?
+- Przygotujmy metodę to_html() w CausalChainBuilder — serializuje łańcuch kauzalny jako fragment HTML z osadzonym diagramem Mermaid.js przez `<div class="mermaid">` + inicjalizację mermaid.initialize()?
+- Jak to_html() różni się od to_mermaid() — to_mermaid() zwraca str z flowchart LR, to_html() opakowuje go w kompletny fragment HTML gotowy do wstawienia w raport?
+- Jak testować to_html() — asercja że wynik zawiera `<div class="mermaid">flowchart LR` i wywołanie `mermaid.initialize()`?
 
 ### 4. Testowanie
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?

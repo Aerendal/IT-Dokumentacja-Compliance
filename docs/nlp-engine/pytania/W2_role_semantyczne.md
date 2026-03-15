@@ -122,6 +122,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak rozbudować ontologię o relacje czasowe i przestrzenne?
 - Zaktualizujmy logikę analizy intencji aktów mowy w SemanticMapper — jak rozróżnić ZOBOWIĄZANIE od WYKONANIA jako wymiar EventFrame?
 - Jak dodać pole speech_act do EventFrame — enum: ZOBOWIĄZANIE, POTWIERDZENIE, ZAPRZECZENIE, OSTRZEŻENIE, POLECENIE?
+- Jak wymiar intencji łączy się z rolami semantycznymi — AGENT+ZOBOWIĄZANIE = osoba zobowiązana, AGENT+POLECENIE = zleceniodawca w kontrakcie?
+- Jak wymiar narzędzia (INSTRUMENT) z SemanticMapper mapuje się do Neo4j — tag `inst` (narzędnik) z Morfeusza → INSTRUMENT → :HAS_ROLE {role:'INSTRUMENT'} w W4?
 
 ### 4. Testowanie
 - Zdefiniujmy test integracyjny dla relacji agent-patient w tym modelu..

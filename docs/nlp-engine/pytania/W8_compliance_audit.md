@@ -152,6 +152,8 @@ Tekst z NKJP (XML)
 - Jak KnowledgeGapTracker dostarcza zagregowane dane do sekcji knowledge_gaps w GapAnalysisReport po zakończeniu sesji przetwarzania?
 - Stwórzmy wizualizację grafu zdarzeń w Mermaid.js dla raportu — jak AuditEngine generuje pole `mermaid_diagram` w AuditResponse z flowchart LR zawierającym :EventFrame naruszenia?
 - Jak filtrować węzły :EventFrame w wizualizacji raportu — pokazuj tylko zdarzenia severity CRITICAL/HIGH aby uniknąć przesłonięcia kluczowych naruszeń zbędnymi węzłami?
+- Przygotujmy metodę to_html() w GapAnalysisReport — serializuje raport jako kompletny plik HTML z tabelą naruszeń i osadzonym diagramem Mermaid.js w jednym pliku?
+- Jak to_html() osadza diagram Mermaid.js w raporcie HTML — inline `<div class="mermaid">` z zawartością flowchart LR wewnątrz sekcji "Łańcuch przyczynowy" raportu?
 
 ### 4. Testowanie
 - Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?

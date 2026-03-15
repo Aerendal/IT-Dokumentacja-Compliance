@@ -130,9 +130,14 @@ _brak pytań źródłowych w tej kategorii_
 - Stwórzmy klasę DocumentClassifier do automatycznej kategoryzacji plików — jak DocumentClassifier.classify(file_path) → DocumentType?
 - Jak DocumentClassifier różni się od KlasyfikatorKontekstu — DocumentClassifier operuje na pliku/metadanych, KlasyfikatorKontekstu na zawartości semantycznej?
 - Jak DocumentClassifier integruje się z Linterem W0 — klasyfikacja przed audytem aby wybrać odpowiedni zestaw reguł?
+- Jak DocumentClassifier jako Krok 0 zwiększa trafność audytu W0 — klasyfikacja dokumentu przed Linterem umożliwia użycie właściwego zestawu reguł per typ dokumentu?
+- Jak sequencjonować Krok 0 w run_dogfooding.py — wywołaj DocumentClassifier.classify(file) przed LinterEngine.audit(file) dla każdego pliku?
 - Uruchommy skrypt run_dogfooding.py na oznaczonych plikach Markdown — jakie argumenty przyjmuje: --input docs/ --filter-tags [Component:W0] --output report.json?
 - Jak run_dogfooding.py filtruje pliki po tagach YAML — parsuje front matter każdego *.md i sprawdza pole tags przed audytem?
 - Jak run_dogfooding.py raportuje wyniki per plik — tabela: ścieżka, status (PASS/FAIL), liczba naruszeń, lista rule_id?
+- Stwórzmy punkt wejścia python -m audit dla CI/CD — plik `audit/__main__.py` z funkcją main() przyjmującą --input, --output, --format {json,markdown,html}, --exit-on-failure?
+- Jak `python -m audit` zwraca exit code 1 w CI/CD gdy są naruszenia BLOCKER — sys.exit(1) gdy len(blockers) > 0?
+- Jak upewnić się że audit/__main__.py i endpoint /audit (FastAPI) korzystają z tej samej klasy AuditService — DRY przez wspólną warstwę logiki?
 
 ### 4. Testowanie
 - Jak zaimplementować testy własnościowe dla reguł ARCH-01 i SEC-01?

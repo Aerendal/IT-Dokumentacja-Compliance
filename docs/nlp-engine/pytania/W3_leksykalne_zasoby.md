@@ -143,6 +143,10 @@ _brak pytań źródłowych w tej kategorii_
 - Napiszmy kod SlowosiecAdapter do obsługi synonimów — metoda get_synonyms(lemma) → List[str] przeszukuje słownik synsetów i zwraca wszystkie lematy ze wspólnego synsetu?
 - Jak SlowosiecAdapter obsługuje relacje pojęć — metody get_hypernyms(lemma) i get_hyponyms(lemma) traversując graf IS_A w Słowosieci?
 - Jak SlowosiecAdapter.get_related_concepts(lemma, relation_type) zwraca powiązane pojęcia — parametr relation_type: Literal['synonym', 'hypernym', 'hyponym', 'meronym']?
+- Stwórzmy skrypt kompilujący plWordNet do zoptymalizowanej bazy SQLite — skrypt parsuje plik LMF XML i wstawia synsets, lemmas i relations do plwordnet.db przez iterparse + batch INSERT?
+- Jak zaindeksować bazę SQLite plWordNet dla wydajności — indeks na kolumnach `lemma` i `synset_id` dla szybkich zapytań get_synonyms(lemma)?
+- Jak SlowosiecAdapter korzysta ze skompilowanej bazy SQLite zamiast pliku tekstowego — connection pool, parametryczne zapytania SELECT, LRU cache wyników?
+- Jak weryfikować kompletność skompilowanej bazy SQLite — SELECT COUNT(*) z każdej tabeli i porównanie z liczbą `<Synset>` w źródłowym LMF XML?
 
 ### 4. Testowanie
 - Zdefiniujmy testy dla synkretyzmu form takich jak słowo zamek..

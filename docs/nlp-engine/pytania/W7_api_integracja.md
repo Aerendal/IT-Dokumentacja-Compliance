@@ -97,6 +97,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak skonfigurować reverse proxy (Nginx/Traefik) przed /audit — timeout, max body size, TLS termination?
 - Pokaż jak zintegrować document_profile z AuditResponse w FastAPI — endpoint /audit pobiera dokument, wywołuje KlasyfikatorKontekstu, konstruuje AuditResponse?
 - Jak endpoint /audit zwraca document_profile w odpowiedzi — pole `profile` z document_type, golden_standard i confidence?
+- Stwórzmy punkt wejścia `python -m audit` dla CI/CD — jak audit/__main__.py rejestruje te same handlery co FastAPI endpoint /audit ale bez serwera HTTP?
+- Jak współdzielić logikę między audit/__main__.py (CLI) a endpointem /audit (FastAPI) — wspólna klasa AuditService używana przez obie warstwy wejścia?
 
 ### 4. Testowanie
 - Gdzie w procesie CI/CD uruchomić te testy?
