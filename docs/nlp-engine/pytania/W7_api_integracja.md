@@ -34,7 +34,7 @@ Klient (HTTP / Thrift)
   Pipeline: W1 -> W6 -> W4 (Neo4j)
 ```
 
-## Pytania zrodlowe — sklasyfikowane
+## Pytania źródłowe — sklasyfikowane
 
 - Jak zintegrować RapidMiner z Multiservice do analizy NKJP?
 - Czy Multiservice oferuje narzędzia do automatyzacji ekstrakcji danych?
@@ -61,7 +61,7 @@ Klient (HTTP / Thrift)
 - Jakie to 6 komend diagnostycznych w whiteliscie SystemExecutor?
 - Pokaż kod api.py z endpointem /audit dla FastAPI.
 
-## Pytania uzupelniajace
+## Pytania uzupełniające
 
 ### 1. Architektura
 

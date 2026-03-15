@@ -171,3 +171,16 @@ gap_detector  duplicate_detector  relation_mapper
 - Jak każde wykrycie luki jest powiązane z konkretnym plikiem, linią i regułą w SQLite?
 - Jak wygenerować raport "dlaczego dokument X dostał score 0.6?" z szczegółowym uzasadnieniem?
 - Jak przechowywać historię audytów (który commit = jaki wynik) dla celów dowodowych?
+
+---
+
+## Rozszerzalność i skalowanie
+
+### Stopniowe rozszerzanie analizy dokumentów
+
+- Jak W0 obsługuje dokumenty w nowych formatach (DOCX, PDF, RST) bez zmiany kontraktu `AuditResult`?
+- Jak dodać nową regułę audytu (np. wykrywanie duplikatów między plikami) bez modyfikacji istniejących reguł?
+- Jak skalować W0 do analizy repo z 1000+ plikami — limit czasu, paginacja, cache wyników?
+- Jak testować, że dodanie nowej reguły nie zmienia wyników dla dokumentów niepodlegających tej regule?
+- Jak wersjonować zbiór reguł audytu — żeby wynik z reguła v1.0 i v1.1 był porównywalny historycznie?
+- Jak W0 obsługuje dokumenty wielojęzyczne gdy W1 (Morfeusz) jest dostępny tylko dla polskiego?

@@ -1,0 +1,110 @@
+# Macierz pokrycia — pliki W_x
+
+Zamiast checkboxów w poszczególnych plikach, ta macierz pokazuje które sekcje i tematy są pokryte
+w których warstwach. Plik W_x pozostają **dokumentami projektowymi** (nie task-listami).
+
+> **Zasada:** jeśli temat pojawia się we wszystkich warstwach → oznaczony `✓ (wszystkie)`.
+> Jeśli tylko w niektórych → wskazane gdzie brakuje. Praca naprawcza opisana w ostatniej kolumnie.
+
+---
+
+## 1. Pokrycie obowiązkowych sekcji
+
+| Sekcja | W0 | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | Status |
+|--------|----|----|----|----|----|----|----|----|-----|--------|
+| Przegląd | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| Diagram przepływu danych | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| Pytania źródłowe — sklasyfikowane | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| Pytania uzupełniające | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| Kryteria akceptacji | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| Pytania o idempotentność | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| Pytania o migrację i wersjonowanie | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| Pytania o audytowalność | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+| **Rozszerzalność i skalowanie** | ✓* | ✓ | ✓ | ✓ | ✓ | ✓ | ✓* | ✓ | ✓ | ✓ wszystkie (*dodane 2026-03) |
+| **Luki cross-warstwowe** | — | ✓ | ✓ | — | — | ✓ | — | — | — | Tylko gdzie znaleziono luki |
+| **7 podsekcji technicznych** (Arch/Kontrakty/…/Pułapki) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ wszystkie |
+
+_* — sekcja dodana ręcznie w tej sesji, wcześniej brakowało_
+
+---
+
+## 2. Liczba pytań per warstwa
+
+| Warstwa | Pytania (?) | Linie ogółem | Proporcja pytań |
+|---------|-------------|--------------|-----------------|
+| W0 — doc audit | 54 | ~179 | 30% |
+| W1 — fundamenty NLP | 185 | ~393 | 47% |
+| W2 — role semantyczne | 91 | ~234 | 39% |
+| W3 — zasoby leksykalne | 102 | ~246 | 41% |
+| W4 — baza grafowa | 95 | ~245 | 39% |
+| W5 — silnik wnioskowania | 124 | ~275 | 45% |
+| W6 — koreferencja | 58 | ~166 | 35% |
+| W7 — API/integracja | 65 | ~172 | 38% |
+| W8 — compliance/audit | 81 | ~237 | 34% |
+| **SUMA** | **855** | **~2147** | **~40%** |
+
+> W6 i W7 mają relatywnie mało pytań — kandydaci do uzupełnienia gdy dojdziemy do implementacji tych warstw.
+
+---
+
+## 3. Pokrycie tematów przekrojowych (cross-cutting concerns)
+
+Tematy które z natury powinny być omówione w **każdej** warstwie:
+
+| Temat | Pokrycie | Uwagi |
+|-------|----------|-------|
+| Fallback / degraded mode | W1 ✓, W2 ✓, W5 ✓ | W6, W7 — nie opisano co się dzieje gdy warstwa wyżej nie odpowiada |
+| Circuit breaker / timeout | W7 ✓ | Tylko W7 (API). Wewnętrzne warstwy nie omawiają |
+| Structured logging (JSON) | W7 ✓, W8 ✓ | W1–W6 — zakłada się log, ale format nie jest opisany |
+| Health check / liveness | W7 ✓ | Pozostałe warstwy nie opisują endpointów health |
+| Metryki Prometheus | W7 ✓, W8 ✓ | W1–W6 — brak opisu jakie metryki eksportować |
+| Contract test (Pact/schemata) | W1 ✓, W2 ✓ | W3–W6 — kontrakty opisane, ale brak pytań o automatyczne testy kontraktów |
+| Blue/green deployment | — | Żadna warstwa nie omawia strategii wdrożeń bez downtime |
+| Chaos testing | — | Żadna warstwa nie omawia odporności na awarie sąsiednich usług |
+
+---
+
+## 4. Luki cross-warstwowe — status ADR
+
+Szczegóły w `INDEX.md` → sekcja ADR. Tu tylko status rozwiązania:
+
+| ADR | Pytanie | Status |
+|-----|---------|--------|
+| ADR-01 | Pipeline: W3 przed W2 czy wewnątrz W2? | ⚠️ NIEROZSTRZYGNIĘTE |
+| ADR-02 | Pipeline: W6 przed W2 czy po W2? | ⚠️ NIEROZSTRZYGNIĘTE |
+| ADR-03 | W5 ← W3: callback/hot-reload/polling? | ⚠️ NIEROZSTRZYGNIĘTE |
+| ADR-04 | W0 ← W1: ILemmatizer interface? | ⚠️ NIEROZSTRZYGNIĘTE |
+| ADR-05 | W1 fallback parser: sync czy async? | ⚠️ NIEROZSTRZYGNIĘTE |
+
+> Każde NIEROZSTRZYGNIĘTE ADR to blokada implementacji warstw których dotyczy.
+> Przed rozpoczęciem kodowania danej warstwy odpowiednie ADR muszą mieć status `✅ PODJĘTE`.
+
+---
+
+## 5. Tematy wymagające rozbudowy (kandydaci do nowych pytań)
+
+Tematy zidentyfikowane jako słabo pokryte na podstawie przeglądu wszystkich plików:
+
+| Temat | Brakuje w | Priorytet |
+|-------|-----------|-----------|
+| Zero-anafora i elipsa | W6 | Wysoki — dotyczy języka polskiego |
+| Named Entity Recognition (NER) integracja | W2, W3 | Wysoki — NER zasila role semantyczne |
+| Obsługa wielojęzyczności (EN fallback gdy PL brak) | W0, W1 | Średni |
+| GDPR / przetwarzanie danych osobowych | W8 | Wysoki (projekt zarobkowy) |
+| Rate limiting / quota na API | W7 | Średni |
+| Dokumentacja OpenAPI/Swagger auto-generowanie | W7 | Niski |
+| Retry policy (exponential backoff) dla zewnętrznych zasobów | W3, W4 | Średni |
+| Cache invalidation strategy (TTL vs event-driven) | W3, W4, W5 | Wysoki |
+| Semantic versioning kontraktów danych | W1, W2 | Wysoki |
+
+---
+
+## 6. Jak używać tej macierzy
+
+1. **Przed implementacją warstwy** — sprawdź sekcję 4 (ADR) czy blokujące decyzje są podjęte
+2. **Podczas code review** — sprawdź sekcję 3 (cross-cutting) czy dana warstwa opisuje swoje zachowanie
+3. **Przed zamknięciem fazy** — sprawdź sekcję 5 (kandydaci do rozbudowy) dla danej warstwy
+4. **Aktualizacja macierzy** — po uzupełnieniu pytań w W_x, zaznacz ✓ w odpowiedniej komórce tabeli 1
+
+> **Nie** dodawaj checkboxów do plików W_x — one są dokumentami projektowymi, nie task-listami.
+> Status implementacji śledź w `IMPLEMENTATION_STATUS.md` (do stworzenia gdy ruszy kodowanie).

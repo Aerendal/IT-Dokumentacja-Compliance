@@ -46,7 +46,7 @@ Tekst z NKJP (XML)
   W7 FastAPI /audit endpoint
 ```
 
-## Pytania zrodlowe — sklasyfikowane
+## Pytania źródłowe — sklasyfikowane
 
 
 - Pokaż jak zapisać zdarzenie „Jan zabił zwierzę” w grafie..
@@ -118,7 +118,7 @@ Tekst z NKJP (XML)
 - Zintegrujmy pełny pipeline NKJP z GapAnalysisReport.
 
 
-## Pytania uzupelniajace
+## Pytania uzupełniające
 
 ### 1. Architektura
 

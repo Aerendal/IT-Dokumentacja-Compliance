@@ -158,3 +158,16 @@ Sekwencja zdań (z W1) + DependencyTree
 - Jak logować "dlaczego 'on' zostało zmergowane z 'Jan'" — ścieżka: recency + gender match?
 - Jak przechowywać łańcuch koreferencji per dokument dla celów dowodowych?
 - Jak śledzić, które zdanie dostarczyło antecedentu dla danego zaimka?
+
+---
+
+## Rozszerzalność i skalowanie
+
+### Stopniowe rozszerzanie koreferencji
+
+- Jak `CoreferenceResolver` rozszerzyć na rozwiązywanie zaimków w tekstach wieloakapitowych (okno kontekstu > 1 zdanie)?
+- Jak dodać obsługę nowych typów wyrażeń koreferencyjnych (np. elipsa, zero-anafora) bez przepisywania silnika?
+- Jak testować poprawność koreferencji na korpusie z rosnącą liczbą zdań — czy precision/recall nie spada?
+- Jak W6 skaluje się na długie dokumenty (>10 000 tokenów) — algorytm O(n²) vs O(n log n)?
+- Jak stopniowo dodawać nowe strategie rozwiązywania (ML → rule-based → hybrid) nie łamiąc istniejących?
+- Jak wersjonować model koreferencji — żeby móc odtworzyć wyniki z konkretnej wersji modelu?
