@@ -269,6 +269,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak użyć APOC (`apoc.import.json`) do szybkiego importu wielu węzłów naraz?
 - Jak zoptymalizować import miliona relacji hiperonimii ze Słowosieci do Neo4j?
 - Jak modelować relację `MITIGATED_BY` w grafie dla modelu zagrożeń — `:ThreatModel {stride:['SPOOFING'], mitigated:False}` + `(:ThreatModel)-[:MITIGATED_BY]->(:Mitigation {control:'rate_limiting', status:'IMPLEMENTED'})`; krawędź `MITIGATED_BY` pozwala Cypherowi na `MATCH (tm)-[:MITIGATED_BY]->(m) WHERE m.status='IMPLEMENTED' RETURN tm` jako alternatywny warunek zaspokojenia SEC-01b bez pola `mitigated` na węźle?
+- Jak zdefiniować relację `MITIGATED_BY` w Cypher dla SEC-01 — pełny przepis: `MERGE (tm:ThreatModel {id:'tm_api'}) MERGE (m:Mitigation {id:'mit_rate', control:'rate_limiting', status:'IMPLEMENTED', owner:'DevOps'}) MERGE (tm)-[r:MITIGATED_BY]->(m) SET r.applied_at='2026-03-01'`; SEC-01b query: `MATCH (e)-[:HAS_THREAT_MODEL]->(tm) WHERE NOT (tm)-[:MITIGATED_BY]->(:Mitigation {status:'IMPLEMENTED'}) RETURN e, tm`; różnica względem `tm.mitigated=True`: właściwość `owner` i `applied_at` na krawędzi dają pełną historię remediacji?
 
 ### 4. Testowanie
 
