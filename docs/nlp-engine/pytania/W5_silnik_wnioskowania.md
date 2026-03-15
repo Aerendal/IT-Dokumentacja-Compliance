@@ -347,6 +347,7 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zintegrować `IntentClassifier` z głównym pipeline'em — `SemanticMapper.__init__(intent_clf: IntentClassifier)`, po `map_roles()` wywołaj `event.speech_act = intent_clf.classify(sentence)` zanim EventFrame trafi do InferenceEngine; klasyfikator operuje na surowym zdaniu przed parsowaniem dep_rel?
 - Jak KnowledgeGapTracker raportuje braki w Słowosieci — `dump_jsonl()` filtruje wpisy `type=='MISSING_SYNSET'` i eksportuje do `wordnet_gaps.jsonl`; format: `{predicate, pos, doc_id, sentence_fragment}`; plik stanowi wkład do procesu rozszerzania plWordNet o nowe leksemy techniczne?
 - Jak sformatować raport luk dla błędów `MISSING_SENSE` — różnica: `MISSING_SYNSET` = brak całego synsetu dla lematu; `MISSING_SENSE` = synset istnieje ale brakuje konkretnego sensu (znaczenia) w danym kontekście domenowym; format wpisu: `{predicate, synset_id, missing_sense_gloss, domain_hint, doc_id}`; wyeksportuj jako `sense_gaps.jsonl` osobno od `wordnet_gaps.jsonl`?
+- W jaki sposób silnik zamraża wniosek w macierzy stanu — `StateMatrix.freeze(fact_hash)` oznacza wniosek jako rozliczony: `self._frozen: Set[str]`; przed każdym `InferenceEngine.run()`: `if fact_hash in state_matrix._frozen: skip`; `freeze()` wywoływany po pomyślnym zapisie `AuditFinding` do Neo4j; gwarancja idempotentności — ten sam dokument audytowany dwukrotnie nie generuje duplikatów; `fact_hash = sha256(agent+action+patient+speech_act)` jako klucz deduplikacji?
 
 ### 4. Testowanie
 
