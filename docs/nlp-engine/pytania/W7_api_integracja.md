@@ -124,6 +124,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zintegrować akcję COMMAND z endpointem FastAPI?
 - Zintegrujmy endpoint FastAPI z pełnym potokiem analizy intencji..
 - Pokaż kod api.py z endpointem /audit dla FastAPI.
+- Jak endpoint /analyze przekazuje pole document_type (wynik KlasyfikatorKontekstu) do warstw W5 i W8?
+- Czy klient API może explicite podać document_type w żądaniu i pominąć KlasyfikatorKontekstu?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

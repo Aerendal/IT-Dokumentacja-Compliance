@@ -127,6 +127,11 @@ Tekst z NKJP (XML)
 - Jak logować każdą rekonstrukcję IMPLICIT_SUBJECT do celów audytu — co zapisać w EventFrame.metadata?
 - Jak AuditEngine korzysta z KlasyfikatorKontekstu do wyboru zestawu reguł compliance per typ dokumentu?
 - Jak wynik KlasyfikatorKontekstu trafia do nagłówka GapAnalysisReport — pole document_type: enum?
+- Jak AuditEngine mapuje typ dokumentu z KlasyfikatorKontekstu na zestaw reguł compliance — słownik type→ruleset?
+- Jak obsłużyć dokument z typem UNKNOWN w AuditEngine — zastosuj zestaw reguł bazowych czy odrzuć?
+- Jak logować decyzję KlasyfikatorKontekstu w raporcie audytu dla celów traceability?
+- Jak raport audytu compliance osadza diagram Mermaid.js łańcucha przyczynowego naruszenia CONS-02?
+- Jak renderować Mermaid.js w raporcie Markdown — znacznik ```mermaid z zawartością flowchart LR?
 
 ### 4. Testowanie
 - Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?

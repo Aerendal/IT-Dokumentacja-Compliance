@@ -76,6 +76,10 @@ CoreferenceChain (z W6)
 - Pokaż strukturę tabel i indeksów dla inżynierskiej bazy grafowej..
 - Przejdźmy do zamiany słownika ról na strukturę grafową..
 - Jak zapisać wielowymiarowy graf zdarzenia w strukturze bazy Neo4j?
+- Zaprojektuj strukturę bazy Neo4j dla grafu przyczynowego — węzły :EventFrame, :Concept, :Synset i krawędzie :CAUSES, :IS_A, :HAS_ROLE?
+- Jak wygląda ontologia zdarzeń w Neo4j — jakie typy węzłów i relacji są konieczne dla compliance dokumentów prawnych?
+- Jak odróżnić węzeł :EventFrame (konkretne zdarzenie z dokumentu) od :Concept (abstrakcyjna klasa) w grafie Neo4j?
+- Jak zdefiniować hierarchię ontologiczną zdarzeń — :EventFrame IS_A :Concept IS_A :OntologyClass?
 
 ### 2. Kontrakty danych
 - Jak zapisać węzeł pojęcia w formacie JSON dla grafu?
@@ -88,6 +92,10 @@ CoreferenceChain (z W6)
 - Jak reprezentować relację synsetową IS_A jako krawędź w grafie Neo4j — węzeł :Concept i krawędź :IS_A z właściwościami?
 - Jak zdefiniować schemat węzła :Synset w Neo4j — właściwości id, name, pos, definition, source (Słowosieć/WordNet)?
 - Jak zapobiec eksplozji grafu gdy każdy token importuje pełne drzewo hiperonimii (setki węzłów per token)?
+- Jaki jest schemat węzła :EventFrame w Neo4j — właściwości: id, predicate, source_doc_id, timestamp, confidence?
+- Jak zdefiniować schemat krawędzi :CAUSES — właściwości: rule_id, confidence, evidence_sentence?
+- Jak zdefiniować schemat węzła :Synset w grafie przyczynowym — id, name, pos, synset_id ze Słowosieci?
+- Jakie ograniczenia (CONSTRAINT) założyć na węzłach :EventFrame — UNIQUE na id, NOT NULL na predicate?
 
 ### 3. Implementacja
 - Pokaż dokładny model danych grafu dla przykładu z Janem..
@@ -133,6 +141,19 @@ CoreferenceChain (z W6)
 - Pokaż implementację wyszukiwania w Neo4j dla pytań o lokalizację..
 - Jak zaimplementować wyszukiwanie wzorca z pytajnikiem w Neo4j?
 - Pokaż implementację wyszukiwarki Cypher dla intencji QUESTION..
+- Pokaż Cypher CREATE CONSTRAINT UNIQUE dla węzła :EventFrame(id) i :Synset(synset_id)?
+- Jak stworzyć indeks pełnotekstowy (fulltext index) na właściwości predicate węzłów :EventFrame?
+- Jak zaimportować ontologię zdarzeń compliance do Neo4j używając APOC.load.json z pliku seed?
+- Jak napisać Cypher który zwraca pełny łańcuch przyczynowy od węzła :EventFrame do korzenia ontologii?
+- Jak zapytać Neo4j o wszystkie :EventFrame połączone krawędzią :CAUSES w łańcuchu A→B→C→D?
+- Pokaż skrypt Python importujący synsety Słowosieci do Neo4j — parsowanie API/XML i UNWIND MERGE Cypher?
+- Jak obsłużyć aktualizację Słowosieci (nowa wersja) w Neo4j — MERGE upsert czy usunięcie i reimport?
+- Jak zweryfikować kompletność importu Słowosieci — porównaj liczbę synsetów w Neo4j z liczbą w źródle?
+- Jak napisać zapytanie Cypher które zwraca łańcuch :CAUSES jako listę par (source, target) do Mermaid serializacji?
+- Jak zbudować Mermaid.js diagram z wyników Cypher — Python f-string template dla `flowchart LR`?
+- Jak zaimportować plik plWordNet LMF XML do Neo4j — skrypt Python z iterparse + UNWIND + MERGE Cypher?
+- Jak zmapować elementy LMF XML na węzły Neo4j — LexicalEntry→:Lemma, Synset→:Synset, SynsetRelation→:IS_A?
+- Jak zweryfikować poprawność importu plWordNet — sprawdź że liczba węzłów :Synset = liczba <Synset> w XML?
 
 ### 4. Testowanie
 - Jak zapisać węzeł „Test jednostkowy” w formacie ontologii JSON?

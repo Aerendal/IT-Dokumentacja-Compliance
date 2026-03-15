@@ -82,6 +82,9 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż model danych dla relacji bazujących na synsetach — Synset(id, name, pos, lemmas) i SynsetRelation(source_id, type, target_id)?
 - Jak zdefiniować kontrakt dla relacji IS_A, HAS_SYNSET, SIMILAR_TO w formacie JSON — pokaż przykładowy obiekt?
 - Jak EnrichedToken z W3 reprezentuje listę synsetów — pole synsets: List[SynsetRef] z id, confidence, pos?
+- Jaki jest format plWordNet (LMF XML) — struktura pliku, elementy LexicalEntry, Sense, Synset, SynsetRelation?
+- Jak odróżnić plWordNet (format LMF XML) od API Słowosieci (REST/SOAP) — kiedy używać którego źródła?
+- Jak parsować plik plWordNet LMF XML w Pythonie — lxml, iterparse dla pliku 500 MB bez ładowania do RAM?
 
 ### 3. Implementacja
 - Jakie reguły ujednoznaczniania dodać do silnika disambiguation?
@@ -169,6 +172,14 @@ _brak pytań źródłowych w tej kategorii_
 - Jak W3 obsługuje żądania z W0 (Linter) o synonimy terminu — synchroniczne wywołanie czy pre-loaded cache?
 - Jak W3 informuje W0 gdy wykryty "synonim" jest faktycznie hiperonimem — relacja generalizacji, nie równoznaczność?
 - Jak W3 eksponuje API dla W0 do sprawdzenia czy dwa terminy należą do tego samego synsetu?
+- Wariant A — pełny import synsetów Słowosieci do Neo4j jako :Synset węzły: jak przeprowadzić import offline i jak często odświeżać?
+- Wariant B — odpytywanie SlowosiecAdapter on-demand dla każdego tokena: jakie są trade-offy latency vs. aktualność danych?
+- Wariant C — pre-built subgraf synsetów dla domeny prawnej (filtr: lematy z NKJP-Legal): jak budować i weryfikować pokrycie?
+- Kiedy wybrać Wariant A vs. B vs. C — kryteria: rozmiar korpusu, latency SLA, częstotliwość aktualizacji Słowosieci?
+- Jak migrować z Wariantu B (on-demand) do Wariantu A (import) bez przerwy w działaniu serwisu?
+- Jak zintegrować plWordNet z grafem przyczynowym — synsety z plWordNet stają się węzłami :Synset w Neo4j?
+- Jak plWordNet definiuje relacje hiperonimii (hyperonymy) i jak mapują się na krawędź :IS_A w grafie?
+- Jak połączyć węzły :EventFrame z :Synset z plWordNet — zapytanie Cypher MATCH i MERGE relacji HAS_SYNSET?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

@@ -164,6 +164,21 @@ _brak pytań źródłowych w tej kategorii_
 - Jak KlasyfikatorKontekstu pobiera sygnały z W3 (leksyka), W2 (role) i W6 (koreferencja) do klasyfikacji dokumentu?
 - Jak zdefiniować enum klas dokumentów w KlasyfikatorKontekstu — UMOWA, SRS, RAPORT_AUDYTU, SPECYFIKACJA_TECHNICZNA?
 - Jak KlasyfikatorKontekstu wpływa na InferenceEngine — czy aktywowane reguły DRL są filtrowane per typ dokumentu?
+- Jak InferenceEngine odpytuje graf przyczynowy w Neo4j — Cypher query wbudowany w regułę DRL?
+- Jak CausalChainBuilder tworzy krawędź :CAUSES między dwoma :EventFrame po aktywacji reguły?
+- Jak InferenceEngine weryfikuje spójność grafu przyczynowego — czy krawędź :CAUSES nie tworzy cyklu?
+- Jakie dane treningowe są potrzebne dla KlasyfikatorKontekstu — etykietowane przykłady per typ dokumentu?
+- Jak zdefiniować próg pewności (confidence threshold) KlasyfikatorKontekstu — co zwrócić gdy wynik < 0.6?
+- Jak obsłużyć fallback KlasyfikatorKontekstu gdy dokument nie pasuje do żadnej klasy — UNKNOWN czy heurystyka?
+- Jak aktualizować model KlasyfikatorKontekstu bez restartu serwisu — hot reload reguł klasyfikacji?
+- Jak InferenceEngine korzysta ze synsetów w Neo4j (Wariant A) do rozszerzenia reguł o synonimy?
+- Jak InferenceEngine odpytuje SlowosiecAdapter on-demand (Wariant B) w regule DRL bez blokowania sesji?
+- Jak porównać skuteczność Wariantu A vs. B dla reguły CONS-02 — F1 score na zbiorze testowym?
+- Zaimplementujmy eksport łańcuchów kauzalnych do formatu Mermaid.js — metoda CausalChainBuilder.to_mermaid()?
+- Jak zserializować graf przyczynowy jako Mermaid flowchart LR — węzły to EventFrame.id, krawędzie to :CAUSES z rule_id?
+- Jak obsłużyć łańcuchy z rozgałęzieniami (jeden :EventFrame powoduje dwa skutki) w formacie Mermaid.js?
+- Jak escapować znaki specjalne (cudzysłowy, polskie litery) w etykietach węzłów Mermaid.js?
+- Jak testować serializer Mermaid.js — golden file test z oczekiwanym outputem dla łańcucha A→B→C?
 
 ### 4. Testowanie
 - Jak w Drools połączyć rozpoznaną akcję z wymogiem testu?
