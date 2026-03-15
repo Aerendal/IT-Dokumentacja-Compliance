@@ -20,7 +20,7 @@ Kluczowe klasy: `SemanticMapper`, `SlowosiecAdapter` (WSD dla ról).
 ## Uzasadnienie istnienia warstwy
 
 **Dlaczego ta warstwa jest potrzebna:**
-W2 istnieje bo drzewo zależności składniowych z W1 mówi o strukturze zdania, nie o znaczeniu. `nsubj` to "podmiot gramatyczny" — ale w stronie biernej podmiot gramatyczny jest PATIENT, nie AGENT ("Zwierzę zostało zabite" → `nsubj(zwierzę)` = PATIENT). W2 tłumaczy strukturę składniową na semantykę zdarzenia: kto (AGENT) zrobił co (ACTION) z czym (INSTRUMENT) komu (PATIENT) gdzie (LOCATION) kiedy (TIME). Ta struktura jest tym czego potrzebuje W5 (Drools) do wnioskowania i W4 (Neo4j) do budowania grafu semantycznego.
+W2 istnieje bo drzewo zależności składniowych z W1 mówi o strukturze zdania, nie o znaczeniu. `nsubj` to "podmiot gramatyczny" — ale w stronie biernej podmiot gramatyczny jest PATIENT, nie AGENT ("Dokumentacja techniczna została odrzucona" → `nsubj(Dokumentacja)` = PATIENT, nie AGENT — Zamawiający jest pominięty lub w `obl` z "przez"). W2 tłumaczy strukturę składniową na semantykę zdarzenia: kto (AGENT) zrobił co (ACTION) komu (PATIENT) czym (INSTRUMENT) gdzie (LOCATION) kiedy (TIME). Ta struktura jest tym czego potrzebuje W5 (Drools) do wnioskowania i W4 (Neo4j) do budowania grafu semantycznego.
 
 **Co się sypie bez tej warstwy:**
 - W5 musi samodzielnie dekodować fleksję polską żeby pisać reguły DRL — logika biznesowa miesza się z lingwistyką; zmiana modelu UDPipe łamie wszystkie reguły
