@@ -123,13 +123,6 @@ _brak pytań źródłowych w tej kategorii_
 - Jak uruchomić skrypt audytujący w trybie CI/CD — exit code 0 gdy 0 błędów krytycznych, exit code 1 gdy są luki?
 - Jak zbatchować wyniki audytu wielu plików Markdown do jednego zbiorczego raportu JSON?
 - Jak zparallelizować audyt wielu plików Markdown — multiprocessing.Pool czy async/await?
-- Jak dodać obsługę ignorowania reguł Lintera w plikach Markdown — komentarz `<!-- noaudit: RULE-ID -->` czy pole `ignore_rules` w YAML?
-- Jak Linter W0 czyta listę reguł do pominięcia z pola `ignore_rules` w YAML front matter — parsowanie i filtrowanie wyników?
-- Jak zapisać pominięte reguły w raporcie audytu — pole `suppressed_rules` z polami: rule_id, reason, author?
-- Jak zapobiec nadużywaniu `ignore_rules` — limit ilości pominięć per dokument i wymaganie pola `reason`?
-- Jak zaimplementować moduł ignorowania ostrzeżeń — klasa WarningSuppressor która parsuje `ignore_rules` z YAML i filtruje wyniki Lintera przed raportem?
-- Jak WarningSuppressor rozróżnia BLOCKER (nigdy nie ignoruj), WARNING (można ignorować z `reason`) i INFO (można ignorować bez uzasadnienia)?
-- Jak testować WarningSuppressor — asercja że Linter z `ignore_rules: [ARCH-01]` nie zwraca naruszenia ARCH-01 ale nadal zwraca BLOCKER?
 - Jak zautomatyzować przypisanie klasy dokumentu na podstawie metadanych YAML — skrypt batch który klasyfikuje per plik po polach layer/tags?
 - Stwórzmy klasę DocumentClassifier do automatycznej kategoryzacji plików — jak DocumentClassifier.classify(file_path) → DocumentType?
 - Jak DocumentClassifier różni się od KlasyfikatorKontekstu — DocumentClassifier operuje na pliku/metadanych, KlasyfikatorKontekstu na zawartości semantycznej?
@@ -214,8 +207,6 @@ _brak pytań źródłowych w tej kategorii_
 - Jak sklasyfikować błędy Lintera według krytyczności — BLOCKER (brak front matter), WARNING (brakujące pole), INFO (formatowanie)?
 - Jak odróżnić błąd struktury Markdown od błędu merytorycznego (brakująca sekcja) w raporcie Lintera?
 - Jak obsłużyć plik Markdown który nie jest dokumentem W_x (np. README.md) — pominąć czy audytować innym zestawem reguł?
-- Jak uniknąć cichego ignorowania reguły gdy komentarz `<!-- noaudit -->` zawiera literówkę RULE-ID — Linter powinien zgłaszać nieznany identyfikator?
-- Jak zapewnić audit trail dla pominięć reguł — log entry z timestampem, autorem i polem `reason` per pominięcie?
 
 ## Pytania uzupełniające
 - **Pułapka 3:** `completeness_score` logarytmiczny może maskować wiele małych błędów — dokument z 20 ostrzeżeniami i 0 błędami krytycznych dostanie wynik ~0.60, co wygląda jak "akceptowalny", choć nie jest.
