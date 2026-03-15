@@ -283,6 +283,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak rozbudować `gap_detector.py` o nowe typy dokumentów (poza 9 istniejącymi szablonami)?
 - Jak dostroić progi podobieństwa w `duplicate_detector.py` (exact/extending/thematic/partial)?
 - Jak zaimplementować regułę ARCH-01 i SEC-01 jako formalne predykaty w `doc_auditor.py`?
+- Jak `LinterRuleEngine` wykrywa błędy kaskadowe przy braku backupu — reguła `BACKUP-01` (`MATCH (db:Database) WHERE NOT (db)-[:HAS_BACKUP]->(:BackupPolicy) RETURN db`) uruchamia `CrossReferenceEngine.check_cascade(violation)` i zbiera wszystkie dokumenty referujące `db`; błąd kaskadowy = każdy dokument opisujący odtwarzanie bez potwierdzenia polityki backupu; `Violation(rule_id='BACKUP-01', node_id=db_id, severity='CRITICAL')`?
+- Jak `CrossReferenceEngine` wykrywa konflikty między regułami — dwie reguły `r1, r2` są w konflikcie gdy ich Cypher MATCH pokrywa ten sam węzeł i generują sprzeczne `Violation.severity`: `class RuleConflict(NamedTuple): rule_a, rule_b, node_id, conflict_type`; `conflict_type ∈ {'DOUBLE_VIOLATION', 'SEVERITY_MISMATCH', 'MUTUAL_EXCLUSION'}`; `CrossReferenceEngine.detect_conflicts(violations_a, violations_b)→List[RuleConflict]`?
+- Jak wdrożyć regułę SEC-01 w grafie Neo4j krok po kroku — (1) `MERGE (:ThreatModel {id:'tm_api', stride:['SPOOFING'], mitigated:True})` tworzy węzeł; (2) `MATCH (e:EventFrame {domain:'API'}) MERGE (e)-[:HAS_THREAT_MODEL]->(tm)` tworzy krawędź; (3) `SEC01Rule.run_cypher_rule(session)` wyszukuje EventFrame bez tej krawędzi; (4) wynik: `Violation('SEC-01', e_id, severity='HIGH')`; `:ThreatModel` bez pola `mitigated` domyślnie traktowany jako `mitigated=False` → naruszenie SEC-01b?
 - Jak dodać obsługę reguły API-01 i DEP-01 do istniejącego schematu SQLite?
 - Jak rozbudować `relation_mapper.py` o relację `contradicts` (wykrywanie sprzeczności)?
 - Jak dodać tagi YAML front matter do plików Markdown projektu (format: `layer`, `title`, `status`, `tags`)?
@@ -295,6 +298,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak przetestować regresję po zmianie progów podobieństwa — złoty wzorzec dla 10 dokumentów?
 - Jak zmierzyć pokrycie mutacyjne (Mutation Score) dla W0 — jakie są minima dla projektu zarobkowego?
 - Jakie testy integracyjne należy napisać dla subkomendy `doc-audit` w `compliance_check.py`?
+- Napiszmy pierwszy RED test dla `CrossReferenceEngine` na poziomie unit — `def test_cross_ref_engine_no_violations_for_empty_docs(): engine = CrossReferenceEngine([]); result = engine.check_cascade(Violation('AUTH-01','node_x')); assert result == []`; RED bo konstruktor `CrossReferenceEngine([])` nie istnieje — zakłada co najmniej jeden dokument; unit test bez fixtury Neo4j?
+- Napiszmy RED test dla bazy danych bez backupu — `def test_backup01_rule_fires_on_db_without_policy(): session = Mock(); session.run.return_value = [{'db': {'id': 'db_prod'}}]; rule = Backup01Rule(); violations = rule.run_cypher_rule(session); assert violations[0].rule_id == 'BACKUP-01'; assert violations[0].severity == 'CRITICAL'`; RED bo klasa `Backup01Rule` jeszcze nie istnieje w katalogu reguł?
 - Jak testować wyniki audytu SQLite, żeby sprawdzić idempotentność skanowania?
 #### Kompletna hierarchia TDD
 - Napisz czerwony test TDD dla `GapDetector` — `detect_gaps(doc)` z brakującą sekcją → `[GapFinding(section='Wymagania', severity=HIGH)]`.
