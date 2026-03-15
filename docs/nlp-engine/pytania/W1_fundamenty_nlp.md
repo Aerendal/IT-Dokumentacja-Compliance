@@ -182,6 +182,11 @@ Plik NKJP (XML/TEI P5)
 - Pokaż przykład analizy raportu o braku szyfrowania w API..
 - Jak rozszerzyć linter o wykrywanie sprzeczności logicznych w dokumentacji?
 - Pokaż przykład analizy przyczynowo-kontekstowej dla wymiaru intencji.
+- Domknijmy NKJPPipeline do generowania raportów luk — pokaż kod metody close() i finalize_report().
+- Jak NKJPPipeline zarządza cyklem życia (init → process → close) dla długich sesji przetwarzania?
+- Jak NKJPPipeline buforuje wyniki pośrednie przed wygenerowaniem końcowego GapAnalysisReport?
+- Jaki jest sygnał zakończenia pipeline'u — wszystkie dokumenty przetworzone, timeout, czy explicit close()?
+- Jak obsłużyć przerwanie NKJPPipeline w połowie przetwarzania — checkpoint i resume od ostatniego dokumentu?
 
 ### 4. Testowanie
 - Jakie konkretne dane z NKJP pobrać do testów lematyzacji?
@@ -267,6 +272,9 @@ Plik NKJP (XML/TEI P5)
 - Jak zintegrować model intencji z naszym potokiem NLP?
 - Jak zintegrować zaprzeczenia z logiką posiadania w grafie?
 - Czy możemy zintegrować Morfeusza do głębszej analizy morfosyntaktycznej?
+- Jak NKJPPipeline z W1 przekazuje przetworzony korpus do W0 (GapAnalysisReport) — batch czy streaming?
+- Jakie dane z NKJP są niezbędne dla GapAnalysisReport — lematy, POS, feats, czy cały CoNLL-U?
+- Jak weryfikować że pipeline NKJP → GapAnalysis nie traci dokumentów przy przetwarzaniu wsadowym?
 
 ### 7. Pułapki i ryzyka
 - Jakie są 3 fundamentalne bariery, które zatrzymały podobne projekty?

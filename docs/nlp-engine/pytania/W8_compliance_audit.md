@@ -120,6 +120,8 @@ Tekst z NKJP (XML)
 - Zastosujmy regułę odtwarzania podmiotu z końcówki czasownika..
 - Zaimplementujmy Gap Analysis Report dla wykrytych luk..
 - Jak rozbudować łańcuchy przyczynowe o osie czasu?
+- Jak endpoint /audit w W7 wywołuje W8 (AuditEngine) — synchronicznie w request czy asynchronicznie z kolejką?
+- Jak W8 serializuje wynik audytu do formatu akceptowanego przez endpoint /audit (JSON z listą naruszeń)?
 
 ### 4. Testowanie
 - Jak stworzyć wielowymiarowy test dla reguły prawnej dotyczącej kłusownictwa?

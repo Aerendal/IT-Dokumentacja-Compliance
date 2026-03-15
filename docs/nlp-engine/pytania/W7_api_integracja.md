@@ -83,6 +83,12 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zaimplementować endpoint /health zwracający status każdej warstwy wewnętrznej (W1–W8)?
 - Jak zaimplementować obsługę Apache Thrift po stronie serwera — generowany stub czy ręczny handler?
 - Jak zaimplementować structured logging (JSON) w FastAPI z correlation ID per request?
+- Jakie parametry przyjmuje endpoint /audit — surowy tekst, JSON z metadanymi dokumentu, czy plik multipart/form-data?
+- Jak paginować wyniki /audit gdy dokument ma setki naruszeń — cursor-based czy offset pagination?
+- Jak zaimplementować asynchroniczny endpoint /audit używając FastAPI BackgroundTasks lub asyncio?
+- Jak zabezpieczyć /audit przed nieautoryzowanym dostępem — Bearer token, API Key, czy mTLS?
+- Jak wdrożyć /audit jako kontener Docker — Dockerfile, health check, uwicorn workers?
+- Jak skonfigurować reverse proxy (Nginx/Traefik) przed /audit — timeout, max body size, TLS termination?
 
 ### 4. Testowanie
 - Gdzie w procesie CI/CD uruchomić te testy?

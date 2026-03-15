@@ -74,6 +74,10 @@ _brak pytań źródłowych w tej kategorii_
 - Jak zdefiniować kontrakt dla pola confidence w raporcie duplikatu — float 0.0–1.0 czy enum (low/medium/high)?
 - Jakie pola są obowiązkowe w metadanych dokumentu przekazywanego do audytu (id, tytuł, wersja, data)?
 - Jak wyglądają przykładowe dane wejściowe i wyjściowe audytu w formacie JSON — pokaż schemat z polami wymaganymi?
+- Jakie pola YAML front matter są obowiązkowe vs. opcjonalne dla plików dokumentacji warstwy W_x (layer, title, status, tags, version)?
+- Jak zwalidować że pole `layer` w YAML front matter odpowiada jednej z zdefiniowanych wartości W0–W8?
+- Jak parsować YAML front matter w Pythonie (ruamel.yaml) bez modyfikowania reszty pliku Markdown?
+- Jak wyeksportować tagi YAML front matter jako właściwości węzła dokumentu w grafie Neo4j?
 
 ### 3. Implementacja
 - Jakie reguły ARCH-01 i SEC-01 sprawdzać w teście własnościowym?
@@ -93,6 +97,8 @@ _brak pytań źródłowych w tej kategorii_
 - Jak system rozpozna brak protokołu bezpieczeństwa w grafie komponentu sieciowego?
 - Jak zmapować pojęcia techniczne na klasę komponent_sieciowy?
 - Czy system obsłuży audyt warunków typu 'Jeśli API, to SSL'?
+- Jak zaimplementować parser YAML front matter który toleruje brakujące pola opcjonalne bez rzucania wyjątku?
+- Jak zbudować walidator schema YAML front matter oparty o jsonschema lub pydantic?
 
 ### 4. Testowanie
 - Jak zaimplementować testy własnościowe dla reguł ARCH-01 i SEC-01?
@@ -129,6 +135,10 @@ _brak pytań źródłowych w tej kategorii_
 - Pokaż przykład reguły w silniku AuditEngine..
 - Pokaż przykład reguły w silniku AuditEngine dla weryfikacji ARCH-01..
 - Zintegrujmy pełny pipeline: od XML NKJP do raportu luk.
+- Jak zdefiniować klasę GapAnalysisReport — pola: document_id, gaps, duplicates, relations, generated_at, severity_summary?
+- Jak pipeline NKJP → GapAnalysisReport obsługuje przypadek gdy plik XML NKJP jest niekompletny lub uszkodzony?
+- Jak serializować GapAnalysisReport do JSON i Markdown jednocześnie z jednej klasy modelu?
+- Jak NKJPPipeline przekazuje przetworzone tokeny do GapAnalyzer który buduje instancję GapAnalysisReport?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_
