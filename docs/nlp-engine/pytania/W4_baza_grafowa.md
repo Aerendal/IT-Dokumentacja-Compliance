@@ -169,6 +169,8 @@ CoreferenceChain (z W6)
 - Pokaż przykład łańcucha przyczynowego w Neo4j dla zdarzenia krytycznego CONS-02 — węzły :EventFrame(predicate:'nie dostarczyć', severity:'CRITICAL') powiązane krawędziami :CAUSES?
 - Jak zwizualizować pełny łańcuch przyczynowy dla zdarzenia krytycznego — Cypher: MATCH path=(e:EventFrame)-[:CAUSES*1..5]->(:EventFrame) WHERE e.severity='CRITICAL' RETURN path?
 - Jak reprezentować zdarzenie krytyczne w grafie — atrybut severity:'CRITICAL' na węźle :EventFrame czy osobna etykieta :CriticalEvent?
+- Pokaż jak wygenerować graf łańcuchów kauzalnych w Mermaid.js — Python skrypt pobiera wyniki Cypher MATCH path=(:EventFrame)-[:CAUSES*]->(:EventFrame) i serializuje jako flowchart LR?
+- Jak obsłużyć pusty łańcuch kauzalny (brak krawędzi :CAUSES) w generatorze Mermaid — fallback: diagram z jednym węzłem i komentarzem "brak łańcucha przyczynowego"?
 
 ### 4. Testowanie
 - Jak zapisać węzeł „Test jednostkowy” w formacie ontologii JSON?

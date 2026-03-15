@@ -194,6 +194,12 @@ _brak pytań źródłowych w tej kategorii_
 - Stwórzmy gotowy plik .github/workflows/audit.yml — jakie kroki zawiera: checkout, setup-python, pip install, run audit_cli.py --exit-code-on-failure 1?
 - Jak skonfigurować wyzwalacze w audit.yml — on: push (branches: [main, fresh-main]) + on: pull_request do dowolnej gałęzi?
 - Jak dodać komentarz do PR z podsumowaniem raportu audit_cli.py — GitHub Actions step z `gh pr comment` parsujący wygenerowany report.json?
+- Jak skonfigurować automatyczne blokowanie Pull Requestów przy błędach audytu — branch protection rule: required status check `audit / run-audit` musi przejść?
+- Jak zdefiniować job name w audit.yml tak aby pasował do required status check w ustawieniach repozytorium branch protection?
+- Jak zapobiec mergowaniu PR gdy audit_cli.py zwraca exit(1) — required_status_checks.strict: true w branch protection zabezpiecza przed mergem?
+- Jak zbudować kompletną strukturę audit.yml — job `run-audit` z krokami: checkout@v4, setup-python@v5, pip install -r requirements.txt, python audit_cli.py --input docs/ --exit-code-on-failure 1?
+- Jak parametryzować audit.yml przez workflow_dispatch inputs — manualne uruchomienie z parametrem --filter-tags dla selektywnego audytu?
+- Jak cachować zależności pip w audit.yml — actions/cache@v4 z kluczem opartym na hashFiles('requirements.txt') dla szybszego CI?
 
 ### 7. Pułapki i ryzyka
 _brak pytań źródłowych w tej kategorii_

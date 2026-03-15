@@ -195,6 +195,9 @@ _brak pytań źródłowych w tej kategorii_
 - Jak przekazać wynik KlasyfikatorKontekstu do GoldenStandardProfile.get_template(document_type) w AuditEngine?
 - Jak testować połączenie KlasyfikatorKontekstu z GoldenStandardProfile — mock document_type=UMOWA → oczekiwany template zawiera CONS-02?
 - Jak wykryć że dokument nie spełnia szablonu walidacyjnego — diff wymaganych sekcji vs. nagłówków wykrytych przez Linter?
+- Zaimplementujmy KlasyfikatorKontekstu i szablony walidacyjne dla typów dokumentów — pipeline: classify() → select_template() → validate_against_template() → lista luk?
+- Jak zdefiniować dataclass DocumentTemplate z listą required_sections, mandatory_rules i optional_rules per typ dokumentu (UMOWA/SRS/RAPORT)?
+- Jak DocumentTemplate.validate(document) zwraca listę ValidationGap — brakujące sekcje i niespełnione reguły jako strukturyzowane wyniki audytu?
 - Jak InferenceEngine korzysta ze synsetów w Neo4j (Wariant A) do rozszerzenia reguł o synonimy?
 - Jak InferenceEngine odpytuje SlowosiecAdapter on-demand (Wariant B) w regule DRL bez blokowania sesji?
 - Jak porównać skuteczność Wariantu A vs. B dla reguły CONS-02 — F1 score na zbiorze testowym?
