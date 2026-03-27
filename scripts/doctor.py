@@ -36,11 +36,18 @@ def _open(db_path: Path) -> sqlite3.Connection:
 
 def check_db_profile(db_path: Path, expected: str) -> tuple[bool, str]:
     if not db_path.exists():
-        hint = (
-            "  → run: python3 scripts/bootstrap_runtime.py"
-            if expected == "current-snapshot"
-            else "  → restore symlink: ln -s reports/it_doc_matrix_before_auto_approve.db reports/it_doc_matrix.db"
-        )
+        if expected == "current-snapshot":
+            hint = (
+                "  Role: current-snapshot document index (fast suite + pipeline)\n"
+                "  Recovery: python3 scripts/bootstrap_runtime.py"
+            )
+        else:
+            hint = (
+                "  Role: legacy-runtime historical database (integration suite / compliance E2E)\n"
+                "  Recovery (Option A — external artifact): restore symlink:\n"
+                "    ln -s reports/it_doc_matrix_before_auto_approve.db reports/it_doc_matrix.db\n"
+                "  Note: fast suite and pipeline smoke work without this asset."
+            )
         return False, f"missing: {db_path}\n{hint}"
     conn = _open(db_path)
     try:
@@ -51,7 +58,7 @@ def check_db_profile(db_path: Path, expected: str) -> tuple[bool, str]:
                 False,
                 f"profile={detected.profile}, expected={expected}, "
                 f"missing={sorted(detected.missing_required)}\n"
-                f"  → run: python3 scripts/bootstrap_runtime.py",
+                f"  Recovery: python3 scripts/bootstrap_runtime.py",
             )
         return True, f"profile={detected.profile}"
     finally:
@@ -61,12 +68,27 @@ def check_db_profile(db_path: Path, expected: str) -> tuple[bool, str]:
 def check_path(path: Path, kind: str = "path") -> tuple[bool, str]:
     if not path.exists():
         hints: dict[str, str] = {
-            str(GENERATED): "  → run: python3 scripts/bootstrap_runtime.py",
-            str(GENERATED / "core"): "  → run: python3 scripts/bootstrap_runtime.py",
-            str(GENERATED / "satellite"): "  → run: mkdir -p generated_templates/satellite",
-            str(ALIGNMENT_LOG): "  → run: python3 scripts/bootstrap_runtime.py",
+            str(GENERATED): (
+                "  Role: root dir for generated template files\n"
+                "  Recovery: python3 scripts/bootstrap_runtime.py"
+            ),
+            str(GENERATED / "core"): (
+                "  Role: primary template store (9k+ .md files)\n"
+                "  Recovery: python3 scripts/bootstrap_runtime.py  (creates dir)\n"
+                "  Note: dir will be empty until templates are imported"
+            ),
+            str(GENERATED / "satellite"): (
+                "  Role: secondary template store (currently empty — OK)\n"
+                "  Recovery: mkdir -p generated_templates/satellite"
+                "  OR: python3 scripts/bootstrap_runtime.py"
+            ),
+            str(ALIGNMENT_LOG): (
+                "  Role: template-to-document alignment input for build_current\n"
+                "  Recovery: python3 scripts/bootstrap_runtime.py  (creates header-only CSV)\n"
+                "  Note: full alignment data populated by pipeline run"
+            ),
         }
-        hint = hints.get(str(path), "  → run: python3 scripts/bootstrap_runtime.py")
+        hint = hints.get(str(path), "  Recovery: python3 scripts/bootstrap_runtime.py")
         return False, f"{kind} missing: {path}\n{hint}"
     return True, f"{kind} ok"
 

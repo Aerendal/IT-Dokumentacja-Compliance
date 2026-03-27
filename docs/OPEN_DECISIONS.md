@@ -46,27 +46,55 @@ Jeden wybrany model, dokumentacja spójna, onboarding zgodny z wyborem.
 
 ## OD-002 — Status i źródło `legacy-runtime` DB
 
-**Status:** `OPEN`  
+**Status:** `CLOSED`  
 **Priorytet:** Wysoki  
-**Właściciel:** `________________________________`  
+**Właściciel:** autor repo  
 **Obszar:** Runtime / Reproducibility / Integration testing
 
-### Opis
-Repo używa `reports/it_doc_matrix.db` (1.7 GB) jako bazy `legacy-runtime`.
-Nie jest formalnie zapisane: skąd pochodzi, kto ją utrzymuje, jak odtworzyć.
+### Decyzja: Opcja C — hybrid (external artifact + graceful degradation)
 
-### Opcje
-- **A:** DB jest artefaktem dostarczanym zewnętrznie — opisać źródło i opiekuna.
-- **B:** DB ma procedurę pełnego odtworzenia — dostarczyć builder + pipeline.
+`reports/it_doc_matrix.db` (1.7 GB) jest **zewnętrznym artefaktem organizacyjnym**.  
+Repo **nie obiecuje jej pełnej odbudowy z kodu źródłowego**.
 
-### Ryzyko braku decyzji
-Integration suite działa tylko „tam, gdzie działała wcześniej". Nowa osoba nie odtworzy runtime.
+#### Co to oznacza w praktyce
 
-### Warunek zamknięcia
-Status DB opisany w docs, `doctor.py` komunikuje to poprawnie, integration zgodne z modelem.
+| Aspekt | Wartość |
+|---|---|
+| Źródło | `it_doc_matrix_before_auto_approve.db` — wynik wcześniejszego pipeline'u domenowego |
+| Opiekun | autor repo — nie jest dostarczana przez zewnętrzną usługę |
+| Odtwarzalność | NIE (wymaga pełnego ponownego przebiegu wcześniejszego pipeline'u domenowego) |
+| Wymagana do | integration suite, compliance E2E (`TestComplianceE2E`) |
+| Wymagana do fast suite | NIE — fast suite przechodzi bez niej |
+| Wymagana do pipeline smoke | NIE — pipeline smoke uruchamia `build_current.py` na `it_doc_matrix_clean.db` |
+| Bez niej `doctor --strict` | FAIL (missing: reports/it_doc_matrix.db) |
 
-**Data przeglądu:** `________________________________`  
-**Decyzja końcowa:** `________________________________`
+#### Tryby pracy
+
+- **minimal / clean-room**: bez legacy DB → fast suite ✅, doctor ⚠️ (FAIL legacy_db, ale nie blokuje fast suite)
+- **full-integration**: z legacy DB → wszystkie testy ✅
+
+#### Jak dostarczyć legacy DB
+
+```bash
+# Jeśli plik istnieje jako kopia:
+ln -sf it_doc_matrix_before_auto_approve.db reports/it_doc_matrix.db
+
+# Jeśli plik nie istnieje — integration suite nie może być wykonany.
+# Patrz: docs/TROUBLESHOOTING.md → sekcja "Missing legacy DB"
+```
+
+#### Implikacje dla `doctor.py`
+
+`doctor.py --strict` zgłosi FAIL na `legacy_db` jeśli plik nie istnieje.  
+To jest **oczekiwane zachowanie** w trybie minimal.  
+`--strict` powinien być uruchamiany z pełnymi assets lub pomijany w CI smoke.
+
+### Zamknięte przez
+
+Phase 7 (2026-03-27) — hybrid model zatwierdzony, docs operacyjne zaktualizowane.
+
+**Data przeglądu:** 2026-03-27  
+**Decyzja końcowa:** Opcja C — external artifact z graceful degradation, opisana w RUNTIME_BOOTSTRAP.md i TROUBLESHOOTING.md
 
 ---
 

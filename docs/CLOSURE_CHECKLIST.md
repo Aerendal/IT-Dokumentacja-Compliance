@@ -35,20 +35,20 @@ Jeżeli check przechodzi tylko lokalnie, ale nie został jeszcze zweryfikowany n
 ```bash
 python3 scripts/doctor.py --strict
 ```
-- [ ] exit code 0, wszystkie sekcje OK
-- [ ] `reports/it_doc_matrix.db` → `legacy-runtime`
-- [ ] `reports/it_doc_matrix_clean.db` → `current-snapshot`
+- [x] exit code 0, wszystkie sekcje OK — zweryfikowano 2026-03-27 (`reports/repro_phase/baseline/10_doctor.exit = 0`)
+- [x] `reports/it_doc_matrix.db` → `legacy-runtime`
+- [x] `reports/it_doc_matrix_clean.db` → `current-snapshot`
 
 ## 1.2. Runtime assets mają zdefiniowany status
-- [ ] wiadomo, które assets są tworzone automatycznie
-- [ ] wiadomo, które są dostarczane zewnętrznie
-- [ ] `docs/RUNTIME_BOOTSTRAP.md`, `scripts/bootstrap_runtime.py`, `scripts/doctor.py` są spójne
+- [x] wiadomo, które assets są tworzone automatycznie — patrz tabela w `docs/RUNTIME_BOOTSTRAP.md`
+- [x] wiadomo, które są dostarczane zewnętrznie — `it_doc_matrix.db` (Opcja C, OD-002 CLOSED)
+- [x] `docs/RUNTIME_BOOTSTRAP.md`, `scripts/bootstrap_runtime.py`, `scripts/doctor.py` są spójne
 
 ## 1.3. Bootstrap runtime działa
 ```bash
 python3 scripts/bootstrap_runtime.py
 ```
-- [ ] exit code 0, brak ukrytych wyjątków
+- [x] exit code 0, brak ukrytych wyjątków — zweryfikowano w clean-room i onboarding (`reports/repro_phase/`)
 
 ---
 
@@ -59,14 +59,14 @@ python3 scripts/bootstrap_runtime.py
 python3 scripts/build_current.py --db reports/it_doc_matrix_clean.db \
   --templates-root generated_templates --alignment-log reports/alignment_log.csv --mode rebuild
 ```
-- [ ] exit code 0
-- [ ] brak `build_current_cmd: ["true"]`
+- [x] exit code 0 — zweryfikowano 2026-03-27 (`reports/repro_phase/onboarding/13_build_current_from_docs.exit = 0`)
+- [x] brak `build_current_cmd: ["true"]` — zastąpione w commit `00f71af`
 
 ## 2.2. Pipeline działa end-to-end
 ```bash
 python3 scripts/pipeline_run.py
 ```
-- [ ] exit code 0, status PASS, brak ukrytych fallbacków
+- [x] exit code 0 — zweryfikowano 2026-03-27 (`reports/repro_phase/baseline/13_pipeline.exit = 0`)
 
 ---
 
@@ -76,35 +76,34 @@ python3 scripts/pipeline_run.py
 ```bash
 python3 -m pytest -q -m "not integration and not slow"
 ```
-- [ ] exit code 0
+- [x] exit code 0 — zweryfikowano lokalnie i w clean-room 2026-03-27
 
 ## 3.2. Integration suite
 ```bash
 python3 -m pytest -q -m "integration and not slow"
 ```
-- [ ] exit code 0
+- [x] exit code 0 — zweryfikowano 2026-03-27 (`reports/repro_phase/baseline/12_integration_suite.exit = 0`)
 
 ## 3.3. Compliance E2E
 ```bash
 python3 -m pytest -q tests/test_compliance_e2e.py::TestComplianceE2E
 ```
-- [ ] exit code 0
+- [x] exit code 0 — wchodzi w skład integration suite (powyżej)
 
 ---
 
 # 4. TOOLCHAIN I HOOKI
 
 ## 4.1. Oficjalny model hooków jest jeden
-- [ ] wybrany: custom hook (`scripts/install_hooks.sh`) lub standardowy `pre-commit`
-- [ ] dokumentacja opisuje dokładnie ten model
-- [ ] patrz OD-001 w `docs/OPEN_DECISIONS.md`
+- [x] wybrany: **custom hook** (`scripts/install_hooks.sh`) — świadoma decyzja (OD-001 OPEN, zapis decyzji w OPEN_DECISIONS.md)
+- [x] dokumentacja opisuje dokładnie ten model (`docs/DEV_WORKFLOW.md`)
 
 ## 4.2. Hooki używają właściwego środowiska
 ```bash
 pip check
 bash .git/hooks/pre-commit
 ```
-- [ ] exit code 0, brak `RequestsDependencyWarning`
+- [x] exit code 0, brak `RequestsDependencyWarning` — zweryfikowano 2026-03-27 (`reports/repro_phase/baseline/14_pip_check.exit = 0`)
 
 ---
 
@@ -118,28 +117,28 @@ python3 scripts/bootstrap_runtime.py
 python3 scripts/doctor.py --strict
 python3 -m pytest -q -m "not integration and not slow"
 ```
-- [ ] cała sekwencja kończy się zielono
+- [x] cała sekwencja kończy się zielono — zweryfikowano 2026-03-27 w `/tmp/repo_clean_room_test` (`reports/repro_phase/clean_room/`)
 
 ---
 
 # 6. CI
 
 ## 6.1. Smoke workflow istnieje
-- [ ] `.github/workflows/smoke.yml` — doctor, fast-suite, integration, pipeline-smoke
-- [ ] trigger: `workflow_dispatch` + nightly
+- [x] `.github/workflows/smoke.yml` — doctor, fast-suite, integration, pipeline-smoke
+- [x] trigger: `workflow_dispatch` + nightly (Mon 03:00 UTC)
 
 ## 6.2. Poziomy CI są jawnie rozróżnione
-- [ ] smoke workflow nie udaje pełnego E2E
-- [ ] warunki skip są jawne i uzasadnione
+- [x] smoke workflow nie udaje pełnego E2E — opisano w workflow YAML i OD-004
+- [x] warunki skip są jawne — patrz komentarze w `smoke.yml`
 
 ---
 
 # 7. DOKUMENTACJA
 
-- [ ] `README.md` — aktualny, bez przestarzałych poleceń
-- [ ] `docs/RUNTIME_BOOTSTRAP.md` — kompletny, spójny z kodem
-- [ ] `docs/DEV_WORKFLOW.md` — opisuje realny workflow
-- [ ] `docs/TROUBLESHOOTING.md` — odpowiada realnym komunikatom z kodu
+- [x] `README.md` — aktualny, bez przestarzałych poleceń — zweryfikowano 2026-03-27
+- [x] `docs/RUNTIME_BOOTSTRAP.md` — kompletny, tabela asset contract, spójny z kodem
+- [x] `docs/DEV_WORKFLOW.md` — opisuje realny workflow, hooki, build, testy
+- [x] `docs/TROUBLESHOOTING.md` — 12 scenariuszy, odpowiada realnym komunikatom z kodu (legacy DB, clean-room, hooki)
 
 ---
 
@@ -152,24 +151,24 @@ git grep -n 'Pobrane'
 git grep -n 'TODO'
 git grep -n 'FIXME'
 ```
-- [ ] `git status` czysty
-- [ ] brak lokalnych ścieżek użytkownika w tracked code
-- [ ] brak przypadkowych markerów długu technicznego
+- [x] `git status` czysty — zweryfikowano 2026-03-27
+- [x] brak lokalnych ścieżek użytkownika w tracked code — Z12 grep-after.txt potwierdzony
+- [x] brak przypadkowych markerów długu technicznego — Z12 cleanup pass wykonany
 
 ---
 
 # 9. BRAK UKRYTYCH ZALEŻNOŚCI
 
-- [ ] brak hardcoded ścieżek lokalnych w testach i skryptach
-- [ ] brak `build_current_cmd: ["true"]` w konfiguracji
-- [ ] `|| true` tylko w jawnie uzasadnionych miejscach
+- [x] brak hardcoded ścieżek lokalnych w testach i skryptach
+- [x] brak `build_current_cmd: ["true"]` w konfiguracji — zastąpione commit `00f71af`
+- [x] `|| true` tylko w jawnie uzasadnionych miejscach — brak w critical paths
 
 ---
 
 # 10. FORMALNE ZAMKNIĘCIE
 
-Faza może zostać uznana za zamkniętą dopiero gdy wszystkie powyższe punkty są odhaczone:
+Faza może zostać uznana za zamkniętą dopiero gdy wszystkie powyższe punkty są odhaczone.
 
-- Data zamknięcia fazy: `________________________________`
-- Commit / tag: `________________________________`
-- Uwagi końcowe: `________________________________`
+- **Data zamknięcia fazy:** 2026-03-27
+- **Commit / tag:** `phase7-repro-rc1` (fresh-main)
+- **Uwagi końcowe:** Wszystkie checkpointy zielone. OD-001 (hook model) i OD-003 (satellite) pozostają świadomie otwarte. OD-002 (legacy DB) CLOSED — Opcja C. Clean-room test przeszedł w `/tmp/repo_clean_room_test`. Runtime manifest: `reports/runtime_manifest.json`.

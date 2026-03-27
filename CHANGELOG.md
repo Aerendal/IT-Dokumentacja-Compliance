@@ -4,6 +4,56 @@ Pełna historia zmian biblioteki szablonów IT. Format: `[data] Faza — opis`.
 
 ---
 
+## [2026-03-27] Faza 7 — Reproducibility, przekazywalność, release checkpoint
+
+### Tag: `phase7-repro-rc1`
+
+### Cel fazy
+Utwardzenie odtwarzalności repo — świeży klon daje się uruchomić bez wiedzy ukrytej w głowie autora.
+
+### Wykonane
+
+#### Faza 7.0 — stan bazowy
+- Zapis stanu bazowego: `reports/repro_phase/baseline/` — doctor, fast suite, integration, pipeline, pip check (wszystkie exit 0)
+
+#### Faza 7.1 — clean-room test
+- Wykonano na świeżej kopii w `/tmp/repo_clean_room_test`
+- Sekwencja: venv → pip install → bootstrap → doctor → fast suite → pip check
+- Wszystkie 4 checkpointy zielone (`reports/repro_phase/clean_room/`)
+
+#### Faza 7.2 — formalizacja kontraktu runtime assets
+- `docs/RUNTIME_BOOTSTRAP.md`: dodana tabela **Asset Contract** (5 assets × 6 pól: rola, wymagany, profil DB, kto tworzy, odtwarzalny, potrzebny do)
+- Dodana tabela trybów pracy: minimal / local-dev / full-integration
+- `scripts/doctor.py`: FAIL komunikaty wzbogacone o `Role:` i `Recovery:` dla każdego assetu
+
+#### Faza 7.3 — decyzja o legacy-runtime
+- **OD-002 CLOSED**: `reports/it_doc_matrix.db` — Opcja C (external artifact + graceful degradation)
+- `docs/OPEN_DECISIONS.md` — wpis OD-002 zaktualizowany do CLOSED z pełnym opisem
+- `docs/TROUBLESHOOTING.md` — dwa nowe scenariusze (#11 Missing legacy DB, #12 doctor FAIL na legacy_db w CI)
+
+#### Faza 7.4 — onboarding techniczny
+- Każda komenda z docs wykonana i zapisana: `reports/repro_phase/onboarding/`
+- bootstrap, doctor, fast suite, build_current, pipeline — wszystkie exit 0
+
+#### Faza 7.5 — release checkpoint
+- `reports/runtime_manifest.json` — manifest assets (ścieżka, profil, rozmiar, hash, mtime)
+- `docs/CLOSURE_CHECKLIST.md` — wszystkie punkty odhaczone z datą i dowodem wykonania
+
+### Stan testów
+- `doctor --strict` → exit 0
+- `pytest -m "not integration and not slow"` → exit 0
+- `pytest -m "integration and not slow"` → exit 0
+- `pipeline_run.py` → exit 0
+- clean-room test → PASS
+
+### Otwarte decyzje (pozostałe)
+- OD-001: model hooków (custom vs standard `pre-commit`) — świadomie OPEN
+- OD-003: `generated_templates/satellite/` 0 plików — świadomie OPEN
+- OD-004: CI poziomy (smoke vs full-runtime gate) — świadomie OPEN
+- OD-005: hermetyzacja danych runtime — świadomie OPEN
+
+---
+
 ## [2026-03-27] Post-stabilizacja — hardening, bootstrap, dokumentacja zamknięcia
 
 ### Tag: `post-stabilization-v1`

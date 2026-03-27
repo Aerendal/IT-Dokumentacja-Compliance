@@ -173,3 +173,50 @@ python3 -m pytest -q -m "not integration and not slow"
 - profil nie zgadza się z oczekiwanym.
 
 Uruchom `doctor.py` aby sprawdzić aktualny profil DB.
+
+---
+
+## 11. Missing legacy DB — integration suite nie może być wykonany
+
+**Objaw:**
+```
+[FAIL] legacy_db: missing: reports/it_doc_matrix.db
+  Role: legacy-runtime historical database (integration suite / compliance E2E)
+  Recovery (Option A — external artifact): restore symlink:
+    ln -s reports/it_doc_matrix_before_auto_approve.db reports/it_doc_matrix.db
+  Note: fast suite and pipeline smoke work without this asset.
+```
+
+**Przyczyna:**
+`reports/it_doc_matrix.db` (1.7 GB) jest zewnętrznym artefaktem organizacyjnym. Nie jest odtwarzany automatycznie przez bootstrap.
+
+**Tryb minimal (bez legacy DB):**
+Fast suite, doctor (bez `legacy_db`), pipeline smoke — działają poprawnie.
+
+**Tryb full-integration (z legacy DB):**
+```bash
+# Jeśli plik it_doc_matrix_before_auto_approve.db istnieje w katalogu reports/:
+ln -sf it_doc_matrix_before_auto_approve.db reports/it_doc_matrix.db
+python3 scripts/doctor.py --strict
+```
+
+**Komenda kontrolna:**
+```bash
+ls -lh reports/it_doc_matrix*.db
+python3 scripts/doctor.py
+```
+
+**Patrz też:** `docs/OPEN_DECISIONS.md` → OD-002
+
+---
+
+## 12. `doctor --strict` FAIL na `legacy_db` w clean-room / CI smoke
+
+**To jest oczekiwane** — w trybie minimal legacy DB nie jest wymagana.
+
+**Jeśli chcesz uruchomić doctor bez blokowania na legacy_db**, uruchom bez `--strict`:
+```bash
+python3 scripts/doctor.py   # raport, exit 0 nawet przy FAIL
+```
+
+CI smoke workflow celowo nie używa `--strict` jeśli legacy DB nie jest dostarczona.
