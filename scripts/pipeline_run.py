@@ -10,11 +10,19 @@ import os
 import shutil
 import sqlite3
 import sys
-import check_no_emoji
 from collections import OrderedDict
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Ensure repo root is on sys.path so itdoc package is importable when
+# this script is run as a subprocess (editable install may point to old path)
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+_REPO_ROOT_PATH = _SCRIPTS_DIR.parent
+for _p in (str(_REPO_ROOT_PATH), str(_SCRIPTS_DIR)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+import check_no_emoji
 
 # Config
 TEMPLATES_ROOT = Path('generated_templates')
@@ -1116,8 +1124,33 @@ def main():
     run_dir = RUNS_ROOT / run_id
     ensure_dirs(run_dir)
 
-    # hard gate: no emoji allowed in tracked text files
-    emoji_report = emoji_check(Path('.'), run_dir)
+    # preflight: verify required artefacts and DB profile before doing any work
+    preflight_errors = []
+    if not TEMPLATES_ROOT.exists():
+        preflight_errors.append(f"TEMPLATES_ROOT missing: {TEMPLATES_ROOT}")
+    if not ALIGNMENT_LOG.exists():
+        preflight_errors.append(f"ALIGNMENT_LOG missing: {ALIGNMENT_LOG}")
+    if not DB_PATH.exists():
+        preflight_errors.append(f"DB_PATH missing: {DB_PATH}")
+    else:
+        _conn = sqlite3.connect(str(DB_PATH))
+        try:
+            from itdoc.schema_profile import detect_schema_profile
+            _check = detect_schema_profile(_conn)
+            if _check.profile != "current-snapshot":
+                preflight_errors.append(
+                    f"DB profile mismatch: expected=current-snapshot, "
+                    f"got={_check.profile}, missing={sorted(_check.missing_required)}"
+                )
+        finally:
+            _conn.close()
+    if preflight_errors:
+        for err in preflight_errors:
+            print(f"PREFLIGHT FAIL: {err}", file=sys.stderr)
+        sys.exit(1)
+
+    # hard gate: no emoji allowed in templates (not the whole repo)
+    emoji_report = emoji_check(TEMPLATES_ROOT, run_dir)
     if emoji_report['status'] != 'PASS':
         print('FAIL: emoji check failed')
         sys.exit(1)

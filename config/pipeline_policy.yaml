@@ -7,8 +7,8 @@ paths:
   latest_root: "reports/latest"
 
 commands:
-  # Placeholder: CURRENT już zbudowany; ustaw "true" by nie wywoływać nic.
-  build_current_cmd: ["python3", "scripts/build_current.py", "--db", "reports/it_doc_matrix_clean.db", "--templates-root", "generated_templates", "--alignment-log", "reports/alignment_log.csv", "--mode", "rebuild"]
+  # build_current.py not yet present — use "true" as placeholder until the script is added.
+  build_current_cmd: ["true"]
 
 hashing:
   rule_version: 2
