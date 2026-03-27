@@ -1,87 +1,238 @@
-# IT-Dokumentacja
+# IT-Dokumentacja-Compliance
 
-Repozytorium szablonów dokumentacji IT z automatycznym pipelinem walidacji i zarządzania.
+Audytowalne repo i zestaw narzędzi do walidacji, analizy i utrzymywania zgodności dokumentacji IT z jawnym kontraktem runtime, warstwą raportową i kontrolą jakości opartą o testy oraz pipeline.
 
-## Struktura repozytorium
+## Co to jest
 
-```
-IT-Dokumentacja/
-├── itdoc/                   # Pakiet Python: schema, DB, query helpers
-├── scripts/                 # Skrypty pipeline, diagnostyki i narzędzia
-│   ├── build_current.py     # Buduje documents_current z generated_templates/
-│   ├── pipeline_run.py      # Główny pipeline (manifest, walidacja, snapshot)
-│   ├── doctor.py            # Diagnostyka kontraktu repo (7 bram)
-│   ├── bootstrap_runtime.py # Przygotowanie środowiska (świeży klon)
-│   ├── install_hooks.sh     # Instaluje pre-commit hook
-│   └── run_in_venv.sh       # Wrapper do uruchamiania przez .venv
-├── tests/                   # Testy: unit, integracyjne, compliance
-├── config/
-│   └── pipeline_policy.yaml # Konfiguracja pipeline
-├── docs/
-│   ├── RUNTIME_BOOTSTRAP.md # Opis odtwarzania runtime assets
-│   ├── DEV_WORKFLOW.md      # Workflow developera
-│   └── TROUBLESHOOTING.md   # Rozwiązywanie problemów
-├── generated_templates/     # ❌ gitignored — artefakty runtime
-└── reports/                 # ❌ częściowo gitignored — artefakty runtime
-```
+Projekt służy do pracy na dużych zbiorach dokumentacji IT i szablonów dokumentacyjnych.  
+Repo skupia się na:
 
-## Środowisko
+- walidacji struktury i jakości dokumentów,
+- utrzymaniu zgodności z regułami i standardami,
+- budowie oraz odświeżaniu warstwy danych runtime,
+- kontroli poprawności przez testy, doctor checks i pipeline.
 
-### Wymagania
+## Jaki problem rozwiązuje
 
-- Python 3.10+
-- SQLite 3.35+ (wbudowany w Python)
-- `pyyaml`, `pytest`, `fastapi`, `httpx` (zależności devowe)
+W praktyce dokumentacja IT często cierpi na:
+- niespójność struktury,
+- brak jawnych zależności między dokumentami,
+- rozjazd między szablonami, raportami i runtime,
+- słabą odtwarzalność procesu walidacji,
+- brak technicznej dyscypliny wokół compliance i utrzymania dokumentów.
 
-### Instalacja
+To repo porządkuje ten obszar przez:
+- jawne profile baz danych,
+- walidację kontraktu runtime,
+- bootstrap środowiska,
+- build warstwy current-snapshot,
+- testy fast / integration,
+- kontrolę pipeline.
+
+## Dla kogo jest
+
+Repo jest przeznaczone głównie dla:
+- maintainerów repozytoriów dokumentacyjnych,
+- osób budujących audytowalny proces compliance dokumentacji,
+- inżynierów odpowiedzialnych za walidację i kontrolę jakości dokumentów,
+- zespołów technicznych, które chcą mieć powtarzalny runtime i przewidywalny proces utrzymania.
+
+## Co działa obecnie
+
+Aktualnie repo udostępnia i weryfikuje:
+
+- bootstrap runtime,
+- doctor checks kontraktu repo i runtime,
+- build current-snapshot,
+- pipeline smoke,
+- fast suite,
+- integration suite,
+- compliance E2E,
+- dokumentację operacyjną i ścieżki uruchomienia.
+
+## Czego repo nie obiecuje
+
+Repo nie obiecuje na dziś:
+- pełnej hermetyczności danych runtime bez żadnych assets zewnętrznych,
+- pełnego publicznego E2E na każdym czystym runnerze bez odpowiednich danych,
+- pełnej rekonstrukcji wszystkich historycznych assets tylko z samego kodu, jeśli dany asset jest jawnie oznaczony jako zewnętrzny.
+
+Status i zakres assets opisane są w `docs/RUNTIME_BOOTSTRAP.md`.
+
+---
+
+# Tryby pracy
+
+Repo wspiera dwa poziomy użycia:
+
+## 1. Minimal mode
+Tryb przeznaczony do:
+- szybkiego uruchomienia,
+- smoke validation,
+- onboardingu technicznego,
+- zewnętrznego przeglądu repo.
+
+W tym trybie działają:
+- bootstrap,
+- doctor,
+- fast suite,
+- podstawowy workflow narzędziowy.
+
+## 2. Full runtime
+Tryb przeznaczony do:
+- integration,
+- pełnej warstwy runtime,
+- compliance E2E,
+- pracy na pełnych assets.
+
+W tym trybie mogą być wymagane dodatkowe assets runtime opisane w `docs/RUNTIME_BOOTSTRAP.md`.
+
+---
+
+# Quick start
+
+## Minimal mode
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-```
 
-## Bootstrap runtime assets
-
-Świeży klon nie zawiera danych runtime (szablony, bazy danych).
-Uruchom bootstrap aby przygotować środowisko:
-
-```bash
 python3 scripts/bootstrap_runtime.py
+python3 scripts/doctor.py --strict
+python3 -m pytest -q -m "not integration and not slow"
 ```
 
-Szczegóły: [docs/RUNTIME_BOOTSTRAP.md](docs/RUNTIME_BOOTSTRAP.md)
-
-## Smoke checks
+## Build current-snapshot
 
 ```bash
-# Kontrakt repo (7 bram)
-python3 scripts/doctor.py --strict
+python3 scripts/build_current.py \
+  --db reports/it_doc_matrix_clean.db \
+  --templates-root generated_templates \
+  --alignment-log reports/alignment_log.csv \
+  --mode rebuild
+```
 
-# Szybka suita testów (< 60 s)
-python3 -m pytest -q -m "not integration and not slow"
+## Pipeline smoke
 
-# Suita integracyjna (wymaga runtime DB)
-python3 -m pytest -q -m "integration and not slow"
-
-# Pipeline end-to-end
+```bash
 python3 scripts/pipeline_run.py
 ```
 
-Wszystkie komendy zwracają `0` przy sukcesie.
+---
 
-## Common failure modes
+# Weryfikacja
 
-| Objaw | Przyczyna | Naprawa |
-|---|---|---|
-| `doctor: FAIL generated_templates/satellite` | Brak katalogu | `python3 scripts/bootstrap_runtime.py` |
-| `doctor: FAIL current_db missing` | Brak DB | `python3 scripts/bootstrap_runtime.py` |
-| `doctor: FAIL legacy_db missing` | Brak symlinka do 1.7 GB DB | `ln -sf reports/it_doc_matrix_before_auto_approve.db reports/it_doc_matrix.db` |
-| `No module named 'itdoc'` | Editable install nieaktywny | `pip install -e ".[dev]"` lub aktywuj `.venv` |
-| `RequestsDependencyWarning` w pre-commit | Hook używa systemowego Pythona | `bash scripts/install_hooks.sh` (przepina na `.venv`) |
-| `pipeline preflight FAIL: DB profile mismatch` | Stara DB po zmianie branchu | `rm reports/it_doc_matrix_clean.db && python3 scripts/bootstrap_runtime.py` |
-| `build_current_cmd failed` | Brak `alignment_log.csv` lub `generated_templates/` | `python3 scripts/bootstrap_runtime.py` |
+## Poziomy testów
 
-## Workflow developera
+### Fast suite
 
-Szczegóły: [docs/DEV_WORKFLOW.md](docs/DEV_WORKFLOW.md)
+```bash
+python3 -m pytest -q -m "not integration and not slow"
+```
+
+### Integration suite
+
+```bash
+python3 -m pytest -q -m "integration and not slow"
+```
+
+### Doctor
+
+```bash
+python3 scripts/doctor.py --strict
+```
+
+### Pipeline
+
+```bash
+python3 scripts/pipeline_run.py
+```
+
+## Oczekiwane użycie
+
+* **Minimal mode**: doctor + fast suite
+* **Full runtime**: doctor + build current + integration + pipeline
+
+---
+
+# Architektura w skrócie
+
+Najważniejsze elementy repo:
+
+* `scripts/bootstrap_runtime.py`
+  bootstrap środowiska runtime
+
+* `scripts/doctor.py`
+  walidacja kontraktu repo i runtime
+
+* `scripts/build_current.py`
+  budowa / odświeżenie warstwy current-snapshot
+
+* `scripts/pipeline_run.py`
+  pipeline smoke / runtime pipeline verification
+
+* `itdoc/`
+  logika domenowa i kontrakt danych
+
+* `generated_templates/`
+  assets dokumentacyjne / templates runtime
+
+* `reports/`
+  runtime DB, manifesty, raporty i artefakty pomocnicze
+
+---
+
+# Runtime assets
+
+Repo używa assets o różnym statusie:
+
+* generowane automatycznie,
+* wymagane tylko dla full runtime,
+* dostarczane zewnętrznie,
+* opcjonalne dla minimal mode.
+
+Szczegóły znajdują się w:
+
+* `docs/RUNTIME_BOOTSTRAP.md`
+* `docs/TROUBLESHOOTING.md`
+
+---
+
+# Dokumentacja
+
+Punkty wejścia:
+
+* `docs/EXTERNAL_REVIEW.md`
+* `docs/RUNTIME_BOOTSTRAP.md`
+* `docs/DEV_WORKFLOW.md`
+* `docs/TROUBLESHOOTING.md`
+* `docs/CLOSURE_CHECKLIST.md`
+* `docs/OPEN_DECISIONS.md`
+
+---
+
+# Status projektu
+
+Projekt jest technicznie ustabilizowany i przygotowany do:
+
+* przeglądu technicznego,
+* dalszego rozwijania,
+* pracy maintainerskiej,
+* ewaluacji zewnętrznej.
+
+Jednocześnie część decyzji architektonicznych i organizacyjnych pozostaje jawnie opisana w `docs/OPEN_DECISIONS.md`.
+
+---
+
+# Wkład i współpraca
+
+* `CONTRIBUTING.md`
+* `SECURITY.md`
+* `SUPPORT.md`
+
+---
+
+# Licencja
+
+Zobacz plik `LICENSE`.
