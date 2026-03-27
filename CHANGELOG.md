@@ -4,6 +4,40 @@ Pełna historia zmian biblioteki szablonów IT. Format: `[data] Faza — opis`.
 
 ---
 
+## [2026-03-27] Faza 8 — Public readiness, external reviewer documentation
+
+### Tag: `phase8-public-rc1`
+
+### Cel fazy
+Doprowadzenie repo do stanu gotowego do zewnętrznego przeglądu technicznego.
+
+### Dodane
+- `README.md`: przepisany jako reviewer-ready — problem statement, tryby pracy,
+  quick start, architektura, uczciwy opis ograniczeń
+- `docs/EXTERNAL_REVIEW.md`: punkt wejścia dla recenzenta technicznego
+  (zakres, model runtime, scenariusze weryfikacji, znane ograniczenia, kolejność czytania)
+- `CONTRIBUTING.md`: zasady zmian, wymagania przed commitem, kontrakt runtime
+- `SUPPORT.md`: zakres wsparcia best-effort, co warto zgłaszać, priorytety
+- `SECURITY.md`: zgłaszanie problemów bezpieczeństwa, zasady pracy z assets runtime,
+  zalecenia dotyczące skanowania sekretów
+
+### Stan testów po zmianach
+- `doctor --strict` → exit 0
+- `pytest -m "not integration and not slow"` → exit 0
+- `pytest -m "integration and not slow"` → exit 0
+- `build_current.py` → exit 0
+- `pipeline_run.py` → exit 0
+- custom hook → exit 0
+
+### Otwarte decyzje (pozostałe)
+- OD-001: model hooków — OPEN
+- OD-003: satellite/ 0 plików — OPEN
+- OD-004: CI levels — OPEN
+- OD-005: data hermeticity — OPEN
+- skan sekretów (gitleaks) — nie wykonany (narzędzie niedostępne w środowisku)
+
+---
+
 ## [2026-03-27] Faza 7 — Reproducibility, przekazywalność, release checkpoint
 
 ### Tag: `phase7-repro-rc1`
