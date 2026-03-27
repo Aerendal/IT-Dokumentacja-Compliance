@@ -18,34 +18,35 @@ fi
 
 cat > "$HOOK_FILE" << 'HOOK'
 #!/usr/bin/env bash
-# pre-commit hook — uruchamia testy przed commitem
+# pre-commit hook — uruchamia testy przez .venv zamiast systemowego Pythona
 # Wygenerowany przez scripts/install_hooks.sh
 
-# Znajdź katalog dokumentacja/ (hook uruchamia się z root repo)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 DOC_DIR="$REPO_ROOT"
+VENV_PYTHON="$REPO_ROOT/.venv/bin/python"
 
-# Sprawdź czy pytest dostępny
-if ! command -v python3 >/dev/null 2>&1; then
-    echo "pre-commit: python3 niedostępny — pomijam testy"
-    exit 0
+# Jeśli .venv nie istnieje, użyj systemowego Pythona z ostrzeżeniem
+if [ ! -x "$VENV_PYTHON" ]; then
+    echo "pre-commit: .venv not found — falling back to system python3" >&2
+    echo "  Run: python3 -m venv .venv && source .venv/bin/activate && pip install -e '.[dev]'" >&2
+    VENV_PYTHON="python3"
 fi
 
-echo "▶ pre-commit: pytest -m 'not slow' -q ..."
+echo "▶ pre-commit: pytest -m 'not slow and not integration' -q ..."
 cd "$DOC_DIR"
-if python3 -m pytest -m "not slow" -q --tb=short 2>&1; then
+if "$VENV_PYTHON" -m pytest -m "not slow and not integration" -q --tb=short 2>&1; then
     echo "✓ Testy OK"
     exit 0
 else
     echo ""
     echo "✗ Testy FAIL — commit zablokowany."
-    echo "  Uruchom: cd dokumentacja && make test"
+    echo "  Uruchom: python3 -m pytest -m 'not slow and not integration'"
     exit 1
 fi
 HOOK
 
 chmod +x "$HOOK_FILE"
 echo "✓ pre-commit hook zainstalowany: $HOOK_FILE"
-echo "  Przy każdym 'git commit' uruchomi się pytest (not slow)."
+echo "  Hook używa .venv/bin/python (z fallback na python3 gdy brak .venv)."
 echo "  Aby pominąć jednorazowo: git commit --no-verify"

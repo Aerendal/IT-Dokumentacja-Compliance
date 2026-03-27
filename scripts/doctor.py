@@ -36,7 +36,12 @@ def _open(db_path: Path) -> sqlite3.Connection:
 
 def check_db_profile(db_path: Path, expected: str) -> tuple[bool, str]:
     if not db_path.exists():
-        return False, f"missing: {db_path}"
+        hint = (
+            "  → run: python3 scripts/bootstrap_runtime.py"
+            if expected == "current-snapshot"
+            else "  → restore symlink: ln -s reports/it_doc_matrix_before_auto_approve.db reports/it_doc_matrix.db"
+        )
+        return False, f"missing: {db_path}\n{hint}"
     conn = _open(db_path)
     try:
         from itdoc.schema_profile import detect_schema_profile
@@ -45,7 +50,8 @@ def check_db_profile(db_path: Path, expected: str) -> tuple[bool, str]:
             return (
                 False,
                 f"profile={detected.profile}, expected={expected}, "
-                f"missing={sorted(detected.missing_required)}",
+                f"missing={sorted(detected.missing_required)}\n"
+                f"  → run: python3 scripts/bootstrap_runtime.py",
             )
         return True, f"profile={detected.profile}"
     finally:
@@ -54,7 +60,14 @@ def check_db_profile(db_path: Path, expected: str) -> tuple[bool, str]:
 
 def check_path(path: Path, kind: str = "path") -> tuple[bool, str]:
     if not path.exists():
-        return False, f"{kind} missing: {path}"
+        hints: dict[str, str] = {
+            str(GENERATED): "  → run: python3 scripts/bootstrap_runtime.py",
+            str(GENERATED / "core"): "  → run: python3 scripts/bootstrap_runtime.py",
+            str(GENERATED / "satellite"): "  → run: mkdir -p generated_templates/satellite",
+            str(ALIGNMENT_LOG): "  → run: python3 scripts/bootstrap_runtime.py",
+        }
+        hint = hints.get(str(path), "  → run: python3 scripts/bootstrap_runtime.py")
+        return False, f"{kind} missing: {path}\n{hint}"
     return True, f"{kind} ok"
 
 

@@ -40,6 +40,7 @@ reports/verification/
 reports/verification_next/
 reports/compliance_fix/
 reports/template_violations_verify/
+reports/post_stabilization_baseline/
 reports/backup_*.db
 reports/*.sha256
 
