@@ -276,7 +276,7 @@ def main():
     filt.add_argument("--filter-title", metavar="TEXT",
                       help="Filtruj po fragmencie tytułu dokumentu")
     filt.add_argument("--filter-isic", metavar="CODE",
-                      help="Filtruj po kodzie ISIC (TODO: wymaga kolumny isic w docs)")
+                      help="Filtruj po kodzie ISIC (wymaga kolumny isic w tabeli docs; obecnie filtruje po path)")
 
     # Patch operations (mutually exclusive with --preview-section)
     ops = parser.add_argument_group("Operacje patch")

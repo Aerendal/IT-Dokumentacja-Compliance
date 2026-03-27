@@ -27,7 +27,17 @@ _ALIGNMENT_LOG = _REPO_ROOT / "reports" / "alignment_log.csv"
 
 
 def _require_db_profile(path: Path, expected: str) -> sqlite3.Connection:
-    """Otwiera DB i sprawdza profil. Skip jeśli brak pliku lub zły profil."""
+    """Otwiera DB i sprawdza profil. Skip jeśli brak pliku lub zły profil.
+
+    TECHNICAL DEBT NOTE:
+    Integration tests require two real SQLite databases (legacy-runtime and
+    current-snapshot profile) that are not committed to the repo (gitignored,
+    too large / generated). This shim is the intentional skip gate.
+
+    Safe to remove when: a lightweight reproducible DB fixture replaces the
+    real runtime assets for integration testing.
+    Owner: repo maintainer. See docs/OPEN_DECISIONS.md OD-002.
+    """
     if not path.exists():
         pytest.skip(f"DB not found: {path}")
     conn = sqlite3.connect(str(path), timeout=30)
