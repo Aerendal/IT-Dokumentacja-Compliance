@@ -29,8 +29,13 @@ CREATE TABLE IF NOT EXISTS template_violations (
     template_path TEXT NOT NULL,
     violation_type TEXT NOT NULL,
     severity TEXT NOT NULL,
+    source_dir TEXT,
     found_at TEXT DEFAULT (datetime('now'))
 )
+"""
+
+MIGRATE_ADD_SOURCE_DIR_SQL = """
+ALTER TABLE template_violations ADD COLUMN source_dir TEXT
 """
 
 
@@ -133,14 +138,22 @@ def scan_directory(templates_dir: Path) -> tuple[int, list[dict]]:
     return len(md_files), all_violations
 
 
-def write_to_db(db_path: Path, violations: list[dict]) -> None:
+def write_to_db(db_path: Path, violations: list[dict], source_dir: str) -> None:
     conn = sqlite3.connect(db_path)
     try:
         conn.execute(CREATE_TABLE_SQL)
-        conn.execute("DELETE FROM template_violations")
+        # Migrate: add source_dir column if missing (safe to ignore if already exists)
+        try:
+            conn.execute(MIGRATE_ADD_SOURCE_DIR_SQL)
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass  # column already exists
+        # Scoped delete — only remove rows for this source_dir
+        conn.execute("DELETE FROM template_violations WHERE source_dir = ?", (source_dir,))
         conn.executemany(
-            "INSERT INTO template_violations (template_path, violation_type, severity) VALUES (?, ?, ?)",
-            [(v["template_path"], v["violation_type"], v["severity"]) for v in violations],
+            "INSERT INTO template_violations (template_path, violation_type, severity, source_dir)"
+            " VALUES (?, ?, ?, ?)",
+            [(v["template_path"], v["violation_type"], v["severity"], source_dir) for v in violations],
         )
         conn.commit()
     finally:
@@ -232,7 +245,7 @@ def main() -> int:
 
     db_path = Path(args.db)
     if db_path.exists():
-        write_to_db(db_path, all_violations)
+        write_to_db(db_path, all_violations, str(templates_dir))
     else:
         print(f"WARNING: DB not found at {db_path}, skipping DB write.", file=sys.stderr)
 
