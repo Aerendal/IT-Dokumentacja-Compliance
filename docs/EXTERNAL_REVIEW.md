@@ -103,9 +103,11 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 
 python3 scripts/bootstrap_runtime.py
-python3 scripts/doctor.py --strict
+python3 scripts/doctor.py
 python3 -m pytest -q -m "not integration and not slow"
 ```
+
+> **Uwaga:** `doctor.py` bez flagi `--strict` jest trybem informacyjnym (exit 0). `doctor.py --strict` jest trybem pełnym i wymaga `it_doc_matrix.db` (opisane w `RUNTIME_BOOTSTRAP.md` §Asset Contract).
 
 ## Rozszerzony scenariusz
 ```bash
@@ -142,13 +144,17 @@ Repo ma obecnie domknięte:
 
 Repo nadal rozróżnia:
 
-* minimal mode,
-* full runtime.
+* minimal mode (`doctor.py` bez flagi — informacyjny, exit 0),
+* full runtime (`doctor.py --strict` — wymaga legacy DB, exit 1 jeśli brakuje).
 
 Nie wszystkie assets są publiczne lub w pełni odtwarzalne wyłącznie z samego kodu.
 To nie jest ukryte ograniczenie — status tych assets opisano jawnie.
 
 Repo używa własnego modelu hooków, opisanego w `docs/DEV_WORKFLOW.md`.
+
+`generated_templates/imported/` zawiera surowe dane wejściowe z zewnętrznego procesu importu.
+Pliki te mogą zawierać historyczne ścieżki środowiskowe i placeholdery — są artefaktami importu,
+nie częścią kontraktu kodu. Szczegóły: `docs/OPEN_DECISIONS.md` → OD-006.
 
 ---
 

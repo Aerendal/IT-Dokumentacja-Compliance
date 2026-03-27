@@ -169,6 +169,41 @@ Docs i tooling opisują wybrany model; bootstrap i doctor są zgodne; CI uwzglę
 
 ---
 
+## OD-006 — Status imported templates zawierających zewnętrzne referencje
+
+**Status:** `OPEN`  
+**Priorytet:** Niski (estetyczny, nie blokujący)  
+**Właściciel:** maintainer repo  
+**Zakres wpływu:** publiczny odbiór repo, recenzja techniczna
+
+### Opis
+`generated_templates/imported/` zawiera surowe dane wejściowe z zewnętrznego procesu importu.
+Te pliki mogą zawierać:
+- ścieżki `/home/...` z oryginalnego środowiska budującego (np. `/home/claude/doc-matrix/`),
+- historyczne placeholdery dokumentacyjne,
+- referencje kontekstowe z procesu importu.
+
+Nie są to sekrety ani dane prywatne — są to artefakty procesu importu treści.
+
+Zewnętrzny recenzent odpalający `git grep -n '/home/'` zobaczy wyniki w tym katalogu.
+
+### Opcje
+- **A (aktualna):** Zostawić i jasno opisać, że `generated_templates/imported/` jest surowym input data, nie code contractem.
+- **B:** Usunąć `generated_templates/imported/` z repo, przenieść do zewnętrznych assets.
+- **C:** Przenieść do dedykowanego katalogu `data/imported/` lub `samples/` z jawnym opisem.
+
+### Aktualna decyzja
+Opcja A: status opisany w `README.md` i `docs/EXTERNAL_REVIEW.md`. Imported templates są jawnie
+oznaczone jako surowy input — nie są częścią kontraktu runtime.
+
+### Warunek zamknięcia
+Formally wybrana opcja; katalog ma jasny opis w dokumentacji lub został przeniesiony/usunięty.
+
+**Data przeglądu:** `________________________________`  
+**Decyzja końcowa:** `________________________________`
+
+---
+
 # ZASADY PRZEGLĄDU
 
 Ten dokument należy przeglądać:

@@ -99,9 +99,11 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 
 python3 scripts/bootstrap_runtime.py
-python3 scripts/doctor.py --strict
+python3 scripts/doctor.py
 python3 -m pytest -q -m "not integration and not slow"
 ```
+
+> **Uwaga:** `doctor.py` bez flagi `--strict` wyświetla informacyjnie stan środowiska i zawsze kończy z kodem 0. `doctor.py --strict` jest przeznaczony dla full runtime i zakończy się kodem 1, jeśli brakuje `it_doc_matrix.db` (legacy DB opisana w `docs/RUNTIME_BOOTSTRAP.md`).
 
 ## Build current-snapshot
 
@@ -140,6 +142,10 @@ python3 -m pytest -q -m "integration and not slow"
 ### Doctor
 
 ```bash
+# Informacyjny — zawsze exit 0, pokazuje stan środowiska:
+python3 scripts/doctor.py
+
+# Strict — wymaga pełnego runtime (legacy DB), exit 1 jeśli brakuje:
 python3 scripts/doctor.py --strict
 ```
 

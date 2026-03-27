@@ -19,11 +19,11 @@ Każdy asset ma zdefiniowany status. Nie ma aktywów "nieznanych".
 
 | Tryb | Wymagane assets | Co działa |
 |---|---|---|
-| **minimal** (świeży klon) | `.venv`, `it_doc_matrix_clean.db` (schema), `alignment_log.csv` | fast suite, doctor, bootstrap |
-| **local-dev** | minimal + `generated_templates/core/` | build_current, pipeline smoke |
-| **full-integration** | local-dev + `reports/it_doc_matrix.db` (legacy) | integration suite, compliance E2E |
+| **minimal** (świeży klon) | `.venv`, `it_doc_matrix_clean.db` (schema), `alignment_log.csv` | fast suite, `doctor.py` (informacyjny), bootstrap |
+| **local-dev** | minimal + `generated_templates/core/` | build_current, pipeline smoke, `doctor.py --strict` |
+| **full-integration** | local-dev + `reports/it_doc_matrix.db` (legacy) | integration suite, compliance E2E, `doctor.py --strict` |
 
-> `reports/it_doc_matrix.db` (1.7 GB) jest **zewnętrznym artefaktem**. Repo działa bez niego w trybach minimal i local-dev. Patrz: `docs/OPEN_DECISIONS.md` → OD-002.
+> `reports/it_doc_matrix.db` (1.7 GB) jest **zewnętrznym artefaktem**. Repo działa bez niego w trybach minimal i local-dev. `doctor.py --strict` zakończy się kodem 1 bez tego pliku — jest to celowe zachowanie dla full-integration mode. Patrz: `docs/OPEN_DECISIONS.md` → OD-002.
 
 ## Co jest runtime assets a co nie jest w repo
 
@@ -99,6 +99,10 @@ python3 scripts/build_current.py --mode rebuild
 ### 4. Uruchom doctor
 
 ```bash
+# Minimal mode (informacyjny, exit 0 zawsze):
+python3 scripts/doctor.py
+
+# Full-integration (strict, exit 1 jeśli brakuje legacy DB):
 python3 scripts/doctor.py --strict
 ```
 
