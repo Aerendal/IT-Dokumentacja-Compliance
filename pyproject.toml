@@ -30,7 +30,7 @@ markers = [
 # Użyj:  pytest -m "not slow"  dla szybkiego CI
 # Użyj:  pytest                dla pełnego zestawu (z --ignore=... jeśli brak DB)
 addopts = "--tb=short -q"
-filterwarnings = ["ignore::urllib3.exceptions.NotOpenSSLWarning", "ignore::UserWarning"]
+filterwarnings = ["ignore::UserWarning"]
 
 [tool.coverage.run]
 source = ["itdoc", "scripts"]
