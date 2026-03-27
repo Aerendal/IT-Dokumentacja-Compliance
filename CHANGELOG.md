@@ -4,6 +4,47 @@ Pełna historia zmian biblioteki szablonów IT. Format: `[data] Faza — opis`.
 
 ---
 
+## [2026-03-27] Post-stabilizacja — hardening, bootstrap, dokumentacja zamknięcia
+
+### Tag: `post-stabilization-v1`
+
+### Dodane
+- `scripts/build_current.py` — realny build `documents_current` (rebuild/incremental); zastępuje placeholder `["true"]` w pipeline
+- `scripts/bootstrap_runtime.py` — jednorazowy setup świeżego klonu (katalogi, DB schema, alignment_log, hook, doctor)
+- `scripts/run_in_venv.sh` — wrapper wywołujący `.venv/bin/python` z fallbackiem
+- `docs/RUNTIME_BOOTSTRAP.md` — dokumentacja runtime assets i procedury bootstrapu
+- `docs/DEV_WORKFLOW.md` — kompletny workflow developerski (setup, testy, pre-commit, hooki)
+- `docs/TROUBLESHOOTING.md` — 10 scenariuszy awarii z remediacja
+- `docs/CLOSURE_CHECKLIST.md` — formalna checklista odbioru fazy (9 sekcji: runtime, pipeline, testy, toolchain, CI, docs, czystość repo, brak ukrytych zależności, formalne zamknięcie)
+- `docs/OPEN_DECISIONS.md` — 5 otwartych decyzji architektonicznych (OD-001–OD-005)
+- `README.md` — przegląd repo, quick start, model runtime, structure
+
+### Zmienione
+- `scripts/install_hooks.sh` — hook używa `.venv/bin/python` z fallbackiem i ostrzeżeniem
+- `scripts/doctor.py` — FAIL komunikaty z `→ run: ...` hint; `TECHNICAL DEBT NOTE` ref do OD-002
+- `scripts/pipeline_run.py` — `_load_build_current_cmd()` + wykonanie realnego buildu przed emoji gate
+- `config/pipeline_policy.yaml` — `build_current_cmd` wskazuje na `scripts/build_current.py`
+- `.gitignore` — dodano `reports/post_stabilization_baseline/`
+- `scripts/maintenance/bulk_section_patcher.py` — usunięto marker `TODO:` z argparse help
+- `tests/conftest.py` — `TECHNICAL DEBT NOTE` blok w `_require_db_profile()` (cel, warunek usunięcia, OD-002)
+
+### Dodane (infrastruktura CI)
+- `.github/workflows/smoke.yml` — 4-job smoke CI (doctor, fast-suite, integration-suite, pipeline-smoke); `workflow_dispatch` + nightly schedule
+
+### Stan testów po zmianach
+- `scripts/doctor.py --strict` → exit 0
+- `pytest -m "not integration and not slow"` → exit 0 (all green)
+- `pytest -m "integration and not slow"` → patrz OD-002 (testy E2E z legacy DB są poza scope tej fazy)
+
+### Otwarte decyzje (świadome, nieblokujące)
+- OD-001: model hooków (custom vs standardowy `pre-commit`)
+- OD-002: status legacy DB — źródło i procedura odtworzenia
+- OD-003: status `generated_templates/satellite/` (0 plików)
+- OD-004: poziomy CI (smoke vs full-runtime gate)
+- OD-005: hermetyzacja danych runtime
+
+---
+
 ## [2026-03-09] Faza 12 — Wartość operacyjna: standardy, powiązania, przewodniki
 
 ### Dodane
