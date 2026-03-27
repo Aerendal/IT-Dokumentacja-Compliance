@@ -22,6 +22,9 @@ python3 scripts/doctor.py          # sprawdź stan repo
 
 ## 3. Uruchamianie testów
 
+> Wszystkie poniższe komendy zakładają aktywne środowisko `.venv` (po `source .venv/bin/activate`).  
+> Alternatywnie używaj `.venv/bin/python -m pytest ...` bez aktywacji.
+
 ### Szybka suita (< 60 s)
 
 ```bash
