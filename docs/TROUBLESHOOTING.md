@@ -220,3 +220,39 @@ python3 scripts/doctor.py   # raport, exit 0 nawet przy FAIL
 ```
 
 CI smoke workflow celowo nie używa `--strict` jeśli legacy DB nie jest dostarczona.
+
+---
+
+## 13. Warningi `RequestsDependencyWarning` / `PytestConfigWarning` przy `python3 -m pytest`
+
+**Przyczyna:**
+Uruchomienie `python3 -m pytest` poza aktywnym `.venv` używa systemowego lub user-site Pythona,
+który może mieć zainstalowane pakiety z innych projektów — np. `requests` z niezgodną wersją
+`urllib3`, albo konflikty z `docschema` / `PyNaCl`.
+
+**To nie jest problem repo** — hook i oficjalne środowisko pracy są czyste.
+
+**Jeśli widzisz ten warning:**
+
+1. Sprawdź, czy `.venv` jest aktywne:
+   ```bash
+   which python3   # powinno wskazywać na .venv/bin/python3
+   ```
+
+2. Jeśli nie — aktywuj:
+   ```bash
+   source .venv/bin/activate
+   python3 -m pytest -q -m "not integration and not slow"
+   ```
+
+3. Alternatywnie bez aktywacji:
+   ```bash
+   .venv/bin/python -m pytest -q -m "not integration and not slow"
+   ```
+
+**Hook zawsze używa `.venv/bin/python`** (linia 8 w `.git/hooks/pre-commit`) — jest odporny na to.
+
+**Weryfikacja środowiska:**
+```bash
+.venv/bin/pip check   # powinno zwracać "No broken requirements found."
+```
