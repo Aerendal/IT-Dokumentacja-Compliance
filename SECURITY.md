@@ -74,9 +74,28 @@ Przed pokazaniem repo na zewnątrz należy sprawdzić:
 - brak sekretów w skryptach i konfiguracji,
 - brak prywatnych ścieżek użytkownika.
 
-Rekomendowane jest użycie skanera sekretów, np.:
+Repo używa `detect-secrets` jako narzędzia do skanowania sekretów. Baseline jest zcommitowany jako `.secrets.baseline`.
+
+Aby zweryfikować stan sekretów:
+
+```bash
+detect-secrets audit .secrets.baseline --stats
+```
+
+Wszystkie findings w baseline są sklasyfikowane (true positive / false positive).  
+Aktualnie baseline zawiera 3 false positives (patrz komentarze w `.secrets.baseline`).
+
+Preferowane narzędzia zewnętrzne do głębszego skanu:
 - `gitleaks`
 - `trufflehog`
+
+Jeżeli chcesz uruchomić `detect-secrets` od nowa:
+
+```bash
+git ls-files -- '*.py' '*.yaml' '*.yml' '*.md' '*.cfg' '*.toml' '*.sh' | \
+  grep -v generated_templates | grep -v reports/ | \
+  xargs detect-secrets scan > new_baseline.json
+```
 
 ---
 

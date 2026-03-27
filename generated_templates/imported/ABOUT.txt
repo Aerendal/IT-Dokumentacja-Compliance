@@ -1,0 +1,55 @@
+# generated_templates/imported/ — warstwa danych wejściowych
+
+## Co to jest
+
+Ten katalog zawiera **surowe dane wejściowe** z zewnętrznego procesu importu.
+
+**Nie jest to część kontraktu kodu runtime.**
+
+---
+
+## Status
+
+| Właściwość | Wartość |
+|---|---|
+| Typ zawartości | surowy import zewnętrzny |
+| Część kontraktu runtime | NIE |
+| Część fast suite | NIE |
+| Część integration suite | NIE (pośrednio jako input) |
+| Wersjonowany | TAK (dane wejściowe powinny być reprodukowalne) |
+
+---
+
+## Co może się tu znajdować
+
+Pliki w tym katalogu mogą zawierać:
+
+- **historyczne ścieżki środowiskowe** z procesu importu (np. `/home/...`)
+- **placeholdery dokumentacyjne** z oryginalnych źródeł
+- **referencje kontekstowe** z narzędzi używanych podczas importu
+- **surowe szablony** przed przetworzeniem przez pipeline
+
+To **nie są** dane personalne ani sekrety — są to artefakty procesu importu treści dokumentacyjnych.
+
+---
+
+## Jak to czytać
+
+Jeżeli widzisz tu ścieżki jak `/home/claude/doc-matrix/...`:
+
+- Są to ścieżki z oryginalnego środowiska budującego te szablony.
+- Nie są to ścieżki lokalne maintainera tego repo.
+- Nie są to wyciek danych.
+
+Jeżeli widzisz tu `TODO`, `placeholder`, `FIXME`:
+
+- Są to znaczniki z oryginalnych dokumentów źródłowych.
+- Nie są to niedomknięte zadania w kontrakcie tego repo.
+
+---
+
+## Gdzie opisane formalnie
+
+- `docs/OPEN_DECISIONS.md` → OD-006 (status imported content)
+- `docs/EXTERNAL_REVIEW.md` → §7 (znane ograniczenia)
+- `README.md` → sekcja "Runtime assets"

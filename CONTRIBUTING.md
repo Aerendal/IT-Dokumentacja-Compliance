@@ -47,9 +47,11 @@ Nie są mile widziane:
 Przed commitem należy uruchomić co najmniej:
 
 ```bash
-python3 scripts/doctor.py --strict
+python3 scripts/doctor.py
 python3 -m pytest -q -m "not integration and not slow"
 ```
+
+> **Uwaga:** `doctor.py` bez flagi `--strict` jest trybem informacyjnym (exit 0). Jeżeli zmiana dotyczy pełnego runtime z legacy DB, uruchom `doctor.py --strict` dla weryfikacji całego kontraktu.
 
 Jeżeli zmiana dotyczy runtime, pipeline, compliance lub integration, to dodatkowo:
 

@@ -65,6 +65,13 @@ Status i zakres assets opisane są w `docs/RUNTIME_BOOTSTRAP.md`.
 
 Repo wspiera dwa poziomy użycia:
 
+| Tryb | Doctor | Fast suite | Integration | Pipeline | Wymagane assets |
+|---|---|---|---|---|---|
+| **Minimal** | `doctor.py` (informacyjny, exit 0) | ✅ | ❌ | smoke | `.venv`, `it_doc_matrix_clean.db` |
+| **Full runtime** | `doctor.py --strict` (exit 0 z legacy DB) | ✅ | ✅ | pełny | minimal + `it_doc_matrix.db` + `generated_templates/core/` |
+
+> `doctor.py --strict` zakończy się kodem 1 bez `it_doc_matrix.db` — jest to **celowe i udokumentowane** (patrz `docs/RUNTIME_BOOTSTRAP.md`, `docs/TROUBLESHOOTING.md #11`).
+
 ## 1. Minimal mode
 Tryb przeznaczony do:
 - szybkiego uruchomienia,
@@ -74,7 +81,7 @@ Tryb przeznaczony do:
 
 W tym trybie działają:
 - bootstrap,
-- doctor,
+- `doctor.py` (informacyjny — zawsze exit 0),
 - fast suite,
 - podstawowy workflow narzędziowy.
 
@@ -85,7 +92,8 @@ Tryb przeznaczony do:
 - compliance E2E,
 - pracy na pełnych assets.
 
-W tym trybie mogą być wymagane dodatkowe assets runtime opisane w `docs/RUNTIME_BOOTSTRAP.md`.
+W tym trybie wymagane są dodatkowe assets runtime opisane w `docs/RUNTIME_BOOTSTRAP.md`.
+`doctor.py --strict` jest bramką jakości dla tego trybu.
 
 ---
 
