@@ -21,9 +21,15 @@ import sqlite3
 from typing import Optional
 
 from itdoc.exceptions import QueryError
+from itdoc.schema_profile import assert_schema_profile, list_tables
 
 # match_reason values considered "high quality" for curated queries
 _CURATED_REASONS = frozenset({"primary_standard", "explicit_audit"})
+
+
+def _require_legacy(conn: sqlite3.Connection) -> None:
+    """Wymusza profil legacy-runtime. Rzuca RuntimeError gdy profil nie pasuje."""
+    assert_schema_profile(conn, "legacy-runtime")
 
 
 def find_by_standard(conn: sqlite3.Connection, code: str) -> list:
@@ -38,7 +44,9 @@ def find_by_standard(conn: sqlite3.Connection, code: str) -> list:
 
     Raises:
         QueryError: Gdy kod jest pusty.
+        RuntimeError: Gdy baza nie jest w profilu legacy-runtime.
     """
+    _require_legacy(conn)
     if not code or not code.strip():
         raise QueryError("Kod standardu nie może być pusty")
 
@@ -67,6 +75,9 @@ def find_curated_by_standard(conn: sqlite3.Connection, code: str) -> list:
     1. gap_analysis (exact/high confidence) — szablony z audytu kompletności
     2. doc_standard_mapping z match_reason w {primary_standard, explicit_audit}
 
+    Graceful degradation: jeśli tabela gap_analysis lub doc_standard_mapping nie istnieje
+    w bazie, ta część wyników jest pomijana (zamiast rzucać OperationalError).
+
     Wyniki nie zawierają duplikatów. Duplikaty gap_analysis są usuwane przez deduplikację po doc_path.
 
     Args:
@@ -79,95 +90,69 @@ def find_curated_by_standard(conn: sqlite3.Connection, code: str) -> list:
 
     Raises:
         QueryError: Gdy kod jest pusty.
+        RuntimeError: Gdy baza nie jest w profilu legacy-runtime.
     """
+    _require_legacy(conn)
     if not code or not code.strip():
         raise QueryError("Kod standardu nie może być pusty")
 
     like = f"%{code.strip()}%"
-
-    # 1. gap_analysis results (exact + high confidence)
-    gap_rows = conn.execute("""
-        SELECT g.matched_doc_path  AS doc_path,
-               g.standard_code,
-               g.confidence,
-               g.doc_title         AS catalog_title,
-               d.title
-        FROM gap_analysis g
-        LEFT JOIN docs d ON d.path = g.matched_doc_path
-        WHERE (g.standard_code LIKE ? OR g.standard_code LIKE ?)
-          AND g.status = 'present'
-          AND g.confidence IN ('exact', 'high')
-        ORDER BY
-            CASE g.confidence WHEN 'exact' THEN 0 ELSE 1 END,
-            g.matched_doc_path
-    """, (like, like)).fetchall()
+    existing = list_tables(conn)
 
     seen: set[str] = set()
     results: list[dict] = []
 
-    for r in gap_rows:
-        path = r["doc_path"]
-        if path and path not in seen:
-            seen.add(path)
-            entry = dict(r)
-            entry["match_reason"] = "gap_analysis"
-            entry["source"] = "gap_analysis"
-            results.append(entry)
+    # 1. gap_analysis results (exact + high confidence) — only if table exists
+    if "gap_analysis" in existing:
+        gap_rows = conn.execute("""
+            SELECT g.matched_doc_path  AS doc_path,
+                   g.standard_code,
+                   g.confidence,
+                   g.doc_title         AS catalog_title,
+                   d.title
+            FROM gap_analysis g
+            LEFT JOIN docs d ON d.path = g.matched_doc_path
+            WHERE (g.standard_code LIKE ? OR g.standard_code LIKE ?)
+              AND g.status = 'present'
+              AND g.confidence IN ('exact', 'high')
+            ORDER BY
+                CASE g.confidence WHEN 'exact' THEN 0 ELSE 1 END,
+                g.matched_doc_path
+        """, (like, like)).fetchall()
 
-    # 2. doc_standard_mapping with primary_standard / explicit_audit
-    map_rows = conn.execute("""
-        SELECT m.doc_path,
-               m.standard_code,
-               m.match_reason,
-               d.title
-        FROM doc_standard_mapping m
-        LEFT JOIN docs d ON d.path = m.doc_path
-        WHERE (m.standard_code LIKE ?)
-          AND m.match_reason IN ('primary_standard', 'explicit_audit')
-        ORDER BY m.doc_path
-    """, (like,)).fetchall()
+        for r in gap_rows:
+            path = r["doc_path"]
+            if path and path not in seen:
+                seen.add(path)
+                entry = dict(r)
+                entry["match_reason"] = "gap_analysis"
+                entry["source"] = "gap_analysis"
+                results.append(entry)
 
-    for r in map_rows:
-        path = r["doc_path"]
-        if path and path not in seen:
-            seen.add(path)
-            entry = dict(r)
-            entry["confidence"] = None
-            entry["source"] = "mapping"
-            results.append(entry)
+    # 2. doc_standard_mapping with primary_standard / explicit_audit — only if table exists
+    if "doc_standard_mapping" in existing:
+        map_rows = conn.execute("""
+            SELECT m.doc_path,
+                   m.standard_code,
+                   m.match_reason,
+                   d.title
+            FROM doc_standard_mapping m
+            LEFT JOIN docs d ON d.path = m.doc_path
+            WHERE (m.standard_code LIKE ?)
+              AND m.match_reason IN ('primary_standard', 'explicit_audit')
+            ORDER BY m.doc_path
+        """, (like,)).fetchall()
+
+        for r in map_rows:
+            path = r["doc_path"]
+            if path and path not in seen:
+                seen.add(path)
+                entry = dict(r)
+                entry["confidence"] = None
+                entry["source"] = "mapping"
+                results.append(entry)
 
     return results
-    """Zwraca szablony powiązane z danym standardem (częściowe dopasowanie kodu lub nazwy).
-
-    Args:
-        conn: Połączenie z DB (row_factory=Row).
-        code: Kod lub fragment nazwy standardu (np. "ISO/IEC 27001", "ITIL").
-
-    Returns:
-        list[dict] z kluczami: doc_path, standard_code, standard_name, match_reason, title.
-
-    Raises:
-        QueryError: Gdy kod jest pusty.
-    """
-    if not code or not code.strip():
-        raise QueryError("Kod standardu nie może być pusty")
-
-    like = f"%{code.strip()}%"
-    cur = conn.execute("""
-        SELECT m.doc_path,
-               m.standard_code,
-               s.standard_name,
-               m.match_reason,
-               d.title
-        FROM doc_standard_mapping m
-        LEFT JOIN standards s ON s.standard_code = m.standard_code
-        LEFT JOIN docs d ON d.path = m.doc_path
-        WHERE m.standard_code LIKE ?
-           OR s.standard_name LIKE ?
-           OR s.standard_code LIKE ?
-        ORDER BY m.doc_path
-    """, (like, like, like))
-    return [dict(r) for r in cur.fetchall()]
 
 
 def find_by_regulation(conn: sqlite3.Connection, code: str) -> list:
@@ -182,7 +167,9 @@ def find_by_regulation(conn: sqlite3.Connection, code: str) -> list:
 
     Raises:
         QueryError: Gdy kod jest pusty.
+        RuntimeError: Gdy baza nie jest w profilu legacy-runtime.
     """
+    _require_legacy(conn)
     if not code or not code.strip():
         raise QueryError("Kod regulacji nie może być pusty")
 
@@ -216,7 +203,9 @@ def get_contract(conn: sqlite3.Connection, doc_uid: str) -> dict:
 
     Raises:
         QueryError: Gdy dokument o podanym doc_uid nie istnieje.
+        RuntimeError: Gdy baza nie jest w profilu legacy-runtime.
     """
+    _require_legacy(conn)
     if not doc_uid or not doc_uid.strip():
         raise QueryError("doc_uid nie może być pusty")
 
@@ -264,7 +253,11 @@ def rhythm_upstream(
 
     Returns:
         list[dict] z kluczami: from_uid, to_uid, edge_type, weight, distance.
+
+    Raises:
+        RuntimeError: Gdy baza nie jest w profilu legacy-runtime.
     """
+    _require_legacy(conn)
     if not doc_uid or not doc_uid.strip():
         raise QueryError("doc_uid nie może być pusty")
 
@@ -319,7 +312,11 @@ def rhythm_downstream(
 
     Returns:
         list[dict] z kluczami: from_uid, to_uid, edge_type, weight, distance.
+
+    Raises:
+        RuntimeError: Gdy baza nie jest w profilu legacy-runtime.
     """
+    _require_legacy(conn)
     if not doc_uid or not doc_uid.strip():
         raise QueryError("doc_uid nie może być pusty")
 

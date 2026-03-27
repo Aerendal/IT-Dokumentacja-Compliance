@@ -37,6 +37,15 @@ def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     try:
+        from itdoc.schema_profile import assert_schema_profile
+        assert_schema_profile(conn, "legacy-runtime")
+    except RuntimeError as exc:
+        conn.close()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Schema profile mismatch: {exc}",
+        )
+    try:
         yield conn
     finally:
         conn.close()

@@ -157,8 +157,9 @@ class TestValidateSchema:
         conn = open_connection(empty_db)
         errors = validate_schema(conn)
         conn.close()
-        # Każda wymagana tabela powinna być wymieniona jako błąd
-        assert len(errors) >= len(_REQUIRED_TABLES)
+        # Nowe zachowanie: jeden błąd kontraktu profilu (schema profile mismatch)
+        assert len(errors) >= 1
+        assert any("profile mismatch" in e or "Brakujaca tabela" in e for e in errors)
 
     def test_error_strings_are_descriptive(self, empty_db):
         conn = open_connection(empty_db)

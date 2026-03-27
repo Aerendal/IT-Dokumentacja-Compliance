@@ -324,6 +324,22 @@ def parse_args() -> argparse.Namespace:
         "--no-pipeline", action="store_true",
         help="Pomiń uruchomienie pipeline_run na końcu"
     )
+    parser.add_argument(
+        "--db", type=Path, default=None,
+        help="Ścieżka do bazy danych legacy-runtime (domyślnie: reports/it_doc_matrix.db)"
+    )
+    parser.add_argument(
+        "--templates-root", type=Path, default=None,
+        help="Katalog główny szablonów (domyślnie: generated_templates/)"
+    )
+    parser.add_argument(
+        "--core-dir", type=Path, default=None,
+        help="Katalog szablonów core (domyślnie: generated_templates/core/)"
+    )
+    parser.add_argument(
+        "--sat-dir", type=Path, default=None,
+        help="Katalog szablonów satellite (domyślnie: generated_templates/satellite/)"
+    )
     return parser.parse_args()
 
 
@@ -417,6 +433,13 @@ def run(
 
     db_rel = str(rel_path).replace("\\", "/")
     conn = sqlite3.connect(str(DB_PATH))
+    try:
+        from itdoc.schema_profile import assert_schema_profile
+        assert_schema_profile(conn, "legacy-runtime")
+    except RuntimeError as exc:
+        conn.close()
+        print(f"ERROR: {exc}", file=sys.stderr)
+        sys.exit(1)
     insert_to_db(conn, title, db_rel, standards, regulations)
     conn.close()
 

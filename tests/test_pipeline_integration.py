@@ -15,15 +15,33 @@ pytestmark = pytest.mark.slow
 
 _REPO_ROOT = Path(__file__).parent.parent
 _PIPELINE_SCRIPT = _REPO_ROOT / "scripts" / "pipeline_run.py"
-_DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix.db"
+_DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix_clean.db"
+_ALIGNMENT_LOG = _REPO_ROOT / "reports" / "alignment_log.csv"
+_TEMPLATES_ROOT = _REPO_ROOT / "generated_templates"
 
 
 @pytest.fixture(scope="module", autouse=True)
 def require_db():
     if not _DB_PATH.exists():
-        pytest.skip(f"Real DB not found: {_DB_PATH}")
+        pytest.skip(f"Current-snapshot DB not found: {_DB_PATH}")
     if not _PIPELINE_SCRIPT.exists():
         pytest.skip(f"Pipeline script not found: {_PIPELINE_SCRIPT}")
+    if not _ALIGNMENT_LOG.exists():
+        pytest.skip(f"Alignment log not found: {_ALIGNMENT_LOG}")
+    if not _TEMPLATES_ROOT.exists():
+        pytest.skip(f"Templates root not found: {_TEMPLATES_ROOT}")
+    # verify DB profile
+    import sqlite3
+    from itdoc.schema_profile import detect_schema_profile
+    conn = sqlite3.connect(str(_DB_PATH))
+    try:
+        check = detect_schema_profile(conn)
+        if check.profile != "current-snapshot":
+            pytest.skip(
+                f"DB profile mismatch: expected=current-snapshot, got={check.profile}"
+            )
+    finally:
+        conn.close()
 
 
 class TestPipelinePass:

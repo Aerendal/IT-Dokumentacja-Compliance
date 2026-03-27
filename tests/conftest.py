@@ -1,9 +1,16 @@
 """tests/conftest.py — wspólne fixtures dla wszystkich testów.
 
 Fixtures:
-  db_conn      — in-memory SQLite z minimalnym schematem (unit tests)
-  real_db_conn — połączenie z reports/it_doc_matrix.db (skip jeśli brak pliku)
+  db_conn            — in-memory SQLite z minimalnym schematem (unit tests)
+  real_db_conn       — alias: real_legacy_db_conn (kompatybilność wsteczna)
+  real_legacy_db_conn — połączenie z reports/it_doc_matrix.db (skip jeśli brak lub zły profil)
+  real_current_db_conn — połączenie z reports/it_doc_matrix_clean.db (skip jeśli brak/zły profil)
   sample_template_path — ścieżka do istniejącego szablonu core/ (skip jeśli brak)
+  templates_root     — ścieżka do generated_templates/ (skip jeśli brak)
+  core_dir           — ścieżka do generated_templates/core/ (skip jeśli brak)
+  satellite_dir      — ścieżka do generated_templates/satellite/ (skip jeśli brak)
+  alignment_log_path — ścieżka do reports/alignment_log.csv (skip jeśli brak)
+  repo_root          — katalog główny repo (Path)
 """
 
 import sqlite3
@@ -13,7 +20,27 @@ import pytest
 
 _REPO_ROOT = Path(__file__).parent.parent
 _DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix.db"
+_CLEAN_DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix_clean.db"
 _CORE_DIR = _REPO_ROOT / "generated_templates" / "core"
+_SAT_DIR = _REPO_ROOT / "generated_templates" / "satellite"
+_ALIGNMENT_LOG = _REPO_ROOT / "reports" / "alignment_log.csv"
+
+
+def _require_db_profile(path: Path, expected: str) -> sqlite3.Connection:
+    """Otwiera DB i sprawdza profil. Skip jeśli brak pliku lub zły profil."""
+    if not path.exists():
+        pytest.skip(f"DB not found: {path}")
+    conn = sqlite3.connect(str(path), timeout=30)
+    conn.row_factory = sqlite3.Row
+    from itdoc.schema_profile import detect_schema_profile
+    detected = detect_schema_profile(conn)
+    if detected.profile != expected:
+        conn.close()
+        pytest.skip(
+            f"DB profile mismatch for {path.name}: "
+            f"expected={expected}, got={detected.profile}"
+        )
+    return conn
 
 
 @pytest.fixture()
@@ -167,20 +194,84 @@ def db_conn():
             access_mask INTEGER
         );
         INSERT INTO flags VALUES (1, 'UID001', '1.0.0', 1, 0), (2, 'UID002', '1.0.0', 1, 0);
+
+        CREATE TABLE gap_analysis (
+            id INTEGER PRIMARY KEY,
+            standard_code TEXT,
+            matched_doc_path TEXT,
+            doc_title TEXT,
+            status TEXT,
+            confidence TEXT
+        );
+        INSERT INTO gap_analysis VALUES
+            (1, 'ISO/IEC 27001', 'core/test_a.md', 'Test Doc A', 'present', 'exact'),
+            (2, 'PMBOK 7', 'core/test_b.md', 'Test Doc B', 'present', 'high');
     """)
     yield conn
     conn.close()
 
 
 @pytest.fixture()
-def real_db_conn():
-    """Połączenie z rzeczywistą DB. Pomija test jeśli plik nie istnieje."""
-    if not _DB_PATH.exists():
-        pytest.skip(f"Real DB not found: {_DB_PATH}")
-    conn = sqlite3.connect(str(_DB_PATH), timeout=30)
-    conn.row_factory = sqlite3.Row
+def real_legacy_db_conn():
+    """Połączenie z reports/it_doc_matrix.db (legacy-runtime). Skip jeśli brak lub zły profil."""
+    conn = _require_db_profile(_DB_PATH, "legacy-runtime")
     yield conn
     conn.close()
+
+
+@pytest.fixture()
+def real_current_db_conn():
+    """Połączenie z reports/it_doc_matrix_clean.db (current-snapshot). Skip jeśli brak lub zły profil."""
+    conn = _require_db_profile(_CLEAN_DB_PATH, "current-snapshot")
+    yield conn
+    conn.close()
+
+
+@pytest.fixture()
+def real_db_conn(real_legacy_db_conn):
+    """Alias kompatybilności wstecznej → real_legacy_db_conn."""
+    yield real_legacy_db_conn
+
+
+@pytest.fixture()
+def repo_root() -> Path:
+    """Katalog główny repozytorium."""
+    return _REPO_ROOT
+
+
+@pytest.fixture()
+def templates_root():
+    """Ścieżka do generated_templates/. Skip jeśli brak."""
+    path = _REPO_ROOT / "generated_templates"
+    if not path.exists():
+        pytest.skip("generated_templates/ missing")
+    return path
+
+
+@pytest.fixture()
+def core_dir(templates_root):
+    """Ścieżka do generated_templates/core/. Skip jeśli brak."""
+    path = templates_root / "core"
+    if not path.exists():
+        pytest.skip("generated_templates/core/ missing")
+    return path
+
+
+@pytest.fixture()
+def satellite_dir(templates_root):
+    """Ścieżka do generated_templates/satellite/. Skip jeśli brak."""
+    path = templates_root / "satellite"
+    if not path.exists():
+        pytest.skip("generated_templates/satellite/ missing")
+    return path
+
+
+@pytest.fixture()
+def alignment_log_path():
+    """Ścieżka do reports/alignment_log.csv. Skip jeśli brak."""
+    if not _ALIGNMENT_LOG.exists():
+        pytest.skip("reports/alignment_log.csv missing")
+    return _ALIGNMENT_LOG
 
 
 @pytest.fixture()

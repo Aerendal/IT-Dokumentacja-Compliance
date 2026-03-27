@@ -2,7 +2,8 @@
 
 Funkcje:
   get_connection(db_path=None) -> context manager / sqlite3.Connection
-  validate_schema(conn, on_error=None) -> list[str]
+  validate_schema(conn, on_error=None, expected_profile="legacy-runtime") -> list[str]
+  validate_current_snapshot_schema(conn, on_error=None) -> list[str]
   check_link_resolution_coverage(conn) -> float
 
 Uzycie (zalecane):
@@ -21,21 +22,16 @@ from pathlib import Path
 from typing import Callable, Generator, List, Optional
 
 from itdoc.exceptions import SchemaError
+from itdoc.schema_profile import (
+    CURRENT_REQUIRED,
+    LEGACY_REQUIRED,
+    detect_schema_profile,
+)
 
 _DEFAULT_DB = Path(__file__).parent.parent / "reports" / "it_doc_matrix.db"
 
-_REQUIRED_TABLES = [
-    "docs",
-    "sections",
-    "standards",
-    "compliance_regulations",
-    "content_links",
-    "content_links_resolved",
-    "rhythm_edges",
-    "contracts",
-    "flags",
-    "_schema_version",
-]
+# Zachowane dla kompatybilności wstecznej — używaj LEGACY_REQUIRED z schema_profile
+_REQUIRED_TABLES = sorted(LEGACY_REQUIRED)
 
 
 def _open_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
@@ -69,29 +65,75 @@ def get_connection(db_path: Optional[Path] = None) -> Generator[sqlite3.Connecti
 def validate_schema(
     conn: sqlite3.Connection,
     on_error: Optional[Callable[[str], None]] = None,
+    expected_profile: str = "legacy-runtime",
 ) -> list:
-    """Sprawdza obecnosc i niepustosc kluczowych tabel.
+    """Sprawdza profil schematu i niepustosc kluczowych tabel.
+
+    Najpierw weryfikuje profil DB (legacy-runtime lub current-snapshot),
+    potem sprawdza niepustosc tabel wymaganego profilu.
 
     Args:
         conn: Polaczenie z DB.
         on_error: Opcjonalny callback (error_msg: str) -> None wywolywany
-            dla kazdego znalezionego bledu (np. do logowania lub alertow).
-            None = tylko zbierz bledy w liscie.
+            dla kazdego znalezionego bledu.
+        expected_profile: Oczekiwany profil schematu (domyslnie "legacy-runtime").
 
     Returns:
         Lista bledow (stringow). Pusta lista = schema OK.
     """
     errors: List[str] = []
-    cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    existing = {row[0] for row in cur.fetchall()}
 
-    for table in _REQUIRED_TABLES:
-        if table not in existing:
-            msg = f"Brakujaca tabela: {table}"
+    detected = detect_schema_profile(conn)
+    if detected.profile != expected_profile:
+        msg = (
+            f"Schema profile mismatch: expected={expected_profile}, "
+            f"got={detected.profile}, "
+            f"missing_required={sorted(detected.missing_required)}"
+        )
+        errors.append(msg)
+        if on_error:
+            on_error(msg)
+        return errors
+
+    for table in sorted(LEGACY_REQUIRED):
+        count = conn.execute(f"SELECT COUNT(*) FROM [{table}]").fetchone()[0]
+        if count == 0:
+            msg = f"Pusta tabela: {table}"
             errors.append(msg)
             if on_error:
                 on_error(msg)
-            continue
+
+    return errors
+
+
+def validate_current_snapshot_schema(
+    conn: sqlite3.Connection,
+    on_error: Optional[Callable[[str], None]] = None,
+) -> list:
+    """Sprawdza profil current-snapshot i niepustosc jego tabel.
+
+    Args:
+        conn: Polaczenie z DB.
+        on_error: Opcjonalny callback (error_msg: str) -> None.
+
+    Returns:
+        Lista bledow. Pusta lista = schema OK.
+    """
+    errors: List[str] = []
+
+    detected = detect_schema_profile(conn)
+    if detected.profile != "current-snapshot":
+        msg = (
+            "Schema profile mismatch: expected=current-snapshot, "
+            f"got={detected.profile}, "
+            f"missing_required={sorted(detected.missing_required)}"
+        )
+        errors.append(msg)
+        if on_error:
+            on_error(msg)
+        return errors
+
+    for table in sorted(CURRENT_REQUIRED):
         count = conn.execute(f"SELECT COUNT(*) FROM [{table}]").fetchone()[0]
         if count == 0:
             msg = f"Pusta tabela: {table}"

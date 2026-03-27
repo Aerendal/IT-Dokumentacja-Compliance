@@ -4,6 +4,7 @@ import json
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -218,7 +219,7 @@ class TestInsertToDB:
 # TestWizardCLI — integration tests (subprocess, --dry-run)
 # ---------------------------------------------------------------------------
 
-_CWD = '/home/jerzy/Pobrane/IT_Dokumentacja/dokumentacja'
+_REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class TestWizardCLI:
@@ -232,7 +233,7 @@ class TestWizardCLI:
              '--type', 'Polityka',
              '--goal', 'Cel testowy dokumentu',
              '--dry-run'],
-            capture_output=True, text=True, cwd=_CWD
+            capture_output=True, text=True, cwd=str(_REPO_ROOT)
         )
         assert result.returncode == 0
         assert '## Cel dokumentu' in result.stdout
@@ -247,7 +248,7 @@ class TestWizardCLI:
             [sys.executable, 'scripts/new_template_wizard.py',
              '--title', 'NieIstniejacyDokument99999',
              '--dry-run'],
-            capture_output=True, cwd=_CWD
+            capture_output=True, cwd=str(_REPO_ROOT)
         )
         after = set(glob.glob('generated_templates/**/*.md', recursive=True))
         assert before == after  # no new files
@@ -260,10 +261,20 @@ class TestWizardCLI:
              '--title', 'Security Policy',
              '--standard', 'ISO/IEC 27001',
              '--dry-run'],
-            capture_output=True, text=True, cwd=_CWD
+            capture_output=True, text=True, cwd=str(_REPO_ROOT)
         )
         assert result.returncode == 0
         assert 'ISO/IEC 27001' in result.stdout
+
+    def test_dry_run_does_not_require_db_or_templates(self):
+        """--dry-run nie wymaga DB ani generated_templates/"""
+        result = subprocess.run(
+            [sys.executable, 'scripts/new_template_wizard.py',
+             '--title', 'Dry Run Contract Test',
+             '--dry-run'],
+            capture_output=True, text=True, cwd=str(_REPO_ROOT)
+        )
+        assert result.returncode == 0
 
 
 # ---------------------------------------------------------------------------
@@ -295,7 +306,7 @@ Oryginalna tresc celu.
             [sys.executable, 'scripts/maintenance/bulk_section_patcher.py',
              '--file', str(sample_md),
              '--preview-section', '## Cel dokumentu'],
-            capture_output=True, text=True, cwd=_CWD
+            capture_output=True, text=True, cwd=str(_REPO_ROOT)
         )
         assert result.returncode == 0
         output = result.stdout + result.stderr
@@ -315,7 +326,7 @@ Oryginalna tresc celu.
              '--append-text', 'Dodatkowy tekst testowy',
              '--reason', 'integration test',
              '--dry-run'],
-            capture_output=True, text=True, cwd=_CWD
+            capture_output=True, text=True, cwd=str(_REPO_ROOT)
         )
         assert result.returncode == 0
         after = sample_md.read_text(encoding='utf-8')
@@ -330,7 +341,7 @@ Oryginalna tresc celu.
              '--append-to-section', '## Cel dokumentu',
              '--append-text', 'Dodany tekst przez test integracyjny',
              '--reason', 'integration test'],
-            capture_output=True, text=True, cwd=_CWD
+            capture_output=True, text=True, cwd=str(_REPO_ROOT)
         )
         assert result.returncode == 0
         content = sample_md.read_text(encoding='utf-8')

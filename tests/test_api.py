@@ -9,10 +9,29 @@ pytestmark = pytest.mark.unit
 
 @pytest.fixture
 def client(tmp_path):
-    """Create test client with in-memory SQLite DB."""
+    """Create test client with in-memory SQLite DB (legacy-runtime schema + API tables)."""
     db_path = tmp_path / "test.db"
     conn = sqlite3.connect(db_path)
     conn.executescript("""
+        -- legacy-runtime required tables
+        CREATE TABLE _schema_version (version TEXT, applied_at TEXT);
+        INSERT INTO _schema_version VALUES ('1.0.0', '2026-01-01');
+        CREATE TABLE docs (doc_uid TEXT PRIMARY KEY, title TEXT, title_norm TEXT, path TEXT, origin TEXT, created_at_utc TEXT, updated_at_utc TEXT);
+        CREATE TABLE sections (section_uid TEXT PRIMARY KEY, doc_uid TEXT, heading_text TEXT, heading_norm TEXT, heading_level INTEGER, heading_path TEXT, anchor TEXT, ordinal INTEGER, status TEXT, text_fingerprint_sha256 TEXT, start_line INTEGER, end_line INTEGER);
+        CREATE TABLE standards (standard_id INTEGER PRIMARY KEY, standard_code TEXT, standard_name TEXT, standard_name_en TEXT, description TEXT, version TEXT, url TEXT, applicable_industries TEXT);
+        CREATE TABLE compliance_regulations (id INTEGER PRIMARY KEY, regulation_code TEXT, regulation_name TEXT, jurisdiction TEXT, industry TEXT, key_requirements TEXT, penalty_info TEXT, data_engineering_impact TEXT);
+        CREATE TABLE content_links (id INTEGER PRIMARY KEY, from_doc TEXT, to_doc TEXT, link_type TEXT);
+        INSERT INTO content_links VALUES (1, 'core/a.md', 'core/b.md', 'requires');
+        CREATE TABLE content_links_resolved (id INTEGER PRIMARY KEY, content_link_id INTEGER, from_kind TEXT, from_uid TEXT, to_kind TEXT, to_uid TEXT, link_type TEXT, direction TEXT, rationale TEXT, strength TEXT, resolution_method TEXT, resolution_confidence REAL, notes TEXT);
+        INSERT INTO content_links_resolved VALUES (1, 1, 'doc', 'UID001', 'doc', 'UID002', 'requires', 'forward', '', 'required', 'explicit', 1.0, '');
+        CREATE TABLE rhythm_edges (edge_id INTEGER PRIMARY KEY, from_node TEXT, to_node TEXT, rhythm_type TEXT, weight REAL, conditions TEXT, version_range TEXT, notes TEXT);
+        INSERT INTO rhythm_edges VALUES (1, 'UID001', 'UID002', 'triggers', 0.9, '', '', '');
+        CREATE TABLE contracts (contract_id INTEGER PRIMARY KEY, scope_kind TEXT, scope_uid TEXT, version TEXT, inputs_json TEXT, outputs_json TEXT, gates_json TEXT, impact_json TEXT, owner TEXT, notes TEXT, created_at_utc TEXT, updated_at_utc TEXT);
+        INSERT INTO contracts VALUES (1, 'doc', 'UID001', '1.0', '[]', '[]', '[]', '{}', 'owner', '', '2026-01-01', '2026-01-01');
+        CREATE TABLE flags (id INTEGER PRIMARY KEY, doc_uid TEXT, version TEXT, branch_id INTEGER, access_mask INTEGER);
+        INSERT INTO flags VALUES (1, 'UID001', '1.0.0', 1, 0);
+
+        -- API-specific tables
         CREATE TABLE doc_standard_mapping (
             id INTEGER PRIMARY KEY, doc_path TEXT, standard_code TEXT,
             confidence REAL, match_reason TEXT, evidence TEXT
@@ -162,13 +181,29 @@ def test_review_not_found(client):
 
 
 def test_violations_missing_table(tmp_path):
-    """Covers lines 122-123: OperationalError when table is missing → returns []."""
+    """Covers lines 122-123: OperationalError when template_violations table is missing → returns []."""
     import sqlite3
     import os
     db_path = tmp_path / "empty.db"
     conn = sqlite3.connect(db_path)
-    # Do NOT create template_violations table
+    # Create legacy-runtime required tables but NOT template_violations
     conn.executescript("""
+        CREATE TABLE _schema_version (version TEXT, applied_at TEXT);
+        INSERT INTO _schema_version VALUES ('1.0.0', '2026-01-01');
+        CREATE TABLE docs (doc_uid TEXT PRIMARY KEY, title TEXT, title_norm TEXT, path TEXT, origin TEXT, created_at_utc TEXT, updated_at_utc TEXT);
+        CREATE TABLE sections (section_uid TEXT PRIMARY KEY, doc_uid TEXT, heading_text TEXT, heading_norm TEXT, heading_level INTEGER, heading_path TEXT, anchor TEXT, ordinal INTEGER, status TEXT, text_fingerprint_sha256 TEXT, start_line INTEGER, end_line INTEGER);
+        CREATE TABLE standards (standard_id INTEGER PRIMARY KEY, standard_code TEXT, standard_name TEXT, standard_name_en TEXT, description TEXT, version TEXT, url TEXT, applicable_industries TEXT);
+        CREATE TABLE compliance_regulations (id INTEGER PRIMARY KEY, regulation_code TEXT, regulation_name TEXT, jurisdiction TEXT, industry TEXT, key_requirements TEXT, penalty_info TEXT, data_engineering_impact TEXT);
+        CREATE TABLE content_links (id INTEGER PRIMARY KEY, from_doc TEXT, to_doc TEXT, link_type TEXT);
+        INSERT INTO content_links VALUES (1, 'core/a.md', 'core/b.md', 'requires');
+        CREATE TABLE content_links_resolved (id INTEGER PRIMARY KEY, content_link_id INTEGER, from_kind TEXT, from_uid TEXT, to_kind TEXT, to_uid TEXT, link_type TEXT, direction TEXT, rationale TEXT, strength TEXT, resolution_method TEXT, resolution_confidence REAL, notes TEXT);
+        INSERT INTO content_links_resolved VALUES (1, 1, 'doc', 'UID001', 'doc', 'UID002', 'requires', 'forward', '', 'required', 'explicit', 1.0, '');
+        CREATE TABLE rhythm_edges (edge_id INTEGER PRIMARY KEY, from_node TEXT, to_node TEXT, rhythm_type TEXT, weight REAL, conditions TEXT, version_range TEXT, notes TEXT);
+        INSERT INTO rhythm_edges VALUES (1, 'UID001', 'UID002', 'triggers', 0.9, '', '', '');
+        CREATE TABLE contracts (contract_id INTEGER PRIMARY KEY, scope_kind TEXT, scope_uid TEXT, version TEXT, inputs_json TEXT, outputs_json TEXT, gates_json TEXT, impact_json TEXT, owner TEXT, notes TEXT, created_at_utc TEXT, updated_at_utc TEXT);
+        INSERT INTO contracts VALUES (1, 'doc', 'UID001', '1.0', '[]', '[]', '[]', '{}', 'owner', '', '2026-01-01', '2026-01-01');
+        CREATE TABLE flags (id INTEGER PRIMARY KEY, doc_uid TEXT, version TEXT, branch_id INTEGER, access_mask INTEGER);
+        INSERT INTO flags VALUES (1, 'UID001', '1.0.0', 1, 0);
         CREATE TABLE doc_standard_mapping (
             id INTEGER PRIMARY KEY, doc_path TEXT, standard_code TEXT,
             confidence REAL, match_reason TEXT, evidence TEXT
