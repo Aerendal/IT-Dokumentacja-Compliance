@@ -32,3 +32,21 @@ coverage.xml
 # Large IT doc text files
 IT_Dokumentacja_Czesc_*.md
 odpow*.md
+
+# Session artifacts and local packs
+*.tar.gz
+*.zip
+reports/verification/
+reports/verification_next/
+reports/compliance_fix/
+reports/template_violations_verify/
+reports/backup_*.db
+reports/*.sha256
+
+# Root-level generated/session documents
+Cykl-Produkcyjny.md
+hdfs_spec.md
+
+# Scripts with hardcoded local paths (not portable)
+scripts/extract_requirements.py
+scripts/extract_requirements_workshop.py
