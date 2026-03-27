@@ -14,10 +14,13 @@ mg = "metagraph.cli.main:cli"
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "fastapi>=0.100",
+    "httpx>=0.24",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 markers = [
     "unit: Szybkie testy jednostkowe bez dostępu do DB (< 5s)",
     "integration: Testy wymagające rzeczywistej DB it_doc_matrix.db",
