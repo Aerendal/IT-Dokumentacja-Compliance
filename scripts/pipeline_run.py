@@ -39,6 +39,23 @@ RETENTION_WEEKLY = 12
 RETENTION_MONTHLY = 12
 BASELINE_ID = 1
 
+_PIPELINE_POLICY_PATH = Path('config/pipeline_policy.yaml')
+
+
+def _load_build_current_cmd() -> list[str] | None:
+    """Read build_current_cmd from pipeline_policy.yaml. Returns None if absent or is a no-op."""
+    try:
+        import yaml  # type: ignore
+    except ImportError:
+        return None
+    if not _PIPELINE_POLICY_PATH.exists():
+        return None
+    data = yaml.safe_load(_PIPELINE_POLICY_PATH.read_text(encoding="utf-8"))
+    cmd = data.get("commands", {}).get("build_current_cmd", [])
+    if not cmd or cmd == ["true"] or cmd == "true":
+        return None
+    return [str(c) for c in cmd]
+
 # Thresholds (simple defaults; adjust if needed)
 TH_COLLISIONS_WARN = 20   # +20 over baseline 94
 TH_COLLISIONS_FAIL = 200
@@ -1148,6 +1165,16 @@ def main():
         for err in preflight_errors:
             print(f"PREFLIGHT FAIL: {err}", file=sys.stderr)
         sys.exit(1)
+
+    # run build_current_cmd (rebuilds documents_current before pipeline)
+    _build_cmd = _load_build_current_cmd()
+    if _build_cmd:
+        import subprocess as _sp
+        print(f"pipeline: running build_current_cmd: {_build_cmd}")
+        _proc = _sp.run(_build_cmd, capture_output=False, text=True)
+        if _proc.returncode != 0:
+            print(f"FAIL: build_current_cmd exited with {_proc.returncode}", file=sys.stderr)
+            sys.exit(1)
 
     # hard gate: no emoji allowed in templates (not the whole repo)
     emoji_report = emoji_check(TEMPLATES_ROOT, run_dir)
