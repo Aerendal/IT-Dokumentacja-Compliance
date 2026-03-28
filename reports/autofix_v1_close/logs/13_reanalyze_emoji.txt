@@ -1,0 +1,12 @@
+========================================================================
+Fix Plan Summary — 2026-03-28T05:30:00Z
+========================================================================
+  Mode          : analyze
+  Root          : generated_templates/demo_case_emoji
+  Files scanned : 1
+  Total changes : 0
+  Safe (auto)   : 0
+  Review needed : 0
+
+  ✓ No changes needed.
+========================================================================

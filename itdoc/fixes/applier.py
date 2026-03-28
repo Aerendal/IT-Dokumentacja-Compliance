@@ -26,6 +26,24 @@ class ApplyResult:
     write_results: list[WriteResult] = field(default_factory=list)
     diff_lines_by_file: dict[str, list[str]] = field(default_factory=dict)
 
+    def to_dict(self, run_id: str = "") -> dict:
+        return {
+            "schema_version": "1.0",
+            "run_id": run_id,
+            "changed": len(self.changed_files),
+            "skipped": len(self.skipped_files),
+            "errors": len(self.errors),
+            "files": [
+                {
+                    "file": wr.path.as_posix(),
+                    "hash_before": wr.hash_before,
+                    "hash_after": wr.hash_after,
+                    "changed": wr.changed,
+                }
+                for wr in self.write_results
+            ],
+        }
+
 
 def apply_insert_section(content: str, section: str, placeholder: str) -> str:
     """

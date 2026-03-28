@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "run_id": "2026-03-28T05:30:00Z",
+  "mode": "analyze",
+  "root": "generated_templates/demo_case_emoji",
+  "total_files": 1,
+  "changes": []
+}

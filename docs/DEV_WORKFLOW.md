@@ -123,6 +123,43 @@ python3 scripts/build_current.py --mode incremental
 python3 scripts/pipeline_run.py
 ```
 
+## Autofix V1 — zakres i ograniczenia
+
+Narzędzie `scripts/fix_docs.py` obsługuje bezpieczne autofixy strukturalne.
+
+### V1 naprawia automatycznie (`safe_autofix=True`)
+
+- **`DOC.SECTION.MISSING`** — brakująca wymagana sekcja szablonu
+  Wstawia placeholder na końcu dokumentu (np. `<!-- TODO: Opisz cel dokumentu -->`).
+- **`DOC.EMOJI.FORBIDDEN`** — niedozwolone emoji w pliku `.md`
+  Usuwa znaki emoji, zachowując całą resztę treści.
+
+### V1 tylko raportuje (`safe_autofix=False` / `report_only`)
+
+- **`DOC.FRONTMATTER.MISSING`** — brak bloku YAML frontmatter
+- **`DOC.FRONTMATTER.NO_TITLE`** — brak pola `title:` w frontmatter
+
+Te przypadki wymagają manualnej decyzji — nie są modyfikowane automatycznie.
+
+### Znane ograniczenia V1
+
+- `DOC.SECTION.MISSING`: sekcja jest dodawana na **końcu dokumentu**, bez rekonstrukcji kanonicznej kolejności.
+- Autofix nie uzupełnia treści merytorycznej — wstawia tylko placeholder.
+- Nie dotyczy plików poza `generated_templates/` i `reports/demo_review/files/input/`.
+
+### Użycie
+
+```bash
+# Analiza (bez zapisu):
+.venv/bin/python scripts/fix_docs.py --root DIR --mode analyze --output plan.json
+
+# Dry-run (diff bez zapisu):
+.venv/bin/python scripts/fix_docs.py --root DIR --mode dry-run --output plan.json --write-diff diff.txt
+
+# Apply tylko bezpiecznych fixów:
+.venv/bin/python scripts/apply_fix_plan.py --plan plan.json --only-safe --backup-dir reports/autofix_backups
+```
+
 ## 10. Typowy cykl pracy
 
 ```bash

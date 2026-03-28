@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "run_id": "2026-03-28T05:29:45Z",
+  "mode": "dry-run",
+  "root": "generated_templates/demo_case_emoji",
+  "total_files": 1,
+  "changes": [
+    {
+      "file": "generated_templates/demo_case_emoji/emoji_case.md",
+      "rule_id": "DOC.EMOJI.FORBIDDEN",
+      "severity": "WARNING",
+      "action": "strip_emoji",
+      "detail": {
+        "message": "File contains emoji characters"
+      },
+      "safe_autofix": true
+    }
+  ]
+}

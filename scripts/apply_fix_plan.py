@@ -38,6 +38,10 @@ def main() -> int:
         "--write-diff", type=Path, default=None, dest="write_diff",
         help="Write diff report to this path after applying",
     )
+    parser.add_argument(
+        "--write-result", type=Path, default=None, dest="write_result",
+        help="Write apply result as JSON to this path",
+    )
     args = parser.parse_args()
 
     if not args.plan.exists():
@@ -65,6 +69,15 @@ def main() -> int:
     if args.write_diff and result.diff_lines_by_file:
         write_diff_report(result.diff_lines_by_file, args.write_diff)
         print(f"Diff written to: {args.write_diff}")
+
+    if args.write_result:
+        import json
+        args.write_result.parent.mkdir(parents=True, exist_ok=True)
+        args.write_result.write_text(
+            json.dumps(result.to_dict(run_id=plan.run_id), ensure_ascii=False, indent=2),
+            encoding='utf-8'
+        )
+        print(f"Result JSON written to: {args.write_result}")
 
     # Exit 1 if any errors
     return 1 if result.errors else 0

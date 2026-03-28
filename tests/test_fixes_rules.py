@@ -94,3 +94,27 @@ def test_analyze_emoji_forbidden(tmp_path):
 def test_rules_dict_contains_all_four_rule_ids():
     expected = {"DOC.SECTION.MISSING", "DOC.EMOJI.FORBIDDEN", "DOC.FRONTMATTER.MISSING", "DOC.FRONTMATTER.NO_TITLE"}
     assert expected.issubset(set(RULES.keys()))
+
+
+@pytest.mark.unit
+def test_strip_emoji_removes_symbols_only():
+    from itdoc.fixes.rules import _strip_emoji
+    text = "Hello ✅ world ⚠️ done ❌ go 🚀"
+    result = _strip_emoji(text)
+    assert "✅" not in result
+    assert "⚠️" not in result
+    assert "❌" not in result
+    assert "🚀" not in result
+    assert "Hello" in result
+    assert "world" in result
+    assert "done" in result
+    assert "go" in result
+
+
+@pytest.mark.unit
+def test_strip_emoji_is_idempotent():
+    from itdoc.fixes.rules import _strip_emoji
+    text = "Text ✅ with 🚀 emoji ❌"
+    once = _strip_emoji(text)
+    twice = _strip_emoji(once)
+    assert once == twice
