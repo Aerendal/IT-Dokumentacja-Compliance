@@ -46,3 +46,7 @@ reports/
 # Root-level generated/session documents
 Cykl-Produkcyjny.md
 hdfs_spec.md
+
+# Scripts with hardcoded local paths (not portable)
+scripts/extract_requirements.py
+scripts/extract_requirements_workshop.py
