@@ -152,9 +152,9 @@ To nie jest ukryte ograniczenie — status tych assets opisano jawnie.
 
 Repo używa własnego modelu hooków, opisanego w `docs/DEV_WORKFLOW.md`.
 
-`generated_templates/imported/` zawiera surowe dane wejściowe z zewnętrznego procesu importu.
-Pliki te mogą zawierać historyczne ścieżki środowiskowe i placeholdery — są artefaktami importu,
-nie częścią kontraktu kodu. Szczegóły: `docs/OPEN_DECISIONS.md` → OD-006.
+Katalog `generated_templates/imported/` został wycofany z kontraktu repo i przeniesiony do
+repozytorium laboratoryjnego (`it-doc-semantic-lab/corpora/imported_reference_material/`).
+Decyzja udokumentowana w `docs/OPEN_DECISIONS.md` → OD-006 (CLOSED).
 
 ---
 

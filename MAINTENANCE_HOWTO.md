@@ -32,12 +32,11 @@ python3 scripts/new_template_wizard.py
 
 Wizard zapyta o:
 - Tytuł dokumentu (PL)
-- Typ (core / satellite)
 - Branżę ISIC
 - Powiązane dokumenty
 - Mające zastosowanie standardy
 
-Wygeneruje plik `.md` w `generated_templates/core/` lub `satellite/` oraz
+Wygeneruje plik `.md` w `generated_templates/core/` oraz
 doda wpis do tabeli `docs`.
 
 Zasady:

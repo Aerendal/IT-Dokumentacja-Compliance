@@ -43,7 +43,7 @@ def coverage_by_standard(conn: sqlite3.Connection) -> dict:
 def unmapped_by_category(conn: sqlite3.Connection) -> dict:
     """
     Zwraca niezmapowane szablony pogrupowane wg kategorii ścieżki.
-    Kategoria = pierwsza część ścieżki po 'core/' lub 'satellite/' (podkatalog) lub 'root'.
+    Kategoria = pierwsza część ścieżki po 'core/' (podkatalog) lub 'root'.
 
     Returns:
         {category: [path, ...], ...}
