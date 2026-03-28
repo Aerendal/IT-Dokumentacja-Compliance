@@ -1,23 +1,6 @@
 # TROUBLESHOOTING
 
-## 1. Brak `generated_templates/satellite/`
-
-**Objaw:**
-```
-[FAIL] generated_templates/satellite: dir missing: .../generated_templates/satellite
-  → run: mkdir -p generated_templates/satellite
-```
-
-**Naprawa:**
-```bash
-python3 scripts/bootstrap_runtime.py
-# lub:
-mkdir -p generated_templates/satellite
-```
-
----
-
-## 2. Schema profile mismatch
+## 1. Schema profile mismatch
 
 **Objaw:**
 ```

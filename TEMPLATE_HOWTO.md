@@ -46,14 +46,14 @@ Wizard poprowadzi przez:
 
 1. Tytuł dokumentu (polski)
 2. Krótki opis celu
-3. Typ: `core` (ogólnobranżowy) lub `satellite` (specjalistyczny)
+3. Typ: `core`
 4. Fazy cyklu życia (1–23)
 5. Powiązane dokumenty
 6. Standardy międzynarodowe
 7. Polskie regulacje/normy
 
 Po zakończeniu wizard:
-- Generuje plik `.md` w `generated_templates/core/` lub `satellite/`
+- Generuje plik `.md` w `generated_templates/core/`
 - Wstawia rekord do tabeli `docs` w bazie danych
 - Dodaje podstawowe wpisy `doc_section_guidance`
 - Opcjonalnie uruchamia pipeline walidacyjny
@@ -208,12 +208,7 @@ document::Test Plan::section::Zakres i granice
 
 | Katalog | Zastosowanie |
 |---------|--------------|
-| `generated_templates/core/` | Szablony ogólnobranżowe (> 7 000 plików) |
-| `generated_templates/satellite/` | Szablony branżowe/specjalistyczne (741 plików) |
-
-Użyj `satellite/` gdy szablon dotyczy:
-- Konkretnej branży (ISIC ≠ ogólna)
-- Specjalistycznego procesu regulowanego (np. HL7 dla ochrony zdrowia)
+| `generated_templates/core/` | Szablony dokumentów (> 7 000 plików) |
 
 ---
 

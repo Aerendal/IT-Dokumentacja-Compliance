@@ -77,11 +77,7 @@ def check_path(path: Path, kind: str = "path") -> tuple[bool, str]:
                 "  Recovery: python3 scripts/bootstrap_runtime.py  (creates dir)\n"
                 "  Note: dir will be empty until templates are imported"
             ),
-            str(GENERATED / "satellite"): (
-                "  Role: secondary template store (currently empty — OK)\n"
-                "  Recovery: mkdir -p generated_templates/satellite"
-                "  OR: python3 scripts/bootstrap_runtime.py"
-            ),
+
             str(ALIGNMENT_LOG): (
                 "  Role: template-to-document alignment input for build_current\n"
                 "  Recovery: python3 scripts/bootstrap_runtime.py  (creates header-only CSV)\n"
@@ -127,7 +123,6 @@ def main() -> int:
     checks: list[tuple[str, bool, str]] = [
         ("generated_templates",          *check_path(GENERATED, "dir")),
         ("generated_templates/core",     *check_path(GENERATED / "core", "dir")),
-        ("generated_templates/satellite",*check_path(GENERATED / "satellite", "dir")),
         ("legacy_db",                    *check_db_profile(LEGACY_DB, "legacy-runtime")),
         ("current_db",                   *check_db_profile(CURRENT_DB, "current-snapshot")),
         ("alignment_log",                *check_path(ALIGNMENT_LOG, "file")),

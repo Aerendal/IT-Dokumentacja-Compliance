@@ -4,7 +4,7 @@
 Co robi
 -------
 1. Sprawdza, czy .venv istnieje i ma zainstalowane repo (pip show itdoc-style).
-2. Tworzy brakujące katalogi: generated_templates/{core,satellite,imported}.
+2. Tworzy brakujące katalogi: generated_templates/{core,imported}.
 3. Inicjalizuje pusty reports/it_doc_matrix_clean.db z minimalnym schematem
    (current-snapshot profile), jeśli nie istnieje.
 4. Generuje przykładowy reports/alignment_log.csv z nagłówkiem, jeśli nie istnieje.
@@ -132,7 +132,7 @@ def check_venv() -> bool:
 
 
 def ensure_dirs() -> None:
-    for subdir in ("core", "satellite", "imported"):
+    for subdir in ("core", "imported"):
         d = GENERATED / subdir
         d.mkdir(parents=True, exist_ok=True)
         _ok(f"dir ready: generated_templates/{subdir}")

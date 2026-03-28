@@ -212,5 +212,5 @@ python3 dokumentacja/scripts/new_template_wizard.py
 
 ---
 
-*Biblioteka: 7 966 szablonów core + 741 satellite. Ostatnia aktualizacja: 2026-03-09.*
+*Biblioteka: 7 966 szablonów core. Ostatnia aktualizacja: 2026-03-09.*
 *Docs: `TEMPLATE_HOWTO.md` (tworzenie) · `MAINTENANCE_HOWTO.md` (utrzymanie) · `AGENT.md` (historia)*

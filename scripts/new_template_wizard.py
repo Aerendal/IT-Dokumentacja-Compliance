@@ -16,7 +16,7 @@ Uruchomienie nieinteraktywne (CLI):
 
 Wizard:
   1. Pyta o tytul, branze (ISIC), faze SDLC, powiazane dokumenty, standardy.
-  2. Generuje plik .md w generated_templates/core/ lub satellite/.
+  2. Generuje plik .md w generated_templates/core/.
   3. Wstawia rekord do docs i doc_section_guidance w it_doc_matrix.db.
   4. Uruchamia pipeline (opcjonalnie).
 """
@@ -36,7 +36,6 @@ SCRIPT_DIR   = Path(__file__).parent
 DOC_DIR      = SCRIPT_DIR.parent
 DB_PATH      = DOC_DIR / "reports" / "it_doc_matrix.db"
 CORE_DIR     = DOC_DIR / "generated_templates" / "core"
-SAT_DIR      = DOC_DIR / "generated_templates" / "satellite"
 
 # ── Stale ─────────────────────────────────────────────────────────────────────
 PHASES = [
@@ -336,10 +335,6 @@ def parse_args() -> argparse.Namespace:
         "--core-dir", type=Path, default=None,
         help="Katalog szablonów core (domyślnie: generated_templates/core/)"
     )
-    parser.add_argument(
-        "--sat-dir", type=Path, default=None,
-        help="Katalog szablonów satellite (domyślnie: generated_templates/satellite/)"
-    )
     return parser.parse_args()
 
 
@@ -358,7 +353,7 @@ def get_interactive_inputs() -> dict:
 
     goal = ask("Krotki opis celu dokumentu (opcjonalny)")
 
-    kind = ask("Typ szablonu (core/satellite)", default="core")
+    kind = ask("Typ szablonu", default="core")
 
     sel_phases = choose(
         "Wybierz fazy cyklu zycia (Enter=wszystkie 23):",
@@ -410,7 +405,7 @@ def run(
     if linked_docs is None:
         linked_docs = []
 
-    target_dir = SAT_DIR if doc_type and doc_type.strip().lower() == "satellite" else CORE_DIR
+    target_dir = CORE_DIR
     out_path = target_dir / f"{slugify(title)}.md"
 
     content = render_template(title, phases, linked_docs, standards, regulations, goal)

@@ -33,7 +33,6 @@ Służy do odróżnienia:
 
 **Katalogi:**
 - `generated_templates/core/` — szablony core runtime
-- `generated_templates/satellite/` — szablony satellite (aktualnie 0 plików — OD-003)
 
 **Pliki:**
 - `reports/it_doc_matrix_clean.db` — current-snapshot DB (wersjonowana schema, dane runtime)
@@ -80,7 +79,6 @@ repo root/
 │
 ├── generated_templates/
 │   ├── core/                 ← runtime assets (wymagane: local-dev+)
-│   ├── satellite/            ← runtime assets (0 plików, OD-003)
 │   └── imported/             ← imported data (surowy input, nie kontrakt)
 │
 ├── reports/

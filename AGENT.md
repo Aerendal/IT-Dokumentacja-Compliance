@@ -7,8 +7,8 @@
 
 ## Ustalenia kluczowe
 - Lista referencyjna tytułów (`documents_expected`): 6 054 (część 1–9 + brakujące 153).
-- Pełna baza tytułów (`documents_final`): 11 810 wierszy, 7 934 unikalnych tytułów (core + satellite + import z baz w `unpacked/`).
-- Wszystkie tytuły pozostają (core + satellite); **brak braków** – `missing_template` wyzerowane (wszystkie szablony wygenerowane w PL).
+- Pełna baza tytułów (`documents_final`): 11 810 wierszy, 7 934 unikalnych tytułów (core + import z baz w `unpacked/`).
+- Wszystkie tytuły pozostają (core); **brak braków** – `missing_template` wyzerowane (wszystkie szablony wygenerowane w PL).
 - Powiązania sekcja↔sekcja / dokument↔dokument / podsekcja↔podsekcja są trzymane w DB.
 - Treści właściwe (mięso) będą uzupełniane ręcznie; skryptowo tworzymy tylko szkielet i „tory przepływu informacji”.
 - Filozofia pracy: **optymalizuj przez rozwój, nie ucinanie** — preferujemy pełny zakres i rozbudowę zamiast redukcji.
@@ -16,15 +16,14 @@
 - Docelowa baza: `reports/it_doc_matrix.db` (WAL włączony; kopie: `/tmp/it_doc_matrix_clean.db`, `reports/it_doc_matrix_frozen.db`).
 - Szablony: `generated_templates/`
   - `generated_templates/core/` — 7 203 szablony `.md`
-  - `generated_templates/satellite/` — 741 szablonów `.md`
   - `generated_templates/linkage_index.jsonl`, `generated_templates/guidance_index.jsonl` — indeksy pomocnicze
-  - Łącznie szablony `.md`: 7 944; brakujące: 0.
+  - Łącznie szablony `.md`: 7 203; brakujące: 0.
 - Raporty: `reports/*.json`, checklisty: `reports/quality_checklist.jsonl`, braki z części 1–9: `reports/missing_from_parts.md`, braki z baz pobocznych: `reports/missing_from_other_dbs.json`, bieżący status: `reports/template_status_latest.json`.
 - Lokalizacje źródeł: kopia paczek w `sources_raw/` (rsync z `unpacked/`), oryginalne `unpacked/` można usunąć po backupie.
 
 ## Najważniejsze tabele w DB
 - `documents_expected` — lista referencyjna (5,901 tytułów)
-- `documents_final` — pełna lista tytułów (core + satellite)
+- `documents_final` — pełna lista tytułów (core)
 - `content_links` — powiązania sekcja/dokument/podsekcja
 - `link_types` — słownik typów powiązań
 - `doc_section_links` — relacje dokument → faza / meta‑sekcje
@@ -32,7 +31,6 @@
 
 ## Wygenerowane szkielety
 - `generated_templates/core/*.md`
-- `generated_templates/satellite/*.md`
 
 Każdy szablon zawiera:
 - Cel dokumentu
@@ -65,14 +63,14 @@ Każdy szablon zawiera:
 
 
 ## Ostatnie rozszerzenia (automatyczne)
-- content_links: relacje sekcja↔sekcja (core + satellite), relacje fazowe, cross‑phase, doc↔doc
+- content_links: relacje sekcja↔sekcja (core), relacje fazowe, cross‑phase, doc↔doc
 - doc_section_guidance: guidance 2–3 zdania dla sekcji bazowych, meta‑sekcji, faz i cross‑relacji
 - link_type_guidance: opis typów relacji
 - Szablony: wstrzyknięto sekcję Guidance do 6,491 plików
 
 - Checklisty: `reports/checklist_atomic.jsonl` posiadają teraz pola DoR/DoD (atomowe kryteria gotowości i ukończenia) dla każdego z 7 934 tytułów; statusy domyślnie `pending`.
 
-- Szablony core/satellite wzbogacone o sekcję "Jak używać dokumentu" (3 kroki: przeczytaj cel/zakres, wypełniaj wg guidance + DoR/DoD, aktualizuj statusy checklist).
+- Szablony core wzbogacone o sekcję "Jak używać dokumentu" (3 kroki: przeczytaj cel/zakres, wypełniaj wg guidance + DoR/DoD, aktualizuj statusy checklist).
 
 - Guidance light (skrót) dostępny w reports/guidance_light.md (PL).
 

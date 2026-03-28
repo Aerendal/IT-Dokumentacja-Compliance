@@ -8,7 +8,6 @@ Fixtures:
   sample_template_path — ścieżka do istniejącego szablonu core/ (skip jeśli brak)
   templates_root     — ścieżka do generated_templates/ (skip jeśli brak)
   core_dir           — ścieżka do generated_templates/core/ (skip jeśli brak)
-  satellite_dir      — ścieżka do generated_templates/satellite/ (skip jeśli brak)
   alignment_log_path — ścieżka do reports/alignment_log.csv (skip jeśli brak)
   repo_root          — katalog główny repo (Path)
 """
@@ -22,7 +21,6 @@ _REPO_ROOT = Path(__file__).parent.parent
 _DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix.db"
 _CLEAN_DB_PATH = _REPO_ROOT / "reports" / "it_doc_matrix_clean.db"
 _CORE_DIR = _REPO_ROOT / "generated_templates" / "core"
-_SAT_DIR = _REPO_ROOT / "generated_templates" / "satellite"
 _ALIGNMENT_LOG = _REPO_ROOT / "reports" / "alignment_log.csv"
 
 
@@ -264,15 +262,6 @@ def core_dir(templates_root):
     path = templates_root / "core"
     if not path.exists():
         pytest.skip("generated_templates/core/ missing")
-    return path
-
-
-@pytest.fixture()
-def satellite_dir(templates_root):
-    """Ścieżka do generated_templates/satellite/. Skip jeśli brak."""
-    path = templates_root / "satellite"
-    if not path.exists():
-        pytest.skip("generated_templates/satellite/ missing")
     return path
 
 

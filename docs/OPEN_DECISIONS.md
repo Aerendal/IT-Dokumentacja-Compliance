@@ -98,26 +98,11 @@ Phase 7 (2026-03-27) — hybrid model zatwierdzony, docs operacyjne zaktualizowa
 
 ---
 
-## OD-003 — Status pustego `generated_templates/satellite/`
+## OD-003 — Status `generated_templates/satellite/` — CLOSED
 
-**Status:** `OPEN`  
-**Priorytet:** Średni  
-**Właściciel:** `________________________________`  
-**Obszar:** Runtime assets / Bootstrap / Doctor
-
-### Opis
-Katalog `generated_templates/satellite/` istnieje i jest częścią kontraktu runtime,
-ale pozostaje pusty. Nie jest zapisane: czy to stan poprawny czy niepełny.
-
-### Opcje
-- **A:** Pusty `satellite/` jest poprawny (tylko strukturalnie wymagany).
-- **B:** Pusty `satellite/` oznacza niepełny runtime — bootstrap powinien go zasilać.
-
-### Warunek zamknięcia
-Bootstrap, doctor i docs mają to samo stanowisko; testy nie zakładają sprzecznych interpretacji.
-
-**Data przeglądu:** `________________________________`  
-**Decyzja końcowa:** `________________________________`
+**Status:** `CLOSED`  
+**Decyzja:** Katalog `satellite/` wycofany z kontraktu repo. Usunięty z kodu, bootstrapu i docs.  
+**Data zamknięcia:** 2026-03-28
 
 ---
 
