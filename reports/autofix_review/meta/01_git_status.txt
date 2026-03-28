@@ -1,4 +1,0 @@
-?? itdoc/fixes/
-?? scripts/apply_fix_plan.py
-?? scripts/fix_docs.py
-?? scripts/review_fix_plan.py

@@ -1,9 +1,0 @@
-[OK  ] generated_templates: dir ok
-[OK  ] generated_templates/core: dir ok
-[OK  ] generated_templates/satellite: dir ok
-[OK  ] legacy_db: profile=legacy-runtime
-[OK  ] current_db: profile=current-snapshot
-[OK  ] alignment_log: file ok
-[OK  ] pipeline_policy: config ok
-
-All checks passed.

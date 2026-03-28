@@ -51,3 +51,7 @@ hdfs_spec.md
 # Scripts with hardcoded local paths (not portable)
 scripts/extract_requirements.py
 scripts/extract_requirements_workshop.py
+reports/autofix_*/
+reports/demo_*/
+reports/semantic_doc_trial/
+reports/debug/
