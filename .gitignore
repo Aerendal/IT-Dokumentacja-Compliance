@@ -37,24 +37,12 @@ odpow*.md
 # Session artifacts and local packs
 *.tar.gz
 *.zip
-reports/verification/
-reports/verification_next/
-reports/compliance_fix/
-reports/template_violations_verify/
-reports/post_stabilization_baseline/
-reports/backup_*.db
-reports/*.sha256
+*.sqlite
+*.sqlite3
+
+# All reports (local runtime artifacts, not part of public contract)
+reports/
 
 # Root-level generated/session documents
 Cykl-Produkcyjny.md
 hdfs_spec.md
-
-# Scripts with hardcoded local paths (not portable)
-scripts/extract_requirements.py
-scripts/extract_requirements_workshop.py
-reports/autofix_*/
-reports/demo_*/
-reports/semantic_doc_trial/
-reports/debug/
-autofix_review_pack.tar.gz
-autofix_v1_close_pack.tar.gz
