@@ -50,21 +50,11 @@ Służy do odróżnienia:
 
 ---
 
-## Warstwa 3: Imported data
+## Warstwa 3: Imported data (historyczna — przeniesiona do repozytorium semantycznego)
 
-**Katalogi:**
-- `generated_templates/imported/` — surowe dane wejściowe z zewnętrznego procesu importu
-  (opis: `generated_templates/imported/ABOUT.txt`)
-
-**Właściwości:**
-- Nie jest częścią kontraktu kodu runtime.
-- Może zawierać historyczne ścieżki środowiskowe, placeholdery i referencje źródłowe.
-- Jest wersjonowana jako dane wejściowe (aby import był reprodukowalny).
-- Nie jest objęta tym samym standardem czystości co core code.
-- Szczegóły: `docs/OPEN_DECISIONS.md` → OD-006.
-
-**Jak czytać zawartość:**
-Ścieżki `/home/...` w tym katalogu są artefaktami procesu importu, nie wyciekiem danych lokalnych.
+Katalog `generated_templates/imported/` zawierał surowe dane wejściowe z zewnętrznego procesu importu.
+Został przeniesiony do repozytorium `it-doc-semantic-lab` jako materiał referencyjny
+(`corpora/imported_reference_material/`). Nie jest częścią kontraktu repo stabilnego.
 
 ---
 
@@ -78,8 +68,7 @@ repo root/
 ├── config/                   ← core code (konfiguracja)
 │
 ├── generated_templates/
-│   ├── core/                 ← runtime assets (wymagane: local-dev+)
-│   └── imported/             ← imported data (surowy input, nie kontrakt)
+│   └── core/                 ← runtime assets (wymagane: local-dev+)
 │
 ├── reports/
 │   ├── it_doc_matrix_clean.db ← runtime asset (current-snapshot)

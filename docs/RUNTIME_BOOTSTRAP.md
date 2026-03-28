@@ -7,7 +7,6 @@ Każdy asset ma zdefiniowany status. Nie ma aktywów "nieznanych".
 | Asset | Rola | Wymagany | Profil DB | Kto tworzy | Odtwarzalny z repo | Potrzebny do |
 |---|---|---|---|---|---|---|
 | `generated_templates/core/` | główne szablony dokumentów | TAK | — | zewnętrzny pipeline / import | ❌ (dane) | fast suite: ❌, integration: TAK, build_current: TAK |
-| `generated_templates/imported/` | szablony z importu zewnętrznego | NIE | — | pipeline importu | ❌ | integracja zewnętrzna |
 | `reports/it_doc_matrix_clean.db` | indeks current-snapshot dokumentów | TAK | `current-snapshot` | `bootstrap_runtime.py` (schema) + `build_current.py` (dane) | ✅ (schema); ❌ (dane bez templates) | fast suite: TAK, pipeline: TAK |
 | `reports/it_doc_matrix.db` | baza legacy-runtime — pełne dane historyczne | NIE (opcjonalna) | `legacy-runtime` | **zewnętrzny artefakt** — nie jest odtwarzany z repo | ❌ (patrz OD-002) | integration suite (compliance E2E): TAK |
 | `reports/alignment_log.csv` | mapowanie szablonów na dokumenty | TAK | — | `bootstrap_runtime.py` (nagłówek) + pipeline (dane) | ✅ (nagłówek) | pipeline: TAK, build_current: TAK |
@@ -29,7 +28,6 @@ Każdy asset ma zdefiniowany status. Nie ma aktywów "nieznanych".
 | Ścieżka | W repo? | Jak odtworzyć |
 |---|---|---|
 | `generated_templates/core/` | ❌ (gitignored) | generuje pipeline lub zewnętrzny skrypt |
-| `generated_templates/imported/` | ❌ (gitignored) | generuje pipeline |
 | `reports/it_doc_matrix_clean.db` | ❌ (gitignored) | tworzy `bootstrap_runtime.py` |
 | `reports/it_doc_matrix.db` | ❌ (gitignored, 1.7 GB) | zewnętrzne repozytorium danych |
 | `reports/alignment_log.csv` | ❌ (gitignored) | tworzy `bootstrap_runtime.py` |
