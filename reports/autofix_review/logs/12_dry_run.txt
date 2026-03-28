@@ -1,0 +1,51 @@
+========================================================================
+Fix Plan Summary — 2026-03-28T05:04:43Z
+========================================================================
+  Mode          : dry-run
+  Root          : generated_templates/demo_case_01
+  Files scanned : 3
+  Total changes : 4
+  Safe (auto)   : 3
+  Review needed : 1
+
+Changes by rule:
+  ⚠ DOC.FRONTMATTER.MISSING                1  (review required)
+  ✓ DOC.SECTION.MISSING                    3  (safe autofix)
+
+File-level detail:
+------------------------------------------------------------------------
+  generated_templates/demo_case_01/template_B_missing_section.md
+    [safe]     DOC.SECTION.MISSING                 section='## Zakres i granice'
+  generated_templates/demo_case_01/template_C_broken.md
+    [review]   DOC.FRONTMATTER.MISSING             File does not start with --- YAML frontmatter block
+    [safe]     DOC.SECTION.MISSING                 section='## Cel dokumentu'
+    [safe]     DOC.SECTION.MISSING                 section='## Zakres i granice'
+
+========================================================================
+
+Diff: generated_templates/demo_case_01/template_B_missing_section.md
+--- a/generated_templates/demo_case_01/template_B_missing_section.md
++++ b/generated_templates/demo_case_01/template_B_missing_section.md
+@@ -30,3 +30,6 @@
+ 
+ Procedura backapów powinna być wykonywana codziennie dla systemów krytycznych
+ i co najmniej raz tygodniowo dla pozostałych systemów.
++
++## Zakres i granice
++<!-- TODO: Opisz zakres i granice -->
+
+Diff: generated_templates/demo_case_01/template_C_broken.md
+--- a/generated_templates/demo_case_01/template_C_broken.md
++++ b/generated_templates/demo_case_01/template_C_broken.md
+@@ -15,3 +15,9 @@
+ ## Notatki
+ 
+ Każdy incydent powinien być dokumentowany i przeanalizowany pod kątem przyczyn.
++
++## Cel dokumentu
++<!-- TODO: Opisz cel dokumentu -->
++
++## Zakres i granice
++<!-- TODO: Opisz zakres i granice -->
+
+Full diff written to: reports/autofix_review/files/fix_diff.txt

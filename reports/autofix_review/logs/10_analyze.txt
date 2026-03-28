@@ -1,0 +1,24 @@
+========================================================================
+Fix Plan Summary — 2026-03-28T05:04:32Z
+========================================================================
+  Mode          : analyze
+  Root          : generated_templates/demo_case_01
+  Files scanned : 3
+  Total changes : 4
+  Safe (auto)   : 3
+  Review needed : 1
+
+Changes by rule:
+  ⚠ DOC.FRONTMATTER.MISSING                1  (review required)
+  ✓ DOC.SECTION.MISSING                    3  (safe autofix)
+
+File-level detail:
+------------------------------------------------------------------------
+  generated_templates/demo_case_01/template_B_missing_section.md
+    [safe]     DOC.SECTION.MISSING                 section='## Zakres i granice'
+  generated_templates/demo_case_01/template_C_broken.md
+    [review]   DOC.FRONTMATTER.MISSING             File does not start with --- YAML frontmatter block
+    [safe]     DOC.SECTION.MISSING                 section='## Cel dokumentu'
+    [safe]     DOC.SECTION.MISSING                 section='## Zakres i granice'
+
+========================================================================

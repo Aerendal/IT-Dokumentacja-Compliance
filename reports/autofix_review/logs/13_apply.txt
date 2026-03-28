@@ -1,0 +1,14 @@
+Plan: 4 total changes (3 safe, 1 review-required)
+Mode: --only-safe (applying 3 changes)
+========================================================================
+Apply Summary
+========================================================================
+  Applied : 2 file(s)
+  Skipped : 0 file(s) (no change / unsafe)
+  Errors  : 0
+
+Changed:
+  ✓ generated_templates/demo_case_01/template_B_missing_section.md
+  ✓ generated_templates/demo_case_01/template_C_broken.md
+========================================================================
+Diff written to: reports/autofix_review/files/apply_diff.txt
