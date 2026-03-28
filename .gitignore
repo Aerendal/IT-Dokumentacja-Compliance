@@ -1,5 +1,6 @@
-# Large generated content
-generated_templates/
+# Large generated content (not tracked by default)
+# Note: generated_templates/core/ and demo subdirs ARE explicitly tracked via git add
+# generated_templates/ line removed — tracked content must be visible
 exports/
 mutants/
 
