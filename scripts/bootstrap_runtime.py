@@ -100,6 +100,12 @@ CREATE TABLE IF NOT EXISTS path_transitions (
     transition_kind TEXT,
     snapshot_id INTEGER
 );
+CREATE TABLE IF NOT EXISTS document_tags_current (
+    document_id INTEGER NOT NULL REFERENCES documents_current(id) ON DELETE CASCADE,
+    tag_type TEXT NOT NULL,
+    tag_value TEXT NOT NULL,
+    PRIMARY KEY (document_id, tag_type, tag_value)
+);
 """
 
 
