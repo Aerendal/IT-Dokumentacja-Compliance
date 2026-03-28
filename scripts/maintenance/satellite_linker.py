@@ -2,8 +2,12 @@
 """
 scripts/maintenance/satellite_linker.py
 
-Zarządzanie szablonami "satelitarnymi" — niezmapowanymi dokumentami, które
+Zarządzanie dokumentami "satelitarnymi" w DB — niezmapowanymi dokumentami, które
 logicznie należą obok konkretnego zatwierdzonego dokumentu IT.
+
+UWAGA: "Satelita" w tym pliku oznacza RELACJĘ W BAZIE DANYCH (parent-child między
+dokumentami). Nie ma związku z katalogiem generated_templates/satellite/, który
+został wycofany z kontraktu repo w 2026-03-28 (OD-003 CLOSED).
 
 Koncepcja:
   Zamiast przypisywać niezamapowany szablon bezpośrednio do standardu,

@@ -171,4 +171,4 @@ Faza może zostać uznana za zamkniętą dopiero gdy wszystkie powyższe punkty 
 
 - **Data zamknięcia fazy:** 2026-03-27
 - **Commit / tag:** `phase7-repro-rc1` (fresh-main)
-- **Uwagi końcowe:** Wszystkie checkpointy zielone. OD-001 (hook model) i OD-003 (satellite) pozostają świadomie otwarte. OD-002 (legacy DB) CLOSED — Opcja C. Clean-room test przeszedł w `/tmp/repo_clean_room_test`. Runtime manifest: `reports/runtime_manifest.json`.
+- **Uwagi końcowe:** Wszystkie checkpointy zielone. OD-001 (hook model) świadomie otwarte. OD-002 (legacy DB) CLOSED — Opcja C. OD-003 (satellite) CLOSED — 2026-03-28 (satellite wycofany z kontraktu). Clean-room test przeszedł w `/tmp/repo_clean_room_test`. Runtime manifest: `reports/runtime_manifest.json`.

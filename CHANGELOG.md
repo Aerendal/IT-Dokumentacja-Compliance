@@ -4,6 +4,34 @@ Pełna historia zmian biblioteki szablonów IT. Format: `[data] Faza — opis`.
 
 ---
 
+## [2026-03-28] Wycofanie satellite i imported z kontraktu repo
+
+### Gałąź: `chore/retire-satellite-and-imported`
+
+### Wykonane
+- `generated_templates/satellite/` usunięty z repo i kontraktu (był zawsze pusty)
+- `generated_templates/imported/` (1022 pliki) przeniesiony do `it-doc-semantic-lab/corpora/imported_reference_material/`
+- `docs/nlp-engine/` (21 plików) przeniesiony do `it-doc-semantic-lab/docs/nlp-engine/`
+- `AGENT.md` usunięty — był wewnętrznym notes operacyjnym, nie dokumentem publicznym
+- OD-003 CLOSED: satellite wycofany
+- OD-006 CLOSED: imported przeniesiony do repozytorium labortoryjnego
+
+### Uwaga terminologiczna
+`scripts/maintenance/satellite_linker.py` i tabela `doc_satellites` w DB **nie dotyczą** katalogu
+`generated_templates/satellite/`. „Satelita" w tym kontekście = dokument powiązany logicznie
+z dokumentem-rodzicem (relacja w DB). Narzędzie pozostaje aktywne.
+
+### Stan testów
+- `doctor --strict` → exit 0 (All checks passed)
+- `pytest -m "not integration and not slow"` → 1349 passed, 0 failed
+- `pytest -m "integration and not slow"` → 61 passed, 0 failed
+
+### Otwarte decyzje
+- OD-003: CLOSED — satellite wycofany całkowicie
+- OD-006: CLOSED — imported przeniesiony do semantic lab
+
+---
+
 ## [2026-03-27] Faza 8 — Public readiness, external reviewer documentation
 
 ### Tag: `phase8-public-rc1`
