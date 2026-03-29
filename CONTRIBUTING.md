@@ -172,3 +172,25 @@ Minimalny standard zmiany to:
 * poziom testów adekwatny do zakresu zmiany przechodzi,
 * dokumentacja nie kłamie,
 * nie pojawiają się ukryte zależności lokalne.
+
+
+---
+
+## Korzystanie z narzędzi wspomagających AI
+
+Dopuszczalne jest korzystanie z narzędzi wspomagających programowanie i redakcję dokumentacji (np. GitHub Copilot), pod warunkiem że każda zmiana:
+
+- została przeczytana i zrozumiana przez autora commitu,
+- jest zgodna z kontraktem repozytorium i aktualną dokumentacją,
+- przechodzi wymagane testy i walidację,
+- nie wprowadza sekretów, danych poufnych ani treści o niejasnym statusie licencyjnym,
+- nie omija odpowiedzialności inżynierskiej za wynik końcowy.
+
+Narzędzia AI traktujemy jako źródło sugestii roboczych.  
+Nie zastępują one odpowiedzialności za architekturę, dobór rozwiązań, weryfikację zmian ani utrzymanie repozytorium.
+
+Jeżeli commit lub pull request powstał z użyciem narzędzi wspomagających, autor zmiany powinien w szczególności upewnić się, że:
+- rozumie cały wprowadzany kod,
+- potrafi uzasadnić zmianę,
+- potrafi wskazać sposób jej lokalnej weryfikacji,
+- potrafi ocenić jej wpływ na kontrakt runtime, testy i dokumentację.

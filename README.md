@@ -239,6 +239,34 @@ Jednocześnie część decyzji architektonicznych i organizacyjnych pozostaje ja
 
 ---
 
+# Wsparcie narzędziami AI
+
+W pracach nad tym repozytorium wykorzystywano pomocniczo narzędzia wspomagające programowanie i redakcję dokumentacji, w tym narzędzia klasy AI coding assistant (np. GitHub Copilot).
+
+Zakres użycia obejmował przede wszystkim:
+- szkice fragmentów kodu,
+- propozycje refaktoryzacji,
+- warianty testów,
+- robocze fragmenty dokumentacji technicznej.
+
+Narzędzia te były traktowane jako źródło sugestii roboczych, a nie jako autonomiczny autor architektury, kontraktu repozytorium ani końcowych decyzji projektowych.
+
+Ostateczna odpowiedzialność za:
+- dobór rozwiązań,
+- architekturę,
+- integrację zmian,
+- uruchomienie lokalne,
+- walidację wyników,
+- publikowaną treść dokumentacji
+
+pozostaje po stronie autora repozytorium.
+
+Repozytorium należy oceniać na podstawie jego aktualnego stanu: kodu, dokumentacji, testów, oraz spójności technicznej, a nie na podstawie samego faktu użycia narzędzi wspomagających.
+
+Szczegóły dotyczące zakresu użycia narzędzi wspomagających znajdują się w `docs/AI_ASSISTANCE.md`.
+
+---
+
 # Wkład i współpraca
 
 * `CONTRIBUTING.md`
