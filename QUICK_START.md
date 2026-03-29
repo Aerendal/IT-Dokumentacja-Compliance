@@ -187,13 +187,13 @@ Aktualizuj pole `status:` w sekcji `## Metadane` przy każdej zmianie stanu.
 ### Wyszukiwanie szablonu
 ```bash
 # Po nazwie (PL)
-ls dokumentacja/generated_templates/core/ | grep -i "polityka"
+ls generated_templates/core/ | grep -i "polityka"
 
 # Po tematyce (zawartość)
-grep -rl "ISO/IEC 27001" dokumentacja/generated_templates/core/ | head -20
+grep -rl "ISO/IEC 27001" generated_templates/core/ | head -20
 
 # Przez narzędzie wizard
-python3 dokumentacja/scripts/new_template_wizard.py
+python3 scripts/new_template_wizard.py
 ```
 
 ---
