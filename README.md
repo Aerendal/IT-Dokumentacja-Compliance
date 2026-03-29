@@ -12,6 +12,8 @@ Repo skupia się na:
 - budowie oraz odświeżaniu warstwy danych runtime,
 - kontroli poprawności przez testy, doctor checks i pipeline.
 
+Repo zawiera publiczną bibliotekę core templates dla dokumentacji IT oraz zestaw narzędzi do walidacji, budowy runtime i kontroli jakości.
+
 ## Jaki problem rozwiązuje
 
 W praktyce dokumentacja IT często cierpi na:

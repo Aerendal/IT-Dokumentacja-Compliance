@@ -1,6 +1,6 @@
 # Szybki start — przewodnik operacyjny IT_Dokumentacja
 
-> **8 002 szablonów** gotowych do wypełnienia. Ten przewodnik wskazuje, od czego zacząć w zależności od
+> **8 002 szablonów core** gotowych do wypełnienia. Ten przewodnik wskazuje, od czego zacząć w zależności od
 > typu projektu, roli i kontekstu. Każda ścieżka zawiera minimalny zestaw (3–5 dokumentów) wymagany do
 > uruchomienia pracy oraz rozszerzony zestaw dla pełnego pokrycia.
 
@@ -212,5 +212,5 @@ python3 dokumentacja/scripts/new_template_wizard.py
 
 ---
 
-*Biblioteka: 8 002 szablonów core. Ostatnia aktualizacja: 2026-03-29.*
+*Publiczna biblioteka core templates: 8 002 szablony. Ostatnia aktualizacja: 2026-03-29.*
 *Docs: `TEMPLATE_HOWTO.md` (tworzenie) · `MAINTENANCE_HOWTO.md` (utrzymanie) · `AGENT.md` (historia)*

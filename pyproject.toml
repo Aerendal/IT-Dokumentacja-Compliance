@@ -1,14 +1,11 @@
 [project]
 name = "itdoc"
 version = "0.1.0"
-description = "Biblioteka Python dla IT Dokumentacja — 7966 szablonów IT"
+description = "Zestaw narzędzi do walidacji, analizy i utrzymania dokumentacji IT"
 requires-python = ">=3.9"
 
 [tool.setuptools.packages.find]
-include = ["itdoc*", "metagraph*"]
-
-[project.scripts]
-mg = "metagraph.cli.main:cli"
+include = ["itdoc*"]
 
 [project.optional-dependencies]
 dev = [
