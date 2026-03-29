@@ -225,6 +225,7 @@ Punkty wejścia:
 * `docs/TROUBLESHOOTING.md`
 * `docs/CLOSURE_CHECKLIST.md`
 * `docs/OPEN_DECISIONS.md`
+* `docs/REFERENCES.md` — źródła referencyjne i standardy odniesienia (ISO, NIST, UE, OWASP, RFC)
 
 ---
 

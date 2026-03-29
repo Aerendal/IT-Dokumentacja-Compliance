@@ -213,4 +213,4 @@ python3 scripts/new_template_wizard.py
 ---
 
 *Publiczna biblioteka core templates: 8 002 szablony. Ostatnia aktualizacja: 2026-03-29.*
-*Docs: `TEMPLATE_HOWTO.md` (tworzenie) · `MAINTENANCE_HOWTO.md` (utrzymanie) · `AGENT.md` (historia)*
+*Docs: `TEMPLATE_HOWTO.md` (tworzenie) · `MAINTENANCE_HOWTO.md` (utrzymanie) · `AGENT.md` (historia) · `docs/REFERENCES.md` (standardy i źródła)*
